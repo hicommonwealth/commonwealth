@@ -1,5 +1,4 @@
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
-import { OpenFeature } from '@openfeature/web-sdk';
 import { APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useTopicGating from 'hooks/useTopicGating';
@@ -47,9 +46,6 @@ import {
   SearchFilters,
 } from './index.types';
 
-const client = OpenFeature.getClient();
-const referralsEnabled = client.getBooleanValue('referrals', false);
-
 enum TabValues {
   AllMembers = 'all-members',
   Leaderboard = 'leaderboard',
@@ -58,9 +54,7 @@ enum TabValues {
 
 const TABS = [
   { value: TabValues.AllMembers, label: 'All members' },
-  ...(referralsEnabled
-    ? [{ value: TabValues.Leaderboard, label: 'Leaderboard' }]
-    : []),
+  { value: TabValues.Leaderboard, label: 'Leaderboard' },
   { value: TabValues.Groups, label: 'Groups' },
 ];
 

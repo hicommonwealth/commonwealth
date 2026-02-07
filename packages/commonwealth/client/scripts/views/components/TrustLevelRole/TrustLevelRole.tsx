@@ -8,7 +8,6 @@ import {
   UserTier,
   UserTierMap,
 } from '@hicommonwealth/shared';
-import { useFlag } from 'hooks/useFlag';
 import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
@@ -28,10 +27,6 @@ const TrustLevelRole = ({
   size = 'small',
   withTooltip = false,
 }: TrustLevelRoleProps) => {
-  const isTrustLevelEnabled = useFlag('trustLevel');
-
-  if (!isTrustLevelEnabled) return null;
-
   const { icon } =
     type === 'community'
       ? getCommunityTrustLevel(tier)

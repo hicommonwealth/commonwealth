@@ -4,7 +4,16 @@ import {
   addressSwapper,
   getSessionSignerForDid,
 } from '@hicommonwealth/shared';
+import { verifyPersonalMessageSignature } from '@mysten/sui/verify';
 import assert from 'assert';
+
+/**
+ * Sui authorization data containing message and signature
+ */
+type SuiAuthorizationData = {
+  message: string;
+  signature: string;
+};
 
 /**
  * Verifies that the session signature is valid for the address model
@@ -34,9 +43,24 @@ export const verifySessionSignature = async (
       `session.did address (${walletAddress}) does not match (${expectedAddress})`,
     );
 
-    // For Sui wallet, we simply verify the address matches since we don't have a
-    // proper Canvas.js signer implementation yet to verify the actual signature
-    // When a proper signer is implemented, this should use that for verification
+    // Verify the Sui signature cryptographically
+    const suiAuthData = session.authorizationData as
+      | SuiAuthorizationData
+      | undefined;
+    assert(
+      suiAuthData?.message && suiAuthData?.signature,
+      'Missing Sui session authorizationData (message or signature)',
+    );
+
+    const messageBytes = new TextEncoder().encode(suiAuthData.message);
+
+    // The signature from the client is hex-encoded
+    const isValid = await verifyPersonalMessageSignature(
+      messageBytes,
+      suiAuthData.signature,
+    );
+
+    assert(isValid, 'Invalid Sui session signature');
     return;
   }
 

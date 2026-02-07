@@ -27,12 +27,12 @@ class BinanceWebWalletController implements IWebWallet<string> {
   private _web3: Web3 | any;
 
   public readonly name = WalletId.Binance;
-  public readonly label = 'Binance';
+  public readonly label = 'Binance Wallet';
   public readonly defaultNetwork = ChainNetwork.Ethereum;
   public readonly chain = ChainBase.Ethereum;
 
   public get available() {
-    return !!window?.ethereum?.isBinance;
+    return !!window.binancew3w?.ethereum;
   }
 
   public get provider() {
@@ -91,7 +91,7 @@ class BinanceWebWalletController implements IWebWallet<string> {
 
   // ACTIONS
   public async enable(forceChainId?: string) {
-    console.log('Attempting to enable Binance Wallet');
+    console.log('Attempting to enable Binance Wallet (Chrome Extension)');
     this._enabling = true;
     try {
       // default to ETH
@@ -100,14 +100,19 @@ class BinanceWebWalletController implements IWebWallet<string> {
       // ensure we're on the correct chain
       const Web3 = (await import('web3')).default;
 
-      // Binance Chain wallet interface
-      const ethereum = window.ethereum;
+      let ethereum = window.binancew3w.ethereum;
+
+      if (window.binancew3w.ethereum?.providers?.length) {
+        window.binancew3w.ethereum.providers.forEach((p) => {
+          if (p.isBinance) ethereum = p;
+        });
+      }
 
       this._web3 = {
         givenProvider: ethereum,
       };
 
-      // Get accounts
+      // TODO: does this come after?
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts',
       });
@@ -169,17 +174,19 @@ class BinanceWebWalletController implements IWebWallet<string> {
       });
       this._provider = this._web3.currentProvider;
       if (this._accounts.length === 0) {
-        throw new Error('Binance Wallet fetched no accounts');
+        throw new Error(
+          'Binance Wallet (Chrome Extension) fetched no accounts',
+        );
       }
 
       await this.initAccountsChanged();
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
-      let errorMsg = `Failed to enable Binance Wallet: ${error.message}`;
+      let errorMsg = `Failed to enable Binance Wallet (Chrome Extension): ${error.message}`;
       if (error.code === 4902) {
         // eslint-disable-next-line max-len
-        errorMsg = `Failed to enable Binance Wallet: Please add chain ID ${app?.chain?.meta?.ChainNode?.eth_chain_id || 0}`;
+        errorMsg = `Failed to enable Binance Wallet (Chrome Extension): Please add chain ID ${app?.chain?.meta?.ChainNode?.eth_chain_id || 0}`;
       }
       console.error(errorMsg);
       this._enabling = false;

@@ -3,16 +3,7 @@ import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { SignIn } from 'views/components/SignIn/SignIn';
 import { withLayout } from 'views/Layout';
-import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
-import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
 import ExportPrivateKeyFromMagic from '../views/components/ExportPrivateKeyFromMagic';
-
-const QuillPage = lazy(() => import('views/pages/QuillPage'));
-const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
-const MarkdownViewerPage = lazy(() => import('views/pages/MarkdownViewerPage'));
-const MarkdownHitHighlighterPage = lazy(
-  () => import('views/pages/MarkdownHitHighlighterPage'),
-);
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const ExplorePage = lazy(() => import('views/pages/ExplorePage'));
@@ -147,20 +138,12 @@ const CommunityHomePage = lazy(
 );
 const GovernancePage = lazy(() => import('../views/pages/GovernancePage'));
 
-const OnBoardingPage = lazy(() => import('../views/pages/OnBoarding'));
-
 const newProposalViewPage = lazy(
   () => import('../views/pages/NewProposalViewPage'),
 );
 
 const CommonDomainRoutes = (marketsEnabled: boolean) => {
   return [
-    <Route
-      key="mobile-app-redirect"
-      path="/_internal/mobile-app-redirect"
-      element={<MobileAppRedirect />}
-    />,
-
     <Route
       key="ExportPrivateKeyFromMagic"
       path="/export-magic"
@@ -174,30 +157,6 @@ const CommonDomainRoutes = (marketsEnabled: boolean) => {
     />,
 
     <Route
-      key="/_internal/quill"
-      path="/_internal/quill"
-      element={<QuillPage />}
-    />,
-
-    <Route
-      key="/_internal/markdown-editor"
-      path="/_internal/markdown-editor"
-      element={<MarkdownEditorPage />}
-    />,
-
-    <Route
-      key="/_internal/markdown-hit-highlighter"
-      path="/_internal/markdown-hit-highlighter"
-      element={<MarkdownHitHighlighterPage />}
-    />,
-
-    <Route
-      key="/_internal/markdown-viewer"
-      path="/_internal/markdown-viewer"
-      element={<MarkdownViewerPage />}
-    />,
-    <Route key="/onboarding" path="/onboarding" element={<OnBoardingPage />} />,
-    <Route
       key="/"
       path="/"
       element={withLayout(DashboardPage, { type: 'common' })}
@@ -206,12 +165,6 @@ const CommonDomainRoutes = (marketsEnabled: boolean) => {
       key="/home"
       path="/home"
       element={withLayout(HomePage, { type: 'common' })}
-    />,
-
-    <Route
-      key="/mobile-signin"
-      path="/mobile-signin"
-      element={withLayout(MobileSignIn, { type: 'common' })}
     />,
 
     <Route

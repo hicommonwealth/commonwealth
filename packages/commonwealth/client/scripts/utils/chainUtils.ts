@@ -1,6 +1,9 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import type AddressInfo from '../models/AddressInfo';
-import { CustomIconName } from '../views/components/component_kit/cw_icons/cw_icon_lookup';
+import {
+  CustomIconName,
+  customIconLookup,
+} from '../views/components/component_kit/cw_icons/cw_icon_lookup';
 
 interface AddressInfoLike {
   address: string;
@@ -86,4 +89,20 @@ export const getSsoIconName = (
     default:
       return undefined;
   }
+};
+
+const isCustomIconName = (icon: string): icon is CustomIconName =>
+  icon in customIconLookup;
+
+export const getWalletIconName = (
+  walletId?: WalletId,
+  walletSsoSource?: WalletSsoSource,
+): CustomIconName | undefined => {
+  if (!walletId) return undefined;
+
+  if (walletId === WalletId.Magic) {
+    return getSsoIconName(walletSsoSource) ?? 'magic';
+  }
+
+  return isCustomIconName(walletId) ? walletId : undefined;
 };

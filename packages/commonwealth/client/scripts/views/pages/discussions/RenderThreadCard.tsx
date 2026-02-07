@@ -9,7 +9,7 @@ import Thread from 'client/scripts/models/Thread';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
-import { checkIsTopicInContest } from '../../components/NewThreadFormLegacy/helpers';
+import { checkIsTopicInContest } from '../../components/NewThreadForm/helpers';
 import { ThreadCard } from './ThreadCard';
 
 type contestsData = {

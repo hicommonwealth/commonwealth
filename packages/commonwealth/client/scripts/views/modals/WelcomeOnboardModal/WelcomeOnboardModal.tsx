@@ -2,7 +2,6 @@ import { WalletId } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import clsx from 'clsx';
-import { useFlag } from 'hooks/useFlag';
 import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -21,8 +20,6 @@ import { WelcomeOnboardModalProps, WelcomeOnboardModalSteps } from './types';
 
 const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
-  const referralsEnabled = useFlag('referrals');
-
   const [activeStep, setActiveStep] = useState<WelcomeOnboardModalSteps>(
     WelcomeOnboardModalSteps.TermsOfServices,
   );
@@ -108,19 +105,13 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
           component: (
             <JoinCommunityStep
               onComplete={() =>
-                referralsEnabled
-                  ? setActiveStep(WelcomeOnboardModalSteps.InviteModal)
-                  : handleClose()
+                setActiveStep(WelcomeOnboardModalSteps.InviteModal)
               }
             />
           ),
         };
       }
       case WelcomeOnboardModalSteps.InviteModal: {
-        if (!referralsEnabled) {
-          return handleClose();
-        }
-
         return {
           index: 7,
           title: '',

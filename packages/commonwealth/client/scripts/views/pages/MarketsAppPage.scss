@@ -31,6 +31,11 @@
     }
   }
 
+  .markets-tabs {
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+
   .markets-empty-state {
     display: flex;
     flex-direction: column;
@@ -55,108 +60,21 @@
     }
   }
 
-  .markets-grid-container {
+  .markets-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
 
     @include media_queries.smallInclusive {
       grid-template-columns: 1fr;
+      gap: 16px;
     }
   }
 
-  .market-card {
-    background: #ffffff;
-    border-radius: 16px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid #e9ecef;
-    overflow: hidden;
-    height: 100%;
+  .load-more-container {
     display: flex;
-    flex-direction: column;
-
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-      border-color: #dee2e6;
-    }
-
-    .market-card-content {
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      gap: 20px;
-    }
-
-    .market-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 4px;
-
-      .market-tags {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        flex: 1;
-
-        .category-tag {
-          font-size: 12px;
-          font-weight: 600;
-          padding: 4px 12px;
-          border-radius: 6px;
-        }
-
-        .status-tag {
-          font-size: 11px;
-          font-weight: 700;
-          padding: 4px 10px;
-          border-radius: 6px;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .date-tag {
-          font-size: 11px;
-          font-weight: 500;
-          padding: 4px 10px;
-          border-radius: 6px;
-        }
-      }
-
-      .market-provider {
-        .provider-badge {
-          display: inline-block;
-          padding: 6px 12px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: #ffffff;
-          border-radius: 8px;
-          font-size: 11px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
-        }
-      }
-    }
-
-    .market-question {
-      h5 {
-        color: #212529;
-        line-height: 1.5;
-        font-size: 18px;
-        margin: 0;
-      }
-    }
-
-    .market-card-footer {
-      margin-top: auto;
-      padding-top: 16px;
-      border-top: 1px solid #e9ecef;
-      display: flex;
-      justify-content: flex-end;
-    }
+    justify-content: flex-end;
+    align-items: center;
+    padding: 24px 0;
   }
 }

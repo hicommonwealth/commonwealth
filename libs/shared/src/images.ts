@@ -1,5 +1,72 @@
 import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 
+/**
+ * Valid image extensions for user-generated content.
+ * Images must have one of these extensions to be rendered.
+ */
+export const VALID_IMAGE_EXTENSIONS = [
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.gif',
+  '.webp',
+  '.svg',
+  '.bmp',
+  '.ico',
+  '.avif',
+] as const;
+
+/**
+ * Checks if an image URL is valid for rendering in user-generated content.
+ * A valid image URL must:
+ * 1. Use HTTPS protocol (or be a data: URL for inline images, or ipfs:// which gets converted)
+ * 2. Have a valid image file extension
+ *
+ * @param url - The image URL to validate
+ * @returns true if the URL is valid for rendering, false otherwise
+ */
+export const isValidImageUrl = (url: string | undefined | null): boolean => {
+  if (!url || typeof url !== 'string') {
+    return false;
+  }
+
+  const trimmedUrl = url.trim();
+  if (!trimmedUrl) {
+    return false;
+  }
+
+  // Allow data URLs (base64 encoded images)
+  if (trimmedUrl.startsWith('data:image/')) {
+    return true;
+  }
+
+  // Allow IPFS URLs (they get converted to HTTPS later)
+  if (trimmedUrl.startsWith('ipfs://')) {
+    return true;
+  }
+
+  // Must be HTTPS for all other URLs
+  if (!trimmedUrl.startsWith('https://')) {
+    return false;
+  }
+
+  // Check for valid image extension
+  // Parse URL to handle query strings and fragments
+  try {
+    const urlObj = new URL(trimmedUrl);
+    const pathname = urlObj.pathname.toLowerCase();
+
+    // Check if pathname ends with a valid image extension
+    return VALID_IMAGE_EXTENSIONS.some((ext) => pathname.endsWith(ext));
+  } catch {
+    // If URL parsing fails, try a simple check on the URL string
+    const lowerUrl = trimmedUrl.toLowerCase();
+    // Remove query string and fragment for extension check
+    const cleanUrl = lowerUrl.split('?')[0].split('#')[0];
+    return VALID_IMAGE_EXTENSIONS.some((ext) => cleanUrl.endsWith(ext));
+  }
+};
+
 const defaultAvatars: string[] = [
   `https://${S3_ASSET_BUCKET_CDN}/fb3289b0-38cb-4883-908b-7af0c1626ece.png`,
   `https://${S3_ASSET_BUCKET_CDN}/794bb7a3-17d7-407a-b52e-2987501221b5.png`,
