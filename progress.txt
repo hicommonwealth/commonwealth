@@ -1,3 +1,9 @@
+# Progress Log
+
+This file tracks AI-assisted development progress.
+Each entry documents: date, feature, decisions, files changed, tests, and concerns.
+
+---
 [2026-02-04] #13341 fix: add graceful shutdown for modulith workers
 - Files: server.ts, bootstrap.ts, relayForever.ts, graphileWorker.ts, workerLifecycle.ts, workerLifecycle.spec.ts, archiveOutbox.ts
 - Changes: Added workerLifecycle module for coordinating worker shutdown. Workers register cleanup functions called on SIGTERM/SIGINT. Workers start in background to avoid blocking server. Fixed blocking execSync in archiveOutbox by converting to async exec.
