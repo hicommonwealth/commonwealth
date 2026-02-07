@@ -10,7 +10,6 @@ import { useAiCompletion } from 'state/api/ai';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import { useAIFeatureEnabled, useUserAiSettingsStore } from 'state/ui/user';
-import { useTurnstile } from 'views/components/useTurnstile';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import { ImageActionModal } from '../../ImageActionModal/ImageActionModal';
@@ -53,6 +52,10 @@ export type CommentEditorProps = {
   webSearchEnabled?: boolean;
   setWebSearchEnabled?: (enabled: boolean) => void;
   communityId?: string;
+  isTurnstileEnabled?: boolean;
+  turnstileToken?: string | null;
+  resetTurnstile?: () => void;
+  TurnstileWidget?: React.FC;
 };
 
 // eslint-disable-next-line react/display-name
@@ -81,6 +84,10 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       webSearchEnabled,
       setWebSearchEnabled,
       communityId,
+      isTurnstileEnabled = false,
+      turnstileToken,
+      resetTurnstile,
+      TurnstileWidget,
     },
     _ref,
   ) => {
@@ -101,15 +108,6 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       setWebSearchEnabled || setLocalWebSearchEnabled;
 
     const { generateCompletion } = useAiCompletion();
-
-    const {
-      resetTurnstile,
-      turnstileToken,
-      isTurnstileEnabled,
-      TurnstileWidget,
-    } = useTurnstile({
-      action: 'create-comment',
-    });
 
     // Fetch community details
     const { data: community } = useGetCommunityByIdQuery({
@@ -162,6 +160,7 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
       });
     };
 
+    const TurnstileWidgetComponent = TurnstileWidget ?? (() => <></>);
     const handleEnhancedSubmit = async () => {
       // Immediately close the editor before any operations
       onCancel?.(
@@ -182,7 +181,7 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
         } catch (error) {
           console.error('Failed to submit comment:', error);
           if (isTurnstileEnabled) {
-            resetTurnstile();
+            resetTurnstile?.();
           }
           return;
         }
@@ -236,7 +235,7 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
       } catch (error) {
         console.error('Error during submission:', error);
         if (isTurnstileEnabled) {
-          resetTurnstile();
+          resetTurnstile?.();
         }
       }
     };
@@ -316,7 +315,7 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
           placeholder={placeholder}
         />
 
-        {isTurnstileEnabled && <TurnstileWidget />}
+        {isTurnstileEnabled && <TurnstileWidgetComponent />}
 
         <div className="form-bottom">
           <div className="form-buttons">
