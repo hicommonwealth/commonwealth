@@ -280,21 +280,251 @@ common-protocol/  (branch: dillchen/prediction-market)
 
 ---
 
-## Engineering Tickets
+## Event Storming Model
 
-### TICKET PM-1: Zod Schemas + Context
+Event storming maps the full domain flow: **Commands** (user/system intent), **Domain Events** (facts that happened), **Policies** (reactive automation), **Read Models** (query projections), and **External Systems** (on-chain contracts, EVM worker). Tickets are derived from vertical slices through this model.
 
-**Size:** S | **Depends on:** nothing | **Blocks:** PM-2, PM-3
+### Actors
 
-Create Zod schemas for PredictionMarket entities, commands, and queries.
+| Actor | Description |
+|-------|-------------|
+| **Thread Author** | Creates thread, attaches prediction market, can cancel/resolve |
+| **Trader** | Mints, swaps, merges, redeems tokens |
+| **Community Admin** | Can resolve or cancel markets |
+| **EVM Worker** | External system: polls on-chain events every 120s |
+| **System (Policy)** | Automated: reacts to domain events with commands |
+
+### Aggregate: PredictionMarket
+
+```text
+SLICE 1: Market Creation
+=========================================================================================
+  Actor            Command                    Event                      Read Model
+  -----            -------                    -----                      ----------
+  Thread Author -> CreatePredictionMarket  -> PredictionMarketCreated -> PredictionMarketView
+                   [ThreadContext auth]        {market_id, thread_id,     (status: draft)
+                   [sets thread.has_pm=true]    prompt, collateral,
+                                                duration, threshold}
+
+SLICE 2: Market Deployment
+=========================================================================================
+  Actor            Command                    Event                      Read Model
+  -----            -------                    -----                      ----------
+  Thread Author -> DeployPredictionMarket  -> PredictionMarketDeployed-> PredictionMarketView
+                   [wallet tx on-chain]        {vault_address,            (status: active,
+                   [records addresses]          governor_address,          addresses populated)
+                                                router_address,
+                                                p_token, f_token,
+                                                start_time, end_time}
+
+        +-- External System: EVM Worker polls ProposalCreated log -----+
+        |                                                              |
+        |   Policy: PredictionMarketPolicy                             |
+        |   on(ProposalCreated) -> ProjectMarketCreated command        |
+        |   [verify/link on-chain addresses to DB record]              |
+        +--------------------------------------------------------------+
+
+SLICE 3: Mint Tokens
+=========================================================================================
+  Actor            External Event             Policy                     Read Model
+  -----            --------------             ------                     ----------
+  Trader        -> [wallet: Vault.mint()]
+
+        +-- EVM Worker polls TokensMinted log -------------+
+        |                                                  |
+        |   Policy: PredictionMarketPolicy                 |
+        |   on(PredictionMarketTokensMinted)                |
+        |     -> command(ProjectPredictionMarketTrade)      |
+        |        {action: mint, collateral_amount,          |
+        |         p_token_amount, f_token_amount}           |
+        |     -> UPSERT PredictionMarketPosition            |
+        |     -> UPDATE PredictionMarket.total_collateral   |
+        +--------------------------------------------------+
+                                                             -> TradeHistory
+                                                             -> PositionView
+                                                                (p:100, f:100)
+
+SLICE 4: Swap (Express Prediction)
+=========================================================================================
+  Actor            External Event             Policy                     Read Model
+  -----            --------------             ------                     ----------
+  Trader        -> [wallet: Router.swap()]
+
+        +-- EVM Worker polls SwapExecuted log -------------+
+        |                                                  |
+        |   Policy: PredictionMarketPolicy                 |
+        |   on(PredictionMarketSwapExecuted)                |
+        |     -> command(ProjectPredictionMarketTrade)      |
+        |        {action: swap_buy_pass | swap_buy_fail,    |
+        |         amount_in, amount_out}                    |
+        |     -> UPSERT PredictionMarketPosition            |
+        |     -> UPDATE PredictionMarket.current_probability|
+        +--------------------------------------------------+
+                                                             -> TradeHistory
+                                                             -> PositionView
+                                                             -> ProbabilityView
+
+SLICE 5: Merge Tokens
+=========================================================================================
+  Actor            External Event             Policy                     Read Model
+  -----            --------------             ------                     ----------
+  Trader        -> [wallet: Vault.merge()]
+
+        +-- EVM Worker polls TokensMerged log -------------+
+        |                                                  |
+        |   Policy: PredictionMarketPolicy                 |
+        |   on(PredictionMarketTokensMerged)                |
+        |     -> command(ProjectPredictionMarketTrade)      |
+        |        {action: merge, p_amount, f_amount,        |
+        |         collateral_returned}                      |
+        |     -> UPSERT PredictionMarketPosition            |
+        |     -> UPDATE PredictionMarket.total_collateral   |
+        +--------------------------------------------------+
+                                                             -> TradeHistory
+                                                             -> PositionView
+
+SLICE 6: Market Resolution
+=========================================================================================
+  Actor            Command / External         Event                      Read Model
+  -----            ------------------         -----                      ----------
+  Thread Author -> ResolvePredictionMarket -> PredictionMarketResolved-> PredictionMarketView
+  OR Admin         [wallet: Governor.resolve()]                          (status: resolved,
+                                                                         winner: 1 or 2)
+
+        +-- EVM Worker polls ProposalResolved log ---------+
+        |                                                  |
+        |   Policy: PredictionMarketPolicy                 |
+        |   on(PredictionMarketProposalResolved)            |
+        |     -> command(ProjectPredictionMarketResolution) |
+        |        {winner, resolved_at}                      |
+        |     -> UPDATE PredictionMarket status/winner      |
+        +--------------------------------------------------+
+
+        +-- EVM Worker polls MarketResolved log -----------+
+        |   (redundant confirmation from BinaryVault)      |
+        |   Policy: same handler, idempotent               |
+        +--------------------------------------------------+
+
+SLICE 7: Token Redemption
+=========================================================================================
+  Actor            External Event             Policy                     Read Model
+  -----            --------------             ------                     ----------
+  Trader        -> [wallet: Vault.redeem()]
+
+        +-- EVM Worker polls TokensRedeemed log -----------+
+        |                                                  |
+        |   Policy: PredictionMarketPolicy                 |
+        |   on(PredictionMarketTokensRedeemed)              |
+        |     -> command(ProjectPredictionMarketTrade)      |
+        |        {action: redeem, winning_token_amount,     |
+        |         collateral_returned}                      |
+        |     -> UPSERT PredictionMarketPosition            |
+        +--------------------------------------------------+
+                                                             -> TradeHistory
+                                                             -> PositionView
+
+SLICE 8: Market Cancellation
+=========================================================================================
+  Actor            Command                    Event                      Read Model
+  -----            -------                    -----                      ----------
+  Thread Author -> CancelPredictionMarket  -> PredictionMarketCancelled-> PredictionMarketView
+  OR Admin         [validates draft/active]                               (status: cancelled)
+```
+
+### Domain Events Summary
+
+| Domain Event | Source | Payload | Triggers |
+|-------------|--------|---------|----------|
+| PredictionMarketCreated | CreatePredictionMarket cmd | market_id, thread_id, prompt, config | -- |
+| PredictionMarketDeployed | DeployPredictionMarket cmd | all contract addresses, times | -- |
+| PredictionMarketProposalCreated | EVM: FutarchyGovernor | proposal_id, market_id, addresses | ProjectMarketCreated |
+| PredictionMarketMarketCreated | EVM: BinaryVault | market_id, p_token, f_token, collateral | ProjectMarketCreated |
+| PredictionMarketTokensMinted | EVM: BinaryVault | market_id, user, collateral_amount, token_amounts | ProjectTrade(mint) |
+| PredictionMarketTokensMerged | EVM: BinaryVault | market_id, user, p_amount, f_amount, collateral_out | ProjectTrade(merge) |
+| PredictionMarketSwapExecuted | EVM: FutarchyRouter | market_id, user, buy_pass, amount_in, amount_out | ProjectTrade(swap) |
+| PredictionMarketTokensRedeemed | EVM: BinaryVault | market_id, user, winning_amount, collateral_out | ProjectTrade(redeem) |
+| PredictionMarketProposalResolved | EVM: FutarchyGovernor | proposal_id, winner | ProjectResolution |
+| PredictionMarketMarketResolved | EVM: BinaryVault | market_id, winner | ProjectResolution |
+| PredictionMarketCancelled | CancelPredictionMarket cmd | market_id | -- |
+
+### Invariants (Business Rules)
+
+| Invariant | Enforced By | Description |
+|-----------|-------------|-------------|
+| Only thread author creates PM | authPredictionMarket middleware | ThreadContext auth check |
+| Only author/admin resolves | authPredictionMarket middleware | Role-based check |
+| Valid status transitions only | Command body validation | draft->active, active->resolved, active->cancelled, draft->cancelled |
+| No duplicate positions | DB UNIQUE constraint | (prediction_market_id, user_address) |
+| No duplicate trades | DB composite PK | (eth_chain_id, transaction_hash) |
+| Idempotent event processing | Composite PK on Trade | Same tx_hash silently rejected |
+| Market must be active for trading | On-chain contract | BinaryVault enforces market state |
+| TWAP threshold for resolution | On-chain contract | FutarchyGovernor enforces >= threshold |
+
+### Read Models (Projections)
+
+| Read Model | Source Events | What it Shows |
+|------------|---------------|---------------|
+| PredictionMarketView | Created, Deployed, Resolved, Cancelled | Full market state: status, addresses, probability, winner |
+| TradeHistory | TokensMinted, SwapExecuted, TokensMerged, TokensRedeemed | Paginated list of all trades for a market |
+| PositionView | All trade events | Per-user token balances (p_token, f_token, total_collateral_in) |
+| ProbabilityView | SwapExecuted | Current TWAP-derived probability (updated on each swap) |
+
+### Event Flow Diagram
+
+```text
+  +--------+     +---------+     +----------+     +---------+     +----------+
+  | Thread |     |         |     |          |     |         |     |          |
+  | Author |---->| Command |---->|  Domain  |---->| Outbox  |---->| RabbitMQ |
+  |        |     |         |     |  Event   |     |  Table  |     |  (Rascal)|
+  +--------+     +---------+     +----------+     +---------+     +----+-----+
+                                                                       |
+  +--------+     +---------+     +----------+                          |
+  |  EVM   |     | Event   |     |  Domain  |                          |
+  | Worker |---->| Mapper  |---->|  Event   |--------------------------+
+  | (120s) |     | (ABI    |     | (Outbox) |                          |
+  +--------+     | decode) |     +----------+                          |
+                 +---------+                                           |
+                                                                       v
+                                      +--------------------------------+-------+
+                                      |        PredictionMarketPolicy          |
+                                      |                                        |
+                                      |  on(TokensMinted)    -> ProjectTrade   |
+                                      |  on(SwapExecuted)    -> ProjectTrade   |
+                                      |  on(TokensMerged)    -> ProjectTrade   |
+                                      |  on(TokensRedeemed)  -> ProjectTrade   |
+                                      |  on(ProposalCreated) -> ProjectCreated |
+                                      |  on(MarketCreated)   -> ProjectCreated |
+                                      |  on(ProposalResolved)-> ProjectResolve |
+                                      |  on(MarketResolved)  -> ProjectResolve |
+                                      +---+------------------------------------+
+                                          |
+                                          v
+                                      +---+----+     +----------+
+                                      | System |---->|  Read    |
+                                      | Command|     |  Models  |
+                                      | (write)|     | (query)  |
+                                      +--------+     +----------+
+```
+
+---
+
+## Engineering Tickets (Derived from Model Slices)
+
+Tickets are cut as vertical slices through the event storming model. Each slice delivers end-to-end value from schema through to read model.
+
+### TICKET PM-1: Schemas + Models + Migration (Slices 1-8 foundation)
+
+**Size:** M | **Depends on:** nothing | **Blocks:** PM-2, PM-3
+
+Foundation layer: all Zod schemas (single file per category, like quests) and Sequelize models.
 
 **Files to create:**
 
-- `libs/schemas/src/entities/prediction-market.schemas.ts`
-- `libs/schemas/src/entities/prediction-market-trade.schemas.ts`
-- `libs/schemas/src/entities/prediction-market-position.schemas.ts`
-- `libs/schemas/src/commands/prediction-market.schemas.ts`
-- `libs/schemas/src/queries/prediction-market.schemas.ts`
+- `libs/schemas/src/entities/prediction-market.schemas.ts` (all entities: PredictionMarket, PredictionMarketTrade, PredictionMarketPosition, enums)
+- `libs/schemas/src/commands/prediction-market.schemas.ts` (all commands)
+- `libs/schemas/src/queries/prediction-market.schemas.ts` (all queries)
+- `libs/model/src/models/prediction_market.ts` (all 3 Sequelize models: PredictionMarket, PredictionMarketTrade, PredictionMarketPosition)
+- `libs/model/migrations/YYYYMMDDHHMMSS-create-prediction-markets.js`
 
 **Files to modify:**
 
@@ -302,85 +532,53 @@ Create Zod schemas for PredictionMarket entities, commands, and queries.
 - `libs/schemas/src/commands/index.ts`
 - `libs/schemas/src/queries/index.ts`
 - `libs/schemas/src/context.ts` (add `PredictionMarketContext`)
-
-**Acceptance criteria:**
-
-- [ ] `PredictionMarket` entity schema has all fields (see Data Model ERD above)
-- [ ] `PredictionMarketTrade` entity has composite key (eth_chain_id, transaction_hash)
-- [ ] `PredictionMarketPosition` entity has unique constraint schema (prediction_market_id, user_address)
-- [ ] `CreatePredictionMarket` command has ThreadContext, accepts prompt/collateral/duration/threshold/initial_liquidity
-- [ ] `DeployPredictionMarket` command accepts all on-chain addresses
-- [ ] `ResolvePredictionMarket`, `CancelPredictionMarket` commands defined
-- [ ] `ProjectPredictionMarketTrade` + `ProjectPredictionMarketResolution` system commands defined
-- [ ] 3 query schemas defined (GetPredictionMarkets, GetTrades, GetPositions)
-- [ ] `PredictionMarketContext` added to context.ts
-- [ ] All schemas exported from barrel files
-- [ ] `pnpm -r check-types` passes
-
-**Tests:**
-
-- Schema validation tests: valid/invalid inputs for each command schema
-- Enum validation: status must be one of [draft, active, resolved, cancelled]
-- Action enum validation: must be one of [mint, merge, swap_buy_pass, swap_buy_fail, redeem]
-
----
-
-### TICKET PM-2: Sequelize Models + Migration
-
-**Size:** M | **Depends on:** PM-1 | **Blocks:** PM-3, PM-4
-
-Create Sequelize models and database migration for prediction market tables.
-
-**Files to create:**
-
-- `libs/model/src/models/prediction_market.ts`
-- `libs/model/src/models/prediction_market_trade.ts`
-- `libs/model/src/models/prediction_market_position.ts`
-- `libs/model/migrations/YYYYMMDDHHMMSS-create-prediction-markets.js`
-
-**Files to modify:**
-
+- `libs/schemas/src/events/events.schemas.ts` (8 new domain event types)
 - `libs/model/src/models/factories.ts` (register 3 models)
 - `libs/model/src/models/index.ts` (export types)
 - `libs/model/src/models/associations.ts` (add relationships)
 - `libs/model/src/models/thread.ts` (add `has_prediction_market` column)
 
+**Follows quests pattern:**
+
+- Single entity schema file covers all entities (like `quest.schemas.ts` covers Quest, QuestActionMeta, QuestTweet, QuestScore)
+- Single model file defines all related Sequelize models (like `quest.ts` defines Quest + QuestActionMeta)
+
 **Acceptance criteria:**
 
-- [ ] `PredictionMarkets` table created with correct column types (DECIMAL(78,0) for amounts)
+- [ ] Single `prediction-market.schemas.ts` exports: PredictionMarket, PredictionMarketTrade, PredictionMarketPosition, PredictionMarketStatus enum, PredictionMarketTradeAction enum
+- [ ] Single `prediction_market.ts` model file defines all 3 Sequelize models
+- [ ] `PredictionMarkets` table with DECIMAL(78,0) for amounts
 - [ ] `PredictionMarketTrades` table with composite PK (eth_chain_id, transaction_hash)
-- [ ] `PredictionMarketPositions` table with UNIQUE constraint (prediction_market_id, user_address)
+- [ ] `PredictionMarketPositions` table with UNIQUE (prediction_market_id, user_address)
 - [ ] `Threads` table has new `has_prediction_market` BOOLEAN column
 - [ ] Associations: Community->PM (1:N), Thread->PM (1:N), PM->Trade (1:N), PM->Position (1:N)
-- [ ] All foreign keys have ON DELETE behavior defined
 - [ ] Indexes on: thread_id, community_id, market_id, status, vault_address, trader_address
-- [ ] Migration runs cleanly: `pnpm migrate-db`
-- [ ] Migration rolls back cleanly
+- [ ] `PredictionMarketContext` added to context.ts
+- [ ] 8 domain event schemas in events.schemas.ts
+- [ ] Migration runs + rolls back cleanly
 - [ ] `pnpm -r check-types` passes
 
 **Tests:**
 
-- Model creation: can create PredictionMarket with all required fields
-- Association tests: PM belongs to Thread, PM has many Trades, PM has many Positions
-- Unique constraint: duplicate (prediction_market_id, user_address) in Position throws
-- Composite PK: duplicate (eth_chain_id, tx_hash) in Trade throws
+- Schema validation: valid/invalid inputs for each entity + command schema
+- Enum validation: status in [draft, active, resolved, cancelled], action in [mint, merge, swap_buy_pass, swap_buy_fail, redeem]
+- Model creation with all required fields
+- Unique/composite PK constraint enforcement
 
 ---
 
-### TICKET PM-3: Backend Aggregates (Commands + Queries)
+### TICKET PM-2: Slice 1+2 -- Create + Deploy Market (Commands + Queries)
 
-**Size:** L | **Depends on:** PM-1, PM-2 | **Blocks:** PM-4, PM-7
+**Size:** L | **Depends on:** PM-1 | **Blocks:** PM-3, PM-4
 
-Implement business logic commands and queries following existing aggregate patterns.
+Market lifecycle commands following existing aggregate patterns (like `aggregates/quest/`).
 
 **Files to create (in `libs/model/src/aggregates/prediction-market/`):**
 
-- `CreatePredictionMarket.command.ts`
-- `DeployPredictionMarket.command.ts`
-- `ResolvePredictionMarket.command.ts`
-- `CancelPredictionMarket.command.ts`
-- `ProjectPredictionMarketTrade.command.ts`
-- `ProjectPredictionMarketResolution.command.ts`
+- `CreatePredictionMarket.command.ts` (Slice 1)
+- `DeployPredictionMarket.command.ts` (Slice 2)
+- `CancelPredictionMarket.command.ts` (Slice 8)
+- `ResolvePredictionMarket.command.ts` (Slice 6)
 - `GetPredictionMarkets.query.ts`
 - `GetPredictionMarketTrades.query.ts`
 - `GetPredictionMarketPositions.query.ts`
@@ -393,64 +591,67 @@ Implement business logic commands and queries following existing aggregate patte
 
 **Acceptance criteria:**
 
-- [ ] `CreatePredictionMarket`: requires ThreadContext auth (thread author), creates PM + sets thread.has_prediction_market=true in transaction
-- [ ] `DeployPredictionMarket`: updates PM with on-chain addresses, sets status=active, records start_time/end_time
+- [ ] `CreatePredictionMarket`: ThreadContext auth (thread author), creates PM + sets thread.has_prediction_market=true in transaction
+- [ ] `DeployPredictionMarket`: updates PM with on-chain addresses, sets status=active, records start/end time
 - [ ] `ResolvePredictionMarket`: only thread author or admin, validates market is active, sets winner
 - [ ] `CancelPredictionMarket`: only thread author or admin, validates market is draft/active
-- [ ] `ProjectPredictionMarketTrade`: system command, creates Trade record, upserts Position (updates balances based on action type), updates total_collateral
-- [ ] `ProjectPredictionMarketResolution`: system command, updates status=resolved, sets winner + resolved_at
-- [ ] `GetPredictionMarkets`: returns markets for thread_id with eager-loaded positions
-- [ ] `GetPredictionMarketTrades`: returns paginated trades for a market
-- [ ] `GetPredictionMarketPositions`: returns all positions for a market
+- [ ] Queries return markets/trades/positions with proper eager loading and pagination
 - [ ] `authPredictionMarket()` middleware validates actor permissions
-- [ ] All commands use transactions where needed
+- [ ] All commands use transactions
 - [ ] `pnpm -r check-types` passes
 
 **Tests:**
 
-- CreatePredictionMarket: success, non-author rejected, duplicate on thread
-- DeployPredictionMarket: success, invalid status transition (cancelled -> active rejected)
-- ResolvePredictionMarket: success, non-author non-admin rejected, already resolved rejected
-- CancelPredictionMarket: success, already resolved rejected
-- ProjectPredictionMarketTrade: mint creates position, swap updates balances, merge reduces balances, redeem reduces winning tokens
-- State machine: draft->active, active->resolved, active->cancelled, draft->cancelled (only valid transitions)
+- Create: success, non-author rejected, duplicate on thread
+- Deploy: success, invalid status transition rejected (cancelled -> active)
+- Resolve: success, non-author non-admin rejected, already resolved rejected
+- Cancel: success, already resolved rejected
+- State machine: only valid transitions (draft->active, active->resolved, active->cancelled, draft->cancelled)
 
 ---
 
-### TICKET PM-4: tRPC API Routes + External Router
+### TICKET PM-3: Slice 3-5,7 -- Trade Projection (System Commands + Policy)
 
-**Size:** S | **Depends on:** PM-3 | **Blocks:** PM-7, PM-8
+**Size:** L | **Depends on:** PM-1, PM-4 | **Blocks:** PM-5
 
-Wire up tRPC routes for all prediction market commands and queries.
+System commands for projecting on-chain events into read models. This is the core event storming slice: EVM event -> mapper -> outbox -> policy -> command -> read model.
 
 **Files to create:**
 
-- `packages/commonwealth/server/api/prediction-market.ts`
+- `libs/model/src/aggregates/prediction-market/ProjectPredictionMarketTrade.command.ts`
+- `libs/model/src/aggregates/prediction-market/ProjectPredictionMarketResolution.command.ts`
+- `libs/model/src/policies/PredictionMarket.policy.ts`
 
 **Files to modify:**
 
-- `packages/commonwealth/server/api/external-router.ts`
+- `libs/model/src/aggregates/prediction-market/index.ts` (export new commands)
+- `libs/model/src/services/evmChainEvents/chain-event-utils.ts` (8 mappers)
+- `packages/commonwealth/server/bindings/rascalConsumerMap.ts` (register policy)
+- `libs/model/src/index.ts` (export policy)
 
 **Acceptance criteria:**
 
-- [ ] All 7 routes registered: createPredictionMarket, deployPredictionMarket, resolvePredictionMarket, cancelPredictionMarket, getPredictionMarkets, getPredictionMarketTrades, getPredictionMarketPositions
-- [ ] Mutations have Mixpanel analytics tracking
-- [ ] Routes accessible via `trpc.predictionMarket.*`
-- [ ] External API routes registered in `external-router.ts`
+- [ ] `ProjectPredictionMarketTrade`: system command, creates Trade record, upserts Position (updates balances by action type), updates total_collateral
+- [ ] `ProjectPredictionMarketResolution`: system command, updates status=resolved, sets winner + resolved_at
+- [ ] 8 mapper functions decode raw EVM logs using ABIs -> typed event payloads
+- [ ] `PredictionMarketPolicy` handles all 8 domain events (see Event Storming Model above)
+- [ ] Policy registered in rascalConsumerMap
+- [ ] Idempotent: composite PK prevents duplicate trades
 - [ ] `pnpm -r check-types` passes
 
 **Tests:**
 
-- Integration tests hitting each tRPC endpoint
-- Auth: unauthenticated requests rejected for mutations
-- Query: getPredictionMarkets returns empty array for thread without markets
-- Full CRUD flow: create -> deploy -> query -> resolve
+- ProjectTrade: mint creates position, swap updates balances, merge reduces both, redeem reduces winning tokens
+- Position aggregation: mint 100 + swap 50 fToken = position(p:152, f:50)
+- Mapper tests: raw log hex -> decoded event payload (each of 8 events)
+- Policy integration: mock event -> verify DB state
+- Idempotency: same event twice, no duplicate trades
 
 ---
 
-### TICKET PM-5: Contract ABIs + Event Signatures + Registry
+### TICKET PM-4: Contract ABIs + Event Signatures + Registry
 
-**Size:** M | **Depends on:** nothing | **Blocks:** PM-6
+**Size:** M | **Depends on:** nothing | **Blocks:** PM-3
 
 Import ABIs from common-protocol and register event signatures for chain event polling.
 
@@ -470,66 +671,52 @@ Import ABIs from common-protocol and register event signatures for chain event p
 
 **Acceptance criteria:**
 
-- [ ] ABIs extracted from common-protocol helpers and formatted for Viem
+- [ ] ABIs extracted from common-protocol helpers, formatted for Viem
 - [ ] 8 event signature hashes computed and registered under `PredictionMarket` namespace
-- [ ] 3 contract sources registered: binaryVaultSource (5 events), futarchyGovernorSource (2), futarchyRouterSource (1)
+- [ ] 3 contract sources: binaryVaultSource (5 events), futarchyGovernorSource (2), futarchyRouterSource (1)
 - [ ] Sources registered for Base, Base Sepolia, and Anvil chain IDs
 - [ ] Contract helpers wrap: createProposal, mintTokens, mergeTokens, swapTokens, resolveProposal, redeemTokens, getCurrentProbability, getMarketInfo
 - [ ] `pnpm -r check-types` passes
 
 **Tests:**
 
-- Verify event signature hashes match actual keccak256 of Solidity event signatures
+- Event signature hashes match keccak256 of Solidity event signatures
 - Contract helper unit tests with mocked providers
 
 ---
 
-### TICKET PM-6: Outbox Events + Event Mappers + Policy
+### TICKET PM-5: tRPC API Routes + External Router
 
-**Size:** L | **Depends on:** PM-2, PM-3, PM-5 | **Blocks:** PM-9
+**Size:** S | **Depends on:** PM-2 | **Blocks:** PM-6
 
-Full chain events pipeline: event schemas, mappers, and consumer policy.
+Wire up tRPC routes for all prediction market commands and queries.
 
 **Files to create:**
 
-- `libs/model/src/policies/PredictionMarket.policy.ts`
+- `packages/commonwealth/server/api/prediction-market.ts`
 
 **Files to modify:**
 
-- `libs/schemas/src/events/events.schemas.ts` (8 new event types)
-- `libs/model/src/services/evmChainEvents/chain-event-utils.ts` (8 mappers)
-- `packages/commonwealth/server/bindings/rascalConsumerMap.ts` (register policy)
-- `libs/model/src/index.ts` (export policy)
+- `packages/commonwealth/server/api/external-router.ts`
 
 **Acceptance criteria:**
 
-- [ ] 8 event schemas defined in events.schemas.ts matching contract event parameters
-- [ ] 8 mapper functions decode raw EVM logs using ABIs and produce typed event payloads
-- [ ] All mappers registered in `chainEventMappers` keyed by event signature hash
-- [ ] `PredictionMarketPolicy` handles all 8 events:
-  - ProposalCreated -> link on-chain addresses to DB record
-  - SwapExecuted -> ProjectPredictionMarketTrade (swap_buy_pass/swap_buy_fail)
-  - TokensMinted -> ProjectPredictionMarketTrade (mint)
-  - TokensMerged -> ProjectPredictionMarketTrade (merge)
-  - TokensRedeemed -> ProjectPredictionMarketTrade (redeem)
-  - MarketResolved -> ProjectPredictionMarketResolution
-  - ProposalResolved -> ProjectPredictionMarketResolution
-  - MarketCreated -> verify/link market record
-- [ ] Policy registered in rascalConsumerMap
+- [ ] All 7 routes registered: createPredictionMarket, deployPredictionMarket, resolvePredictionMarket, cancelPredictionMarket, getPredictionMarkets, getPredictionMarketTrades, getPredictionMarketPositions
+- [ ] Mutations have Mixpanel analytics tracking
+- [ ] External API routes registered in `external-router.ts`
 - [ ] `pnpm -r check-types` passes
 
 **Tests:**
 
-- Mapper tests: raw log hex -> decoded event payload (for each of 8 events)
-- Policy integration tests: mock event -> verify DB state after processing
-- Idempotency: processing same event twice doesn't create duplicate trades (composite PK enforces)
-- Position aggregation: mint 100 + swap 50 fToken = position(p:152, f:50)
+- Integration tests hitting each tRPC endpoint
+- Auth: unauthenticated requests rejected for mutations
+- Full CRUD flow: create -> deploy -> query -> resolve
 
 ---
 
-### TICKET PM-7: Frontend React Query Hooks
+### TICKET PM-6: Frontend React Query Hooks
 
-**Size:** S | **Depends on:** PM-4 | **Blocks:** PM-8
+**Size:** S | **Depends on:** PM-5 | **Blocks:** PM-7
 
 Create React Query hooks wrapping all prediction market tRPC endpoints.
 
@@ -545,25 +732,20 @@ Create React Query hooks wrapping all prediction market tRPC endpoints.
 
 **Acceptance criteria:**
 
-- [ ] `useCreatePredictionMarketMutation` wraps trpc.predictionMarket.createPredictionMarket
+- [ ] `useCreatePredictionMarketMutation` wraps createPredictionMarket
 - [ ] `useDeployPredictionMarketMutation` wraps deploy endpoint
 - [ ] `useResolvePredictionMarketMutation` wraps resolve endpoint
-- [ ] `useGetPredictionMarketsQuery(threadId)` fetches markets with staleTime: 30s
+- [ ] `useGetPredictionMarketsQuery(threadId)` with staleTime: 30s
 - [ ] `useGetPredictionMarketTradesQuery(marketId)` fetches trade history
 - [ ] `useGetPredictionMarketPositionsQuery(marketId)` fetches positions
 - [ ] All mutations invalidate relevant queries on success
 - [ ] `pnpm -r check-types` passes
 
-**Tests:**
-
-- Hook renders without error (React Testing Library)
-- Mutation success invalidates cache
-
 ---
 
-### TICKET PM-8: Frontend Components + Thread Integration
+### TICKET PM-7: Frontend Components + Thread Integration
 
-**Size:** XL | **Depends on:** PM-7 | **Blocks:** PM-9
+**Size:** XL | **Depends on:** PM-6 | **Blocks:** PM-8
 
 Build all prediction market UI components and integrate into thread creation/view.
 
@@ -582,119 +764,59 @@ Build all prediction market UI components and integrate into thread creation/vie
 - `client/scripts/views/components/NewThreadForm/NewThreadForm.tsx`
 - `client/scripts/views/pages/view_thread/ViewThreadPage.tsx`
 
-**Sub-tickets:**
+**Sub-tickets (by slice):**
 
-#### PM-8a: ThreadPredictionMarketCard
+#### PM-7a: Market Card (Slice 1+2 read model)
 
-Display component showing market state, probability, positions, and action buttons.
-
-**Acceptance criteria:**
-
-- [ ] Shows market prompt as card header
+- [ ] Shows market prompt, status badge (DRAFT/ACTIVE/RESOLVED/CANCELLED)
 - [ ] Probability bar: green (PASS) / red (FAIL) proportional fill
-- [ ] Displays user's pToken + fToken balances if connected
-- [ ] Action buttons: Mint, Swap to PASS, Swap to FAIL, Merge (when active)
-- [ ] Redeem button visible when resolved + user has winning tokens
-- [ ] Status badge: DRAFT (gray), ACTIVE (blue), RESOLVED (green/red), CANCELLED (gray)
-- [ ] Shows total collateral locked and time remaining
+- [ ] Total collateral locked, time remaining
 - [ ] Cancel button for thread author (draft/active only)
-- [ ] Responsive layout, matches CW design system
-- [ ] Skeleton loading state
+- [ ] Skeleton loading state, responsive layout
 
-#### PM-8b: Editor Modal (Creation)
+#### PM-7b: Editor Modal (Slice 1+2 commands)
 
-Form for configuring a new prediction market.
+- [ ] Prompt input, collateral selector (USDC/WETH/custom ERC20), duration picker (1-90d)
+- [ ] Resolution threshold slider (default 55%), initial liquidity input
+- [ ] "Create and Deploy" triggers: DB record -> wallet tx -> record deployment
+- [ ] Loading/error states during wallet interaction
 
-**Acceptance criteria:**
+#### PM-7c: Trade Modal (Slices 3-5,7 commands)
 
-- [ ] Text input for prompt/question
-- [ ] Collateral token selector (USDC, WETH, custom ERC20 address input)
-- [ ] Duration picker (1-90 days)
-- [ ] Resolution threshold slider (default 55%, range 51-99%)
-- [ ] Initial liquidity amount input with token balance check
-- [ ] Chain selector (Base, Base Sepolia)
-- [ ] Validation: all fields required, liquidity > 0, valid addresses
-- [ ] "Create and Deploy" button: creates DB record, then triggers wallet tx, then records deployment
-- [ ] Loading states during wallet interaction
-- [ ] Error handling for rejected/failed transactions
+- [ ] **Mint tab:** amount input, collateral cost, "Deposit and Mint"
+- [ ] **Swap tab:** PASS/FAIL toggle, amount, slippage (1%), estimated output
+- [ ] **Merge tab:** amount (limited to min balance), collateral returned
+- [ ] **Redeem tab:** (post-resolution only) amount, collateral returned
+- [ ] Shows token balances, wallet tx via contract helpers, loading/error states
+- [ ] Tabs disabled by market status (swap off when resolved, redeem off when active)
 
-#### PM-8c: Trade Modal
+#### PM-7d: Resolve Modal (Slice 6 command)
 
-Trading interface with Mint/Swap/Merge/Redeem tabs.
+- [ ] Current TWAP probability, TWAP window selector, predicted outcome
+- [ ] "Resolve Market" triggers Governor.resolve() on-chain
+- [ ] Only visible to thread author / community admin, only enabled after end_time
 
-**Acceptance criteria:**
+#### PM-7e: Thread Integration (all slices)
 
-- [ ] **Mint tab:** amount input, shows collateral cost, "Deposit and Mint" button
-- [ ] **Swap tab:** buy PASS/FAIL toggle, amount input, slippage setting (default 1%), estimated output, "Swap" button
-- [ ] **Merge tab:** amount input (limited to min of pToken/fToken balance), shows collateral returned, "Merge" button
-- [ ] **Redeem tab:** (only post-resolution) amount input, shows collateral returned, "Redeem" button
-- [ ] All tabs show current token balances
-- [ ] All tabs trigger wallet tx via contract helpers
-- [ ] Loading/success/error states for each operation
-- [ ] Tabs disabled based on market status (swap disabled when resolved, redeem disabled when active)
-
-#### PM-8d: Resolve Modal
-
-Admin resolution interface.
-
-**Acceptance criteria:**
-
-- [ ] Shows current TWAP probability percentage
-- [ ] TWAP window selector (default 1hr)
-- [ ] Shows predicted outcome based on threshold
-- [ ] "Resolve Market" button triggers FutarchyGovernor.resolve() on-chain
-- [ ] Only visible to thread author / community admin
-- [ ] Only enabled when market end_time has passed
-
-#### PM-8e: Thread Integration
-
-Wire prediction market into thread creation and view flows.
-
-**Acceptance criteria:**
-
-- [ ] NewThreadForm: "Prediction Market" button in sidebar opens editor modal
-- [ ] NewThreadForm: local prediction market state persisted during thread creation
-- [ ] NewThreadForm: prediction market created after successful thread creation
-- [ ] ViewThreadPage: ThreadPredictionMarketCard rendered in sidebar when thread.has_prediction_market=true
-- [ ] ViewThreadPage: predictions load via useGetPredictionMarketsQuery
+- [ ] NewThreadForm: "Prediction Market" button opens editor modal
+- [ ] ViewThreadPage: card rendered when thread.has_prediction_market=true
 
 ---
 
-### TICKET PM-9: Feature Flag + Community Setting
+### TICKET PM-8: Feature Flag + Community Setting
 
-**Size:** S | **Depends on:** PM-8 | **Blocks:** nothing
-
-Gate the feature behind a feature flag for controlled rollout.
-
-**Files to modify:**
-
-- Feature flag configuration (add `FLAG_PREDICTION_MARKETS`)
-- Frontend: wrap all PM UI behind `useFlag('prediction_markets')`
-- NewThreadForm: hide "Prediction Market" button when flag is off
-- ViewThreadPage: hide PM card when flag is off
-
-**Acceptance criteria:**
+**Size:** S | **Depends on:** PM-7 | **Blocks:** nothing
 
 - [ ] Feature flag `FLAG_PREDICTION_MARKETS` defined
-- [ ] All prediction market UI hidden when flag is off
-- [ ] API routes still functional (flag only gates UI)
-- [ ] Flag can be toggled per environment
+- [ ] All PM UI behind `useFlag('prediction_markets')`
+- [ ] API routes still functional when flag is off (flag only gates UI)
+- [ ] Flag togglable per environment
 
 ---
 
-### TICKET PM-10: Testing + QA
+### TICKET PM-9: Testing + QA
 
-**Size:** L | **Depends on:** PM-1 through PM-9 | **Blocks:** nothing
-
-Comprehensive testing across all layers.
-
-**Files to create:**
-
-- `libs/model/test/prediction-market/CreatePredictionMarket.spec.ts`
-- `libs/model/test/prediction-market/ProjectTrade.spec.ts`
-- `libs/model/test/prediction-market/Resolution.spec.ts`
-- `packages/commonwealth/test/integration/api/prediction-markets.spec.ts`
-- `packages/commonwealth/test/integration/chain-events/prediction-market-events.spec.ts`
+**Size:** L | **Depends on:** PM-1 through PM-8 | **Blocks:** nothing
 
 See detailed test plan below.
 
@@ -703,30 +825,29 @@ See detailed test plan below.
 ## Dependency Graph
 
 ```text
-  PM-1 (Schemas)
+  PM-1 (Schemas + Models + Migration)
     |
-    +-------> PM-2 (Models + Migration)
+    +-------> PM-2 (Create/Deploy/Resolve/Cancel commands + Queries)
     |            |
-    |            +-------> PM-3 (Aggregates)
+    |            +-------> PM-3 (Trade Projection + Policy)
+    |            |              ^
+    |            |              |
+    |            +-------> PM-5 (tRPC Routes)
     |                        |
-    |                        +-------> PM-4 (tRPC Routes)
-    |                        |            |
-    |                        |            +-------> PM-7 (React Query Hooks)
-    |                        |                        |
-    |                        |                        +-------> PM-8 (Frontend Components)
-    |                        |                                     |
-    |                        +-------> PM-6 (Chain Events)         +-------> PM-9 (Feature Flag)
-    |                             ^                                |
-    |                             |                                +-------> PM-10 (Testing)
-    +-------> PM-5 (ABIs + Sigs)-+
+    |                        +-------> PM-6 (React Query Hooks)
+    |                                    |
+    |                                    +-------> PM-7 (Frontend Components)
+    |                                                 |
+    +-------> PM-4 (ABIs + Sigs)---+                  +-------> PM-8 (Feature Flag)
+                                   |                  |
+                                   +-> PM-3           +-------> PM-9 (Testing)
 ```
 
 **Parallelizable work:**
 
-- PM-1 + PM-5 can start simultaneously (no dependencies)
-- PM-2 starts after PM-1
-- PM-5 has no backend dependencies (pure contract/ABI work)
-- PM-7 and PM-6 can run in parallel after PM-3/PM-4
+- PM-1 + PM-4 can start simultaneously (no dependencies)
+- PM-2 and PM-4 can run in parallel after PM-1
+- PM-6 and PM-3 can run in parallel after PM-2/PM-5
 
 ---
 
@@ -794,18 +915,14 @@ See detailed test plan below.
 
 ## Implementation Phases (detailed)
 
-### Phase 1: Data Model + Schemas + Migration
+### Phase 1: Schemas + Models + Migration (PM-1)
 
 **New files:**
 
-- `libs/schemas/src/entities/prediction-market.schemas.ts`
-- `libs/schemas/src/entities/prediction-market-trade.schemas.ts`
-- `libs/schemas/src/entities/prediction-market-position.schemas.ts`
+- `libs/schemas/src/entities/prediction-market.schemas.ts` (single file: all entities + enums)
 - `libs/schemas/src/commands/prediction-market.schemas.ts`
 - `libs/schemas/src/queries/prediction-market.schemas.ts`
-- `libs/model/src/models/prediction_market.ts`
-- `libs/model/src/models/prediction_market_trade.ts`
-- `libs/model/src/models/prediction_market_position.ts`
+- `libs/model/src/models/prediction_market.ts` (single file: all 3 Sequelize models)
 - `libs/model/migrations/YYYYMMDDHHMMSS-create-prediction-markets.js`
 
 **Modified files:**
@@ -820,7 +937,7 @@ See detailed test plan below.
 - `libs/model/src/models/associations.ts`
 - `libs/model/src/models/thread.ts`
 
-### Phase 2: Backend Aggregates + API
+### Phase 2: Backend Aggregates + API (PM-2 + PM-4 + PM-5)
 
 **New files:**
 
@@ -842,7 +959,7 @@ See detailed test plan below.
 - `libs/model/src/middleware/auth.ts`
 - `packages/commonwealth/server/api/external-router.ts`
 
-### Phase 3: Chain Events Integration
+### Phase 3: Chain Events Integration (PM-3 + PM-4)
 
 **New files:**
 
@@ -860,7 +977,7 @@ See detailed test plan below.
 - `packages/commonwealth/server/bindings/rascalConsumerMap.ts`
 - `libs/model/src/index.ts`
 
-### Phase 4: Frontend
+### Phase 4: Frontend (PM-6 + PM-7 + PM-8)
 
 **New files:**
 
@@ -908,7 +1025,7 @@ See detailed test plan below.
 
 ### Step 0b: Tickets (pre-cut in this spec)
 
-The 10 tickets (PM-1 through PM-10) above are pre-cut with:
+The 9 tickets (PM-1 through PM-9) above are pre-cut with:
 
 - Sizes, dependency chains, file lists
 - Full acceptance criteria checklists
