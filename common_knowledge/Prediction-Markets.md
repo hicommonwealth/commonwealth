@@ -284,6 +284,11 @@ common-protocol/  (branch: dillchen/prediction-market)
 
 Event storming maps the full domain flow: **Commands** (user/system intent), **Domain Events** (facts that happened), **Policies** (reactive automation), **Read Models** (query projections), and **External Systems** (on-chain contracts, EVM worker). Tickets are derived from vertical slices through this model.
 
+### Visual Diagrams (FigJam)
+
+- **[Event Storming Model](https://www.figma.com/online-whiteboard/create-diagram/61090bc5-253e-41c6-a038-01aa15ab6660)** -- Full domain flow: actors, commands, on-chain TX, domain events, outbox/relay, policies, system commands, read models
+- **[Lifecycle State Machine](https://www.figma.com/online-whiteboard/create-diagram/9cde7256-9576-4e70-b8ab-436f8a1f4be9)** -- Market states: Draft -> Active -> Resolved/Cancelled with transitions
+
 ### Actors
 
 | Actor | Description |
