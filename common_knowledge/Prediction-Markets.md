@@ -590,7 +590,7 @@ Foundation layer: all Zod schemas (single file per category, like quests) and Se
 - [ ] `PredictionMarketPositions` table with UNIQUE (prediction_market_id, user_address)
 - [ ] `Threads` table has new `has_prediction_market` BOOLEAN column
 - [ ] Associations: Community->PM (1:N), Thread->PM (1:N), PM->Trade (1:N), PM->Position (1:N)
-- [ ] Indexes on: thread_id, community_id, market_id, status, vault_address, trader_address
+- [ ] Indexes on: thread_id, community_id, market_id, status, vault_address, trader_address, PredictionMarket (status, end_time)
 - [ ] `PredictionMarketContext` added to context.ts
 - [ ] 8 domain event schemas in events.schemas.ts
 - [ ] Migration runs + rolls back cleanly
