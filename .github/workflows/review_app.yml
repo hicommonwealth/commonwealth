@@ -158,34 +158,7 @@ jobs:
           pnpm -F railway deploy-review-app \
             --env="pr-${{ steps.set_pr_number.outputs.pr_number }}" \
             --commit="${{ steps.set_effective_sha.outputs.sha }}" \
-            --db-url="${{ steps.create_neon_branch.outputs.db_url }}"
-
-  destroy:
-    name: Destroy Review App
-    if: |
-      github.event.issue.pull_request &&
-      github.event.comment.body == '/destroy'
-    runs-on: ubuntu-latest
-    env:
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-    steps:
-      - name: Set PR Number
-        id: set_pr_number
-        run: |
-          echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
-
-      - uses: actions/checkout@v4
-
-      - uses: ./.github/actions/setup
-        with:
-          node-version: 22
-
-      - name: Destroy Railway environment
-        env:
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-        run: |
-          pnpm -F railway destroy-review-app \
-            --env="pr-${{ steps.set_pr_number.outputs.pr_number }}"
+            --db-url="${{ steps.create_neon_branch.outputs.db_url }}"    
 
       # TODO: check if this posts a new comment for each commit to an open PR if this updates the comment
       # TODO: if this creates a new comment for each commit, we need to update if so it only posts a
