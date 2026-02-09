@@ -4,7 +4,6 @@ import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
-import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -15,8 +14,6 @@ import {
   AuthWallets,
   EVMWallets,
 } from 'views/components/AuthButton/types';
-import { PrivyEmailDialog } from 'views/components/Privy/dialogs/PrivyEmailDialog';
-import { PrivySMSDialog } from 'views/components/Privy/dialogs/PrivySMSDialog';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import {
@@ -55,8 +52,6 @@ const MODAL_COPY = {
   },
 };
 
-const mobileApp = isMobileApp();
-
 const SMS_ALLOWED_COUNTRIES = ['US', 'CA', 'AS', 'GU', 'MP', 'PR', 'VI'];
 
 const SSO_OPTIONS_DEFAULT: AuthSSOs[] = [
@@ -67,13 +62,6 @@ const SSO_OPTIONS_DEFAULT: AuthSSOs[] = [
   'github',
   'email',
   'farcaster',
-  'SMS',
-] as const;
-
-const SSO_OPTIONS_MOBILE: AuthSSOs[] = [
-  'google',
-  'apple',
-  'email',
   'SMS',
 ] as const;
 
@@ -105,10 +93,15 @@ const ModalBase = ({
   triggerOpenEVMWalletsSubModal,
   isUserFromWebView = false,
 }: ModalBaseProps) => {
+  const mobileApp = isUserFromWebView;
   const copy = MODAL_COPY[layoutType];
 
   const binanceWebEnabled = useFlag('binanceWeb');
   const crecimientoHackathonEnabled = useFlag('crecimientoHackathon');
+  const isBinanceProvider = () =>
+    typeof window !== 'undefined' &&
+    (window.ethereum as { isBinance?: boolean } | undefined)?.isBinance ===
+      true;
 
   const [isSMSAllowed, setIsSMSAllowed] = useState(false);
 
@@ -125,10 +118,7 @@ const ModalBase = ({
   }, []);
 
   const ssoOptions = useMemo(
-    () =>
-      (mobileApp ? SSO_OPTIONS_MOBILE : SSO_OPTIONS_DEFAULT).filter(
-        (opt) => opt !== 'SMS' || isSMSAllowed,
-      ),
+    () => SSO_OPTIONS_DEFAULT.filter((opt) => opt !== 'SMS' || isSMSAllowed),
     [isSMSAllowed],
   );
 
@@ -236,7 +226,7 @@ const ModalBase = ({
         if (
           wallet === 'binance' &&
           !binanceWebEnabled &&
-          !(typeof window !== 'undefined' && window?.ethereum?.isBinance)
+          !isBinanceProvider()
         ) {
           return;
         }
@@ -326,8 +316,6 @@ const ModalBase = ({
     setActiveTabIndex((prevActiveTab) => {
       if (!shouldShowSSOOptions && prevActiveTab === 1) return 0;
 
-      if (isMobileApp()) return 1;
-
       if (showAuthOptionFor) {
         return ssoOptions.includes(showAuthOptionFor as AuthSSOs) ? 1 : 0;
       }
@@ -405,8 +393,6 @@ const ModalBase = ({
 
   return (
     <>
-      <PrivySMSDialog />
-      <PrivyEmailDialog />
       <section className="ModalBase">
         {!isUserFromWebView && (
           <CWIcon iconName="close" onClick={onClose} className="close-btn" />

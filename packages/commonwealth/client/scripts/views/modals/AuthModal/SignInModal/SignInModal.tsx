@@ -1,10 +1,7 @@
-import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React from 'react';
 import { ModalBase } from '../common/ModalBase';
 import { AuthModalType, ModalVariantProps } from '../types';
 import './SignInModal.scss';
-
-const mobileApp = isMobileApp();
 
 const SignInModal = ({
   onClose,
@@ -27,7 +24,7 @@ const SignInModal = ({
       bodyClassName="SignInModal"
       onSignInClick={onSignInClick}
       triggerOpenEVMWalletsSubModal={triggerOpenEVMWalletsSubModal}
-      isUserFromWebView={mobileApp || isUserFromWebView}
+      isUserFromWebView={isUserFromWebView}
     />
   );
 };

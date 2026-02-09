@@ -2,3 +2,12 @@
 - Files: server.ts, bootstrap.ts, relayForever.ts, graphileWorker.ts, workerLifecycle.ts, workerLifecycle.spec.ts, archiveOutbox.ts
 - Changes: Added workerLifecycle module for coordinating worker shutdown. Workers register cleanup functions called on SIGTERM/SIGINT. Workers start in background to avoid blocking server. Fixed blocking execSync in archiveOutbox by converting to async exec.
 - Decisions: Used Promise.all for parallel worker startup; 30s timeout for graceful shutdown; workers check isShutdownInProgress() flag.
+
+[2026-02-06] #13352 fix: use bind mounts for macos volumes
+- Files: scripts/macos/cwup.sh, scripts/macos/cwdown.sh
+- Changes: Switched macOS cwup.sh volumes to bind mounts under ~/.container-volumes with directory creation and permissive chmod for local dev; run RabbitMQ as uid 999 to avoid chown failures; cwdown now removes those host directories.
+
+[2026-02-06] #13354 fix: add Outbox table existence check before starting message relayer loop
+- Files: relayForever.ts, bootstrap.ts, waitForOutboxTable.spec.ts
+- Changes: Added waitForOutboxTable() with exponential backoff (1s-30s) that polls for Outbox table accessibility before relay loop starts. Called from bootstrapRelayer() so isServiceHealthy gates on DB readiness.
+- Decisions: Placed readiness check in bootstrapRelayer (awaited) rather than inside fire-and-forget relayForever, so health check naturally gates on it.

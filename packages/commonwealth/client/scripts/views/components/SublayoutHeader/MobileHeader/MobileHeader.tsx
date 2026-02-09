@@ -18,7 +18,6 @@ import MobileSearchModal from 'views/modals/MobileSearchModal';
 import useUserMenuItems from '../useUserMenuItems';
 
 import { DOCS_SUBDOMAIN } from '@hicommonwealth/shared';
-import DownloadMobileApp from 'views/components/DownloadMobileApp';
 import XPProgressIndicator, {
   XPProgressIndicatorMode,
 } from '../XPProgressIndicator';
@@ -91,8 +90,6 @@ const MobileHeader = ({
               onClick={() => isSetModalOpen(true)}
             />
           )}
-
-          <DownloadMobileApp />
 
           {userData.isLoggedIn && (
             <div onClick={() => setIsUserDrawerOpen(true)}>
