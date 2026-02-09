@@ -280,6 +280,39 @@ common-protocol/  (branch: dillchen/prediction-market)
 
 ---
 
+## Design Decisions (from review)
+
+This spec follows two structural decisions identified during review (@Rotorsoft), based on the observation that prediction markets are very similar in nature to the existing quests domain model:
+
+### 1. Single schema file per domain (quests pattern)
+
+Instead of separate schema files per entity, all prediction market entities live in one file — matching how `quest.schemas.ts` covers Quest, QuestActionMeta, QuestTweet, and QuestScore in a single file.
+
+| Quests (reference) | Prediction Markets (this spec) |
+|---------------------|-------------------------------|
+| `libs/schemas/src/entities/quest.schemas.ts` — Quest, QuestActionMeta, QuestTweet, QuestScore, enums | `libs/schemas/src/entities/prediction-market.schemas.ts` — PredictionMarket, PredictionMarketTrade, PredictionMarketPosition, enums |
+| `libs/schemas/src/commands/quest.schemas.ts` — CreateQuest, UpdateQuest, DeleteQuest, CancelQuest | `libs/schemas/src/commands/prediction-market.schemas.ts` — Create, Deploy, Resolve, Cancel, ProjectTrade, ProjectResolution |
+| `libs/schemas/src/queries/quest.schemas.ts` — GetQuest, GetQuests | `libs/schemas/src/queries/prediction-market.schemas.ts` — GetPredictionMarkets, GetTrades, GetPositions |
+
+### 2. Single model file + aggregate directory (quests pattern)
+
+All Sequelize models in one file, aggregate directory with one command/query per file and barrel export — matching how `quest.ts` defines both Quest and QuestActionMeta, and `aggregates/quest/` has one file per operation.
+
+| Quests (reference) | Prediction Markets (this spec) |
+|---------------------|-------------------------------|
+| `libs/model/src/models/quest.ts` — defines Quest + QuestActionMeta models | `libs/model/src/models/prediction_market.ts` — defines PredictionMarket + PredictionMarketTrade + PredictionMarketPosition models |
+| `libs/model/src/aggregates/quest/CreateQuest.command.ts` | `libs/model/src/aggregates/prediction-market/CreatePredictionMarket.command.ts` |
+| `libs/model/src/aggregates/quest/index.ts` (barrel) | `libs/model/src/aggregates/prediction-market/index.ts` (barrel) |
+
+### Status
+
+- [x] Schema consolidation applied (PM-1)
+- [x] Model consolidation applied (PM-1)
+- [x] Event storming model generated (see below)
+- [x] Tickets derived from model slices (PM-1 through PM-9)
+
+---
+
 ## Event Storming Model
 
 Event storming maps the full domain flow: **Commands** (user/system intent), **Domain Events** (facts that happened), **Policies** (reactive automation), **Read Models** (query projections), and **External Systems** (on-chain contracts, EVM worker). Tickets are derived from vertical slices through this model.
