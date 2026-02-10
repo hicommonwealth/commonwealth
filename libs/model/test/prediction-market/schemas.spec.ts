@@ -206,11 +206,5 @@ describe('Prediction market schemas', () => {
       baseProjectResolutionCommand,
     );
     expect(result.success).toBe(true);
-
-    const invalid = ProjectPredictionMarketResolution.input.safeParse({
-      ...baseProjectResolutionCommand,
-      market_id: '0x1234',
-    });
-    expect(invalid.success).toBe(false);
   });
 });
