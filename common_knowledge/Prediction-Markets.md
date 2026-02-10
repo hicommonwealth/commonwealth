@@ -221,17 +221,16 @@ common-protocol/  (branch: dillchen/prediction-market)
   |     Thread       |       |   PredictionMarket      |       |   PM_Trade         |
   |------------------|       |-------------------------|       |--------------------|
   | id          (PK) |<------| thread_id          (FK) |<------| prediction_mkt_id  |
-  | has_prediction_  |  1:N  | community_id       (FK) |  1:N  | eth_chain_id  (PK) |
-  |   market         |       | eth_chain_id            |       | tx_hash       (PK) |
-  | ...              |       | proposal_id (bytes32)   |       | trader_address     |
-  +------------------+       | market_id   (bytes32)   |       | action (enum)      |
-                             | vault_address           |       | collateral_amount  |
-  +------------------+       | governor_address        |       | p_token_amount     |
-  |    Community     |       | router_address          |       | f_token_amount     |
-  |------------------|       | strategy_address        |       | timestamp          |
-  | id          (PK) |<------| p_token_address         |       +--------------------+
-  | ...              |  1:N  | f_token_address         |
-  +------------------+       | collateral_address      |       +--------------------+
+  | ...              |  1:N  | eth_chain_id            |       | eth_chain_id  (PK) |
+  +------------------+       | proposal_id (bytes32)   |       | tx_hash       (PK) |
+                             | market_id   (bytes32)   |       | trader_address     |
+                             | vault_address           |       | action (enum)      |
+                             | governor_address        |       | collateral_amount  |
+                             | router_address          |       | p_token_amount     |
+                             | strategy_address        |       | f_token_amount     |
+                             | p_token_address         |       | timestamp          |
+                             | f_token_address         |       +--------------------+
+                             | collateral_address      |       +--------------------+
                              | creator_address         |       |   PM_Position      |
                              | prompt                  |       |--------------------|
                              | status (enum)           |<------| prediction_mkt_id  |
@@ -574,7 +573,7 @@ Foundation layer: all Zod schemas (single file per category, like quests) and Se
 - `libs/model/src/models/factories.ts` (register 3 models)
 - `libs/model/src/models/index.ts` (export types)
 - `libs/model/src/models/associations.ts` (add relationships)
-- `libs/model/src/models/thread.ts` (add `has_prediction_market` column)
+- `libs/model/src/models/thread.ts` (no thread flag; use PredictionMarket thread FK)
 
 **Follows quests pattern:**
 
@@ -588,9 +587,9 @@ Foundation layer: all Zod schemas (single file per category, like quests) and Se
 - [ ] `PredictionMarkets` table with DECIMAL(78,0) for amounts
 - [ ] `PredictionMarketTrades` table with composite PK (eth_chain_id, transaction_hash)
 - [ ] `PredictionMarketPositions` table with UNIQUE (prediction_market_id, user_address)
-- [ ] `Threads` table has new `has_prediction_market` BOOLEAN column
+- [ ] No `Threads.has_prediction_market` column (use PredictionMarket thread FK instead)
 - [ ] Associations: Community->PM (1:N), Thread->PM (1:N), PM->Trade (1:N), PM->Position (1:N)
-- [ ] Indexes on: thread_id, community_id, market_id, status, vault_address, trader_address, PredictionMarket (status, end_time)
+- [ ] Indexes on: thread_id, market_id, status, vault_address, trader_address, PredictionMarket (status, end_time)
 - [ ] `PredictionMarketContext` added to context.ts
 - [ ] 8 domain event schemas in events.schemas.ts
 - [ ] Migration runs + rolls back cleanly
@@ -629,7 +628,7 @@ Market lifecycle commands following existing aggregate patterns (like `aggregate
 
 **Acceptance criteria:**
 
-- [ ] `CreatePredictionMarket`: ThreadContext auth (thread author), creates PM + sets thread.has_prediction_market=true in transaction
+- [ ] `CreatePredictionMarket`: ThreadContext auth (thread author), creates PM linked to thread
 - [ ] `DeployPredictionMarket`: updates PM with on-chain addresses, sets status=active, records start/end time
 - [ ] `ResolvePredictionMarket`: only thread author or admin, validates market is active, sets winner
 - [ ] `CancelPredictionMarket`: only thread author or admin, validates market is draft/active
@@ -837,7 +836,7 @@ Build all prediction market UI components and integrate into thread creation/vie
 #### PM-7e: Thread Integration (all slices)
 
 - [ ] NewThreadForm: "Prediction Market" button opens editor modal
-- [ ] ViewThreadPage: card rendered when thread.has_prediction_market=true
+- [ ] ViewThreadPage: card rendered when prediction market exists for thread
 
 ---
 
