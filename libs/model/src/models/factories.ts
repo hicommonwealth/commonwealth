@@ -36,6 +36,11 @@ import Membership from './membership';
 import Outbox from './outbox';
 import PinnedToken from './pinned_token';
 import Poll from './poll';
+import {
+  PredictionMarket,
+  PredictionMarketPosition,
+  PredictionMarketTrade,
+} from './prediction_market';
 import ProfileTags from './profile_tags';
 import ProposalVote from './proposal_votes';
 import { Quest, QuestActionMeta } from './quest';
@@ -115,6 +120,9 @@ export const Factories = {
   Poll,
   ProfileTags,
   ProposalVote,
+  PredictionMarket,
+  PredictionMarketPosition,
+  PredictionMarketTrade,
   Quest,
   QuestActionMeta,
   QuestTweets,
