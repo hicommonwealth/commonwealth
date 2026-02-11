@@ -29,7 +29,7 @@ export const MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER = 1_000;
 
 export const PRODUCTION_DOMAIN = 'common.xyz';
 
-export const MIN_SEARCH_LENGTH = 1;
+export const MIN_SEARCH_LENGTH = 3;
 
 export const BLOG_SUBDOMAIN = `blog.${PRODUCTION_DOMAIN}`;
 
