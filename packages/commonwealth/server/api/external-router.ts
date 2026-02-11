@@ -26,6 +26,7 @@ import {
 } from './external-router-middleware';
 import * as launchpad from './launchpadToken';
 import * as poll from './poll';
+import * as predictionMarket from './prediction-market';
 import * as thread from './thread';
 import * as user from './user';
 
@@ -74,6 +75,8 @@ const { createToken, createTrade, getLaunchpadTrades, getTokenInfoAlchemy } =
   launchpad.trpcRouter;
 const { launchTokenBot } = bot.trpcRouter;
 const { createPoll, deletePoll, createPollVote } = poll.trpcRouter;
+const { getPredictionMarkets, cancelPredictionMarket } =
+  predictionMarket.trpcRouter;
 
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
@@ -160,6 +163,8 @@ const api = {
   getPollVotes: trpc.query(Poll.GetPollVotes, trpc.Tag.Poll, {
     forceSecure: true,
   }),
+  getPredictionMarkets,
+  cancelPredictionMarket,
 };
 
 const PATH = '/api/v1';
