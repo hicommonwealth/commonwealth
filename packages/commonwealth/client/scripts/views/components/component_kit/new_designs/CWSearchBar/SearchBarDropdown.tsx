@@ -1,3 +1,4 @@
+import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import React, { FC } from 'react';
 
 import { SearchScope } from '../../../../../models/SearchQuery';
@@ -89,7 +90,8 @@ export const SearchBarDropdown: FC<SearchBarDropdownProps> = ({
   onSearchItemClick,
 }) => {
   const showResults =
-    searchTerm.length >= 3 && Object.values(searchResults).flat(1).length > 0;
+    searchTerm.length >= MIN_SEARCH_LENGTH &&
+    Object.values(searchResults).flat(1).length > 0;
 
   return (
     <div className="SearchBarDropdown">
@@ -106,14 +108,16 @@ export const SearchBarDropdown: FC<SearchBarDropdownProps> = ({
           ))}
         </div>
       )}
-      {!showResults && searchTerm.length >= 3 && (
+      {!showResults && searchTerm.length >= MIN_SEARCH_LENGTH && (
         <div className="no-results">
           <CWText type="b2">No results found</CWText>
         </div>
       )}
-      {!showResults && searchTerm.length < 3 && (
+      {!showResults && searchTerm.length < MIN_SEARCH_LENGTH && (
         <div className="no-results">
-          <CWText type="b2">Search term requires 3 or more characters</CWText>
+          <CWText type="b2">
+            Search term requires {MIN_SEARCH_LENGTH} or more characters
+          </CWText>
         </div>
       )}
     </div>

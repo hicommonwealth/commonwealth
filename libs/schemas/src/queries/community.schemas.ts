@@ -5,6 +5,7 @@ import {
   GatedActionEnum,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
+  MIN_SEARCH_LENGTH,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext } from '../context';
@@ -148,7 +149,7 @@ export const GetCommunityStake = {
 
 export const GetCommunityMembers = {
   input: PaginationParamsSchema.extend({
-    search: z.string().min(3).optional(),
+    search: z.string().min(MIN_SEARCH_LENGTH).optional(),
     community_id: z.string(),
     include_roles: z.boolean().optional(),
     memberships: z

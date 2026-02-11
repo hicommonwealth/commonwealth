@@ -1,3 +1,4 @@
+import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import React, { useCallback, useMemo, useState } from 'react';
 
 import app from 'state';
@@ -27,7 +28,8 @@ export const ThreadSelector = ({
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const communityId = app.activeChainId() || '';
-  const queryEnabled = debouncedSearchTerm?.trim().length >= 3 && !!communityId;
+  const queryEnabled =
+    debouncedSearchTerm?.trim().length >= MIN_SEARCH_LENGTH && !!communityId;
 
   const { data: threadsData, isLoading } = useSearchThreadsQuery({
     community_id: communityId,

@@ -67,7 +67,7 @@ WHERE
   T.deleted_at IS NULL
   AND T.marked_as_spam_at IS NULL
   ${replacements.community_id ? 'AND T.community_id = :community_id' : ''} 
-  AND (T.title ILIKE '%' || :search_term || '%' ${!thread_title_only ? 'OR tsquery @@ T.search' : ''})
+  AND ${thread_title_only ? `T.title ILIKE '%' || :search_term || '%'` : `tsquery @@ T.search`}
 ),
 ${buildGatedOutput(actor)}  
 SELECT

@@ -1,3 +1,4 @@
+import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import { useGetMembersQuery } from 'client/scripts/state/api/communities';
 import { APIOrderDirection } from 'helpers/constants';
 import React, { useState } from 'react';
@@ -69,7 +70,7 @@ const LeaderboardSection = () => {
     order_by: 'earnings' as MemberResultsOrderBy,
     order_direction: APIOrderDirection.Desc,
     ...(debouncedSearchTerm &&
-      debouncedSearchTerm.length >= 3 && {
+      debouncedSearchTerm.length >= MIN_SEARCH_LENGTH && {
         search: debouncedSearchTerm,
       }),
   });
