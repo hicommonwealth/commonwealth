@@ -14,6 +14,7 @@ import * as launchpadToken from './launchpadToken';
 import * as loadTest from './load-test';
 import * as mcp from './mcp';
 import * as poll from './poll';
+import * as predictionMarket from './predictionMarket';
 import * as quest from './quest';
 import * as search from './search';
 import * as subscription from './subscription';
@@ -54,6 +55,10 @@ if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
 
 if (config.ALCHEMY.AA.FLAG_COMMON_WALLET) {
   api['wallet'] = wallet.trpcRouter;
+}
+
+if (config.MARKETS.FUTARCHY_ENABLED) {
+  api['predictionMarket'] = predictionMarket.trpcRouter;
 }
 
 const PATH = '/api/internal';
