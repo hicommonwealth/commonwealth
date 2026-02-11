@@ -61,21 +61,6 @@ export const ThreadPredictionMarketCard = ({
     });
   };
 
-  const getStatusColor = (status: PredictionMarketStatus) => {
-    switch (status) {
-      case PredictionMarketStatus.Draft:
-        return 'neutral';
-      case PredictionMarketStatus.Active:
-        return 'primary';
-      case PredictionMarketStatus.Resolved:
-        return 'positive';
-      case PredictionMarketStatus.Cancelled:
-        return 'negative';
-      default:
-        return 'neutral';
-    }
-  };
-
   const getStatusLabel = (status: PredictionMarketStatus) => {
     switch (status) {
       case PredictionMarketStatus.Draft:
