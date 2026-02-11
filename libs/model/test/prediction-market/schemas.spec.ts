@@ -70,6 +70,7 @@ const baseCreateCommand = {
 };
 
 const baseDeployCommand = {
+  thread_id: 1,
   prediction_market_id: 1,
   vault_address: '0x1111111111111111111111111111111111111111',
   governor_address: '0x2222222222222222222222222222222222222222',
@@ -82,11 +83,13 @@ const baseDeployCommand = {
 };
 
 const baseResolveCommand = {
+  thread_id: 1,
   prediction_market_id: 1,
   winner: 1,
 };
 
 const baseCancelCommand = {
+  thread_id: 1,
   prediction_market_id: 1,
 };
 
