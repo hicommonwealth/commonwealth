@@ -8,7 +8,7 @@ import { chainNodeMustExist } from '../../../utils/utils';
 
 const log = logger(import.meta);
 
-export const handleCommunityStakeTrades: EventHandler<
+export const projectCommunityStakeTrades: EventHandler<
   'CommunityStakeTrade',
   ZodUndefined
 > = async ({ payload }) => {

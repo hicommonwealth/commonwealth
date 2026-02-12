@@ -1,8 +1,8 @@
 import { Projection } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { ZodUndefined } from 'zod';
-import { handleCommunityStakeTrades } from './handlers/handleCommunityStakeTrades';
-import { handleReferralFeeDistributed } from './handlers/handleReferralFeeDistributed';
+import { projectCommunityStakeTrades } from './projections/projectCommunityStakeTrades';
+import { projectReferralFeeDistributed } from './projections/projectReferralFeeDistributed';
 
 const inputs = {
   CommunityStakeTrade: events.CommunityStakeTrade,
@@ -16,8 +16,8 @@ export function ChainEventProjection(): Projection<
   return {
     inputs,
     body: {
-      CommunityStakeTrade: handleCommunityStakeTrades,
-      ReferralFeeDistributed: handleReferralFeeDistributed,
+      CommunityStakeTrade: projectCommunityStakeTrades,
+      ReferralFeeDistributed: projectReferralFeeDistributed,
     },
   };
 }
