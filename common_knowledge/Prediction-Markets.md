@@ -1081,3 +1081,848 @@ The 9 tickets (PM-1 through PM-9) above are pre-cut with:
 6. Manual: create thread + prediction market on Base Sepolia
 7. Manual: mint/swap/merge/resolve/redeem full lifecycle
 8. Manual: verify chain events worker picks up all 8 event types
+
+---
+
+## Frontend Touch Points (PM-7 through PM-18)
+
+The prediction market UI integrates into **7 existing surfaces** plus **2 new pages**. This follows the same pattern as contests, quests, and the existing external markets feature — each has: card component, list component, explore tab, community homepage section, sidebar nav entry, admin settings page.
+
+```text
+Touch Points:
+
+1. Thread View (sidebar card)       -- ViewThreadPage.tsx sidebarComponents[]
+2. Thread Creation (editor modal)   -- NewThreadForm.tsx "Prediction Market" button
+3. Explore Page (tab + AllTab)      -- ExplorePage.tsx TAB_VIEWS[], AllTabContent section
+4. Community Homepage (section)     -- CommunityHomePage.tsx (like ActiveContestList)
+5. Global Homepage (section)        -- HomePage.tsx (like ActiveContestList)
+6. Sidebar Navigation (nav entry)   -- governance_section.tsx (like "Markets", "Contests")
+7. Admin Settings (config page)     -- CommunityManagement/ (like Markets/MarketsPage.tsx)
+8. Dedicated App Page (full view)   -- PredictionMarketsAppPage.tsx (like MarketsAppPage.tsx)
+9. Thread List (badge/tag)          -- ThreadContestTag pattern for market status
+```
+
+### Existing patterns to follow
+
+| Surface | Existing Reference | Pattern |
+|---------|-------------------|---------|
+| Thread sidebar card | `ThreadPollCard.tsx` → wraps `PollCard.tsx` in `CWContentPageCard` | Collapsible card in sidebarComponents[] array |
+| Thread creation | `ThreadPollEditorCard.tsx` → opens `poll_editor_modal.tsx` | Button in NewThreadForm, opens modal |
+| Explore page tab | `ExplorePage.tsx` → `MarketsList` component gated by `marketsEnabled` | Tab in TAB_VIEWS[], section in AllTabContent |
+| Community homepage | `ActiveContestList.tsx` (horizontal scroll cards, `isCommunityHomePage` prop) | Section with `CWSectionHeader` + horizontal scroll |
+| Global homepage | `ActiveContestList.tsx`, `XpQuestList.tsx` (3-item preview + "See all") | Section between existing content blocks |
+| Sidebar nav | `governance_section.tsx` → "Markets" entry gated by `useFlag('markets')` | Menu item in Apps section, gated by feature flag |
+| Admin settings | `CommunityManagement/Markets/MarketsPage.tsx` → `MarketSelector` | Admin page at `/:scope/manage/prediction-markets` |
+| App page | `MarketsAppPage.tsx` (tabs: "My Markets" / "Discover", subscriptions) | Tabbed page at `/:scope/prediction-markets` |
+| Thread badge | `ThreadContestTag.tsx` → popover with title/date/prize | Small tag on thread cards showing market status + probability |
+
+---
+
+### TICKET PM-7: PredictionMarketCard — Reusable Card Component
+
+**Size:** M | **Depends on:** PM-6 | **Blocks:** PM-8, PM-9, PM-10, PM-11, PM-12, PM-13, PM-14, PM-15
+
+Base presentational card used across all surfaces (like `PollCard` is to `ThreadPollCard`).
+
+**Files to create:**
+
+- `client/scripts/views/components/PredictionMarketCard/PredictionMarketCard.tsx`
+- `client/scripts/views/components/PredictionMarketCard/PredictionMarketCard.scss`
+- `client/scripts/utils/prediction-markets.ts`
+
+**Follows:** `client/scripts/views/components/Polls/PollCard/PollCard.tsx`
+
+**Acceptance criteria:**
+
+- [ ] Shows market prompt, status badge (DRAFT/ACTIVE/RESOLVED/CANCELLED)
+- [ ] Probability bar: green (PASS) / red (FAIL) proportional fill
+- [ ] Total collateral locked, time remaining via `CWCountDownTimer`
+- [ ] Winner display when resolved
+- [ ] Cancel button for thread author (draft/active only)
+- [ ] Skeleton loading state, responsive layout
+- [ ] Compact variant for explore/homepage cards (330px width, horizontal scroll)
+- [ ] Full variant for thread sidebar (full-width in `CWContentPageCard`)
+- [ ] Root CSS class `.PredictionMarketCard`, component-scoped SCSS
+
+**Component hierarchy:**
+
+```text
+PredictionMarketCard (PM-7)                    <-- shared presentational base
+|
++-- [full variant]
+|   |
+|   +-- ThreadPredictionMarketCard (PM-8)      <-- wraps card with trade actions + gating
+|   |     rendered inside:
+|   |       ViewThreadPage.tsx -> sidebarComponents[] -> CWContentPageCard
+|   |
+|   +-- PredictionMarketsAppPage (PM-14)       <-- tabbed list: Active / My Positions / Resolved
+|         rendered at: /:scope/prediction-markets
+|
++-- [compact variant, 330px]
+    |
+    +-- ActivePredictionMarketList (PM-13)      <-- horizontal scroll, "See all" link
+    |     rendered inside: HomePage.tsx, CommunityHomePage.tsx
+    |
+    +-- PredictionMarketsList (PM-12)           <-- filterable list, infinite scroll
+    |     rendered inside: ExplorePage.tsx, AllTabContent.tsx
+    |
+    +-- ThreadPredictionMarketTag (PM-15)       <-- compact badge on thread cards
+          rendered inside: ThreadCard (feed views)
+```
+
+**Card states (full variant):**
+
+```text
+  DRAFT                         ACTIVE                        RESOLVED
+  +-------------------------+   +-------------------------+   +-------------------------+
+  | Will ETH reach $5k?     |   | Will ETH reach $5k?     |   | Will ETH reach $5k?     |
+  |                         |   |                         |   |                         |
+  | Status: [DRAFT]         |   | Status: [ACTIVE] 23d    |   | Status: [RESOLVED]      |
+  |                         |   |                         |   | Winner: PASS            |
+  | Awaiting deployment...  |   | PASS 62% ████████░░ FAIL|   |                         |
+  |                         |   |                         |   | PASS 73% █████████░ FAIL|
+  |           [Cancel]      |   | Locked: 12,450 USDC     |   |                         |
+  +-------------------------+   |                         |   |           [Redeem]      |
+                                | [Trade]      [Cancel]   |   +-------------------------+
+  CANCELLED                     +-------------------------+
+  +-------------------------+                               COMPACT (330px)
+  | Will ETH reach $5k?     |                               +------------------+
+  |                         |                               | Will ETH reach   |
+  | Status: [CANCELLED]     |                               | $5k?             |
+  |                         |                               | PASS: 62%        |
+  | This market was         |                               | 23d left         |
+  | cancelled.              |                               | 12.4k USDC       |
+  +-------------------------+                               +------------------+
+```
+
+---
+
+### TICKET PM-8: Thread View — Sidebar Card + Editor Card
+
+**Size:** M | **Depends on:** PM-7 | **Blocks:** PM-17
+
+Integration into `ViewThreadPage.tsx` sidebarComponents[] array, following poll pattern.
+
+**Files to create:**
+
+- `client/scripts/views/pages/view_thread/ThreadPredictionMarketCard.tsx`
+- `client/scripts/views/pages/view_thread/ThreadPredictionMarketEditorCard.tsx`
+- `client/scripts/views/pages/view_thread/prediction_market_cards.scss`
+
+**Files to modify:**
+
+- `client/scripts/views/pages/view_thread/ViewThreadPage.tsx` (add to sidebarComponents[])
+
+**Follows:** `client/scripts/views/pages/view_thread/ThreadPollCard.tsx`
+
+```typescript
+// ViewThreadPage.tsx — add to sidebarComponent[] (like polls at line 692)
+...(predictionMarketData?.length > 0 || (isAuthor && predictionMarketsEnabled)
+  ? [{
+      label: 'Prediction Markets',
+      item: (
+        <CWContentPageCard header="Prediction Markets" content={
+          <>
+            {predictionMarketData?.map(market => (
+              <ThreadPredictionMarketCard key={market.id} market={market} ... />
+            ))}
+            {isAuthor && <ThreadPredictionMarketEditorCard thread={thread} ... />}
+          </>
+        } />
+      ),
+    }]
+  : []),
+```
+
+**Acceptance criteria:**
+
+- [ ] `ThreadPredictionMarketCard` wraps `PredictionMarketCard` with trade actions + permission gating via `actionGroups`/`bypassGating`
+- [ ] `ThreadPredictionMarketEditorCard` shows "Create Prediction Market" button, opens editor modal
+- [ ] Uses `useGetPredictionMarketsQuery(threadId)` for data
+- [ ] `useTopicGating` for permission checks (add `GatedActionEnum.UPDATE_PREDICTION_MARKET`)
+- [ ] Follows `ThreadPollCard` → `PollCard` delegation pattern
+
+**Wireframe:**
+
+```text
+  ViewThreadPage (sidebar)
+  +---------------------------------------+
+  | Prediction Markets                    |
+  | +-----------------------------------+ |
+  | | Will ETH reach $5k?              | |
+  | |                                   | |
+  | | Status: [ACTIVE]    23d remaining | |
+  | |                                   | |
+  | | PASS 62% ████████████░░░░░░ FAIL  | |
+  | |                                   | |
+  | | Locked: 12,450 USDC              | |
+  | |                                   | |
+  | | [Trade]              [Cancel]     | |
+  | +-----------------------------------+ |
+  |                                       |
+  | +-----------------------------------+ |
+  | | [+] Create Prediction Market      | |
+  | +-----------------------------------+ |
+  +---------------------------------------+
+```
+
+---
+
+### TICKET PM-9: Editor Modal — Market Creation
+
+**Size:** M | **Depends on:** PM-7 | **Blocks:** PM-17
+
+Market creation modal, triggered from thread view editor card and NewThreadForm.
+
+**Files to create:**
+
+- `client/scripts/views/modals/prediction_market_editor_modal.tsx`
+
+**Files to modify:**
+
+- `client/scripts/views/components/NewThreadForm/NewThreadForm.tsx` (add "Prediction Market" button alongside "Poll")
+
+**Follows:** `client/scripts/views/modals/poll_editor_modal.tsx`, `client/scripts/views/pages/view_thread/ThreadPollEditorCard.tsx`
+
+**Acceptance criteria:**
+
+- [ ] Prompt input, collateral selector (USDC/WETH/custom ERC20), duration picker (1-90d)
+- [ ] Resolution threshold slider (default 55%), initial liquidity input
+- [ ] "Create and Deploy" triggers: DB record -> wallet tx -> record deployment
+- [ ] Loading/error states during wallet interaction
+- [ ] AI-powered prompt generation (reuse `useAiCompletion` like `ThreadPollEditorCard`)
+- [ ] Integration in `NewThreadForm.tsx`: "Prediction Market" button alongside existing "Poll" button
+
+**Wireframe:**
+
+```text
+  NewThreadForm                          Editor Modal
+  +---------------------------+          +---------------------------+
+  | Write your thread...      |          | Create Prediction Market  |
+  | _________________________ |          |                           |
+  |                           |  click   | Prompt:                   |
+  | [Poll] [Prediction Market]| -------> | [Will ETH reach $5k?   ] |
+  +---------------------------+          |                [AI] btn   |
+                                         |                           |
+                                         | Collateral: [USDC v]     |
+                                         | Duration:   [30 days v]  |
+                                         | Threshold:  [55%    ===] |
+                                         | Liquidity:  [1000 USDC]  |
+                                         |                           |
+                                         | [Cancel]  [Create & Deploy]
+                                         +---------------------------+
+                                                    |
+                                                    | 1. POST createPredictionMarket (status=draft)
+                                                    | 2. Wallet TX: Vault.createMarket()
+                                                    | 3. POST deployPredictionMarket (status=active)
+                                                    v
+```
+
+---
+
+### TICKET PM-10: Trade Modal — Mint/Swap/Merge/Redeem
+
+**Size:** L | **Depends on:** PM-7 | **Blocks:** PM-17
+
+Tabbed trading modal for all token operations.
+
+**Files to create:**
+
+- `client/scripts/views/modals/prediction_market_trade_modal.tsx`
+
+**Follows:** `client/scripts/views/components/ThreadTokenDrawer/ThreadTokenDrawer.tsx` (tabbed trading pattern)
+
+**Acceptance criteria:**
+
+- [ ] **Mint tab:** amount input, collateral cost, "Deposit and Mint"
+- [ ] **Swap tab:** PASS/FAIL toggle, amount, slippage (1%), estimated output
+- [ ] **Merge tab:** amount (limited to min balance), collateral returned
+- [ ] **Redeem tab:** (post-resolution only) amount, collateral returned
+- [ ] Shows token balances, wallet tx via contract helpers, loading/error states
+- [ ] Tabs disabled by market status (swap off when resolved, redeem off when active)
+
+**Wireframe — all 4 tabs:**
+
+```text
+  Mint Tab                               Swap Tab
+  +---------------------------------------+  +---------------------------------------+
+  | Trade: Will ETH reach $5k?           |  | Trade: Will ETH reach $5k?           |
+  |                                       |  |                                       |
+  | [Mint] [Swap] [Merge] [Redeem]       |  | [Mint] [Swap] [Merge] [Redeem]       |
+  | ====== ~~~~~~ ~~~~~~~ ~~~~~~~~       |  | ~~~~~~ ====== ~~~~~~~ ~~~~~~~~       |
+  |                                       |  |                                       |
+  | Deposit collateral to mint tokens:   |  | Buy:  (x) PASS  ( ) FAIL            |
+  |                                       |  |                                       |
+  | Amount: [100        ] USDC           |  | Sell:   [50         ] FAIL tokens    |
+  |                                       |  | Receive: ~48.2 PASS tokens (est.)   |
+  | You receive:                         |  | Slippage: 1%                         |
+  |   100 PASS tokens                    |  |                                       |
+  |   100 FAIL tokens                    |  | [Cancel]              [Swap]         |
+  |                                       |  +---------------------------------------+
+  | [Cancel]        [Deposit and Mint]   |
+  +---------------------------------------+  Merge Tab
+                                             +---------------------------------------+
+  Redeem Tab (post-resolution only)          | Trade: Will ETH reach $5k?           |
+  +---------------------------------------+  |                                       |
+  | Trade: Will ETH reach $5k?           |  | [Mint] [Swap] [Merge] [Redeem]       |
+  |                                       |  | ~~~~~~ ~~~~~~ ======= ~~~~~~~~       |
+  | [Mint] [Swap] [Merge] [Redeem]       |  |                                       |
+  | ~~~~~~ ~~~~~~ ~~~~~~~ ========       |  | Merge equal tokens back to collateral|
+  |  off    off    off                   |  |                                       |
+  |                                       |  | Amount: [25         ] token pairs    |
+  | Market resolved: PASS wins           |  | (max: 50 -- limited to min balance)  |
+  |                                       |  |                                       |
+  | Your PASS balance: 148 tokens        |  | You receive: 25 USDC                 |
+  | Redeem: [148        ] PASS tokens    |  |                                       |
+  |                                       |  | [Cancel]              [Merge]        |
+  | You receive: 148 USDC               |  +---------------------------------------+
+  |                                       |
+  | [Cancel]              [Redeem]       |
+  +---------------------------------------+
+```
+
+**Data flow — frontend to chain (applies to PM-9, PM-10, PM-11):**
+
+```text
+  CREATE FLOW (PM-9):
+  EditorModal -----> useCreatePredictionMarketMutation
+                       |
+                       +----> POST /predictionMarket/create ------> DB insert (draft)
+                       |
+                     user wallet signs TX
+                       |
+                       +----> Vault.createMarket() ----------------> on-chain
+                       +----> Governor.createProposal() -----------> on-chain
+                       |
+                       +----> POST /predictionMarket/deploy ------> DB update (active)
+
+  TRADE FLOW (PM-10):
+  TradeModal -------> user wallet signs TX
+                       |
+                       +----> Vault.mint() / Router.swap() --------> on-chain
+                       |
+                     (no API call -- EVM worker picks up event)
+                       |
+                     EVM Worker (120s) polls logs
+                       |
+                       +----> event mapper -> Outbox -> RabbitMQ
+                       +----> PredictionMarketPolicy
+                       +----> ProjectTrade command -> DB insert
+                       |
+                     React Query auto-refetch (staleTime: 30s)
+                       |
+                     UI updates with new position / probability
+
+  RESOLVE FLOW (PM-11):
+  ResolveModal -----> user wallet signs TX
+                       |
+                       +----> Governor.resolve() ------------------> on-chain
+                       |
+                     EVM Worker picks up ProposalResolved event
+                       |
+                       +----> ProjectResolution command -> DB update (resolved)
+                       |
+                     React Query refetch -> card shows winner
+
+  REDEEM FLOW (PM-10, redeem tab):
+  TradeModal -------> user wallet signs TX
+                       |
+                       +----> Vault.redeem() ----------------------> on-chain
+                       |
+                     EVM Worker picks up TokensRedeemed event
+                       |
+                       +----> ProjectTrade(redeem) -> DB update
+```
+
+---
+
+### TICKET PM-11: Resolve Modal — TWAP Resolution
+
+**Size:** S | **Depends on:** PM-7 | **Blocks:** PM-17
+
+Resolution modal for thread author / community admin.
+
+**Files to create:**
+
+- `client/scripts/views/modals/prediction_market_resolve_modal.tsx`
+
+**Acceptance criteria:**
+
+- [ ] Current TWAP probability, TWAP window selector, predicted outcome
+- [ ] "Resolve Market" triggers Governor.resolve() on-chain
+- [ ] Only visible to thread author / community admin, only enabled after end_time
+
+**Wireframe:**
+
+```text
+  +---------------------------------------+
+  | Resolve: Will ETH reach $5k?         |
+  |                                       |
+  | Current TWAP Probability:            |
+  |                                       |
+  | PASS 73% █████████████░░░░░░░ FAIL   |
+  |                                       |
+  | Threshold: 55%                       |
+  | Predicted outcome: PASS              |
+  |                                       |
+  | This will resolve the market and     |
+  | allow winners to redeem tokens.      |
+  |                                       |
+  | [Cancel]        [Resolve Market]     |
+  +---------------------------------------+
+             |
+             | Wallet TX: Governor.resolve()
+             v
+```
+
+---
+
+### TICKET PM-12: Explore Page — Tab + AllTabContent Section
+
+**Size:** M | **Depends on:** PM-7 | **Blocks:** PM-17
+
+Add prediction markets to the explore page alongside existing Markets tab.
+
+**Files to create:**
+
+- `client/scripts/views/pages/ExplorePage/PredictionMarketsList/PredictionMarketsList.tsx`
+
+**Files to modify:**
+
+- `client/scripts/views/pages/ExplorePage/ExplorePage.tsx` (add to TAB_VIEWS[])
+- `client/scripts/views/pages/ExplorePage/AllTabContent/AllTabContent.tsx` (add section)
+
+**Follows:** `client/scripts/views/pages/ExplorePage/MarketsList/MarketsList.tsx`
+
+```typescript
+// ExplorePage.tsx — add to TAB_VIEWS[] (like markets tab)
+...(predictionMarketsEnabled
+  ? [{ value: 'prediction-markets', label: 'Prediction Markets' }]
+  : []),
+
+// AllTabContent.tsx — add section (like Markets section)
+{predictionMarketsEnabled && (
+  <div className="section-container">
+    <CWSectionHeader
+      title="Prediction Markets"
+      seeAllText="See all prediction markets"
+      onSeeAllClick={() => navigate('/explore?tab=prediction-markets')}
+    />
+    <PredictionMarketsList hideHeader hideFilters />
+  </div>
+)}
+```
+
+**Acceptance criteria:**
+
+- [ ] `PredictionMarketsList` component: filter by status, community, sort by volume/recency
+- [ ] Uses `PredictionMarketCard` compact variant in horizontal scroll container
+- [ ] Infinite scroll pagination on dedicated tab
+- [ ] Search functionality in AllTabContent
+
+**Wireframe:**
+
+```text
+  ExplorePage.tsx
+  +================================================================+
+  | [All] [Communities] [Users] [Contests] [Threads] [Quests]      |
+  |       [Tokens] [Markets] [Prediction Markets]                  |
+  |                           ^^^^^^^^^^^^^^^^^^^ NEW TAB          |
+  +================================================================+
+
+  --- "All" Tab (AllTabContent.tsx) ---
+  +-----------------------------------------------------------------+
+  | Communities                                    [See all >]      |
+  | +----------+ +----------+ +----------+ +----------+   -->     |
+  | | Comm 1   | | Comm 2   | | Comm 3   | | Comm 4   |          |
+  | +----------+ +----------+ +----------+ +----------+           |
+  |                                                                 |
+  | Prediction Markets                             [See all >]      |
+  | +----------+ +----------+ +----------+                    -->  |
+  | |Will ETH  | |BTC $100k | |SOL flip  |                        |
+  | |reach $5k?| |by 2026?  | |ETH?      |                        |
+  | |PASS: 62% | |PASS: 45% | |PASS: 28% |                        |
+  | |23d left  | |87d left  | |12d left  |                        |
+  | +----------+ +----------+ +----------+                         |
+  |         (compact PredictionMarketCard, 330px)                   |
+  +-----------------------------------------------------------------+
+
+  --- "Prediction Markets" Tab ---
+  +-----------------------------------------------------------------+
+  | Filters: [Status v] [Community v] [Sort: Volume v] [Search...] |
+  |                                                                 |
+  | +----------+ +----------+ +----------+ +----------+            |
+  | |Will ETH  | |BTC $100k | |SOL flip  | |Will the  |           |
+  | |reach $5k?| |by 2026?  | |ETH?      | |merge pass|           |
+  | |PASS: 62% | |PASS: 45% | |PASS: 28% | |PASS: 81% |           |
+  | |23d left  | |87d left  | |12d left  | |5d left   |           |
+  | |12.4k USDC| |45.2k USDC| |3.1k USDC | |89k USDC  |           |
+  | +----------+ +----------+ +----------+ +----------+            |
+  |                                                                 |
+  |                    [Load more...]                               |
+  +-----------------------------------------------------------------+
+```
+
+---
+
+### TICKET PM-13: Homepage + Community Homepage — Discovery Sections
+
+**Size:** M | **Depends on:** PM-7 | **Blocks:** PM-17
+
+Add prediction market discovery sections to both homepages.
+
+**Files to create:**
+
+- `client/scripts/views/pages/HomePage/ActivePredictionMarketList/ActivePredictionMarketList.tsx`
+- `client/scripts/views/pages/HomePage/ActivePredictionMarketList/ActivePredictionMarketList.scss`
+
+**Files to modify:**
+
+- `client/scripts/views/pages/HomePage/HomePage.tsx` (add section)
+- `client/scripts/views/pages/CommunityHome/CommunityHomePage.tsx` (add section)
+
+**Follows:** `client/scripts/views/pages/HomePage/ActiveContestList/ActiveContestList.tsx`
+
+```typescript
+// HomePage.tsx — add between contests and threads
+<ActivePredictionMarketList />
+
+// CommunityHomePage.tsx — add with community filter
+<ActivePredictionMarketList
+  isCommunityHomePage
+  communityIdFilter={chain}
+/>
+```
+
+**Acceptance criteria:**
+
+- [ ] `ActivePredictionMarketList` shows active markets sorted by volume/recency
+- [ ] Compact `PredictionMarketCard` (330px) in horizontal scroll container
+- [ ] "See all prediction markets" links to `/explore?tab=prediction-markets`
+- [ ] Empty state handling (hide section if no active markets)
+- [ ] `isCommunityHomePage` prop filters to community scope
+- [ ] Loading skeletons match existing contest/quest card skeletons
+
+**Wireframe:**
+
+```text
+  HomePage.tsx / CommunityHomePage.tsx
+  +-----------------------------------------------------------------+
+  | ...existing content...                                          |
+  |                                                                 |
+  | Active Contests                                [See all >]      |
+  | +----------+ +----------+ +----------+                    -->  |
+  | | Contest1 | | Contest2 | | Contest3 |                         |
+  | +----------+ +----------+ +----------+                         |
+  |                                                                 |
+  | Prediction Markets                             [See all >]      |
+  | +----------+ +----------+ +----------+                    -->  |
+  | |Will ETH  | |BTC $100k | |SOL flip  |                        |
+  | |reach $5k?| |by 2026?  | |ETH?      |                        |
+  | |PASS: 62% | |PASS: 45% | |PASS: 28% |                        |
+  | |23d left  | |87d left  | |12d left  |                        |
+  | +----------+ +----------+ +----------+                         |
+  |    ActivePredictionMarketList (horizontal scroll, compact)      |
+  |                                                                 |
+  | ...existing content (threads, quests, etc.)...                  |
+  +-----------------------------------------------------------------+
+
+  CommunityHomePage: same layout but filtered via communityIdFilter={chain}
+```
+
+---
+
+### TICKET PM-14: Sidebar Navigation + Admin Settings Page
+
+**Size:** M | **Depends on:** PM-7 | **Blocks:** PM-17
+
+Sidebar nav entries and admin management page.
+
+**Files to create:**
+
+- `client/scripts/views/pages/CommunityManagement/PredictionMarkets/PredictionMarketsPage.tsx`
+- `client/scripts/views/pages/PredictionMarketsAppPage.tsx`
+
+**Files to modify:**
+
+- `client/scripts/views/components/sidebar/governance_section.tsx` (add nav entry)
+- `client/scripts/views/components/sidebar/AdminSection/AdminSection.tsx` (add admin nav)
+
+**Follows:** `client/scripts/views/components/sidebar/governance_section.tsx` (Markets entry), `client/scripts/views/pages/CommunityManagement/Markets/MarketsPage.tsx`, `client/scripts/views/pages/MarketsAppPage.tsx`
+
+```typescript
+// governance_section.tsx — add menu item (like "Markets" entry)
+...(predictionMarketsEnabled
+  ? [{ type: 'default', label: 'Prediction Markets',
+       to: `/${communityId}/prediction-markets` }]
+  : []),
+
+// AdminSection.tsx — add admin nav item
+...(predictionMarketsEnabled
+  ? [{ type: 'default', label: 'Prediction Markets',
+       to: `/${communityId}/manage/prediction-markets` }]
+  : []),
+```
+
+**Acceptance criteria:**
+
+- [ ] Sidebar: "Prediction Markets" entry in Apps section alongside Contests, Markets, Quests
+- [ ] Admin sidebar: "Prediction Markets" entry in admin section
+- [ ] `PredictionMarketsPage.tsx` admin page: enable/disable for community, set default collateral token, set max duration
+- [ ] `PredictionMarketsAppPage.tsx` app page: tabbed view ("Active", "My Positions", "Resolved") following `MarketsAppPage.tsx` pattern
+
+**Wireframe — sidebar + admin + app page:**
+
+```text
+  Sidebar (governance_section.tsx)           Admin Sidebar (AdminSection.tsx)
+  +----------------------------+            +----------------------------+
+  | APPS                       |            | ADMIN                      |
+  |                            |            |                            |
+  |   Members                  |            |   Community Profile        |
+  |   Governance               |            |   Integrations             |
+  |   Proposals                |            |   Topics                   |
+  |   Contests                 |            |   Contests                 |
+  |   Quests                   |            |   Quests                   |
+  |   Markets                  |            |   Market Integrations      |
+  |   > Prediction Markets     |  <-- NEW   |   > Prediction Markets     |  <-- NEW
+  |   Directory                |            |   Analytics                |
+  +----------------------------+            +----------------------------+
+                |                                        |
+                v                                        v
+  /:scope/prediction-markets            /:scope/manage/prediction-markets
+  +----------------------------+        +----------------------------+
+  | [Active] [My Pos.] [Done] |        | Prediction Markets Config  |
+  |                            |        |                            |
+  | +------------------------+ |        | Enable: [x] On  [ ] Off   |
+  | | Will ETH reach $5k?   | |        | Collateral: [USDC v]      |
+  | | PASS 62% ████████░ FAIL| |        | Max Duration: [90 days]   |
+  | | 23d left  12.4k USDC  | |        +----------------------------+
+  | +------------------------+ |
+  | +------------------------+ |
+  | | BTC to $100k by 2026? | |
+  | | PASS 45% ██████░░ FAIL| |
+  | | 87d left  45.2k USDC  | |
+  | +------------------------+ |
+  |                            |
+  |     [Load more...]        |
+  +----------------------------+
+
+  --- "My Positions" Tab ---
+  +----------------------------+
+  | [Active] [My Pos.] [Done] |
+  |          ==========        |
+  | +------------------------+ |
+  | | Will ETH reach $5k?   | |
+  | | PASS 62% ████████░ FAIL| |
+  | | Your position:         | |
+  | |  148 PASS | 2 FAIL     | |
+  | |  100 USDC in   [Trade] | |
+  | +------------------------+ |
+  +----------------------------+
+
+  --- "Resolved" Tab ---
+  +----------------------------+
+  | [Active] [My Pos.] [Done] |
+  |                    ======  |
+  | +------------------------+ |
+  | | Gas fees stay low?     | |
+  | | [RESOLVED] PASS wins   | |
+  | | PASS 88% ████████░ FAIL| |
+  | |             [Redeem]   | |
+  | +------------------------+ |
+  +----------------------------+
+```
+
+---
+
+### TICKET PM-15: Thread List Badge — Market Status Tag
+
+**Size:** S | **Depends on:** PM-6 | **Blocks:** PM-17
+
+Small tag on thread cards showing market status + probability.
+
+**Files to create:**
+
+- `client/scripts/views/components/ThreadPredictionMarketTag/ThreadPredictionMarketTag.tsx`
+
+**Follows:** `client/scripts/views/components/ThreadContestTag/ThreadContestTag.tsx`
+
+**Acceptance criteria:**
+
+- [ ] `ThreadPredictionMarketTag` shows status + probability in compact popover
+- [ ] Renders on thread cards in feed views when `thread.has_prediction_market === true`
+- [ ] Green/red probability indicator
+- [ ] Popover: market prompt, time remaining, total volume
+
+**Wireframe:**
+
+```text
+  Thread Feed (ThreadCard)
+  +-----------------------------------------------------------------+
+  | +-- Thread Title Here ---------------------------------+        |
+  | |                                                       |        |
+  | | Thread preview text...                               |        |
+  | |                                                       |        |
+  | | [Governance]  [PASS 62%]   5 comments   2h ago       |        |
+  | |                ^^^^^^^^^^                             |        |
+  | |                ThreadPredictionMarketTag              |        |
+  | +------------------------------------------------------+        |
+  |                                                                 |
+  | +-- Another Thread Without Market ---------------------+        |
+  | |                                                       |        |
+  | | Thread preview text...                               |        |
+  | |                                                       |        |
+  | | [Discussion]               12 comments   5h ago      |        |
+  | +------------------------------------------------------+        |
+  +-----------------------------------------------------------------+
+
+  ThreadPredictionMarketTag -- popover on hover:
+  +-------------------------------+
+  | Will ETH reach $5k?          |
+  | PASS 62% ████████░░░░░ FAIL  |
+  | 23 days remaining            |
+  | 12,450 USDC locked           |
+  +-------------------------------+
+```
+
+---
+
+### TICKET PM-16: Routing
+
+**Size:** S | **Depends on:** PM-14 | **Blocks:** PM-17
+
+Register all prediction market routes.
+
+**Files to modify:**
+
+- `client/scripts/navigation/CommonDomainRoutes.tsx`
+- `client/scripts/navigation/CustomDomainRoutes.tsx`
+
+**Follows:** existing Markets routes in same files
+
+**Acceptance criteria:**
+
+- [ ] `/:scope/prediction-markets` → `PredictionMarketsAppPage` (scoped)
+- [ ] `/prediction-markets` → `PredictionMarketsAppPage` (common domain)
+- [ ] `/:scope/manage/prediction-markets` → `PredictionMarketsPage` (admin)
+- [ ] `/manage/prediction-markets` → `PredictionMarketsPage` (admin)
+- [ ] All routes conditional on `predictionMarketsEnabled` flag
+
+---
+
+### TICKET PM-17: Feature Flag + Community Setting
+
+**Size:** M | **Depends on:** PM-8 through PM-16 | **Blocks:** nothing
+
+Feature flag and community-level configuration for prediction markets.
+
+**Files to create:**
+
+- `libs/schemas/src/entities/community-prediction-market-settings.schemas.ts` (or extend community schemas)
+
+**Files to modify:**
+
+- `packages/commonwealth/client/scripts/helpers/feature-flags.ts` (add `prediction_markets` flag)
+- `packages/commonwealth/client/vite.config.ts` (expose `FLAG_PREDICTION_MARKETS`)
+- `packages/commonwealth/server/config.ts` (add `FLAG_PREDICTION_MARKETS` env var)
+
+**Acceptance criteria:**
+
+- [ ] Feature flag `FLAG_PREDICTION_MARKETS` defined in `feature-flags.ts` using `buildFlag`
+- [ ] Flag exposed in `vite.config.ts` for frontend access
+- [ ] All PM UI surfaces gated by `useFlag('prediction_markets')`:
+  - [ ] Thread sidebar card (ViewThreadPage)
+  - [ ] Thread creation button (NewThreadForm)
+  - [ ] Explore page tab + AllTabContent section
+  - [ ] Homepage + Community homepage sections
+  - [ ] Sidebar navigation entries (governance + admin)
+  - [ ] Routing (CommonDomainRoutes + CustomDomainRoutes)
+  - [ ] Admin settings page
+  - [ ] App page
+  - [ ] Thread list badge/tag
+- [ ] API routes still functional when flag is off (flag only gates UI, not backend)
+- [ ] Community-level setting: admin can enable/disable prediction markets per community
+- [ ] Default collateral token configurable per community (USDC default)
+- [ ] Flag togglable per environment (dev/staging/prod)
+
+---
+
+### TICKET PM-18: Testing + QA
+
+**Size:** L | **Depends on:** PM-1 through PM-17 | **Blocks:** nothing
+
+Covers all frontend surface testing in addition to existing backend test plan above.
+
+**Frontend-specific tests:**
+
+- [ ] PredictionMarketCard renders all states (draft/active/resolved/cancelled)
+- [ ] Probability bar proportional fill matches data
+- [ ] Editor modal validates inputs and triggers wallet TX
+- [ ] Trade modal tabs enable/disable by market status
+- [ ] Resolve modal only visible to authorized users after end_time
+- [ ] Explore page tab appears only when flag enabled
+- [ ] Homepage sections hide when no active markets
+- [ ] Sidebar nav entries gated by feature flag
+- [ ] Thread badge renders on correct threads
+- [ ] All routes resolve correctly
+- [ ] Feature flag off hides all UI surfaces
+- [ ] Community setting respected per-community
+
+---
+
+### Frontend Dependency Graph (PM-7 through PM-18)
+
+```text
+  PM-6 (React Query Hooks)
+    |
+    +-------> PM-7 (Card Component)
+    |            |
+    |            +---> PM-8  (Thread View)
+    |            +---> PM-9  (Editor Modal)
+    |            +---> PM-10 (Trade Modal)
+    |            +---> PM-11 (Resolve Modal)
+    |            +---> PM-12 (Explore Page)
+    |            +---> PM-13 (Homepages)
+    |            +---> PM-14 (Sidebar + Admin)
+    |            |        |
+    |            |        +---> PM-16 (Routing)
+    |            |
+    +-------> PM-15 (Thread Badge — only needs PM-6)
+                                   |
+              PM-8..PM-16 --------+
+                                   v
+                                PM-17 (Feature Flag)
+                                   |
+                                   v
+                                PM-18 (Testing)
+```
+
+**Parallelizable:** PM-8 through PM-15 can ALL run in parallel after PM-7 (each is an independent surface). PM-15 only needs PM-6, not PM-7 — can start earlier.
+
+### Frontend Key Patterns to Reuse
+
+| Pattern | Source File | Reuse For |
+|---------|------------|-----------|
+| Poll React Query hooks | `client/scripts/state/api/polls/` | PM React Query hooks |
+| ThreadPollCard → PollCard | `client/scripts/views/pages/view_thread/ThreadPollCard.tsx` | ThreadPredictionMarketCard → PredictionMarketCard |
+| Poll editor modal | `client/scripts/views/modals/poll_editor_modal.tsx` | PM editor modal |
+| ThreadPollEditorCard | `client/scripts/views/pages/view_thread/ThreadPollEditorCard.tsx` | ThreadPredictionMarketEditorCard (AI generation) |
+| ActiveContestList | `client/scripts/views/pages/HomePage/ActiveContestList/ActiveContestList.tsx` | ActivePredictionMarketList (homepage sections) |
+| XpQuestList | `client/scripts/views/pages/HomePage/XpQuestList/XpQuestList.tsx` | ActivePredictionMarketList (communityIdFilter prop) |
+| MarketsList | `client/scripts/views/pages/ExplorePage/MarketsList/MarketsList.tsx` | PredictionMarketsList (explore tab + filters) |
+| AllTabContent section | `client/scripts/views/pages/ExplorePage/AllTabContent/AllTabContent.tsx` | PM section with CWSectionHeader + horizontal scroll |
+| MarketsAppPage | `client/scripts/views/pages/MarketsAppPage.tsx` | PredictionMarketsAppPage (tabbed app view) |
+| Markets admin page | `client/scripts/views/pages/CommunityManagement/Markets/MarketsPage.tsx` | PredictionMarketsPage (admin settings) |
+| ThreadContestTag | `client/scripts/views/components/ThreadContestTag/ThreadContestTag.tsx` | ThreadPredictionMarketTag (thread list badge) |
+| ThreadTokenDrawer | `client/scripts/views/components/ThreadTokenDrawer/ThreadTokenDrawer.tsx` | Trade activity drawer (TradeActivityTab pattern) |
+| Sidebar nav entry | `client/scripts/views/components/sidebar/governance_section.tsx` | PM nav entry (gated by feature flag) |
+| Admin sidebar entry | `client/scripts/views/components/sidebar/AdminSection/AdminSection.tsx` | PM admin nav entry |
+| CWContentPageCard | `client/scripts/views/components/component_kit/CWContentPageCard/` | Thread sidebar wrapper (collapsible card) |
+| CWSectionHeader | `component_kit` | Homepage/explore section headers with "See all" link |
+| Feature flag pattern | `client/scripts/helpers/feature-flags.ts` → `useFlag('markets')` | `useFlag('prediction_markets')` |
+
+### Visual Diagrams (FigJam)
+
+- **[Event Storming Model](https://www.figma.com/online-whiteboard/create-diagram/61090bc5-253e-41c6-a038-01aa15ab6660)** -- Full domain flow: actors, commands, on-chain TX, domain events, outbox/relay, policies, system commands, read models
+- **[Lifecycle State Machine](https://www.figma.com/online-whiteboard/create-diagram/9cde7256-9576-4e70-b8ab-436f8a1f4be9)** -- Market states: Draft -> Active -> Resolved/Cancelled with transitions
+
