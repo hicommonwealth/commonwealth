@@ -32,3 +32,13 @@
 [2026-02-09] #13361 chore: drop prediction market community fk
 - Files: libs/schemas/src/entities/prediction-market.schemas.ts, libs/schemas/src/queries/prediction-market.schemas.ts, libs/model/src/models/prediction_market.ts, libs/model/src/models/associations.ts, libs/model/migrations/20260209120000-create-prediction-markets.js, libs/model/test/prediction-market/models.spec.ts, libs/model/test/prediction-market/schemas.spec.ts, common_knowledge/Prediction-Markets.md
 - Changes: Removed community_id from prediction markets, associations, migration, and queries; updated tests/docs to rely on thread FK only.
+
+[2026-02-11] #13370 feat: implement prediction market deploy flow, policy, and read model
+- Files: libs/model/src/aggregates/prediction_market/{CreatePredictionMarket,DeployPredictionMarket,ProjectPredictionMarketProposal,ProjectPredictionMarketMarket}.command.ts, PredictionMarket.projection.ts, index.ts, libs/model/src/policies/PredictionMarket.policy.ts, libs/model/src/policies/index.ts, libs/model/src/index.ts, libs/model/test/prediction-market/prediction-market-lifecycle.spec.ts, libs/model/test/prediction-market/schemas.spec.ts, libs/schemas/src/commands/prediction-market.schemas.ts, libs/schemas/src/events/events.schemas.ts, libs/schemas/src/index.ts
+- Changes: Implemented CreatePredictionMarket and DeployPredictionMarket commands with thread author auth and transactional writes. Added PredictionMarketPolicy to reconcile on-chain ProposalCreated/MarketCreated events. Added PredictionMarket.projection as read model. Added lifecycle test covering create->deploy->policy reconciliation.
+- Decisions: Used EventPair type assertion for DeployPredictionMarket event emission (large union narrowing). Read model currently mirrors write model (projection is a no-op logger). Added thread_id to all command schemas requiring ThreadContext auth.
+
+[2026-02-11] #13370 fix: wire prediction market router and remove projection
+- Files: libs/model/src/aggregates/prediction_market/{GetPredictionMarkets.query.ts,index.ts}, libs/adapters/src/trpc/types.ts, packages/commonwealth/server/api/{predictionMarket.ts,internal-router.ts}, packages/commonwealth/server/bindings/rascalConsumerMap.ts
+- Changes: Removed unused PredictionMarket.projection (policy handles projecting). Added GetPredictionMarkets query. Created predictionMarket router exposed behind FLAG_FUTARCHY in internal-router. Registered PredictionMarketPolicy in rascalConsumerMap. Added PredictionMarket tag.
+- Decisions: Used raw SQL query with window function for paginated GetPredictionMarkets, matching quest query pattern.

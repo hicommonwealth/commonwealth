@@ -11,5 +11,6 @@ export * from './Launchpad.policy';
 export * from './Nominations.policy';
 export * from './Notifications.policy';
 export * from './NotificationsSettings.policy';
+export * from './PredictionMarket.policy';
 export * from './ReactionWorker.policy';
 export * from './TwitterEngagement.policy';

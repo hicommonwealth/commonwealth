@@ -461,8 +461,8 @@ export const events = {
 
   PredictionMarketDeployed: z.object({
     prediction_market_id: PG_INT,
-    proposal_id: EVM_BYTES,
-    market_id: EVM_BYTES,
+    proposal_id: EVM_BYTES.nullish(),
+    market_id: EVM_BYTES.nullish(),
     eth_chain_id: z.number(),
     vault_address: EVM_ADDRESS_STRICT,
     governor_address: EVM_ADDRESS_STRICT,

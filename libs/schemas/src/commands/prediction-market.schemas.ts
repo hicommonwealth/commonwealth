@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AuthContext } from '../context';
+import { ThreadContext } from '../context';
 import {
   PredictionMarket,
   PredictionMarketTradeAction,
@@ -21,11 +21,12 @@ export const CreatePredictionMarket = {
     resolution_threshold: z.number(),
   }),
   output: PredictionMarket,
-  context: AuthContext,
+  context: ThreadContext,
 };
 
 export const DeployPredictionMarket = {
   input: z.object({
+    thread_id: PG_INT,
     prediction_market_id: PG_INT,
     vault_address: EVM_ADDRESS,
     governor_address: EVM_ADDRESS,
@@ -37,24 +38,26 @@ export const DeployPredictionMarket = {
     end_time: z.coerce.date(),
   }),
   output: PredictionMarket,
-  context: AuthContext,
+  context: ThreadContext,
 };
 
 export const ResolvePredictionMarket = {
   input: z.object({
+    thread_id: PG_INT,
     prediction_market_id: PG_INT,
     winner: z.number().int().min(0).max(2),
   }),
   output: PredictionMarket,
-  context: AuthContext,
+  context: ThreadContext,
 };
 
 export const CancelPredictionMarket = {
   input: z.object({
+    thread_id: PG_INT,
     prediction_market_id: PG_INT,
   }),
   output: z.boolean(),
-  context: AuthContext,
+  context: ThreadContext,
 };
 
 export const ProjectPredictionMarketTrade = {
@@ -82,6 +85,22 @@ export const ProjectPredictionMarketResolution = {
     market_id: EVM_BYTES,
     winner: z.number().int().min(0).max(2),
     resolved_at: z.coerce.date(),
+  }),
+  output: z.object({}).optional(),
+};
+
+export const ProjectPredictionMarketProposal = {
+  input: z.object({
+    prediction_market_id: PG_INT,
+    proposal_id: EVM_BYTES,
+  }),
+  output: z.object({}).optional(),
+};
+
+export const ProjectPredictionMarketMarket = {
+  input: z.object({
+    prediction_market_id: PG_INT,
+    market_id: EVM_BYTES,
   }),
   output: z.object({}).optional(),
 };
