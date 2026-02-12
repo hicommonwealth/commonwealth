@@ -1,8 +1,8 @@
 import { Projection } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { ZodUndefined } from 'zod';
-import { handleCommunityStakeTrades } from '../../policies/handlers/handleCommunityStakeTrades';
-import { handleReferralFeeDistributed } from '../../policies/handlers/handleReferralFeeDistributed';
+import { handleCommunityStakeTrades } from './handlers/handleCommunityStakeTrades';
+import { handleReferralFeeDistributed } from './handlers/handleReferralFeeDistributed';
 
 const inputs = {
   CommunityStakeTrade: events.CommunityStakeTrade,

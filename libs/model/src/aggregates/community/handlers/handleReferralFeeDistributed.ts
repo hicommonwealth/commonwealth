@@ -2,7 +2,7 @@ import { EventHandler } from '@hicommonwealth/core';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { ZodUndefined } from 'zod';
-import { models } from '../../database';
+import { models } from '../../../database';
 
 export const handleReferralFeeDistributed: EventHandler<
   'ReferralFeeDistributed',

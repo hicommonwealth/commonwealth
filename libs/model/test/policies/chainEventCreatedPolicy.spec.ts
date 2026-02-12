@@ -4,8 +4,8 @@ import { Community } from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
+import { handleCommunityStakeTrades } from '../../src/aggregates/community/handlers/handleCommunityStakeTrades';
 import { models } from '../../src/database';
-import { handleCommunityStakeTrades } from '../../src/policies/handlers/handleCommunityStakeTrades';
 import * as tester from '../../src/tester';
 import { createTestRpc } from '../../src/utils';
 
