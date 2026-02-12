@@ -1926,3 +1926,889 @@ Covers all frontend surface testing in addition to existing backend test plan ab
 - **[Event Storming Model](https://www.figma.com/online-whiteboard/create-diagram/61090bc5-253e-41c6-a038-01aa15ab6660)** -- Full domain flow: actors, commands, on-chain TX, domain events, outbox/relay, policies, system commands, read models
 - **[Lifecycle State Machine](https://www.figma.com/online-whiteboard/create-diagram/9cde7256-9576-4e70-b8ab-436f8a1f4be9)** -- Market states: Draft -> Active -> Resolved/Cancelled with transitions
 
+---
+
+## Testing & Integration Tickets (PM-19 through PM-25)
+
+Expands on PM-18 and the Detailed Test Plan above with concrete test files, patterns, setup code, and acceptance criteria aligned with the existing Commonwealth testing infrastructure.
+
+### Testing Infrastructure Summary
+
+```text
+  Test Layer         Framework       Location                             Pattern Reference
+  ──────────         ─────────       ────────                             ─────────────────
+  Unit (model)       Vitest          libs/model/test/prediction-market/   contest/, poll tests
+  Unit (frontend)    Vitest          packages/commonwealth/test/unit/     state/sidebar.spec.ts
+  Integration (API)  Vitest          test/integration/api/                polls.spec.ts
+  Integration (CE)   Vitest          test/integration/chain-events/       evmChainEvents.spec.ts
+  Devnet (EVM)       Vitest+Anvil    test/devnet/evm/                     evmChainEvents.spec.ts
+  E2E (browser)      Playwright      test/e2e/e2eRegular/                 newDiscussion.spec.ts
+  E2E (stateful)     Playwright      test/e2e/e2eStateful/                (pre-seeded scenarios)
+```
+
+### Testing Dependency Graph
+
+```text
+  Backend Tests                         Frontend Tests
+  ═════════════                         ══════════════
+
+  PM-19 (Unit: Schemas+Models)          PM-24 (Unit: FE Utils+Stores)
+    |                                     |
+    v                                     |
+  PM-20 (Unit: Commands+Queries)          |
+    |                                     |
+    +--------+                            |
+    |        |                            |
+    v        v                            |
+  PM-21    PM-22                          |
+  (API)    (Chain Events)                 |
+    |        |                            |
+    |        v                            |
+    |      PM-23 (Devnet)                 |
+    |        |                            |
+    +--------+----------------------------+
+             |
+             v
+           PM-25 (E2E: Playwright)
+```
+
+**Parallelizable:**
+- PM-19 + PM-24 can start simultaneously (no overlap)
+- PM-21 + PM-22 can run in parallel (both depend on PM-20)
+- PM-23 depends on PM-22 (needs mappers + policy verified first)
+- PM-25 is the integration point — needs all others complete
+
+---
+
+### TICKET PM-19: Unit Tests — Schemas + Models
+
+**Size:** S | **Depends on:** PM-1, PM-2 | **Blocks:** PM-20
+
+Validate Zod schemas, Sequelize model creation, associations, and constraints.
+
+**Files to create:**
+- `libs/model/test/prediction-market/schemas.spec.ts`
+- `libs/model/test/prediction-market/models.spec.ts`
+
+**Follows pattern:** `libs/model/test/contest/check-contests.spec.ts` (seed-based model tests)
+
+**Setup pattern:**
+```typescript
+import { dispose } from '@hicommonwealth/core';
+import { seed } from '@hicommonwealth/model/tester';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+
+describe('PredictionMarket schemas', () => {
+  afterAll(async () => { await dispose()(); });
+  // ...
+});
+```
+
+**Test cases — schemas.spec.ts:**
+
+| # | Test | Input | Expected |
+|---|------|-------|----------|
+| 1 | Valid PredictionMarket entity | All required fields, status='draft' | Parses without error |
+| 2 | Invalid status enum | status='pending' | Zod throws validation error |
+| 3 | Invalid action enum | action='buy' | Zod throws validation error |
+| 4 | Valid CreatePredictionMarket command | prompt, collateral, duration, threshold | Parses without error |
+| 5 | Missing required prompt | omit prompt field | Zod throws validation error |
+| 6 | Duration out of range | duration=0 | Zod throws validation error |
+| 7 | Threshold boundaries | threshold=0.50 (below 0.51) | Zod throws validation error |
+| 8 | Threshold boundaries | threshold=0.55 (valid) | Parses without error |
+| 9 | Valid DeployPredictionMarket command | All on-chain addresses (0x-prefixed) | Parses without error |
+| 10 | Valid trade entity | Composite key (eth_chain_id + tx_hash) | Parses without error |
+| 11 | Valid position entity | prediction_market_id + user_address | Parses without error |
+| 12 | Query schemas | GetPredictionMarkets with thread_id | Parses without error |
+
+**Test cases — models.spec.ts:**
+
+| # | Test | What it validates |
+|---|------|-------------------|
+| 1 | Create PredictionMarket via seed | `seed('PredictionMarket', {...})` returns valid record |
+| 2 | Association: PM belongs to Thread | `pm.thread_id` FK resolves |
+| 3 | Association: PM belongs to Community | `pm.community_id` FK resolves |
+| 4 | Association: PM has many Trades | Can create trades linked to PM |
+| 5 | Association: PM has many Positions | Can create positions linked to PM |
+| 6 | Unique constraint: Position | Duplicate (prediction_market_id, user_address) throws |
+| 7 | Composite PK: Trade | Duplicate (eth_chain_id, tx_hash) throws |
+| 8 | DECIMAL(78,0) precision | Large uint256 values stored without truncation |
+| 9 | Thread.has_prediction_market column | Boolean defaults to false |
+| 10 | ON DELETE behavior | Deleting PM cascades or restricts trades/positions as designed |
+
+**Acceptance criteria:**
+- [ ] All 22 test cases pass
+- [ ] Schema validation covers all enum values (status, action, winner)
+- [ ] Model tests use `seed()` from `@hicommonwealth/model/tester`
+- [ ] No database state leaks between tests
+
+---
+
+### TICKET PM-20: Unit Tests — Commands + Queries (Aggregates)
+
+**Size:** M | **Depends on:** PM-3, PM-19 | **Blocks:** PM-21, PM-22
+
+Test all prediction market commands and queries using the `command()` / `query()` pattern.
+
+**Files to create:**
+- `libs/model/test/prediction-market/CreatePredictionMarket.spec.ts`
+- `libs/model/test/prediction-market/DeployPredictionMarket.spec.ts`
+- `libs/model/test/prediction-market/ResolvePredictionMarket.spec.ts`
+- `libs/model/test/prediction-market/CancelPredictionMarket.spec.ts`
+- `libs/model/test/prediction-market/ProjectTrade.spec.ts`
+- `libs/model/test/prediction-market/ProjectResolution.spec.ts`
+- `libs/model/test/prediction-market/GetPredictionMarkets.spec.ts`
+
+**Follows pattern:** `libs/model/test/contest/check-contests.spec.ts`, `test/integration/api/polls.spec.ts`
+
+**Setup pattern:**
+```typescript
+import { command, dispose, query } from '@hicommonwealth/core';
+import { PredictionMarket } from '@hicommonwealth/model';
+import { seed } from '@hicommonwealth/model/tester';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+
+describe('CreatePredictionMarket', () => {
+  let communityId: string;
+  let threadId: number;
+  let userId: number;
+  let address: string;
+
+  beforeAll(async () => {
+    const [chainNode] = await seed('ChainNode');
+    const [user] = await seed('User', { isAdmin: false });
+    const [community] = await seed('Community', {
+      chain_node_id: chainNode!.id,
+      Addresses: [{ user_id: user!.id, address: '0x...', role: 'member' }],
+      topics: [{ name: 'general' }],
+    });
+    // Create thread owned by user
+    // ...
+  });
+
+  afterAll(async () => { await dispose()(); });
+});
+```
+
+**Test cases — CreatePredictionMarket.spec.ts:**
+
+| # | Test | Actor | Payload | Expected |
+|---|------|-------|---------|----------|
+| 1 | Success: thread author creates PM | thread author | valid prompt/collateral/duration | PM record created, status=draft |
+| 2 | Sets thread.has_prediction_market | thread author | valid | Thread updated to has_prediction_market=true |
+| 3 | Auth: non-author rejected | different user | valid | Throws unauthorized |
+| 4 | Auth: admin can create | community admin | valid | PM record created |
+| 5 | Duplicate: thread already has PM | thread author | second create on same thread | Throws conflict/validation error |
+| 6 | Validation: missing prompt | thread author | omit prompt | Throws validation error |
+
+**Test cases — DeployPredictionMarket.spec.ts:**
+
+| # | Test | Pre-state | Payload | Expected |
+|---|------|-----------|---------|----------|
+| 1 | Success: draft -> active | status=draft | All on-chain addresses | status=active, start_time set |
+| 2 | Invalid transition: cancelled -> active | status=cancelled | addresses | Throws invalid state |
+| 3 | Invalid transition: resolved -> active | status=resolved | addresses | Throws invalid state |
+| 4 | Stores all contract addresses | status=draft | vault, governor, router, strategy, tokens | All fields populated |
+
+**Test cases — ResolvePredictionMarket.spec.ts:**
+
+| # | Test | Actor | Pre-state | Expected |
+|---|------|-------|-----------|----------|
+| 1 | Success: author resolves PASS | thread author | active | status=resolved, winner=1 |
+| 2 | Success: author resolves FAIL | thread author | active | status=resolved, winner=2 |
+| 3 | Auth: non-author rejected | random user | active | Throws unauthorized |
+| 4 | Auth: admin can resolve | community admin | active | status=resolved |
+| 5 | Invalid: already resolved | author | resolved | Throws invalid state |
+| 6 | Invalid: draft cannot resolve | author | draft | Throws invalid state |
+| 7 | Sets resolved_at timestamp | author | active | resolved_at is not null |
+
+**Test cases — CancelPredictionMarket.spec.ts:**
+
+| # | Test | Actor | Pre-state | Expected |
+|---|------|-------|-----------|----------|
+| 1 | Cancel draft | author | draft | status=cancelled |
+| 2 | Cancel active | author | active | status=cancelled |
+| 3 | Cannot cancel resolved | author | resolved | Throws invalid state |
+| 4 | Auth: non-author rejected | random user | active | Throws unauthorized |
+
+**Test cases — ProjectTrade.spec.ts:**
+
+| # | Test | Action | Token amounts | Expected position |
+|---|------|--------|---------------|-------------------|
+| 1 | Mint: first trade creates position | mint | collateral=100 | p:100, f:100, collateral_in:100 |
+| 2 | Mint: second mint adds to position | mint | collateral=50 | p:150, f:150, collateral_in:150 |
+| 3 | Swap buy PASS | swap_buy_pass | f_in=50, p_out=52 | p:202, f:100, collateral_in:150 |
+| 4 | Swap buy FAIL | swap_buy_fail | p_in=30, f_out=31 | p:172, f:131, collateral_in:150 |
+| 5 | Merge | merge | amount=50 | p:122, f:81, collateral_in:100 |
+| 6 | Redeem (after resolve) | redeem | p_in=122 | p:0, f:81, collateral_in:100 |
+| 7 | Trade record created | mint | any | PredictionMarketTrade row exists |
+| 8 | Updates total_collateral on PM | mint | collateral=100 | PM.total_collateral += 100 |
+| 9 | Idempotency: duplicate tx_hash | mint | same tx_hash | Throws composite PK violation |
+
+**Test cases — ProjectResolution.spec.ts:**
+
+| # | Test | Event data | Expected |
+|---|------|------------|----------|
+| 1 | MarketResolved: PASS wins | winner=1 | status=resolved, winner=1 |
+| 2 | MarketResolved: FAIL wins | winner=2 | status=resolved, winner=2 |
+| 3 | Sets resolved_at | any | resolved_at timestamp set |
+| 4 | Idempotent: already resolved | winner=1 on resolved market | No error, no change |
+
+**Test cases — GetPredictionMarkets.spec.ts:**
+
+| # | Test | Params | Expected |
+|---|------|--------|----------|
+| 1 | Returns markets for thread | thread_id with 1 market | Array of length 1 |
+| 2 | Empty for thread without markets | thread_id with no PM | Empty array |
+| 3 | Includes positions | thread_id with PM + positions | Eager-loaded positions |
+| 4 | Includes trades (paginated) | market_id + page params | Paginated trade list |
+
+**Acceptance criteria:**
+- [ ] All ~35 test cases pass
+- [ ] Commands tested via `command(PredictionMarket.CreatePredictionMarket(), {...})`
+- [ ] Queries tested via `query(PredictionMarket.GetPredictionMarkets(), {...})`
+- [ ] State machine transitions exhaustively tested (all valid + all invalid)
+- [ ] Position balance arithmetic verified for all action types
+
+---
+
+### TICKET PM-21: Integration Tests — API Routes (tRPC)
+
+**Size:** M | **Depends on:** PM-4, PM-20 | **Blocks:** PM-25
+
+End-to-end API integration tests hitting real tRPC endpoints with a test server.
+
+**Files to create:**
+- `packages/commonwealth/test/integration/api/prediction-markets.spec.ts`
+
+**Follows pattern:** `packages/commonwealth/test/integration/api/polls.spec.ts`
+
+**Setup pattern:**
+```typescript
+import { command, dispose, query } from '@hicommonwealth/core';
+import { PredictionMarket } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import jwt from 'jsonwebtoken';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { TestServer, testServer } from '../../../server-test';
+import { config } from '../../../server/config';
+
+describe('Prediction Markets API', () => {
+  let server: TestServer;
+  let authorJWT: string;
+  let authorUserId: number;
+  let authorAddress: string;
+  let nonAuthorJWT: string;
+  let threadId: number;
+  let topicId: number;
+
+  beforeAll(async () => {
+    server = await testServer();
+    const topic = await models.Topic.findOne({
+      where: { community_id: 'ethereum' },
+    });
+    topicId = topic!.id;
+
+    // Create thread author
+    const authorRes = await server.seeder.createAndVerifyAddress(
+      { chain: 'ethereum' }, 'Alice',
+    );
+    authorAddress = authorRes.address;
+    authorUserId = parseInt(authorRes.user_id);
+    authorJWT = jwt.sign(
+      { id: authorRes.user_id, email: authorRes.email },
+      config.AUTH.JWT_SECRET,
+    );
+
+    // Create non-author user
+    const nonAuthorRes = await server.seeder.createAndVerifyAddress(
+      { chain: 'ethereum' }, 'Bob',
+    );
+    nonAuthorJWT = jwt.sign(
+      { id: nonAuthorRes.user_id, email: nonAuthorRes.email },
+      config.AUTH.JWT_SECRET,
+    );
+
+    // Create thread owned by author
+    const threadRes = await server.seeder.createThread({
+      chainId: 'ethereum', address: authorAddress, jwt: authorJWT,
+      title: 'PM Test Thread', body: 'Test body', topicId, kind: 'discussion',
+    });
+    threadId = threadRes.result!.id;
+  });
+
+  afterAll(async () => { await dispose()(); });
+});
+```
+
+**Test cases:**
+
+```text
+  Full Lifecycle Flow
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                                                                 │
+  │  1. createPredictionMarket (author) ──→ returns PM with         │
+  │     status=draft, prompt, thread_id                             │
+  │                                                                 │
+  │  2. getPredictionMarkets(thread_id) ──→ returns [PM]            │
+  │                                                                 │
+  │  3. deployPredictionMarket (author) ──→ updates to              │
+  │     status=active, all addresses set                            │
+  │                                                                 │
+  │  4. getPredictionMarkets(thread_id) ──→ PM.status=active        │
+  │                                                                 │
+  │  5. Mock: ProjectPredictionMarketTrade (system) ──→             │
+  │     creates Trade + Position records                            │
+  │                                                                 │
+  │  6. getPredictionMarketTrades(market_id) ──→ trade history      │
+  │                                                                 │
+  │  7. getPredictionMarketPositions(market_id) ──→ positions       │
+  │                                                                 │
+  │  8. resolvePredictionMarket (author, winner=1) ──→              │
+  │     status=resolved, winner=1                                   │
+  │                                                                 │
+  │  9. getPredictionMarkets(thread_id) ──→ PM.status=resolved      │
+  │                                                                 │
+  └─────────────────────────────────────────────────────────────────┘
+```
+
+| # | Test | Actor | Method | Expected |
+|---|------|-------|--------|----------|
+| 1 | Create PM — success | author | createPredictionMarket | 200, PM with status=draft |
+| 2 | Create PM — non-author rejected | nonAuthor | createPredictionMarket | 401/403 |
+| 3 | Create PM — unauthenticated | none | createPredictionMarket | 401 |
+| 4 | Deploy PM — success | author | deployPredictionMarket | 200, status=active |
+| 5 | Get PMs — returns market | any | getPredictionMarkets | Array with 1 PM |
+| 6 | Get PMs — empty for unknown thread | any | getPredictionMarkets | Empty array |
+| 7 | Project trade — creates trade + position | system | command(ProjectTrade) | Trade + Position in DB |
+| 8 | Get trades — returns history | any | getPredictionMarketTrades | Array with trades |
+| 9 | Get positions — returns balances | any | getPredictionMarketPositions | Array with positions |
+| 10 | Resolve PM — success | author | resolvePredictionMarket | 200, status=resolved |
+| 11 | Resolve PM — non-author rejected | nonAuthor | resolvePredictionMarket | 401/403 |
+| 12 | Cancel PM — success (draft) | author | cancelPredictionMarket | 200, status=cancelled |
+| 13 | Cancel PM — already resolved rejected | author | cancelPredictionMarket | 400/409 |
+
+**Acceptance criteria:**
+- [ ] Full lifecycle test passes (create -> deploy -> trade -> query -> resolve)
+- [ ] All auth enforcement tests pass
+- [ ] Uses `testServer()` and `modelSeeder` patterns
+- [ ] Test DB cleaned up in afterAll
+- [ ] `pnpm -F commonwealth test-integration` includes these tests
+
+---
+
+### TICKET PM-22: Integration Tests — Chain Events Pipeline
+
+**Size:** L | **Depends on:** PM-5, PM-6, PM-20 | **Blocks:** PM-23
+
+Test the full chain events pipeline: raw EVM logs -> mapper -> outbox -> policy -> DB state.
+
+**Files to create:**
+- `packages/commonwealth/test/integration/chain-events/prediction-market-events.spec.ts`
+- `libs/model/test/prediction-market/EventMappers.spec.ts`
+- `libs/model/test/prediction-market/Policy.spec.ts`
+
+**Follows pattern:** `packages/commonwealth/test/devnet/evm/evmChainEvents.spec.ts`, `libs/model/test/utils/outbox-drain.ts`
+
+**Test flow diagram:**
+
+```text
+  Raw Log Hex        Event Mapper           Outbox              Policy              DB State
+  ════════════       ════════════           ══════              ══════              ════════
+  ┌───────────┐      ┌──────────┐      ┌──────────┐      ┌──────────────┐     ┌────────────┐
+  │ topics[0] │ ──→  │ decode   │ ──→  │ emit to  │ ──→  │ PredictionMkt│ ──→ │ Trade row  │
+  │ topics[1] │      │ with ABI │      │ Outbox   │      │ Policy       │     │ Position   │
+  │ data      │      │          │      │          │      │ handler      │     │ PM update  │
+  └───────────┘      └──────────┘      └──────────┘      └──────────────┘     └────────────┘
+```
+
+**Test cases — EventMappers.spec.ts (8 mappers):**
+
+| # | Event | Raw log input | Expected decoded output |
+|---|-------|---------------|-------------------------|
+| 1 | ProposalCreated | topics: [sig, proposalId], data: [vault, governor, ...] | { proposalId, vaultAddress, governorAddress, ... } |
+| 2 | MarketCreated | topics: [sig, marketId], data: [pToken, fToken, ...] | { marketId, pTokenAddress, fTokenAddress, ... } |
+| 3 | TokensMinted | topics: [sig, marketId, user], data: [amount] | { marketId, user, collateralAmount, pAmount, fAmount } |
+| 4 | TokensMerged | topics: [sig, marketId, user], data: [amount] | { marketId, user, amount } |
+| 5 | SwapExecuted | topics: [sig, marketId, user], data: [buyPass, amtIn, amtOut] | { marketId, user, buyPass, amountIn, amountOut } |
+| 6 | TokensRedeemed | topics: [sig, marketId, user], data: [amount] | { marketId, user, amount } |
+| 7 | MarketResolved | topics: [sig, marketId], data: [winner] | { marketId, winner } |
+| 8 | ProposalResolved | topics: [sig, proposalId], data: [winner] | { proposalId, winner } |
+
+**Test cases — Policy.spec.ts:**
+
+| # | Event in | Command dispatched | DB assertion |
+|---|----------|--------------------|--------------|
+| 1 | PredictionMarketProposalCreated | Link addresses to PM record | PM.vault_address, governor_address etc. set |
+| 2 | PredictionMarketMarketCreated | Verify/link market | PM.market_id, p_token, f_token set |
+| 3 | PredictionMarketTokensMinted | ProjectTrade(action=mint) | Trade row + Position(p+, f+) created |
+| 4 | PredictionMarketTokensMerged | ProjectTrade(action=merge) | Trade row + Position(p-, f-) updated |
+| 5 | PredictionMarketSwapExecuted (buyPass=true) | ProjectTrade(action=swap_buy_pass) | Trade row + Position(p+, f-) |
+| 6 | PredictionMarketSwapExecuted (buyPass=false) | ProjectTrade(action=swap_buy_fail) | Trade row + Position(p-, f+) |
+| 7 | PredictionMarketTokensRedeemed | ProjectTrade(action=redeem) | Trade row + Position(winning token -) |
+| 8 | PredictionMarketMarketResolved | ProjectResolution(winner=N) | PM.status=resolved, winner=N |
+| 9 | PredictionMarketProposalResolved | ProjectResolution(winner=N) | PM.status=resolved, winner=N |
+| 10 | Duplicate event (idempotency) | Same tx_hash twice | Second insert throws, no duplicate |
+
+**Test cases — prediction-market-events.spec.ts (full pipeline):**
+
+| # | Test | What it validates |
+|---|------|-------------------|
+| 1 | Full mint pipeline | Raw log -> mapper -> outbox -> drainOutbox -> policy -> verify Trade + Position in DB |
+| 2 | Full swap pipeline | Raw swap log -> ... -> verify position balances updated |
+| 3 | Full resolution pipeline | Raw MarketResolved log -> ... -> verify PM.status=resolved |
+| 4 | Multi-event sequence | Mint -> Swap -> Swap -> Resolve in order -> final state correct |
+| 5 | Mapper registry lookup | Event signature hash resolves to correct mapper function |
+| 6 | Unknown event ignored | Random log topic -> no mapper found -> no error |
+
+**Setup pattern (outbox drain):**
+```typescript
+import { emitEvent } from '@hicommonwealth/model';
+import { drainOutbox } from '../../utils/outbox-drain';
+import { models } from '@hicommonwealth/model/db';
+
+// Emit event to outbox
+await emitEvent(models.Outbox, [{
+  event_name: 'PredictionMarketSwapExecuted',
+  event_payload: {
+    marketId: '0xabc...',
+    user: '0x123...',
+    buyPass: true,
+    amountIn: '50000000000000000000',
+    amountOut: '52000000000000000000',
+  },
+}]);
+
+// Drain outbox through policy
+await drainOutbox(
+  ['PredictionMarketSwapExecuted'],
+  PredictionMarketPolicy,
+);
+
+// Verify DB state
+const trade = await models.PredictionMarketTrade.findOne({
+  where: { transaction_hash: '0x...' },
+});
+expect(trade).to.not.be.null;
+expect(trade!.action).to.equal('swap_buy_pass');
+```
+
+**Acceptance criteria:**
+- [ ] All 8 event mappers tested with hex-encoded raw logs
+- [ ] All 10 policy handler cases pass
+- [ ] Full pipeline tests (6 cases) verify end-to-end from raw log to DB state
+- [ ] Idempotency verified (composite PK prevents duplicate trades)
+- [ ] Event signature hashes verified against keccak256 of Solidity signatures
+- [ ] `pnpm -F commonwealth test-integration` includes these tests
+
+---
+
+### TICKET PM-23: Devnet Tests — On-Chain Contract Integration
+
+**Size:** XL | **Depends on:** PM-5, PM-22 | **Blocks:** PM-25
+
+Test actual contract interactions on a local Anvil fork, verifying the full on-chain lifecycle and chain event processing round-trip.
+
+**Files to create:**
+- `packages/commonwealth/test/devnet/evm/predictionMarket.spec.ts`
+
+**Follows pattern:** `packages/commonwealth/test/devnet/evm/evmChainEvents.spec.ts`
+
+**Setup pattern:**
+```typescript
+import { dispose } from '@hicommonwealth/core';
+import {
+  EvmEventSignatures,
+  ValidChains,
+  getBlockNumber,
+} from '@hicommonwealth/evm-protocols';
+import { getAnvil, localRpc, mineBlocks } from '@hicommonwealth/evm-testing';
+import { Anvil } from '@viem/anvil';
+import { createPublicClient, createWalletClient, http } from 'viem';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+
+describe('Prediction Market Devnet Tests', () => {
+  let anvil: Anvil | undefined;
+  let publicClient: ReturnType<typeof createPublicClient>;
+  let walletClient: ReturnType<typeof createWalletClient>;
+  let vaultAddress: `0x${string}`;
+  let governorAddress: `0x${string}`;
+  let routerAddress: `0x${string}`;
+
+  beforeAll(async () => {
+    anvil = await getAnvil(ValidChains.SepoliaBase);
+    publicClient = createPublicClient({ transport: http(localRpc) });
+    walletClient = createWalletClient({ transport: http(localRpc) });
+    // Deploy prediction market contracts via helpers or scripts
+  });
+
+  afterAll(async () => {
+    await anvil?.stop();
+    await dispose()();
+  });
+});
+```
+
+**Test flow:**
+
+```text
+  Anvil Local Chain                    Test Assertions
+  ═════════════════                    ════════════════
+
+  1. Deploy contracts
+     BinaryVault ──────────────────→  vaultAddress is valid contract
+     FutarchyGovernor ─────────────→  governorAddress is valid contract
+     FutarchyRouter ───────────────→  routerAddress is valid contract
+     UniswapV3Strategy ────────────→  strategyAddress is valid contract
+
+  2. Create proposal
+     Governor.propose() ───────────→  ProposalCreated event emitted
+                                      proposalId is bytes32
+
+  3. Mint tokens
+     Vault.mint(100 USDC) ─────────→  TokensMinted event emitted
+     Check balances ────────────────→  pToken.balanceOf(user) == 100
+                                      fToken.balanceOf(user) == 100
+
+  4. Swap tokens
+     Router.swap(buyPass=true, 50) ─→  SwapExecuted event emitted
+     Check balances ────────────────→  pToken balance increased
+                                      fToken balance decreased by 50
+
+  5. Merge tokens
+     Vault.merge(30) ──────────────→  TokensMerged event emitted
+     Check balances ────────────────→  Both tokens decreased by 30
+                                      Collateral returned
+
+  6. Mine blocks to end_time
+     mineBlocks(N) ────────────────→  Block timestamp > end_time
+
+  7. Resolve
+     Governor.resolve() ───────────→  ProposalResolved event emitted
+                                      Winner determined by TWAP
+
+  8. Redeem
+     Vault.redeem(winningTokens) ──→  TokensRedeemed event emitted
+                                      Collateral returned to user
+
+  9. Event processing round-trip
+     getLogs() for all events ──────→  8 event types captured
+     Pass through mappers ─────────→  All decode correctly
+     Feed through policy ──────────→  DB state matches chain state
+```
+
+**Test cases:**
+
+| # | Test | On-chain action | Assertion |
+|---|------|-----------------|-----------|
+| 1 | Deploy contracts | Deploy full suite | All 4 contracts deployed, addresses valid |
+| 2 | Create proposal | Governor.propose(prompt, collateral, duration, threshold) | ProposalCreated log emitted, proposalId non-zero |
+| 3 | Create market | Vault.createMarket(...) | MarketCreated log, pToken + fToken deployed |
+| 4 | Mint tokens | Vault.mint(100e18) | TokensMinted log, balances == 100e18 each |
+| 5 | Swap buy PASS | Router.swap(buyPass=true, 50e18) | SwapExecuted log, pToken balance up, fToken down |
+| 6 | Swap buy FAIL | Router.swap(buyPass=false, 20e18) | SwapExecuted log, fToken balance up, pToken down |
+| 7 | Merge tokens | Vault.merge(10e18) | TokensMerged log, both tokens down, collateral returned |
+| 8 | Get current probability | Strategy.getCurrentProbability() | Returns value between 0 and 1e18 |
+| 9 | Mine past end_time | mineBlocks to future | Block timestamp > proposal end_time |
+| 10 | Resolve proposal | Governor.resolve() | ProposalResolved log, winner != 0 |
+| 11 | Redeem winning tokens | Vault.redeem(amount) | TokensRedeemed log, collateral received |
+| 12 | getLogs captures all events | getLogs with block range | All 8 event types present |
+| 13 | Event mappers decode all | Pass raw logs to mappers | All decode without error |
+| 14 | Policy processes all | drainOutbox for all events | DB state: PM active->resolved, trades + positions correct |
+| 15 | Probability matches chain | Compare DB current_probability to chain | Values match within tolerance |
+
+**Acceptance criteria:**
+- [ ] Full lifecycle test passes on local Anvil
+- [ ] All 8 event types emitted and captured from real contract calls
+- [ ] Event mappers verified against actual ABI-encoded log data (not mocked hex)
+- [ ] Chain state (balances, probability, winner) matches expected values
+- [ ] DB state matches chain state after policy processing
+- [ ] Uses `getAnvil(ValidChains.SepoliaBase)` for chain fork
+- [ ] `pnpm -F commonwealth test-devnet` includes this test (or similar command)
+
+---
+
+### TICKET PM-24: Unit Tests — Frontend Utilities + Stores
+
+**Size:** S | **Depends on:** PM-6, PM-7 | **Blocks:** PM-25
+
+Test frontend utility functions, formatting helpers, and any Zustand stores for prediction markets.
+
+**Files to create:**
+- `packages/commonwealth/test/unit/prediction-markets/utils.spec.ts`
+- `packages/commonwealth/test/unit/prediction-markets/stores.spec.ts` (if applicable)
+
+**Follows pattern:** `packages/commonwealth/test/unit/state/sidebar.spec.ts`, `packages/commonwealth/test/unit/market_integrations/getExternalMarketUrl.spec.ts`
+
+**Test cases — utils.spec.ts:**
+
+| # | Utility function | Input | Expected output |
+|---|------------------|-------|-----------------|
+| 1 | formatProbability | 0.55 | "55%" |
+| 2 | formatProbability | 0 | "0%" |
+| 3 | formatProbability | 1 | "100%" |
+| 4 | formatProbability | 0.5555 | "55.6%" (1 decimal) |
+| 5 | formatCollateral | 1000000n (USDC 6 decimals) | "1.00 USDC" |
+| 6 | formatCollateral | 1000000000000000000n (WETH 18 decimals) | "1.00 WETH" |
+| 7 | formatTimeRemaining | end_time 1 hour from now | "1h remaining" |
+| 8 | formatTimeRemaining | end_time in past | "Ended" |
+| 9 | calculateSlippage | amount=100, slippage=0.01 | { minOutput: 99, maxInput: 101 } |
+| 10 | getMarketStatusColor | 'draft' | 'gray' |
+| 11 | getMarketStatusColor | 'active' | 'blue' |
+| 12 | getMarketStatusColor | 'resolved' | 'green' or 'red' depending on winner |
+| 13 | getMarketStatusColor | 'cancelled' | 'gray' |
+| 14 | canUserTrade | status='active', connected=true | true |
+| 15 | canUserTrade | status='resolved', connected=true | false (only redeem) |
+| 16 | canUserTrade | status='active', connected=false | false |
+| 17 | getWinnerLabel | winner=1 | 'PASS' |
+| 18 | getWinnerLabel | winner=2 | 'FAIL' |
+| 19 | getWinnerLabel | winner=0 | null (not resolved) |
+
+**Test cases — stores.spec.ts (if Zustand store created):**
+
+| # | Store action | Initial state | Expected state |
+|---|-------------|---------------|----------------|
+| 1 | setSelectedTab('swap') | tab='mint' | tab='swap' |
+| 2 | setSlippage(0.005) | slippage=0.01 | slippage=0.005 |
+| 3 | setAmount('100') | amount='' | amount='100' |
+| 4 | resetTradeForm | any | all defaults |
+
+**Acceptance criteria:**
+- [ ] All utility function tests pass
+- [ ] Edge cases covered (zero values, null/undefined, past times)
+- [ ] Store tests verify state transitions
+- [ ] No async calls or API mocking needed (pure unit tests)
+- [ ] `pnpm -F commonwealth test-unit` includes these tests
+
+---
+
+### TICKET PM-25: E2E Tests — Browser Automation (Playwright)
+
+**Size:** XL | **Depends on:** PM-8 through PM-17, PM-21 | **Blocks:** nothing
+
+Full browser E2E tests covering all prediction market user journeys.
+
+**Files to create:**
+- `packages/commonwealth/test/e2e/e2eRegular/predictionMarkets.spec.ts`
+- `packages/commonwealth/test/e2e/e2eStateful/predictionMarketLifecycle.spec.ts`
+
+**Follows pattern:** `packages/commonwealth/test/e2e/e2eRegular/newDiscussion.spec.ts`
+
+**Setup pattern:**
+```typescript
+import { config } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { test, expect } from '@playwright/test';
+import { e2eSeeder, login, type E2E_Seeder } from '../utils/e2eUtils';
+
+let seeder: E2E_Seeder;
+
+test.beforeAll(async () => {
+  seeder = await e2eSeeder();
+});
+
+test.describe('Prediction Markets', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(
+      `${config.SERVER_URL}/${seeder.testChains[0].id}/discussions`,
+    );
+    await seeder.addAddressIfNone(seeder.testChains[0].id);
+    await login(page);
+  });
+});
+```
+
+**Test scenarios — e2eRegular (parallel, empty DB):**
+
+```text
+  Test Scenario                     User Actions                         Assertions
+  ═════════════                     ════════════                         ══════════
+
+  1. Thread + PM creation
+     ┌──────────────────────────────────────────────────────────────────────────┐
+     │  a. Navigate to /discussions                                            │
+     │  b. Click "New Thread"                                                  │
+     │  c. Fill title + body                                                   │
+     │  d. Click "Prediction Market" in sidebar/toolbar                        │
+     │  e. Fill prompt: "Will ETH hit $5000?"                                  │
+     │  f. Set duration: 7 days                                                │
+     │  g. Set threshold: 55%                                                  │
+     │  h. Submit thread                                                       │
+     │                                                                         │
+     │  Assert: Thread created with prediction market card visible             │
+     │  Assert: Card shows status "DRAFT"                                      │
+     │  Assert: Card shows prompt text                                         │
+     │  Assert: Card shows probability bar at 50/50                            │
+     └──────────────────────────────────────────────────────────────────────────┘
+
+  2. Feature flag gating
+     ┌──────────────────────────────────────────────────────────────────────────┐
+     │  a. Disable FLAG_PREDICTION_MARKETS                                     │
+     │  b. Navigate to /discussions                                            │
+     │  c. Click "New Thread"                                                  │
+     │                                                                         │
+     │  Assert: "Prediction Market" button NOT visible in thread form          │
+     │  Assert: Explore page "Markets" tab NOT visible                         │
+     │  Assert: Sidebar "Markets" nav entry NOT visible                        │
+     └──────────────────────────────────────────────────────────────────────────┘
+
+  3. Thread view — PM card display
+     ┌──────────────────────────────────────────────────────────────────────────┐
+     │  a. Navigate to thread with active PM (pre-seeded)                      │
+     │  b. Verify card in sidebar                                              │
+     │                                                                         │
+     │  Assert: PredictionMarketCard visible in sidebar                        │
+     │  Assert: Shows prompt, probability bar, status badge                    │
+     │  Assert: Action buttons visible (Mint, Swap, Merge)                     │
+     │  Assert: Shows total collateral locked                                  │
+     │  Assert: Shows time remaining countdown                                 │
+     └──────────────────────────────────────────────────────────────────────────┘
+
+  4. Explore page — Markets tab
+     ┌──────────────────────────────────────────────────────────────────────────┐
+     │  a. Navigate to /explore                                                │
+     │  b. Click "Markets" tab (or "Prediction Markets" tab)                   │
+     │                                                                         │
+     │  Assert: Tab visible when flag enabled                                  │
+     │  Assert: Market cards render in grid/list                               │
+     │  Assert: Filter controls visible (status, chain)                        │
+     │  Assert: Clicking a card navigates to thread                            │
+     └──────────────────────────────────────────────────────────────────────────┘
+
+  5. Community homepage — Markets section
+     ┌──────────────────────────────────────────────────────────────────────────┐
+     │  a. Navigate to /{community}/                                           │
+     │  b. Scroll to markets section                                           │
+     │                                                                         │
+     │  Assert: "Active Markets" section visible if markets exist              │
+     │  Assert: Horizontal scroll with compact market cards                    │
+     │  Assert: "See all" link navigates to markets app page                   │
+     │  Assert: Section hidden if no active markets                            │
+     └──────────────────────────────────────────────────────────────────────────┘
+
+  6. Sidebar navigation
+     ┌──────────────────────────────────────────────────────────────────────────┐
+     │  a. Navigate to any community page                                      │
+     │  b. Open sidebar                                                        │
+     │                                                                         │
+     │  Assert: "Prediction Markets" entry visible in governance section       │
+     │  Assert: Clicking entry navigates to markets app page                   │
+     │  Assert: Admin section shows PM management link (for admins)            │
+     └──────────────────────────────────────────────────────────────────────────┘
+
+  7. Page crash tests (all PM routes)
+     ┌──────────────────────────────────────────────────────────────────────────┐
+     │  For each route:                                                        │
+     │    /{community}/prediction-markets                                      │
+     │    /{community}/manage/prediction-markets                               │
+     │    Thread with PM card                                                  │
+     │                                                                         │
+     │  Assert: Page loads without crash (no unhandled exceptions)             │
+     │  Assert: No console errors on page load                                 │
+     └──────────────────────────────────────────────────────────────────────────┘
+```
+
+**Test scenarios — e2eStateful (pre-seeded, sequential):**
+
+```text
+  Stateful Lifecycle Test (requires pre-seeded active market)
+  ════════════════════════════════════════════════════════════
+
+  1. View active market thread
+     Assert: Card shows ACTIVE status
+     Assert: Probability bar visible
+     Assert: Trade buttons enabled
+
+  2. Open trade modal — Mint tab
+     Click "Mint" on PM card
+     Assert: Modal opens with Mint tab active
+     Assert: Amount input visible
+     Assert: Collateral cost shown
+     Assert: "Deposit & Mint" button visible
+
+  3. Open trade modal — Swap tab
+     Click Swap tab
+     Assert: PASS/FAIL toggle visible
+     Assert: Amount input + slippage setting
+     Assert: Estimated output displayed
+     Assert: "Swap" button visible
+
+  4. Open trade modal — tab states by market status
+     For resolved market:
+       Assert: Mint tab disabled
+       Assert: Swap tab disabled
+       Assert: Redeem tab enabled
+     For active market:
+       Assert: All tabs except Redeem enabled
+
+  5. Resolve modal — author only
+     As thread author, navigate to thread with ended market
+     Assert: "Resolve" button visible
+     Click "Resolve"
+     Assert: Modal shows current TWAP probability
+     Assert: Shows predicted outcome
+     Assert: "Resolve Market" button visible
+
+  6. Resolve modal — non-author
+     As non-author, navigate to same thread
+     Assert: "Resolve" button NOT visible
+
+  7. Thread list badge
+     Navigate to /discussions
+     Assert: Threads with PM show prediction market badge/tag
+     Assert: Badge shows probability or status
+```
+
+**Acceptance criteria:**
+- [ ] All 7 e2eRegular tests pass in parallel
+- [ ] All 7 e2eStateful tests pass sequentially
+- [ ] Page crash tests cover all PM routes
+- [ ] Feature flag gating verified (UI hidden when off)
+- [ ] Tests use `e2eSeeder()` and `login(page)` utilities
+- [ ] Test data cleaned up in afterAll (DB queries to delete created threads/markets)
+- [ ] Playwright timeout set appropriately (60s default)
+- [ ] Screenshots captured on failure (Playwright retain-on-failure config)
+- [ ] `pnpm -F commonwealth test-e2e` includes these tests
+
+---
+
+### Test Coverage Matrix
+
+| Surface / Feature | Unit | Integration | Devnet | E2E |
+|-------------------|------|-------------|--------|-----|
+| Zod schemas | PM-19 | — | — | — |
+| Sequelize models | PM-19 | — | — | — |
+| CreatePredictionMarket | PM-20 | PM-21 | — | PM-25 |
+| DeployPredictionMarket | PM-20 | PM-21 | PM-23 | PM-25 |
+| ResolvePredictionMarket | PM-20 | PM-21 | PM-23 | PM-25 |
+| CancelPredictionMarket | PM-20 | PM-21 | — | — |
+| ProjectTrade (mint/swap/merge/redeem) | PM-20 | PM-21 | PM-23 | — |
+| ProjectResolution | PM-20 | PM-22 | PM-23 | — |
+| Event mappers (8 events) | — | PM-22 | PM-23 | — |
+| Policy handlers | — | PM-22 | PM-23 | — |
+| Outbox -> RabbitMQ pipeline | — | PM-22 | PM-23 | — |
+| Contract interactions (Anvil) | — | — | PM-23 | — |
+| Frontend utils (format/calc) | PM-24 | — | — | — |
+| Thread + PM creation UI | — | — | — | PM-25 |
+| PM card display (all states) | — | — | — | PM-25 |
+| Trade modal (all tabs) | — | — | — | PM-25 |
+| Resolve modal | — | — | — | PM-25 |
+| Explore page markets tab | — | — | — | PM-25 |
+| Community homepage section | — | — | — | PM-25 |
+| Sidebar navigation | — | — | — | PM-25 |
+| Feature flag gating | — | — | — | PM-25 |
+| Page crash (all routes) | — | — | — | PM-25 |
+
+### Estimated Test Counts
+
+| Ticket | Test file count | Test case count |
+|--------|----------------|-----------------|
+| PM-19 | 2 | ~22 |
+| PM-20 | 7 | ~35 |
+| PM-21 | 1 | ~13 |
+| PM-22 | 3 | ~24 |
+| PM-23 | 1 | ~15 |
+| PM-24 | 2 | ~23 |
+| PM-25 | 2 | ~14 scenarios |
+| **Total** | **18** | **~146** |
+
