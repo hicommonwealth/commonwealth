@@ -88,19 +88,3 @@ export const ProjectPredictionMarketResolution = {
   }),
   output: z.object({}).optional(),
 };
-
-export const ProjectPredictionMarketProposal = {
-  input: z.object({
-    prediction_market_id: PG_INT,
-    proposal_id: EVM_BYTES,
-  }),
-  output: z.object({}).optional(),
-};
-
-export const ProjectPredictionMarketMarket = {
-  input: z.object({
-    prediction_market_id: PG_INT,
-    market_id: EVM_BYTES,
-  }),
-  output: z.object({}).optional(),
-};
