@@ -1,8 +1,4 @@
-import {
-  CustomRetryStrategyError,
-  blobStorage,
-  logger,
-} from '@hicommonwealth/core';
+import { blobStorage, logger } from '@hicommonwealth/core';
 import { isEvmAddress } from '@hicommonwealth/evm-protocols';
 import {
   getThreadUrl,
@@ -15,7 +11,6 @@ import { hasher } from 'node-object-hash';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config';
-import { models } from '../database';
 
 import { parseFarcasterContentUrl } from './farcasterUtils';
 
@@ -277,22 +272,4 @@ export async function tweetExists(tweetId: string) {
   }
 
   return true;
-}
-
-export async function chainNodeMustExist(ethChainId: number) {
-  const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
-    where: {
-      eth_chain_id: ethChainId,
-    },
-  });
-
-  if (!chainNode) {
-    // dead-letter with no retries -- should never happen
-    throw new CustomRetryStrategyError(
-      `Chain node with eth_chain_id ${ethChainId} not found!`,
-      { strategy: 'nack' },
-    );
-  }
-
-  return chainNode;
 }

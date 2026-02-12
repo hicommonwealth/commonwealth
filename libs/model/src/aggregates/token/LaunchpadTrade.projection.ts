@@ -3,8 +3,8 @@ import { events } from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models } from '../../database';
+import { chainNodeMustExist } from '../../utils/chainNodeUtils';
 import { setUserTier } from '../../utils/tiers';
-import { chainNodeMustExist } from '../../utils/utils';
 import { handleCapReached } from './utils';
 
 const inputs = {
