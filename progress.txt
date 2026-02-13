@@ -42,3 +42,8 @@
 - Files: libs/model/src/aggregates/prediction_market/{GetPredictionMarkets.query.ts,index.ts}, libs/adapters/src/trpc/types.ts, packages/commonwealth/server/api/{predictionMarket.ts,internal-router.ts}, packages/commonwealth/server/bindings/rascalConsumerMap.ts
 - Changes: Removed unused PredictionMarket.projection (policy handles projecting). Added GetPredictionMarkets query. Created predictionMarket router exposed behind FLAG_FUTARCHY in internal-router. Registered PredictionMarketPolicy in rascalConsumerMap. Added PredictionMarket tag.
 - Decisions: Used raw SQL query with window function for paginated GetPredictionMarkets, matching quest query pattern.
+
+[2026-02-13] #13382 feat: auto-cleanup deprecated RabbitMQ queues on broker init
+- Files: libs/adapters/src/config.ts, libs/adapters/src/rabbitmq/RabbitMQAdapter.ts, packages/commonwealth/server/bindings/bootstrap.ts, packages/commonwealth/server/bindings/rascalConsumerMap.ts, libs/adapters/test/rabbitmq/cleanupDeprecatedQueues.spec.ts
+- Changes: Added cleanupDeprecatedQueues method to RabbitMQAdapter that uses the RabbitMQ Management HTTP API to discover orphaned queues, deletes empty ones, and warns about non-empty ones. Added CLEANUP_DEPRECATED_QUEUES and RABBITMQ_MANAGEMENT_URL config flags. Added deriveManagementUrl helper to auto-derive management URL from AMQP URI for local dev. Integrated into bootstrapBindings after broker init. Sorted rascalConsumerMap alphabetically by consumer name.
+- Decisions: Used Management HTTP API (native fetch) for queue listing since amqplib has no list-queues API. Only targets queues matching *Queue naming convention to avoid touching system queues. Auto-derives management URL for localhost (port 15672, guest:guest defaults).
