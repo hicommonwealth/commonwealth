@@ -383,6 +383,31 @@ Express middleware orchestrates concerns (auth, rate limiting, logging, error ha
 
 Services publish events to RabbitMQ. Workers consume messages and process async jobs. Enables service isolation and horizontal scaling.
 
+### Policies vs Projections
+
+Both policies and projections are event handlers, but serve fundamentally different purposes:
+
+**Policies** (`libs/model/src/policies/*.policy.ts`):
+- Orchestrators that connect flows: event → `command()`
+- React to events and invoke commands defined by aggregates
+- May read from models (ideally via queries) for context needed to decide which command to invoke
+- **Cannot** mutate the database directly via Sequelize
+- Use the `Policy` type from `@hicommonwealth/core`
+- Side-effect-only handlers (Redis, notifications, external services) are also policies
+
+**Projections** (`libs/model/src/aggregates/<aggregate>/*.projection.ts`):
+- Read model builders that materialize state: event → Sequelize mutation
+- React to events and mutate database models directly
+- **Cannot** call `command()`
+- Use the `Projection` type from `@hicommonwealth/core`
+- Live inside their respective aggregate directory, not in `policies/`
+
+**Rules:**
+- `.policy.ts` files must NOT contain direct DB mutations (`models.*.create/update/destroy/save/upsert/bulkCreate/increment/findOrCreate`)
+- `.projection.ts` files must NOT call `command()`
+- "Project..." prefixed commands are a code smell — projection logic should not be wrapped in command indirection
+- When an event needs both a command call AND a DB mutation, split into separate policy and projection files
+
 ### Configuration Management
 
 Centralized config via `@hicommonwealth/core/configure()` with environment-specific overrides and Zod validation.
