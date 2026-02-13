@@ -7,20 +7,20 @@ import {
 } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
+  ChainEvents,
+  Community,
   CommunityGoalsPolicy,
   Contest,
   ContestWorker,
-  CreateUnverifiedUser,
   DiscordBotPolicy,
   EventStreamPolicy,
   FarcasterWorker,
-  GovernancePolicy,
   LaunchpadPolicy,
-  NominationsWorker,
   NotificationsPolicy,
   NotificationsSettingsPolicy,
-  PredictionMarketPolicy,
-  ReactionWorker,
+  PredictionMarket,
+  Reaction,
+  Token,
   TwitterEngagementPolicy,
   User,
 } from '@hicommonwealth/model';
@@ -85,33 +85,36 @@ const _NotificationsPolicy = {
   },
 };
 
-const _ReactionWorker = {
-  consumer: ReactionWorker,
+const _ReactionWorkerProjection = {
+  consumer: Reaction.ReactionWorkerProjection,
 };
 
-const _GovernancePolicy = {
-  consumer: GovernancePolicy,
+const _GovernanceProjection = {
+  consumer: ChainEvents.GovernanceProjection,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   ChainEventPolicy,
+  Community.ChainEventProjection,
+  Community.NominationsProjection,
   DiscordBotPolicy,
   Contest.Contests,
-  NominationsWorker,
+  Contest.FarcasterContestProjection,
   FarcasterWorker,
   EventStreamPolicy,
   NotificationsSettingsPolicy,
-  CreateUnverifiedUser,
+  User.CreateUnverifiedUser,
+  Token.LaunchpadTradeProjection,
   TwitterEngagementPolicy,
   CommunityGoalsPolicy,
   LaunchpadPolicy,
-  PredictionMarketPolicy,
+  PredictionMarket.PredictionMarketProjection,
   _ContestWorker,
-  _GovernancePolicy,
+  _GovernanceProjection,
   _FarcasterWorker,
   _Xp,
   _NotificationsSettingsPolicy,
   _NotificationsPolicy,
-  _ReactionWorker,
+  _ReactionWorkerProjection,
 ];
