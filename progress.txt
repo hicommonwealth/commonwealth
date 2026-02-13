@@ -58,3 +58,8 @@ Each entry documents: date, feature, decisions, files changed, tests, and concer
 - Files: handleCommunityStakeTrades.ts→projectCommunityStakeTrades.ts, handleReferralFeeDistributed.ts→projectReferralFeeDistributed.ts (moved from policies/handlers/ to aggregates/community/projections/), policies/utils/utils.ts, utils/utils.ts, LaunchpadTrade.projection.ts, ChainEventCreated.projection.ts, chainEventCreatedPolicy.spec.ts
 - Changes: Moved projection handler files to live alongside their projection consumers under projections/ subfolder with project* naming convention. Moved chainNodeMustExist utility from policies/utils/utils.ts to the shared utils/utils.ts module. Updated all import paths and function names.
 - Decisions: Only moved handlers exclusively consumed by projections. Notification handlers (notify*.ts) and policy-specific handlers (handleNamespaceDeployed, handleTokenStaking) remain in policies/handlers/.
+
+[2026-02-13] #13385 docs: update prediction markets plan for projection architecture and ABI events
+- Files: common_knowledge/Prediction-Markets.md
+- Changes: Replaced all PredictionMarketPolicy references with PredictionMarketProjection. Removed ProjectPredictionMarketTrade/Resolution command indirection pattern. Updated PM-4 to import ABIs from @commonxyz/common-protocol-abis instead of creating local files. Marked PM-1 and PM-2 (Slices 1+2) as completed. Added complete EVM event-to-mapper-to-projection mapping table with all 8 ABI event signatures. Updated all diagrams to show projection-based flow (no policy or system command boxes).
+- Decisions: Kept ProjectPredictionMarketTrade/Resolution schemas in prediction-market.schemas.ts as they define the shape of event payloads used by the projection.
