@@ -12,6 +12,7 @@ export * as GroupSnapshot from './aggregates/groupSnapshot';
 export * as LoadTest from './aggregates/load-testing';
 export * as MCP from './aggregates/mcp';
 export * as Poll from './aggregates/poll';
+export * as PredictionMarket from './aggregates/prediction_market';
 export * as Quest from './aggregates/quest';
 export * as Reaction from './aggregates/reaction';
 export * as Search from './aggregates/search';

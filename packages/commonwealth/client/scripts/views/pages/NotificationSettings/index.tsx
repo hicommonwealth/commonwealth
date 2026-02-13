@@ -14,7 +14,6 @@ import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry'
 import EmailsSection from 'views/pages/NotificationSettings/EmailsSection';
 import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNotificationsToggle';
 import { PushNotificationsToggleMaster } from 'views/pages/NotificationSettings/PushNotificationsToggleMaster';
-import { ReactNativeAboutSection } from 'views/pages/NotificationSettings/ReactNativeAboutSection';
 import { ThreadSubscriptions } from 'views/pages/NotificationSettings/ThreadSubscriptions';
 import { TopicSubscriptions } from 'views/pages/NotificationSettings/TopicSubscriptions';
 import { useSupportsPushNotifications } from 'views/pages/NotificationSettings/useSupportsPushNotifications';
@@ -202,7 +201,6 @@ const NotificationSettings = () => {
             <TopicSubscriptions />
           </>
         )}
-        <ReactNativeAboutSection />
       </div>
     </CWPageLayout>
   );

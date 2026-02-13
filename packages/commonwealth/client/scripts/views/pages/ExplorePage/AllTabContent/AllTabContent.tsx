@@ -8,6 +8,7 @@ import TrendingThreadList from '../../HomePage/TrendingThreadList/TrendingThread
 import XPTable from '../../Leaderboard/XPTable/XPTable';
 import { TrendingCommunitiesPreview } from '../../user_dashboard/TrendingCommunitiesPreview';
 import ExploreContestList from '../ExploreContestList';
+import MarketsList from '../MarketsList';
 import QuestList from '../QuestList';
 import TokensList from '../TokensList';
 import './AllTabContent.scss';
@@ -23,8 +24,7 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
   searchText,
   onClearSearch,
 }) => {
-  const launchpadEnabled = useFlag('launchpad');
-  const questsEnabled = useFlag('xp');
+  const marketsEnabled = useFlag('markets');
   const navigate = useCommonNavigate();
 
   return (
@@ -37,23 +37,21 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
         />
       )}
 
-      {launchpadEnabled && (
-        <div className="section-container">
-          <CWSectionHeader
-            title="Tokens"
-            seeAllText="See all tokens"
-            onSeeAllClick={() => navigate('/explore?tab=tokens')}
-          />
-          <TokensList
-            hideHeader
-            hideFilters
-            hideSeeMore
-            hideSearchTag
-            searchText={searchText}
-            onClearSearch={onClearSearch}
-          />
-        </div>
-      )}
+      <div className="section-container">
+        <CWSectionHeader
+          title="Tokens"
+          seeAllText="See all tokens"
+          onSeeAllClick={() => navigate('/explore?tab=tokens')}
+        />
+        <TokensList
+          hideHeader
+          hideFilters
+          hideSeeMore
+          hideSearchTag
+          searchText={searchText}
+          onClearSearch={onClearSearch}
+        />
+      </div>
 
       {/* Communities section */}
       <div className="section-container">
@@ -65,23 +63,39 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
       </div>
 
       {/* Quests section */}
-      {questsEnabled && (
+      <div className="section-container">
+        <CWSectionHeader
+          title="Quests"
+          seeAllText="See all quests"
+          onSeeAllClick={() => navigate('/explore?tab=quests')}
+        />
+        <div className="horizontal-scroll-container">
+          <QuestList
+            hideHeader
+            hideFilters
+            hideSeeMore
+            hideSearchTag
+            searchText={searchText}
+            onClearSearch={onClearSearch}
+          />
+        </div>
+      </div>
+
+      {/* Markets section */}
+      {marketsEnabled && (
         <div className="section-container">
           <CWSectionHeader
-            title="Quests"
-            seeAllText="See all quests"
-            onSeeAllClick={() => navigate('/explore?tab=quests')}
+            title="Markets"
+            seeAllText="See all markets"
+            onSeeAllClick={() => navigate('/explore?tab=markets')}
           />
-          <div className="horizontal-scroll-container">
-            <QuestList
-              hideHeader
-              hideFilters
-              hideSeeMore
-              hideSearchTag
-              searchText={searchText}
-              onClearSearch={onClearSearch}
-            />
-          </div>
+          <MarketsList
+            hideHeader
+            hideFilters
+            hideSearchTag
+            searchText={searchText}
+            onClearSearch={onClearSearch}
+          />
         </div>
       )}
 

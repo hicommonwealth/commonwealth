@@ -171,6 +171,24 @@ export const buildAssociations = (db: DB) => {
       foreignKey: 'thread_id',
     });
 
+  db.Thread.withMany(db.PredictionMarket, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
+
+  db.PredictionMarket.withMany(db.PredictionMarketTrade, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  }).withMany(db.PredictionMarketPosition, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
+
+  db.User.withMany(db.PredictionMarketPosition, {
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  });
+
   db.ThreadToken.withMany(db.ThreadTokenTrade, {
     foreignKey: 'token_address',
     onUpdate: 'CASCADE',

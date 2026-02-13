@@ -1,0 +1,44 @@
+[2026-02-04] #13341 fix: add graceful shutdown for modulith workers
+- Files: server.ts, bootstrap.ts, relayForever.ts, graphileWorker.ts, workerLifecycle.ts, workerLifecycle.spec.ts, archiveOutbox.ts
+- Changes: Added workerLifecycle module for coordinating worker shutdown. Workers register cleanup functions called on SIGTERM/SIGINT. Workers start in background to avoid blocking server. Fixed blocking execSync in archiveOutbox by converting to async exec.
+- Decisions: Used Promise.all for parallel worker startup; 30s timeout for graceful shutdown; workers check isShutdownInProgress() flag.
+
+[2026-02-06] #13352 fix: use bind mounts for macos volumes
+- Files: scripts/macos/cwup.sh, scripts/macos/cwdown.sh
+- Changes: Switched macOS cwup.sh volumes to bind mounts under ~/.container-volumes with directory creation and permissive chmod for local dev; run RabbitMQ as uid 999 to avoid chown failures; cwdown now removes those host directories.
+
+[2026-02-06] #13354 fix: add Outbox table existence check before starting message relayer loop
+- Files: relayForever.ts, bootstrap.ts, waitForOutboxTable.spec.ts
+- Changes: Added waitForOutboxTable() with exponential backoff (1s-30s) that polls for Outbox table accessibility before relay loop starts. Called from bootstrapRelayer() so isServiceHealthy gates on DB readiness.
+- Decisions: Placed readiness check in bootstrapRelayer (awaited) rather than inside fire-and-forget relayForever, so health check naturally gates on it.
+
+[2026-02-09] #13361 feat: add prediction market schemas, models, and migration
+- Files: .env.example, libs/model/src/config.ts, libs/model/src/models/associations.ts, libs/model/src/models/factories.ts, libs/model/src/models/index.ts, libs/model/src/models/prediction_market.ts, libs/model/src/models/thread.ts, libs/model/migrations/20260209120000-create-prediction-markets.js, libs/model/test/prediction-market/models.spec.ts, libs/model/test/prediction-market/schemas.spec.ts, libs/schemas/src/commands/index.ts, libs/schemas/src/commands/prediction-market.schemas.ts, libs/schemas/src/context.ts, libs/schemas/src/entities/index.ts, libs/schemas/src/entities/prediction-market.schemas.ts, libs/schemas/src/entities/thread.schemas.ts, libs/schemas/src/events/events.schemas.ts, libs/schemas/src/queries/index.ts, libs/schemas/src/queries/prediction-market.schemas.ts, packages/commonwealth/client/scripts/helpers/feature-flags.ts, packages/commonwealth/client/vite.config.ts
+- Changes: Added futarchy feature flag wiring, prediction market schemas, events, and contexts; introduced Sequelize models, associations, thread flag, and migration for prediction market tables; added schema and model tests.
+- Decisions: Used DECIMAL(78,0) for on-chain amounts and enforced composite/unique constraints via model indexes and migration.
+
+[2026-02-09] #13361 test: extend prediction market schema coverage
+- Files: libs/model/test/prediction-market/schemas.spec.ts
+- Changes: Added command schema validation coverage for prediction market create, deploy, resolve, cancel, and projection commands.
+
+[2026-02-09] #13361 chore: align prediction market context and tests
+- Files: libs/schemas/src/context.ts, libs/model/test/prediction-market/prediction-market-lifecycle.spec.ts
+- Changes: Removed prediction market context in favor of thread context and dropped lifecycle test until command layer exists.
+
+[2026-02-09] #13361 chore: drop thread prediction-market flag
+- Files: libs/model/src/models/thread.ts, libs/schemas/src/entities/thread.schemas.ts, libs/model/migrations/20260209120000-create-prediction-markets.js, libs/model/test/prediction-market/models.spec.ts, common_knowledge/Prediction-Markets.md
+- Changes: Removed has_prediction_market column/schema/migration usage and updated docs/tests to rely on prediction market thread FK.
+
+[2026-02-09] #13361 chore: drop prediction market community fk
+- Files: libs/schemas/src/entities/prediction-market.schemas.ts, libs/schemas/src/queries/prediction-market.schemas.ts, libs/model/src/models/prediction_market.ts, libs/model/src/models/associations.ts, libs/model/migrations/20260209120000-create-prediction-markets.js, libs/model/test/prediction-market/models.spec.ts, libs/model/test/prediction-market/schemas.spec.ts, common_knowledge/Prediction-Markets.md
+- Changes: Removed community_id from prediction markets, associations, migration, and queries; updated tests/docs to rely on thread FK only.
+
+[2026-02-11] #13370 feat: implement prediction market deploy flow, policy, and read model
+- Files: libs/model/src/aggregates/prediction_market/{CreatePredictionMarket,DeployPredictionMarket,ProjectPredictionMarketProposal,ProjectPredictionMarketMarket}.command.ts, PredictionMarket.projection.ts, index.ts, libs/model/src/policies/PredictionMarket.policy.ts, libs/model/src/policies/index.ts, libs/model/src/index.ts, libs/model/test/prediction-market/prediction-market-lifecycle.spec.ts, libs/model/test/prediction-market/schemas.spec.ts, libs/schemas/src/commands/prediction-market.schemas.ts, libs/schemas/src/events/events.schemas.ts, libs/schemas/src/index.ts
+- Changes: Implemented CreatePredictionMarket and DeployPredictionMarket commands with thread author auth and transactional writes. Added PredictionMarketPolicy to reconcile on-chain ProposalCreated/MarketCreated events. Added PredictionMarket.projection as read model. Added lifecycle test covering create->deploy->policy reconciliation.
+- Decisions: Used EventPair type assertion for DeployPredictionMarket event emission (large union narrowing). Read model currently mirrors write model (projection is a no-op logger). Added thread_id to all command schemas requiring ThreadContext auth.
+
+[2026-02-11] #13370 fix: wire prediction market router and remove projection
+- Files: libs/model/src/aggregates/prediction_market/{GetPredictionMarkets.query.ts,index.ts}, libs/adapters/src/trpc/types.ts, packages/commonwealth/server/api/{predictionMarket.ts,internal-router.ts}, packages/commonwealth/server/bindings/rascalConsumerMap.ts
+- Changes: Removed unused PredictionMarket.projection (policy handles projecting). Added GetPredictionMarkets query. Created predictionMarket router exposed behind FLAG_FUTARCHY in internal-router. Registered PredictionMarketPolicy in rascalConsumerMap. Added PredictionMarket tag.
+- Decisions: Used raw SQL query with window function for paginated GetPredictionMarkets, matching quest query pattern.

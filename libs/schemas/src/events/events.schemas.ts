@@ -11,12 +11,18 @@ import { Comment } from '../entities/comment.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
 import { LaunchpadToken } from '../entities/launchpad-token.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
+import { PredictionMarket } from '../entities/prediction-market.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { ThreadToken } from '../entities/thread-token.schemas';
 import { Thread } from '../entities/thread.schemas';
 import { User } from '../entities/user.schemas';
 import { DiscordEventBase, Tweet } from '../integrations';
-import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_INT } from '../utils';
+import {
+  EVM_ADDRESS_STRICT,
+  EVM_BYTES,
+  EVM_TRANSACTION_HASH,
+  PG_INT,
+} from '../utils';
 
 // All events should carry this common metadata
 export const EventMetadata = z.object({
@@ -449,6 +455,101 @@ export const events = {
     eth_amount: z.coerce.bigint(),
     community_token_amount: z.coerce.bigint(),
     floating_supply: z.coerce.bigint(),
+  }),
+
+  PredictionMarketCreated: PredictionMarket,
+
+  PredictionMarketDeployed: z.object({
+    prediction_market_id: PG_INT,
+    proposal_id: EVM_BYTES.nullish(),
+    market_id: EVM_BYTES.nullish(),
+    eth_chain_id: z.number(),
+    vault_address: EVM_ADDRESS_STRICT,
+    governor_address: EVM_ADDRESS_STRICT,
+    router_address: EVM_ADDRESS_STRICT,
+    strategy_address: EVM_ADDRESS_STRICT,
+    p_token_address: EVM_ADDRESS_STRICT,
+    f_token_address: EVM_ADDRESS_STRICT,
+    start_time: z.coerce.date(),
+    end_time: z.coerce.date(),
+  }),
+
+  PredictionMarketProposalCreated: z.object({
+    prediction_market_id: PG_INT,
+    proposal_id: EVM_BYTES,
+    eth_chain_id: z.number(),
+    transaction_hash: EVM_TRANSACTION_HASH,
+    timestamp: PG_INT,
+  }),
+
+  PredictionMarketMarketCreated: z.object({
+    prediction_market_id: PG_INT,
+    market_id: EVM_BYTES,
+    eth_chain_id: z.number(),
+    transaction_hash: EVM_TRANSACTION_HASH,
+    timestamp: PG_INT,
+  }),
+
+  PredictionMarketTokensMinted: z.object({
+    market_id: EVM_BYTES,
+    eth_chain_id: z.number(),
+    transaction_hash: EVM_TRANSACTION_HASH,
+    trader_address: EVM_ADDRESS_STRICT,
+    collateral_amount: z.coerce.bigint(),
+    p_token_amount: z.coerce.bigint(),
+    f_token_amount: z.coerce.bigint(),
+    timestamp: PG_INT,
+  }),
+
+  PredictionMarketTokensMerged: z.object({
+    market_id: EVM_BYTES,
+    eth_chain_id: z.number(),
+    transaction_hash: EVM_TRANSACTION_HASH,
+    trader_address: EVM_ADDRESS_STRICT,
+    collateral_amount: z.coerce.bigint(),
+    p_token_amount: z.coerce.bigint(),
+    f_token_amount: z.coerce.bigint(),
+    timestamp: PG_INT,
+  }),
+
+  PredictionMarketSwapExecuted: z.object({
+    market_id: EVM_BYTES,
+    eth_chain_id: z.number(),
+    transaction_hash: EVM_TRANSACTION_HASH,
+    trader_address: EVM_ADDRESS_STRICT,
+    collateral_amount: z.coerce.bigint(),
+    p_token_amount: z.coerce.bigint(),
+    f_token_amount: z.coerce.bigint(),
+    timestamp: PG_INT,
+  }),
+
+  PredictionMarketTokensRedeemed: z.object({
+    market_id: EVM_BYTES,
+    eth_chain_id: z.number(),
+    transaction_hash: EVM_TRANSACTION_HASH,
+    trader_address: EVM_ADDRESS_STRICT,
+    collateral_amount: z.coerce.bigint(),
+    p_token_amount: z.coerce.bigint(),
+    f_token_amount: z.coerce.bigint(),
+    timestamp: PG_INT,
+  }),
+
+  PredictionMarketProposalResolved: z.object({
+    prediction_market_id: PG_INT,
+    proposal_id: EVM_BYTES,
+    winner: z.number().int().min(0).max(2),
+    resolved_at: z.coerce.date(),
+  }),
+
+  PredictionMarketMarketResolved: z.object({
+    prediction_market_id: PG_INT,
+    market_id: EVM_BYTES,
+    winner: z.number().int().min(0).max(2),
+    resolved_at: z.coerce.date(),
+  }),
+
+  PredictionMarketCancelled: z.object({
+    prediction_market_id: PG_INT,
   }),
 
   ReferralFeeDistributed: ChainEventBase.extend({

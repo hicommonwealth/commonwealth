@@ -37,6 +37,7 @@ export enum Tag {
   Configuration = 'Configuration',
   MCP = 'MCP',
   TokenAllocation = 'TokenAllocation',
+  PredictionMarket = 'PredictionMarket',
 }
 
 /**

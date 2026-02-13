@@ -68,9 +68,6 @@ const {
   TWITTER_ACCESS_TOKEN,
   TWITTER_ACCESS_TOKEN_SECRET,
   SKALE_PRIVATE_KEY,
-  PRIVY_FLAG,
-  PRIVY_APP_ID,
-  PRIVY_APP_SECRET,
   FLAG_USE_RUNWARE,
   RUNWARE_API_KEY,
   CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
@@ -109,8 +106,8 @@ const {
   MAGNA_BATCH_SIZE,
   SLACK_WEBHOOK_URL_ALL_ENG,
   SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
-  FLAG_CLAIMS,
   FLAG_MARKETS,
+  FLAG_FUTARCHY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -270,11 +267,6 @@ export const config = configure(
     SKALE: {
       PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
     },
-    PRIVY: {
-      FLAG_ENABLED: PRIVY_FLAG === 'true',
-      APP_ID: PRIVY_APP_ID,
-      APP_SECRET: PRIVY_APP_SECRET,
-    },
     IMAGE_GENERATION: {
       FLAG_USE_RUNWARE: FLAG_USE_RUNWARE === 'true' || false,
       RUNWARE_API_KEY: RUNWARE_API_KEY,
@@ -369,11 +361,9 @@ export const config = configure(
         MAGNA_NOTIFS: SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
       },
     },
-    CLAIMS: {
-      ENABLED: FLAG_CLAIMS === 'true',
-    },
     MARKETS: {
       ENABLED: FLAG_MARKETS === 'true',
+      FUTARCHY_ENABLED: FLAG_FUTARCHY === 'true',
     },
   },
   z.object({
@@ -647,15 +637,6 @@ export const config = configure(
           }),
         ),
     }),
-    PRIVY: z
-      .object({
-        FLAG_ENABLED: z.boolean(),
-        APP_ID: z.string().optional(),
-        APP_SECRET: z.string().optional(),
-      })
-      .refine(
-        (data) => !(data.FLAG_ENABLED && (!data.APP_ID || !data.APP_SECRET)),
-      ),
     IMAGE_GENERATION: z
       .object({
         FLAG_USE_RUNWARE: z.boolean().optional(),
@@ -794,11 +775,9 @@ export const config = configure(
         MAGNA_NOTIFS: z.string().optional(),
       }),
     }),
-    CLAIMS: z.object({
-      ENABLED: z.boolean(),
-    }),
     MARKETS: z.object({
       ENABLED: z.boolean(),
+      FUTARCHY_ENABLED: z.boolean(),
     }),
   }),
 );

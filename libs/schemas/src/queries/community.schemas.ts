@@ -5,6 +5,7 @@ import {
   GatedActionEnum,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
+  MIN_SEARCH_LENGTH,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext } from '../context';
@@ -148,7 +149,7 @@ export const GetCommunityStake = {
 
 export const GetCommunityMembers = {
   input: PaginationParamsSchema.extend({
-    search: z.string().optional(),
+    search: z.string().min(MIN_SEARCH_LENGTH).optional(),
     community_id: z.string(),
     include_roles: z.boolean().optional(),
     memberships: z
@@ -466,10 +467,12 @@ export const MarketView = Market.extend({
 });
 
 export const GetMarkets = {
-  input: z.object({
+  input: PaginationParamsSchema.extend({
     community_id: z.string(),
   }),
-  output: z.array(MarketView),
+  output: PaginatedResultSchema.extend({
+    results: z.array(MarketView),
+  }),
 };
 
 export const ExternalMarket = z.object({
@@ -486,11 +489,20 @@ export const ExternalMarket = z.object({
 });
 
 export const DiscoverExternalMarkets = {
-  input: z.object({
+  input: PaginationParamsSchema.extend({
     provider: z.enum([...Markets, 'all']),
-    limit: z.number().min(1).max(200).optional().default(200),
     search: z.string().optional(),
     category: z.string().optional(),
+    status: z
+      .enum(['open', 'closed', 'settled', 'all'])
+      .optional()
+      .default('all'),
+    sortOrder: z
+      .enum(['newest', 'oldest', 'ending-soon', 'starting-soon'])
+      .optional()
+      .default('newest'),
   }),
-  output: z.array(ExternalMarket),
+  output: PaginatedResultSchema.extend({
+    results: z.array(ExternalMarket),
+  }),
 };

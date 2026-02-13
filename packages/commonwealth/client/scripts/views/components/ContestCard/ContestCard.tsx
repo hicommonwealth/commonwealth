@@ -7,7 +7,6 @@ import commonLogo from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
 import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import useRerender from 'hooks/useRerender';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
@@ -34,10 +33,10 @@ import {
 import ContestAlert from './ContestAlert';
 
 import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
-import { useFlag } from 'hooks/useFlag';
 import { smartTrim } from 'shared/utils';
 import { PrizeDisplay } from 'views/components/PrizeDisplay';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
+import useContestCardRerender from './useContestCardRerender';
 
 import './ContestCard.scss';
 
@@ -113,8 +112,6 @@ const ContestCard = ({
   const { mutateAsync: cancelContest } = useCancelContestMutation();
   const { mutateAsync: deleteContest } = useDeleteContestMutation();
 
-  const newContestPage = useFlag('newContestPage');
-
   const isActive = isContestActive({
     contest: {
       cancelled: isCancelled,
@@ -122,7 +119,7 @@ const ContestCard = ({
     },
   });
 
-  useRerender({ isActive, interval: 6000 });
+  useContestCardRerender({ isActive, interval: 6000 });
 
   const { isWindowMediumSmallInclusive } = useBrowserWindow({});
 
@@ -216,14 +213,7 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    // after removing feature flag, we can remove the isFarcaster check as well
-    newContestPage || isFarcaster
-      ? navigate(`/contests/${address}`, {}, community?.id)
-      : navigate(
-          `/discussions?featured=mostLikes&contest=${address}`,
-          {},
-          community?.id,
-        );
+    navigate(`/contests/${address}`, {}, community?.id);
   };
 
   const handleFundClick = () => {
