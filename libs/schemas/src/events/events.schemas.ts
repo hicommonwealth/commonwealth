@@ -517,9 +517,9 @@ export const events = {
     eth_chain_id: z.number(),
     transaction_hash: EVM_TRANSACTION_HASH,
     trader_address: EVM_ADDRESS_STRICT,
-    collateral_amount: z.coerce.bigint(),
-    p_token_amount: z.coerce.bigint(),
-    f_token_amount: z.coerce.bigint(),
+    buy_pass: z.boolean(),
+    amount_in: z.coerce.bigint(),
+    amount_out: z.coerce.bigint(),
     timestamp: PG_INT,
   }),
 

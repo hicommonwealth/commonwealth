@@ -62,6 +62,8 @@ export const EvmEventSignatures = {
   PredictionMarket: {
     TokensMinted:
       '0xef616469a0b35ce807813d17c53c505b9d4796a93287cd361318dbca99ac9250',
+    SwapExecuted:
+      '0x6c3029970cad07cf2c4bef13d30bdb7b6b77093a579d543839b5386cb0184b03',
   },
   TokenCommunityManager: {
     CommunityNamespaceCreated:

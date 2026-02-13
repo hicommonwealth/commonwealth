@@ -5,6 +5,7 @@ import {
   CommunityStakeAbi,
   ContestGovernorAbi,
   ContestGovernorSingleAbi,
+  FutarchyRouterAbi,
   LPBondingCurveAbi,
   NamespaceFactoryAbi,
   ReferralFeeManagerAbi,
@@ -371,6 +372,30 @@ const predictionMarketTokensMintedMapper: EvmMapper<
   };
 };
 
+const predictionMarketSwapExecutedMapper: EvmMapper<
+  'PredictionMarketSwapExecuted'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: FutarchyRouterAbi,
+    eventName: 'SwapExecuted',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketSwapExecuted',
+    event_payload: {
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      trader_address: decoded.args.user,
+      buy_pass: decoded.args.buyPass,
+      amount_in: decoded.args.amountIn,
+      amount_out: decoded.args.amountOut,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
 const communityNamespaceCreatedMapper: EvmMapper<
   'CommunityNamespaceCreated'
 > = (event: EvmEvent) => {
@@ -519,6 +544,8 @@ export const chainEventMappers: Record<string, EvmMapper<OutboxEvents>> = {
   // Prediction Markets
   [EvmEventSignatures.PredictionMarket.TokensMinted]:
     predictionMarketTokensMintedMapper,
+  [EvmEventSignatures.PredictionMarket.SwapExecuted]:
+    predictionMarketSwapExecutedMapper,
 
   // TokenCommunityManager
   [EvmEventSignatures.TokenCommunityManager.CommunityNamespaceCreated]:

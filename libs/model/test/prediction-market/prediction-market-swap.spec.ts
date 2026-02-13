@@ -13,7 +13,7 @@ import { EvmEvent } from '../../src/services/evmChainEvents/types';
 import { seed } from '../../src/tester';
 import { seedCommunity } from '../utils/community-seeder';
 
-describe('Prediction Market Mint', () => {
+describe('Prediction Market Swap', () => {
   let admin: Actor;
   let thread_id: number;
   let eth_chain_id: number;
@@ -84,6 +84,23 @@ describe('Prediction Market Mint', () => {
         timestamp: Math.floor(Date.now() / 1000),
       },
     });
+
+    // Seed initial position via mint so swaps have tokens to trade
+    await projection.body.PredictionMarketTokensMinted({
+      id: 2,
+      name: 'PredictionMarketTokensMinted',
+      payload: {
+        market_id: onChainMarketId,
+        eth_chain_id,
+        transaction_hash:
+          '0xmint0000000000000000000000000000000000000000000000000000000hash',
+        trader_address: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        collateral_amount: 2000000000000000000n,
+        p_token_amount: 2000000000000000000n,
+        f_token_amount: 2000000000000000000n,
+        timestamp: 1700000000,
+      },
+    });
   });
 
   afterAll(async () => {
@@ -91,48 +108,58 @@ describe('Prediction Market Mint', () => {
   });
 
   describe('Event Signature', () => {
-    it('should have the correct keccak256 hash for TokensMinted', () => {
-      expect(EvmEventSignatures.PredictionMarket.TokensMinted).toBe(
-        '0xef616469a0b35ce807813d17c53c505b9d4796a93287cd361318dbca99ac9250',
+    it('should have the correct keccak256 hash for SwapExecuted', () => {
+      expect(EvmEventSignatures.PredictionMarket.SwapExecuted).toBe(
+        '0x6c3029970cad07cf2c4bef13d30bdb7b6b77093a579d543839b5386cb0184b03',
       );
     });
   });
 
   describe('Mapper', () => {
-    it('should decode a TokensMinted raw log into event payload', () => {
+    it('should decode a SwapExecuted raw log into event payload', () => {
       const mapper =
-        chainEventMappers[EvmEventSignatures.PredictionMarket.TokensMinted];
+        chainEventMappers[EvmEventSignatures.PredictionMarket.SwapExecuted];
       expect(mapper).toBeDefined();
 
-      const amount = 1000000000000000000n; // 1e18
+      const traderAddress = '0x1234567890123456789012345678901234567890';
+      const amountIn = 500000000000000000n; // 0.5e18
+      const amountOut = 400000000000000000n; // 0.4e18
+
+      // Encode data: buyPass(bool) + amountIn(uint256) + amountOut(uint256)
+      // buyPass=true → 0x...01, amountIn, amountOut
+      const data =
+        '0x' +
+        '0000000000000000000000000000000000000000000000000000000000000001' + // buyPass=true
+        '00000000000000000000000000000000000000000000000006f05b59d3b20000' + // amountIn=0.5e18
+        '000000000000000000000000000000000000000000000000058d15e176280000'; // amountOut=0.4e18
 
       const evmEvent: EvmEvent = {
         eventSource: {
           ethChainId: 8453,
-          eventSignature: EvmEventSignatures.PredictionMarket.TokensMinted,
+          eventSignature: EvmEventSignatures.PredictionMarket.SwapExecuted,
         },
         rawLog: {
-          blockNumber: 100n,
+          blockNumber: 200n,
           blockHash: '0xblockhash',
           transactionIndex: 0,
           removed: false,
-          address: '0xvault',
-          data: '0x0000000000000000000000000000000000000000000000000de0b6b3a7640000',
+          address: '0xrouter',
+          data,
           topics: [
-            '0xef616469a0b35ce807813d17c53c505b9d4796a93287cd361318dbca99ac9250',
+            '0x6c3029970cad07cf2c4bef13d30bdb7b6b77093a579d543839b5386cb0184b03',
             '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
             '0x0000000000000000000000001234567890123456789012345678901234567890',
           ],
           transactionHash:
-            '0xabcdef0000000000000000000000000000000000000000000000000000000001',
+            '0xswap000000000000000000000000000000000000000000000000000000000001',
           logIndex: 0,
         },
         block: {
-          number: 100n,
+          number: 200n,
           hash: '0xblockhash',
           logsBloom: '0x',
           parentHash: '0x',
-          timestamp: 1700000000n,
+          timestamp: 1700001000n,
           miner: '0x',
           gasLimit: 30000000n,
         },
@@ -141,21 +168,19 @@ describe('Prediction Market Mint', () => {
 
       const result = mapper(
         evmEvent,
-      ) as EventPair<'PredictionMarketTokensMinted'>;
+      ) as EventPair<'PredictionMarketSwapExecuted'>;
 
-      expect(result.event_name).toBe('PredictionMarketTokensMinted');
+      expect(result.event_name).toBe('PredictionMarketSwapExecuted');
       expect(result.event_payload.market_id).toBe(onChainMarketId);
       expect(result.event_payload.eth_chain_id).toBe(8453);
       expect(result.event_payload.transaction_hash).toBe(
-        '0xabcdef0000000000000000000000000000000000000000000000000000000001',
+        '0xswap000000000000000000000000000000000000000000000000000000000001',
       );
-      expect(result.event_payload.trader_address).toBe(
-        '0x1234567890123456789012345678901234567890',
-      );
-      expect(result.event_payload.collateral_amount).toBe(amount);
-      expect(result.event_payload.p_token_amount).toBe(amount);
-      expect(result.event_payload.f_token_amount).toBe(amount);
-      expect(result.event_payload.timestamp).toBe(1700000000);
+      expect(result.event_payload.trader_address).toBe(traderAddress);
+      expect(result.event_payload.buy_pass).toBe(true);
+      expect(result.event_payload.amount_in).toBe(amountIn);
+      expect(result.event_payload.amount_out).toBe(amountOut);
+      expect(result.event_payload.timestamp).toBe(1700001000);
     });
   });
 
@@ -163,177 +188,197 @@ describe('Prediction Market Mint', () => {
     const projection = PredictionMarketProjection();
     const traderAddress = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
     const txHash1 =
-      '0x1111111100000000000000000000000000000000000000000000000000000001' as `0x${string}`;
+      '0xswap111100000000000000000000000000000000000000000000000000000001' as `0x${string}`;
     const txHash2 =
-      '0x2222222200000000000000000000000000000000000000000000000000000002' as `0x${string}`;
-    const amount = 500000000000000000n; // 0.5e18
+      '0xswap222200000000000000000000000000000000000000000000000000000002' as `0x${string}`;
+    const amountIn = 500000000000000000n; // 0.5e18
+    const amountOut = 400000000000000000n; // 0.4e18
 
-    it('should create a trade, position, and update market on mint', async () => {
-      await projection.body.PredictionMarketTokensMinted({
-        id: 10,
-        name: 'PredictionMarketTokensMinted',
+    it('should create trade and update position/probability on buy_pass=true swap', async () => {
+      await projection.body.PredictionMarketSwapExecuted({
+        id: 20,
+        name: 'PredictionMarketSwapExecuted',
         payload: {
           market_id: onChainMarketId,
           eth_chain_id,
           transaction_hash: txHash1,
           trader_address: traderAddress,
-          collateral_amount: amount,
-          p_token_amount: amount,
-          f_token_amount: amount,
-          timestamp: 1700000000,
+          buy_pass: true,
+          amount_in: amountIn,
+          amount_out: amountOut,
+          timestamp: 1700001000,
         },
       });
 
-      // Verify trade created
+      // Verify trade created with swap_buy_pass action
       const trade = await models.PredictionMarketTrade.findOne({
         where: { eth_chain_id, transaction_hash: txHash1 },
       });
       expect(trade).toBeDefined();
       expect(trade!.prediction_market_id).toBe(marketId);
       expect(trade!.trader_address).toBe(traderAddress);
-      expect(trade!.action).toBe('mint');
-      expect(String(trade!.collateral_amount)).toBe(String(amount));
+      expect(trade!.action).toBe('swap_buy_pass');
+      expect(String(trade!.collateral_amount)).toBe('0');
+      // buyPass=true: p_token=amountOut, f_token=amountIn
+      expect(String(trade!.p_token_amount)).toBe(String(amountOut));
+      expect(String(trade!.f_token_amount)).toBe(String(amountIn));
 
-      // Verify position created
+      // Verify position updated: p_token increased, f_token decreased
+      // Initial from mint: p=2e18, f=2e18
+      // After buyPass swap: p += 0.4e18, f -= 0.5e18
       const position = await models.PredictionMarketPosition.findOne({
         where: { prediction_market_id: marketId, user_address: traderAddress },
       });
       expect(position).toBeDefined();
-      expect(String(position!.p_token_balance)).toBe(String(amount));
-      expect(String(position!.f_token_balance)).toBe(String(amount));
-      expect(String(position!.total_collateral_in)).toBe(String(amount));
+      expect(BigInt(position!.p_token_balance as bigint)).toBe(
+        2000000000000000000n + amountOut,
+      );
+      expect(BigInt(position!.f_token_balance as bigint)).toBe(
+        2000000000000000000n - amountIn,
+      );
 
-      // Verify market total_collateral updated
+      // Verify market probability updated
       const market = await models.PredictionMarket.findByPk(marketId);
-      expect(BigInt(market!.total_collateral as bigint)).toBe(amount);
+      const expectedProbability =
+        Number(amountOut) / (Number(amountIn) + Number(amountOut));
+      expect(market!.current_probability).toBeCloseTo(expectedProbability, 10);
     });
 
-    it('should accumulate position balances on second mint', async () => {
-      await projection.body.PredictionMarketTokensMinted({
-        id: 11,
-        name: 'PredictionMarketTokensMinted',
+    it('should create trade with swap_buy_fail action on buy_pass=false swap', async () => {
+      await projection.body.PredictionMarketSwapExecuted({
+        id: 21,
+        name: 'PredictionMarketSwapExecuted',
         payload: {
           market_id: onChainMarketId,
           eth_chain_id,
           transaction_hash: txHash2,
           trader_address: traderAddress,
-          collateral_amount: amount,
-          p_token_amount: amount,
-          f_token_amount: amount,
-          timestamp: 1700000100,
+          buy_pass: false,
+          amount_in: amountIn,
+          amount_out: amountOut,
+          timestamp: 1700001100,
         },
       });
 
-      // Verify second trade created
-      const trades = await models.PredictionMarketTrade.findAll({
-        where: { prediction_market_id: marketId },
+      // Verify trade created with swap_buy_fail action
+      const trade = await models.PredictionMarketTrade.findOne({
+        where: { eth_chain_id, transaction_hash: txHash2 },
       });
-      expect(trades).toHaveLength(2);
+      expect(trade).toBeDefined();
+      expect(trade!.action).toBe('swap_buy_fail');
+      // buyPass=false: p_token=amountIn, f_token=amountOut
+      expect(String(trade!.p_token_amount)).toBe(String(amountIn));
+      expect(String(trade!.f_token_amount)).toBe(String(amountOut));
 
-      // Verify position accumulated
+      // Verify position updated: f_token increased, p_token decreased
+      // Previous: p=2.4e18, f=1.5e18
+      // After buyFail swap: f += 0.4e18, p -= 0.5e18
       const position = await models.PredictionMarketPosition.findOne({
         where: { prediction_market_id: marketId, user_address: traderAddress },
       });
-      expect(BigInt(position!.p_token_balance as bigint)).toBe(amount * 2n);
-      expect(BigInt(position!.f_token_balance as bigint)).toBe(amount * 2n);
-      expect(BigInt(position!.total_collateral_in as bigint)).toBe(amount * 2n);
+      expect(BigInt(position!.p_token_balance as bigint)).toBe(
+        2000000000000000000n + amountOut - amountIn,
+      );
+      expect(BigInt(position!.f_token_balance as bigint)).toBe(
+        2000000000000000000n - amountIn + amountOut,
+      );
 
-      // Verify market total_collateral accumulated
+      // Verify probability updated (for buyFail: amountIn/(amountIn+amountOut))
       const market = await models.PredictionMarket.findByPk(marketId);
-      expect(BigInt(market!.total_collateral as bigint)).toBe(amount * 2n);
+      const expectedProbability =
+        Number(amountIn) / (Number(amountIn) + Number(amountOut));
+      expect(market!.current_probability).toBeCloseTo(expectedProbability, 10);
     });
 
     it('should be idempotent - duplicate event does not double count', async () => {
       // Process same event again (same tx hash)
-      await projection.body.PredictionMarketTokensMinted({
-        id: 12,
-        name: 'PredictionMarketTokensMinted',
+      await projection.body.PredictionMarketSwapExecuted({
+        id: 22,
+        name: 'PredictionMarketSwapExecuted',
         payload: {
           market_id: onChainMarketId,
           eth_chain_id,
-          transaction_hash: txHash1, // same as first mint
+          transaction_hash: txHash1, // same as first swap
           trader_address: traderAddress,
-          collateral_amount: amount,
-          p_token_amount: amount,
-          f_token_amount: amount,
-          timestamp: 1700000000,
+          buy_pass: true,
+          amount_in: amountIn,
+          amount_out: amountOut,
+          timestamp: 1700001000,
         },
       });
 
-      // Trade count should still be 2
+      // Swap trade count should still be 2 (plus the initial mint = 3 total)
       const trades = await models.PredictionMarketTrade.findAll({
         where: { prediction_market_id: marketId },
       });
-      expect(trades).toHaveLength(2);
+      const swapTrades = trades.filter((t) => t.action.startsWith('swap_'));
+      expect(swapTrades).toHaveLength(2);
 
       // Position should not have changed
       const position = await models.PredictionMarketPosition.findOne({
         where: { prediction_market_id: marketId, user_address: traderAddress },
       });
-      expect(BigInt(position!.p_token_balance as bigint)).toBe(amount * 2n);
-
-      // Market total should not have changed
-      const market = await models.PredictionMarket.findByPk(marketId);
-      expect(BigInt(market!.total_collateral as bigint)).toBe(amount * 2n);
+      expect(BigInt(position!.p_token_balance as bigint)).toBe(
+        2000000000000000000n + amountOut - amountIn,
+      );
     });
 
     it('should create separate positions for different traders', async () => {
       const secondTrader = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
       const txHash3 =
-        '0x3333333300000000000000000000000000000000000000000000000000000003' as `0x${string}`;
+        '0xswap333300000000000000000000000000000000000000000000000000000003' as `0x${string}`;
 
-      await projection.body.PredictionMarketTokensMinted({
-        id: 13,
-        name: 'PredictionMarketTokensMinted',
+      await projection.body.PredictionMarketSwapExecuted({
+        id: 23,
+        name: 'PredictionMarketSwapExecuted',
         payload: {
           market_id: onChainMarketId,
           eth_chain_id,
           transaction_hash: txHash3,
           trader_address: secondTrader,
-          collateral_amount: amount,
-          p_token_amount: amount,
-          f_token_amount: amount,
-          timestamp: 1700000200,
+          buy_pass: true,
+          amount_in: amountIn,
+          amount_out: amountOut,
+          timestamp: 1700001200,
         },
       });
 
-      // Two separate positions
+      // Two separate positions (one from mint+swaps, one from this swap)
       const positions = await models.PredictionMarketPosition.findAll({
         where: { prediction_market_id: marketId },
       });
       expect(positions).toHaveLength(2);
 
-      const pos1 = positions.find((p) => p.user_address === traderAddress);
       const pos2 = positions.find((p) => p.user_address === secondTrader);
-      expect(pos1).toBeDefined();
       expect(pos2).toBeDefined();
-      expect(BigInt(pos1!.p_token_balance as bigint)).toBe(amount * 2n);
-      expect(BigInt(pos2!.p_token_balance as bigint)).toBe(amount);
+      // New position from buyPass: p_token=amountOut, f_token=0
+      expect(BigInt(pos2!.p_token_balance as bigint)).toBe(amountOut);
+      expect(BigInt(pos2!.f_token_balance as bigint)).toBe(0n);
     });
 
     it('should skip gracefully when market not found', async () => {
       const unknownMarketId = '0xdeadbeef' as `0x${string}`;
       // Should not throw
-      await projection.body.PredictionMarketTokensMinted({
-        id: 14,
-        name: 'PredictionMarketTokensMinted',
+      await projection.body.PredictionMarketSwapExecuted({
+        id: 24,
+        name: 'PredictionMarketSwapExecuted',
         payload: {
           market_id: unknownMarketId,
           eth_chain_id,
           transaction_hash:
-            '0x4444444400000000000000000000000000000000000000000000000000000004' as `0x${string}`,
+            '0xswap444400000000000000000000000000000000000000000000000000000004' as `0x${string}`,
           trader_address: traderAddress,
-          collateral_amount: amount,
-          p_token_amount: amount,
-          f_token_amount: amount,
-          timestamp: 1700000300,
+          buy_pass: true,
+          amount_in: amountIn,
+          amount_out: amountOut,
+          timestamp: 1700001300,
         },
       });
       // No trade should be created for unknown market
       const trade = await models.PredictionMarketTrade.findOne({
         where: {
           transaction_hash:
-            '0x4444444400000000000000000000000000000000000000000000000000000004',
+            '0xswap444400000000000000000000000000000000000000000000000000000004',
         },
       });
       expect(trade).toBeNull();
