@@ -1,4 +1,9 @@
-import { RabbitMQAdapter, createRmqConfig } from '@hicommonwealth/adapters';
+import {
+  RabbitMQAdapter,
+  config as adapterConfig,
+  createRmqConfig,
+  deriveManagementUrl,
+} from '@hicommonwealth/adapters';
 import {
   Broker,
   ConsumerHooks,
@@ -32,6 +37,18 @@ export async function bootstrapBindings(options?: {
       }),
     );
     await rmqAdapter.init();
+
+    if (adapterConfig.BROKER.CLEANUP_DEPRECATED_QUEUES) {
+      const managementUrl =
+        adapterConfig.BROKER.RABBITMQ_MANAGEMENT_URL ??
+        deriveManagementUrl(config.BROKER.RABBITMQ_URI);
+      if (managementUrl) {
+        await rmqAdapter.cleanupDeprecatedQueues(managementUrl).catch((err) => {
+          log.error('Failed to cleanup deprecated queues', err);
+        });
+      }
+    }
+
     if (!options?.skipRmqAdapter) {
       broker({ adapter: rmqAdapter });
     }

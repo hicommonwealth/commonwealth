@@ -29,7 +29,7 @@ const _ContestWorker: Consumer<ReturnType<typeof ContestWorker>> = {
   consumer: ContestWorker,
   retryStrategy: buildRetryStrategy(undefined, 20_000),
   hooks: {
-    beforeHandleEvent: (topic, event, context) => {
+    beforeHandleEvent: (_topic, _event, context) => {
       context.start = Date.now();
     },
     afterHandleEvent: (topic, event, context) => {
