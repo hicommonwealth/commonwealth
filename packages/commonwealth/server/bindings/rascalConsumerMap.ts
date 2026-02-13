@@ -7,20 +7,20 @@ import {
 } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
+  ChainEvents,
+  Community,
   CommunityGoalsPolicy,
   Contest,
   ContestWorker,
-  CreateUnverifiedUser,
   DiscordBotPolicy,
   EventStreamPolicy,
   FarcasterWorker,
-  GovernancePolicy,
   LaunchpadPolicy,
-  NominationsWorker,
   NotificationsPolicy,
   NotificationsSettingsPolicy,
-  PredictionMarketPolicy,
-  ReactionWorker,
+  PredictionMarket,
+  Reaction,
+  Token,
   TwitterEngagementPolicy,
   User,
 } from '@hicommonwealth/model';
@@ -29,7 +29,7 @@ const _ContestWorker: Consumer<ReturnType<typeof ContestWorker>> = {
   consumer: ContestWorker,
   retryStrategy: buildRetryStrategy(undefined, 20_000),
   hooks: {
-    beforeHandleEvent: (topic, event, context) => {
+    beforeHandleEvent: (_topic, _event, context) => {
       context.start = Date.now();
     },
     afterHandleEvent: (topic, event, context) => {
@@ -85,33 +85,36 @@ const _NotificationsPolicy = {
   },
 };
 
-const _ReactionWorker = {
-  consumer: ReactionWorker,
+const _ReactionWorkerProjection = {
+  consumer: Reaction.ReactionWorkerProjection,
 };
 
-const _GovernancePolicy = {
-  consumer: GovernancePolicy,
+const _GovernanceProjection = {
+  consumer: ChainEvents.GovernanceProjection,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   ChainEventPolicy,
-  CommunityGoalsPolicy,
-  Contest.Contests,
-  _ContestWorker,
-  CreateUnverifiedUser,
+  Community.ChainEventProjection,
+  Community.NominationsProjection,
   DiscordBotPolicy,
-  EventStreamPolicy,
+  Contest.Contests,
+  Contest.FarcasterContestProjection,
   FarcasterWorker,
-  _FarcasterWorker,
-  _GovernancePolicy,
-  LaunchpadPolicy,
-  NominationsWorker,
-  _NotificationsPolicy,
+  EventStreamPolicy,
   NotificationsSettingsPolicy,
-  _NotificationsSettingsPolicy,
-  PredictionMarketPolicy,
-  _ReactionWorker,
+  User.CreateUnverifiedUser,
+  Token.LaunchpadTradeProjection,
   TwitterEngagementPolicy,
+  CommunityGoalsPolicy,
+  LaunchpadPolicy,
+  PredictionMarket.PredictionMarketProjection,
+  _ContestWorker,
+  _GovernanceProjection,
+  _FarcasterWorker,
   _Xp,
+  _NotificationsSettingsPolicy,
+  _NotificationsPolicy,
+  _ReactionWorkerProjection,
 ];

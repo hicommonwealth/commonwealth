@@ -2,13 +2,13 @@ import { EventHandler, logger } from '@hicommonwealth/core';
 import { getStakeTradeInfo } from '@hicommonwealth/evm-protocols';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { ZodUndefined } from 'zod';
-import { models } from '../../database';
-import { setUserTier } from '../../utils/tiers';
-import { chainNodeMustExist } from '../utils/utils';
+import { models } from '../../../database';
+import { chainNodeMustExist } from '../../../utils/chainNodeUtils';
+import { setUserTier } from '../../../utils/tiers';
 
 const log = logger(import.meta);
 
-export const handleCommunityStakeTrades: EventHandler<
+export const projectCommunityStakeTrades: EventHandler<
   'CommunityStakeTrade',
   ZodUndefined
 > = async ({ payload }) => {

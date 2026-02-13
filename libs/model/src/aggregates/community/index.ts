@@ -1,4 +1,5 @@
 export * from './BanAddress.command';
+export * from './ChainEventCreated.projection';
 export * from './CreateCommunity.command';
 export * from './CreateGroup.command';
 export * from './CreateStakeTransaction.command';
@@ -31,6 +32,7 @@ export * from './GetTopics.query';
 export * from './GetTransactions.query';
 export * from './JoinCommunity.command';
 export * from './LinkNamespace.command';
+export * from './Nominations.projection';
 export * from './PinToken.command';
 export * from './RefreshCommunityMemberships.command';
 export * from './RefreshCustomDomain.query';

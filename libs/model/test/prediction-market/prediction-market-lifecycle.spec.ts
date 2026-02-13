@@ -5,8 +5,8 @@ import {
   CreatePredictionMarket,
   DeployPredictionMarket,
 } from '../../src/aggregates/prediction_market';
+import { PredictionMarketProjection } from '../../src/aggregates/prediction_market/PredictionMarket.projection';
 import { models } from '../../src/database';
-import { PredictionMarketPolicy } from '../../src/policies/PredictionMarket.policy';
 import { seed } from '../../src/tester';
 import { seedCommunity } from '../utils/community-seeder';
 
@@ -103,10 +103,10 @@ describe('Prediction Market Lifecycle', () => {
         .prediction_market_id,
     ).toBe(market.id);
 
-    // 3. Reconcile ProposalCreated event via Policy
-    const policy = PredictionMarketPolicy();
+    // 3. Reconcile ProposalCreated event via Projection
+    const projection = PredictionMarketProjection();
     const proposalId = '0xabc123';
-    await policy.body.PredictionMarketProposalCreated({
+    await projection.body.PredictionMarketProposalCreated({
       id: 1,
       name: 'PredictionMarketProposalCreated',
       payload: {
@@ -123,9 +123,9 @@ describe('Prediction Market Lifecycle', () => {
     );
     expect(reconciledMarket1!.proposal_id).toBe(proposalId);
 
-    // 4. Reconcile MarketCreated event via Policy
+    // 4. Reconcile MarketCreated event via Projection
     const marketId = '0xdef456';
-    await policy.body.PredictionMarketMarketCreated({
+    await projection.body.PredictionMarketMarketCreated({
       id: 2,
       name: 'PredictionMarketMarketCreated',
       payload: {

@@ -1,9 +1,9 @@
-import { logger, Policy } from '@hicommonwealth/core';
+import { logger, Projection } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import { models } from '../database';
-import { mustExist } from '../middleware';
-import { ReactionInstance } from '../models/reaction';
-import { getVotingWeight } from '../services/stakeHelper';
+import { models } from '../../database';
+import { mustExist } from '../../middleware';
+import { ReactionInstance } from '../../models/reaction';
+import { getVotingWeight } from '../../services/stakeHelper';
 
 const log = logger(import.meta);
 
@@ -145,7 +145,7 @@ async function processSingleReaction(
   }
 }
 
-export function ReactionWorker(): Policy<typeof inputs> {
+export function ReactionWorkerProjection(): Projection<typeof inputs> {
   return {
     inputs,
     body: {
