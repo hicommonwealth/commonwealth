@@ -23,6 +23,7 @@ import {
   Token,
   TwitterEngagementPolicy,
   User,
+  config,
 } from '@hicommonwealth/model';
 
 const _ContestWorker: Consumer<ReturnType<typeof ContestWorker>> = {
@@ -109,7 +110,9 @@ export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   TwitterEngagementPolicy,
   CommunityGoalsPolicy,
   LaunchpadPolicy,
-  PredictionMarket.PredictionMarketProjection,
+  ...(config.MARKETS.FUTARCHY_ENABLED
+    ? [PredictionMarket.PredictionMarketProjection]
+    : []),
   _ContestWorker,
   _GovernanceProjection,
   _FarcasterWorker,
