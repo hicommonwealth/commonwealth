@@ -150,7 +150,7 @@ common-protocol/  (branch: dillchen/prediction-market)
      |                                |--- store addresses
      |                                |
                                       |<-- EVM worker polls ProposalCreated event
-                                      |--- Outbox -> RabbitMQ -> Policy
+                                      |--- Outbox -> RabbitMQ -> Projection
                                       |--- verify/update DB record
 ```
 
@@ -165,8 +165,8 @@ common-protocol/  (branch: dillchen/prediction-market)
      |<-- 100 pToken + 100 fToken --------------------|
      |                                                  |
      |                              EVM worker polls TokensMinted event
-     |                              |--- Policy -> ProjectTrade (action: mint)
-     |                              |--- update Position (p:100, f:100)
+     |                              |--- Projection -> INSERT Trade (action: mint)
+     |                              |--- UPSERT Position (p:100, f:100)
 
   2. Swap (express prediction)
      |--- wallet tx ------------------------------------> Router.swap(buyPass=true,
@@ -174,16 +174,16 @@ common-protocol/  (branch: dillchen/prediction-market)
      |<-- ~52 pToken ----------------------------------|
      |                                                  |
      |                              EVM worker polls SwapExecuted event
-     |                              |--- Policy -> ProjectTrade (action: swap_buy_pass)
-     |                              |--- update Position (p:152, f:50)
+     |                              |--- Projection -> INSERT Trade (action: swap_buy_pass)
+     |                              |--- UPSERT Position (p:152, f:50)
 
   3. After Resolution (PASS wins)
      |--- wallet tx ------------------------------------> Vault.redeem(152 pToken)
      |<-- 152 USDC ------------------------------------|
      |                                                  |
      |                              EVM worker polls TokensRedeemed event
-     |                              |--- Policy -> ProjectTrade (action: redeem)
-     |                              |--- update Position (p:0, f:50)
+     |                              |--- Projection -> INSERT Trade (action: redeem)
+     |                              |--- UPSERT Position (p:0, f:50)
 ```
 
 ### Market Lifecycle State Machine
@@ -267,11 +267,11 @@ common-protocol/  (branch: dillchen/prediction-market)
                             | 6. RabbitMQ publish (Rascal)
                             |        |
                             |        v
-                            | 7. PredictionMarketPolicy subscribes
+                            | 7. PredictionMarketProjection subscribes
                             |    body.PredictionMarketSwapExecuted:
                             |        |
                             |        v
-                            | 8. command(ProjectPredictionMarketTrade, payload)
+                            | 8. Projection handler (direct DB mutation):
                             |    -> INSERT PredictionMarketTrade
                             |    -> UPSERT PredictionMarketPosition
                             |    -> UPDATE PredictionMarket.current_probability
@@ -300,8 +300,8 @@ All Sequelize models in one file, aggregate directory with one command/query per
 | Quests (reference) | Prediction Markets (this spec) |
 |---------------------|-------------------------------|
 | `libs/model/src/models/quest.ts` — defines Quest + QuestActionMeta models | `libs/model/src/models/prediction_market.ts` — defines PredictionMarket + PredictionMarketTrade + PredictionMarketPosition models |
-| `libs/model/src/aggregates/quest/CreateQuest.command.ts` | `libs/model/src/aggregates/prediction-market/CreatePredictionMarket.command.ts` |
-| `libs/model/src/aggregates/quest/index.ts` (barrel) | `libs/model/src/aggregates/prediction-market/index.ts` (barrel) |
+| `libs/model/src/aggregates/quest/CreateQuest.command.ts` | `libs/model/src/aggregates/prediction_market/CreatePredictionMarket.command.ts` |
+| `libs/model/src/aggregates/quest/index.ts` (barrel) | `libs/model/src/aggregates/prediction_market/index.ts` (barrel) |
 
 ### Status
 
@@ -309,12 +309,16 @@ All Sequelize models in one file, aggregate directory with one command/query per
 - [x] Model consolidation applied (PM-1)
 - [x] Event storming model generated (see below)
 - [x] Tickets derived from model slices (PM-1 through PM-9)
+- [x] PM-1 implemented: schemas, models, migration (PR #13361)
+- [x] PM-2 Slice 1+2 implemented: Create, Deploy commands + Projection for ProposalCreated/MarketCreated (PR #13372)
+- [x] Policy → Projection refactor applied (PR #13381): `PredictionMarket.projection.ts` replaces former `PredictionMarket.policy.ts`
+- [x] "Project..." command indirection removed — projection handles DB mutations directly
 
 ---
 
 ## Event Storming Model
 
-Event storming maps the full domain flow: **Commands** (user/system intent), **Domain Events** (facts that happened), **Policies** (reactive automation), **Read Models** (query projections), and **External Systems** (on-chain contracts, EVM worker). Tickets are derived from vertical slices through this model.
+Event storming maps the full domain flow: **Commands** (user intent), **Domain Events** (facts that happened), **Projections** (read model builders that materialize state via direct DB mutations), and **External Systems** (on-chain contracts, EVM worker). Tickets are derived from vertical slices through this model.
 
 ### Visual Diagrams (FigJam)
 
@@ -329,12 +333,12 @@ Event storming maps the full domain flow: **Commands** (user/system intent), **D
 | **Trader** | Mints, swaps, merges, redeems tokens |
 | **Community Admin** | Can resolve or cancel markets |
 | **EVM Worker** | External system: polls on-chain events every 120s |
-| **System (Policy)** | Automated: reacts to domain events with commands |
+| **System (Projection)** | Automated: reacts to domain events with direct DB mutations |
 
 ### Aggregate: PredictionMarket
 
 ```text
-SLICE 1: Market Creation
+SLICE 1: Market Creation  ✅ COMPLETED (PR #13361, #13372)
 =========================================================================================
   Actor            Command                    Event                      Read Model
   -----            -------                    -----                      ----------
@@ -343,7 +347,7 @@ SLICE 1: Market Creation
                    [sets thread.has_pm=true]    prompt, collateral,
                                                 duration, threshold}
 
-SLICE 2: Market Deployment
+SLICE 2: Market Deployment  ✅ COMPLETED (PR #13372, #13381)
 =========================================================================================
   Actor            Command                    Event                      Read Model
   -----            -------                    -----                      ----------
@@ -356,26 +360,28 @@ SLICE 2: Market Deployment
 
         +-- External System: EVM Worker polls ProposalCreated log -----+
         |                                                              |
-        |   Policy: PredictionMarketPolicy                             |
-        |   on(ProposalCreated) -> ProjectMarketCreated command        |
-        |   [verify/link on-chain addresses to DB record]              |
+        |   Projection: PredictionMarketProjection                     |
+        |   on(ProposalCreated) -> UPDATE market.proposal_id           |
+        |   on(MarketCreated)   -> UPDATE market.market_id             |
+        |   [direct DB mutation, no command indirection]               |
         +--------------------------------------------------------------+
 
 SLICE 3: Mint Tokens
 =========================================================================================
-  Actor            External Event             Policy                     Read Model
-  -----            --------------             ------                     ----------
+  Actor            External Event             Projection                 Read Model
+  -----            --------------             ----------                 ----------
   Trader        -> [wallet: Vault.mint()]
 
         +-- EVM Worker polls TokensMinted log -------------+
         |                                                  |
-        |   Policy: PredictionMarketPolicy                 |
+        |   Projection: PredictionMarketProjection         |
         |   on(PredictionMarketTokensMinted)                |
-        |     -> command(ProjectPredictionMarketTrade)      |
+        |     -> INSERT PredictionMarketTrade               |
         |        {action: mint, collateral_amount,          |
         |         p_token_amount, f_token_amount}           |
         |     -> UPSERT PredictionMarketPosition            |
         |     -> UPDATE PredictionMarket.total_collateral   |
+        |     [direct DB mutation, no command indirection]  |
         +--------------------------------------------------+
                                                              -> TradeHistory
                                                              -> PositionView
@@ -383,19 +389,20 @@ SLICE 3: Mint Tokens
 
 SLICE 4: Swap (Express Prediction)
 =========================================================================================
-  Actor            External Event             Policy                     Read Model
-  -----            --------------             ------                     ----------
+  Actor            External Event             Projection                 Read Model
+  -----            --------------             ----------                 ----------
   Trader        -> [wallet: Router.swap()]
 
         +-- EVM Worker polls SwapExecuted log -------------+
         |                                                  |
-        |   Policy: PredictionMarketPolicy                 |
+        |   Projection: PredictionMarketProjection         |
         |   on(PredictionMarketSwapExecuted)                |
-        |     -> command(ProjectPredictionMarketTrade)      |
+        |     -> INSERT PredictionMarketTrade               |
         |        {action: swap_buy_pass | swap_buy_fail,    |
         |         amount_in, amount_out}                    |
         |     -> UPSERT PredictionMarketPosition            |
         |     -> UPDATE PredictionMarket.current_probability|
+        |     [direct DB mutation, no command indirection]  |
         +--------------------------------------------------+
                                                              -> TradeHistory
                                                              -> PositionView
@@ -403,19 +410,20 @@ SLICE 4: Swap (Express Prediction)
 
 SLICE 5: Merge Tokens
 =========================================================================================
-  Actor            External Event             Policy                     Read Model
-  -----            --------------             ------                     ----------
+  Actor            External Event             Projection                 Read Model
+  -----            --------------             ----------                 ----------
   Trader        -> [wallet: Vault.merge()]
 
         +-- EVM Worker polls TokensMerged log -------------+
         |                                                  |
-        |   Policy: PredictionMarketPolicy                 |
+        |   Projection: PredictionMarketProjection         |
         |   on(PredictionMarketTokensMerged)                |
-        |     -> command(ProjectPredictionMarketTrade)      |
+        |     -> INSERT PredictionMarketTrade               |
         |        {action: merge, p_amount, f_amount,        |
         |         collateral_returned}                      |
         |     -> UPSERT PredictionMarketPosition            |
         |     -> UPDATE PredictionMarket.total_collateral   |
+        |     [direct DB mutation, no command indirection]  |
         +--------------------------------------------------+
                                                              -> TradeHistory
                                                              -> PositionView
@@ -430,32 +438,33 @@ SLICE 6: Market Resolution
 
         +-- EVM Worker polls ProposalResolved log ---------+
         |                                                  |
-        |   Policy: PredictionMarketPolicy                 |
+        |   Projection: PredictionMarketProjection         |
         |   on(PredictionMarketProposalResolved)            |
-        |     -> command(ProjectPredictionMarketResolution) |
-        |        {winner, resolved_at}                      |
-        |     -> UPDATE PredictionMarket status/winner      |
+        |     -> UPDATE PredictionMarket                    |
+        |        {status: resolved, winner, resolved_at}    |
+        |     [direct DB mutation, no command indirection]  |
         +--------------------------------------------------+
 
         +-- EVM Worker polls MarketResolved log -----------+
         |   (redundant confirmation from BinaryVault)      |
-        |   Policy: same handler, idempotent               |
+        |   Projection: same handler, idempotent           |
         +--------------------------------------------------+
 
 SLICE 7: Token Redemption
 =========================================================================================
-  Actor            External Event             Policy                     Read Model
-  -----            --------------             ------                     ----------
+  Actor            External Event             Projection                 Read Model
+  -----            --------------             ----------                 ----------
   Trader        -> [wallet: Vault.redeem()]
 
         +-- EVM Worker polls TokensRedeemed log -----------+
         |                                                  |
-        |   Policy: PredictionMarketPolicy                 |
+        |   Projection: PredictionMarketProjection         |
         |   on(PredictionMarketTokensRedeemed)              |
-        |     -> command(ProjectPredictionMarketTrade)      |
+        |     -> INSERT PredictionMarketTrade               |
         |        {action: redeem, winning_token_amount,     |
         |         collateral_returned}                      |
         |     -> UPSERT PredictionMarketPosition            |
+        |     [direct DB mutation, no command indirection]  |
         +--------------------------------------------------+
                                                              -> TradeHistory
                                                              -> PositionView
@@ -470,19 +479,34 @@ SLICE 8: Market Cancellation
 
 ### Domain Events Summary
 
-| Domain Event | Source | Payload | Triggers |
-|-------------|--------|---------|----------|
+| Domain Event | Source | Payload | Projection Handler |
+|-------------|--------|---------|-------------------|
 | PredictionMarketCreated | CreatePredictionMarket cmd | market_id, thread_id, prompt, config | -- |
 | PredictionMarketDeployed | DeployPredictionMarket cmd | all contract addresses, times | -- |
-| PredictionMarketProposalCreated | EVM: FutarchyGovernor | proposal_id, market_id, addresses | ProjectMarketCreated |
-| PredictionMarketMarketCreated | EVM: BinaryVault | market_id, p_token, f_token, collateral | ProjectMarketCreated |
-| PredictionMarketTokensMinted | EVM: BinaryVault | market_id, user, collateral_amount, token_amounts | ProjectTrade(mint) |
-| PredictionMarketTokensMerged | EVM: BinaryVault | market_id, user, p_amount, f_amount, collateral_out | ProjectTrade(merge) |
-| PredictionMarketSwapExecuted | EVM: FutarchyRouter | market_id, user, buy_pass, amount_in, amount_out | ProjectTrade(swap) |
-| PredictionMarketTokensRedeemed | EVM: BinaryVault | market_id, user, winning_amount, collateral_out | ProjectTrade(redeem) |
-| PredictionMarketProposalResolved | EVM: FutarchyGovernor | proposal_id, winner | ProjectResolution |
-| PredictionMarketMarketResolved | EVM: BinaryVault | market_id, winner | ProjectResolution |
+| PredictionMarketProposalCreated | EVM: FutarchyGovernor | proposal_id, market_id, addresses | UPDATE market.proposal_id |
+| PredictionMarketMarketCreated | EVM: BinaryVault | market_id, p_token, f_token, collateral | UPDATE market.market_id |
+| PredictionMarketTokensMinted | EVM: BinaryVault | market_id, user, collateral_amount, token_amounts | INSERT Trade + UPSERT Position |
+| PredictionMarketTokensMerged | EVM: BinaryVault | market_id, user, p_amount, f_amount, collateral_out | INSERT Trade + UPSERT Position |
+| PredictionMarketSwapExecuted | EVM: FutarchyRouter | market_id, user, buy_pass, amount_in, amount_out | INSERT Trade + UPSERT Position + UPDATE probability |
+| PredictionMarketTokensRedeemed | EVM: BinaryVault | market_id, user, winning_amount, collateral_out | INSERT Trade + UPSERT Position |
+| PredictionMarketProposalResolved | EVM: FutarchyGovernor | proposal_id, winner | UPDATE market status=resolved, winner |
+| PredictionMarketMarketResolved | EVM: BinaryVault | market_id, winner | UPDATE market status=resolved, winner |
 | PredictionMarketCancelled | CancelPredictionMarket cmd | market_id | -- |
+
+### EVM Event → Mapper → Projection Mapping
+
+Complete mapping from on-chain ABI events to projection handlers. ABIs sourced from `@commonxyz/common-protocol-abis@1.4.14`.
+
+| # | Contract | ABI Event Signature | Mapper Function | Domain Event | Projection Handler |
+|---|----------|--------------------|-----------------|--------------|--------------------|
+| 1 | BinaryVault | `MarketCreated(bytes32 indexed marketId, address indexed pToken, address indexed fToken, address collateral)` | `predictionMarketMarketCreatedMapper` | `PredictionMarketMarketCreated` | UPDATE market_id, token addresses |
+| 2 | BinaryVault | `TokensMinted(bytes32 indexed marketId, address indexed to, uint256 amount)` | `predictionMarketTokensMintedMapper` | `PredictionMarketTokensMinted` | INSERT Trade + UPSERT Position |
+| 3 | BinaryVault | `TokensMerged(bytes32 indexed marketId, address indexed from, uint256 amount)` | `predictionMarketTokensMergedMapper` | `PredictionMarketTokensMerged` | INSERT Trade + UPSERT Position |
+| 4 | BinaryVault | `TokensRedeemed(bytes32 indexed marketId, address indexed to, uint256 amount, uint8 outcome)` | `predictionMarketTokensRedeemedMapper` | `PredictionMarketTokensRedeemed` | INSERT Trade + UPSERT Position |
+| 5 | BinaryVault | `MarketResolved(bytes32 indexed marketId, uint8 winner)` | `predictionMarketMarketResolvedMapper` | `PredictionMarketMarketResolved` | UPDATE status=resolved, winner |
+| 6 | FutarchyGovernor | `ProposalCreated(bytes32 indexed proposalId, bytes32 indexed marketId, address indexed strategy, address collateral, uint256 startTime, uint256 endTime)` | `predictionMarketProposalCreatedMapper` | `PredictionMarketProposalCreated` | UPDATE proposal_id |
+| 7 | FutarchyGovernor | `ProposalResolved(bytes32 indexed proposalId, bytes32 indexed marketId, uint8 winner)` | `predictionMarketProposalResolvedMapper` | `PredictionMarketProposalResolved` | UPDATE status=resolved, winner |
+| 8 | FutarchyRouter | `SwapExecuted(bytes32 indexed marketId, address indexed user, bool buyPass, uint256 amountIn, uint256 amountOut)` | `predictionMarketSwapExecutedMapper` | `PredictionMarketSwapExecuted` | INSERT Trade + UPSERT Position + UPDATE probability |
 
 ### Invariants (Business Rules)
 
@@ -522,25 +546,26 @@ SLICE 8: Market Cancellation
   +--------+     | decode) |     +----------+                          |
                  +---------+                                           |
                                                                        v
-                                      +--------------------------------+-------+
-                                      |        PredictionMarketPolicy          |
-                                      |                                        |
-                                      |  on(TokensMinted)    -> ProjectTrade   |
-                                      |  on(SwapExecuted)    -> ProjectTrade   |
-                                      |  on(TokensMerged)    -> ProjectTrade   |
-                                      |  on(TokensRedeemed)  -> ProjectTrade   |
-                                      |  on(ProposalCreated) -> ProjectCreated |
-                                      |  on(MarketCreated)   -> ProjectCreated |
-                                      |  on(ProposalResolved)-> ProjectResolve |
-                                      |  on(MarketResolved)  -> ProjectResolve |
-                                      +---+------------------------------------+
+                                      +--------------------------------+-----------+
+                                      |     PredictionMarketProjection             |
+                                      |     (direct DB mutations, no commands)     |
+                                      |                                            |
+                                      |  on(TokensMinted)    -> INSERT Trade       |
+                                      |  on(SwapExecuted)    -> INSERT Trade       |
+                                      |  on(TokensMerged)    -> INSERT Trade       |
+                                      |  on(TokensRedeemed)  -> INSERT Trade       |
+                                      |  on(ProposalCreated) -> UPDATE market      |
+                                      |  on(MarketCreated)   -> UPDATE market      |
+                                      |  on(ProposalResolved)-> UPDATE status      |
+                                      |  on(MarketResolved)  -> UPDATE status      |
+                                      +---+----------------------------------------+
                                           |
                                           v
-                                      +---+----+     +----------+
-                                      | System |---->|  Read    |
-                                      | Command|     |  Models  |
-                                      | (write)|     | (query)  |
-                                      +--------+     +----------+
+                                      +---+------+
+                                      |  Read    |
+                                      |  Models  |
+                                      |  (query) |
+                                      +----------+
 ```
 
 ---
@@ -549,7 +574,7 @@ SLICE 8: Market Cancellation
 
 Tickets are cut as vertical slices through the event storming model. Each slice delivers end-to-end value from schema through to read model.
 
-### TICKET PM-1: Schemas + Models + Migration (Slices 1-8 foundation)
+### TICKET PM-1: Schemas + Models + Migration (Slices 1-8 foundation) -- ✅ COMPLETED
 
 **Size:** M | **Depends on:** nothing | **Blocks:** PM-2, PM-3
 
@@ -604,13 +629,13 @@ Foundation layer: all Zod schemas (single file per category, like quests) and Se
 
 ---
 
-### TICKET PM-2: Slice 1+2 -- Create + Deploy Market (Commands + Queries)
+### TICKET PM-2: Slice 1+2 -- Create + Deploy Market (Commands + Projection) -- ✅ COMPLETED
 
 **Size:** L | **Depends on:** PM-1 | **Blocks:** PM-3, PM-4
 
 Market lifecycle commands following existing aggregate patterns (like `aggregates/quest/`).
 
-**Files to create (in `libs/model/src/aggregates/prediction-market/`):**
+**Files to create (in `libs/model/src/aggregates/prediction_market/`):**
 
 - `CreatePredictionMarket.command.ts` (Slice 1)
 - `DeployPredictionMarket.command.ts` (Slice 2)
@@ -647,58 +672,77 @@ Market lifecycle commands following existing aggregate patterns (like `aggregate
 
 ---
 
-### TICKET PM-3: Slice 3-5,7 -- Trade Projection (System Commands + Policy)
+### TICKET PM-3: Slice 3-7 -- Trade + Resolution Projection (Extend PredictionMarketProjection)
 
-**Size:** L | **Depends on:** PM-1, PM-4 | **Blocks:** PM-5
+**Size:** L | **Depends on:** PM-1, PM-2, PM-4 | **Blocks:** PM-5
 
-System commands for projecting on-chain events into read models. This is the core event storming slice: EVM event -> mapper -> outbox -> policy -> command -> read model.
+Extend `PredictionMarket.projection.ts` with handlers for all remaining on-chain events. The projection mutates the DB directly — no command indirection (no `ProjectPredictionMarketTrade.command.ts` or `ProjectPredictionMarketResolution.command.ts`).
 
-**Files to create:**
-
-- `libs/model/src/aggregates/prediction-market/ProjectPredictionMarketTrade.command.ts`
-- `libs/model/src/aggregates/prediction-market/ProjectPredictionMarketResolution.command.ts`
-- `libs/model/src/policies/PredictionMarket.policy.ts`
+**Architecture:** EVM event → mapper → Outbox → RabbitMQ → `PredictionMarketProjection` handler → direct DB mutation
 
 **Files to modify:**
 
-- `libs/model/src/aggregates/prediction-market/index.ts` (export new commands)
+- `libs/model/src/aggregates/prediction_market/PredictionMarket.projection.ts` (add 6 new event handlers)
 - `libs/model/src/services/evmChainEvents/chain-event-utils.ts` (8 mappers)
-- `packages/commonwealth/server/bindings/rascalConsumerMap.ts` (register policy)
-- `libs/model/src/index.ts` (export policy)
+
+**New event handlers in PredictionMarketProjection:**
+
+| Event | DB Mutation |
+|-------|-------------|
+| `PredictionMarketTokensMinted` | INSERT Trade (action: mint) + UPSERT Position + UPDATE total_collateral |
+| `PredictionMarketSwapExecuted` | INSERT Trade (action: swap_buy_pass/fail) + UPSERT Position + UPDATE current_probability |
+| `PredictionMarketTokensMerged` | INSERT Trade (action: merge) + UPSERT Position + UPDATE total_collateral |
+| `PredictionMarketTokensRedeemed` | INSERT Trade (action: redeem) + UPSERT Position |
+| `PredictionMarketProposalResolved` | UPDATE PredictionMarket (status=resolved, winner, resolved_at) |
+| `PredictionMarketMarketResolved` | UPDATE PredictionMarket (status=resolved, winner, resolved_at) |
 
 **Acceptance criteria:**
 
-- [ ] `ProjectPredictionMarketTrade`: system command, creates Trade record, upserts Position (updates balances by action type), updates total_collateral
-- [ ] `ProjectPredictionMarketResolution`: system command, updates status=resolved, sets winner + resolved_at
-- [ ] 8 mapper functions decode raw EVM logs using ABIs -> typed event payloads
-- [ ] `PredictionMarketPolicy` handles all 8 domain events (see Event Storming Model above)
-- [ ] Policy registered in rascalConsumerMap
+- [ ] `PredictionMarketProjection` handles all 8 domain events (2 existing + 6 new) with direct DB mutations
+- [ ] No `ProjectPredictionMarketTrade.command.ts` or `ProjectPredictionMarketResolution.command.ts` files created
+- [ ] No `command()` calls inside the projection
+- [ ] 8 mapper functions decode raw EVM logs using ABIs → typed event payloads
+- [ ] Projection already registered in rascalConsumerMap (done in PM-2)
 - [ ] Idempotent: composite PK prevents duplicate trades
 - [ ] `pnpm -r check-types` passes
 
 **Tests:**
 
-- ProjectTrade: mint creates position, swap updates balances, merge reduces both, redeem reduces winning tokens
+- Projection handlers: mint creates Trade + Position, swap updates balances, merge reduces both, redeem reduces winning tokens
 - Position aggregation: mint 100 + swap 50 fToken = position(p:152, f:50)
-- Mapper tests: raw log hex -> decoded event payload (each of 8 events)
-- Policy integration: mock event -> verify DB state
+- Mapper tests: raw log hex → decoded event payload (each of 8 events)
+- Projection integration: mock event → verify DB state
 - Idempotency: same event twice, no duplicate trades
 
 ---
 
-### TICKET PM-4: Contract ABIs + Event Signatures + Registry
+### TICKET PM-4: Event Signatures + Registry + Contract Helpers
 
 **Size:** M | **Depends on:** nothing | **Blocks:** PM-3
 
-Import ABIs from common-protocol and register event signatures for chain event polling.
+Register event signatures and contract sources for chain event polling. ABIs are already published as `@commonxyz/common-protocol-abis@1.4.14` (already in `package.json`) — no ABI files need to be created.
 
-**Source:** `common-protocol/prediction_market_helpers_frontend/src/abis.ts`
+**ABI imports (from `@commonxyz/common-protocol-abis`):**
+
+```typescript
+import { BinaryVaultAbi, FutarchyGovernorAbi, FutarchyRouterAbi } from '@commonxyz/common-protocol-abis';
+```
+
+**On-chain event signatures (8 events from 3 contracts):**
+
+| Contract | Event Signature | Parameters |
+|----------|----------------|------------|
+| BinaryVault | `MarketCreated(bytes32 indexed marketId, address indexed pToken, address indexed fToken, address collateral)` | market_id, token addresses |
+| BinaryVault | `TokensMinted(bytes32 indexed marketId, address indexed to, uint256 amount)` | market_id, recipient, amount |
+| BinaryVault | `TokensMerged(bytes32 indexed marketId, address indexed from, uint256 amount)` | market_id, sender, amount |
+| BinaryVault | `TokensRedeemed(bytes32 indexed marketId, address indexed to, uint256 amount, uint8 outcome)` | market_id, recipient, amount, outcome |
+| BinaryVault | `MarketResolved(bytes32 indexed marketId, uint8 winner)` | market_id, winner |
+| FutarchyGovernor | `ProposalCreated(bytes32 indexed proposalId, bytes32 indexed marketId, address indexed strategy, address collateral, uint256 startTime, uint256 endTime)` | proposal_id, market_id, strategy, collateral, times |
+| FutarchyGovernor | `ProposalResolved(bytes32 indexed proposalId, bytes32 indexed marketId, uint8 winner)` | proposal_id, market_id, winner |
+| FutarchyRouter | `SwapExecuted(bytes32 indexed marketId, address indexed user, bool buyPass, uint256 amountIn, uint256 amountOut)` | market_id, user, direction, amounts |
 
 **Files to create:**
 
-- `libs/evm-protocols/src/abis/BinaryVaultAbi.ts`
-- `libs/evm-protocols/src/abis/FutarchyGovernorAbi.ts`
-- `libs/evm-protocols/src/abis/FutarchyRouterAbi.ts`
 - `libs/evm-protocols/src/common-protocol/contractHelpers/predictionMarket.ts`
 
 **Files to modify:**
@@ -708,7 +752,7 @@ Import ABIs from common-protocol and register event signatures for chain event p
 
 **Acceptance criteria:**
 
-- [ ] ABIs extracted from common-protocol helpers, formatted for Viem
+- [ ] ABIs imported from `@commonxyz/common-protocol-abis` (no local ABI files created)
 - [ ] 8 event signature hashes computed and registered under `PredictionMarket` namespace
 - [ ] 3 contract sources: binaryVaultSource (5 events), futarchyGovernorSource (2), futarchyRouterSource (1)
 - [ ] Sources registered for Base, Base Sepolia, and Anvil chain IDs
@@ -862,11 +906,11 @@ See detailed test plan below.
 ## Dependency Graph
 
 ```text
-  PM-1 (Schemas + Models + Migration)
+  PM-1 (Schemas + Models + Migration) ✅ DONE
     |
-    +-------> PM-2 (Create/Deploy/Resolve/Cancel commands + Queries)
+    +-------> PM-2 (Create/Deploy + Projection for ProposalCreated/MarketCreated) ✅ DONE
     |            |
-    |            +-------> PM-3 (Trade Projection + Policy)
+    |            +-------> PM-3 (Extend Projection: 6 new event handlers)
     |            |              ^
     |            |              |
     |            +-------> PM-5 (tRPC Routes)
@@ -875,16 +919,16 @@ See detailed test plan below.
     |                                    |
     |                                    +-------> PM-7 (Frontend Components)
     |                                                 |
-    +-------> PM-4 (ABIs + Sigs)---+                  +-------> PM-8 (Feature Flag)
-                                   |                  |
-                                   +-> PM-3           +-------> PM-9 (Testing)
+    +-------> PM-4 (Event Sigs + Registry)--+         +-------> PM-8 (Feature Flag)
+              [imports ABIs from npm]       |         |
+                                            +-> PM-3  +-------> PM-9 (Testing)
 ```
 
 **Parallelizable work:**
 
-- PM-1 + PM-4 can start simultaneously (no dependencies)
-- PM-2 and PM-4 can run in parallel after PM-1
-- PM-6 and PM-3 can run in parallel after PM-2/PM-5
+- PM-4 can start now (no remaining dependencies)
+- PM-3 and PM-5 can run in parallel after PM-4
+- PM-6 and PM-3 can run in parallel after PM-5
 
 ---
 
@@ -899,13 +943,13 @@ See detailed test plan below.
 | DeployPredictionMarket | same dir | Updates addresses, status transition draft->active |
 | ResolvePredictionMarket | same dir | Sets winner, status transition active->resolved |
 | CancelPredictionMarket | same dir | Status transition, auth checks |
-| ProjectTrade - mint | `libs/model/test/prediction-market/ProjectTrade.spec.ts` | Creates trade + position with both token balances |
-| ProjectTrade - swap | same | Updates position, changes token balances |
-| ProjectTrade - merge | same | Reduces both token balances, returns collateral |
-| ProjectTrade - redeem | same | Reduces winning token balance |
+| Projection - mint | `libs/model/test/prediction-market/Projection.spec.ts` | Creates trade + position with both token balances |
+| Projection - swap | same | Updates position, changes token balances |
+| Projection - merge | same | Reduces both token balances, returns collateral |
+| Projection - redeem | same | Reduces winning token balance |
+| Projection - resolve | same | Updates market status and winner |
 | State machine | `libs/model/test/prediction-market/Resolution.spec.ts` | Only valid transitions allowed |
 | Event mappers | `libs/model/test/prediction-market/EventMappers.spec.ts` | Raw hex logs decoded to typed payloads |
-| Policy handlers | `libs/model/test/prediction-market/Policy.spec.ts` | Events -> correct commands dispatched |
 
 ### Integration Tests
 
@@ -913,8 +957,8 @@ See detailed test plan below.
 |------|------|-------------------|
 | API CRUD | `test/integration/api/prediction-markets.spec.ts` | Full lifecycle via tRPC: create->deploy->query->resolve |
 | Auth enforcement | same | Non-author cannot create/resolve/cancel |
-| Trade projection | same | System commands correctly update DB from mock events |
-| Chain event pipeline | `test/integration/chain-events/prediction-market-events.spec.ts` | Mock EVM logs -> mapper -> outbox -> policy -> DB verification |
+| Trade projection | same | Projection handlers correctly update DB from mock events |
+| Chain event pipeline | `test/integration/chain-events/prediction-market-events.spec.ts` | Mock EVM logs -> mapper -> outbox -> projection -> DB verification |
 | Idempotency | same | Duplicate events don't create duplicate records |
 
 ### E2E Tests (Base Sepolia)
@@ -952,7 +996,7 @@ See detailed test plan below.
 
 ## Implementation Phases (detailed)
 
-### Phase 1: Schemas + Models + Migration (PM-1)
+### Phase 1: Schemas + Models + Migration (PM-1) -- ✅ COMPLETED
 
 **New files:**
 
@@ -974,21 +1018,23 @@ See detailed test plan below.
 - `libs/model/src/models/associations.ts`
 - `libs/model/src/models/thread.ts`
 
-### Phase 2: Backend Aggregates + API (PM-2 + PM-4 + PM-5)
+### Phase 2: Backend Aggregates + API (PM-2 + PM-4 + PM-5) -- ✅ PARTIALLY COMPLETED
 
-**New files:**
+**Completed files (PM-2):**
 
-- `libs/model/src/aggregates/prediction-market/CreatePredictionMarket.command.ts`
-- `libs/model/src/aggregates/prediction-market/DeployPredictionMarket.command.ts`
-- `libs/model/src/aggregates/prediction-market/ResolvePredictionMarket.command.ts`
-- `libs/model/src/aggregates/prediction-market/CancelPredictionMarket.command.ts`
-- `libs/model/src/aggregates/prediction-market/ProjectPredictionMarketTrade.command.ts`
-- `libs/model/src/aggregates/prediction-market/ProjectPredictionMarketResolution.command.ts`
-- `libs/model/src/aggregates/prediction-market/GetPredictionMarkets.query.ts`
-- `libs/model/src/aggregates/prediction-market/GetPredictionMarketTrades.query.ts`
-- `libs/model/src/aggregates/prediction-market/GetPredictionMarketPositions.query.ts`
-- `libs/model/src/aggregates/prediction-market/index.ts`
-- `packages/commonwealth/server/api/prediction-market.ts`
+- `libs/model/src/aggregates/prediction_market/CreatePredictionMarket.command.ts` ✅
+- `libs/model/src/aggregates/prediction_market/DeployPredictionMarket.command.ts` ✅
+- `libs/model/src/aggregates/prediction_market/GetPredictionMarkets.query.ts` ✅
+- `libs/model/src/aggregates/prediction_market/PredictionMarket.projection.ts` ✅ (handles ProposalCreated + MarketCreated)
+- `libs/model/src/aggregates/prediction_market/index.ts` ✅
+- `packages/commonwealth/server/api/predictionMarket.ts` ✅
+
+**Remaining files:**
+
+- `libs/model/src/aggregates/prediction_market/ResolvePredictionMarket.command.ts`
+- `libs/model/src/aggregates/prediction_market/CancelPredictionMarket.command.ts`
+- `libs/model/src/aggregates/prediction_market/GetPredictionMarketTrades.query.ts`
+- `libs/model/src/aggregates/prediction_market/GetPredictionMarketPositions.query.ts`
 
 **Modified files:**
 
@@ -1000,19 +1046,16 @@ See detailed test plan below.
 
 **New files:**
 
-- `libs/evm-protocols/src/abis/BinaryVaultAbi.ts`
-- `libs/evm-protocols/src/abis/FutarchyGovernorAbi.ts`
-- `libs/evm-protocols/src/abis/FutarchyRouterAbi.ts`
 - `libs/evm-protocols/src/common-protocol/contractHelpers/predictionMarket.ts`
-- `libs/model/src/policies/PredictionMarket.policy.ts`
 
 **Modified files:**
 
-- `libs/evm-protocols/src/event-registry/eventSignatures.ts`
-- `libs/evm-protocols/src/event-registry/eventRegistry.ts`
-- `libs/model/src/services/evmChainEvents/chain-event-utils.ts`
-- `packages/commonwealth/server/bindings/rascalConsumerMap.ts`
-- `libs/model/src/index.ts`
+- `libs/model/src/aggregates/prediction_market/PredictionMarket.projection.ts` (extend with 6 new event handlers)
+- `libs/evm-protocols/src/event-registry/eventSignatures.ts` (8 event signatures)
+- `libs/evm-protocols/src/event-registry/eventRegistry.ts` (3 contract sources)
+- `libs/model/src/services/evmChainEvents/chain-event-utils.ts` (8 mappers)
+
+**Note:** No ABI files to create — import from `@commonxyz/common-protocol-abis`. No policy file — projection handles all events with direct DB mutations. No `ProjectPredictionMarketTrade.command.ts` or `ProjectPredictionMarketResolution.command.ts` — these are anti-patterns per the enforced architecture rule.
 
 ### Phase 4: Frontend (PM-6 + PM-7 + PM-8)
 
@@ -1040,7 +1083,7 @@ See detailed test plan below.
 | Pattern | Source File | Reuse For |
 |---------|------------|-----------|
 | Poll thread attachment | `libs/model/src/aggregates/poll/CreatePoll.command.ts` | CreatePredictionMarket command structure |
-| Launchpad trade projection | `libs/model/src/policies/Launchpad.policy.ts` | PredictionMarket policy + ProjectTrade |
+| LaunchpadTrade projection | `libs/model/src/aggregates/launchpad/LaunchpadTrade.projection.ts` | PredictionMarketProjection (direct DB mutations) |
 | LaunchpadTrade model | `libs/model/src/models/launchpad_trade.ts` | PredictionMarketTrade model (composite PK) |
 | Thread token model | `libs/model/src/models/thread_token.ts` | PredictionMarket model (thread association) |
 | Poll tRPC router | `packages/commonwealth/server/api/poll.ts` | PredictionMarket tRPC router |
