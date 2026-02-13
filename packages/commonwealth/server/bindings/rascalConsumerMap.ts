@@ -113,14 +113,8 @@ export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   _ContestWorker,
   _GovernanceProjection,
   _FarcasterWorker,
-<<<<<<< HEAD
   _Xp,
   _NotificationsSettingsPolicy,
-=======
-  _GovernancePolicy,
-  LaunchpadPolicy,
-  NominationsWorker,
->>>>>>> 8afb803ae3aa70509c7b95769377534a56dc0271
   _NotificationsPolicy,
   _ReactionWorkerProjection,
 ];
