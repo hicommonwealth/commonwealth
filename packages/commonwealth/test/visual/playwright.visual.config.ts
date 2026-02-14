@@ -5,9 +5,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// CI: built server serves API + frontend on a single port (default 8080).
-// Local: API on E2E_API_PORT (default 3001), Vite on E2E_VITE_PORT (default 8081).
-// We use non-standard ports locally to avoid conflicts with other running services.
 const isCI = !!process.env.CI;
 const apiPort =
   process.env.PORT || (isCI ? '8080' : process.env.E2E_API_PORT || '3051');
@@ -19,19 +16,24 @@ const repoRoot = path.resolve(__dirname, '../../../..');
 const cwdPackage = path.resolve(__dirname, '../..');
 
 export default defineConfig({
+  testDir: '.',
+  timeout: 30_000,
+  expect: {
+    timeout: 10_000,
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.01,
+      threshold: 0.2,
+    },
+  },
+  fullyParallel: true,
+  reporter: [['list'], ['html', { outputFolder: './visual-report' }]],
+  outputDir: './test-results',
   use: {
     baseURL,
     viewport: { width: 1440, height: 900 },
-    video: 'on',
-    trace: 'retain-on-failure',
     ignoreHTTPSErrors: true,
-    screenshot: 'only-on-failure',
+    screenshot: 'off', // We take manual screenshots with toHaveScreenshot()
   },
-  timeout: 90_000,
-  expect: { timeout: 15_000 },
-  fullyParallel: true,
-  reporter: [['list'], ['playwright-json-summary-reporter']],
-  outputDir: './test-results',
   webServer: isCI
     ? {
         command: `pnpm -F commonwealth bootstrap-test-db && cd packages/commonwealth && PORT=${apiPort} NODE_ENV=test SERVICE=web node --import=extensionless/register --enable-source-maps ./build/server.js`,
@@ -56,4 +58,5 @@ export default defineConfig({
           timeout: 120_000,
         },
       ],
+  snapshotDir: './__snapshots__',
 });
