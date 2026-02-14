@@ -1,5 +1,9 @@
 import { Projection, logger } from '@hicommonwealth/core';
-import { PredictionMarketTradeAction, events } from '@hicommonwealth/schemas';
+import {
+  PredictionMarketStatus,
+  PredictionMarketTradeAction,
+  events,
+} from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { mustExist } from '../../middleware';
 
@@ -9,7 +13,11 @@ const inputs = {
   PredictionMarketProposalCreated: events.PredictionMarketProposalCreated,
   PredictionMarketMarketCreated: events.PredictionMarketMarketCreated,
   PredictionMarketTokensMinted: events.PredictionMarketTokensMinted,
+  PredictionMarketTokensMerged: events.PredictionMarketTokensMerged,
   PredictionMarketSwapExecuted: events.PredictionMarketSwapExecuted,
+  PredictionMarketTokensRedeemed: events.PredictionMarketTokensRedeemed,
+  PredictionMarketProposalResolved: events.PredictionMarketProposalResolved,
+  PredictionMarketMarketResolved: events.PredictionMarketMarketResolved,
 };
 
 export function PredictionMarketProjection(): Projection<typeof inputs> {
@@ -115,6 +123,92 @@ export function PredictionMarketProjection(): Projection<typeof inputs> {
             {
               total_collateral: models.sequelize.literal(
                 `total_collateral + ${collateral_amount}`,
+              ) as unknown as bigint,
+            },
+            { where: { id: market.id }, transaction },
+          );
+        });
+      },
+      PredictionMarketTokensMerged: async ({ payload }) => {
+        const {
+          market_id,
+          eth_chain_id,
+          transaction_hash,
+          trader_address,
+          collateral_amount,
+          p_token_amount,
+          f_token_amount,
+          timestamp,
+        } = payload;
+
+        const market = await models.PredictionMarket.findOne({
+          where: { market_id },
+        });
+        if (!market) {
+          log.warn(
+            `PredictionMarketTokensMerged: market not found for market_id=${market_id}`,
+          );
+          return;
+        }
+
+        await models.sequelize.transaction(async (transaction) => {
+          // Insert trade (idempotent via composite PK)
+          const [, tradeCreated] =
+            await models.PredictionMarketTrade.findOrCreate({
+              where: { eth_chain_id, transaction_hash },
+              defaults: {
+                eth_chain_id,
+                transaction_hash,
+                prediction_market_id: market.id!,
+                trader_address,
+                action: PredictionMarketTradeAction.Merge,
+                collateral_amount,
+                p_token_amount,
+                f_token_amount,
+                timestamp,
+              },
+              transaction,
+            });
+
+          // Skip position/market updates if trade already existed (idempotency)
+          if (!tradeCreated) return;
+
+          // Upsert position (decrement both token balances)
+          const [position, positionCreated] =
+            await models.PredictionMarketPosition.findOrCreate({
+              where: {
+                prediction_market_id: market.id!,
+                user_address: trader_address,
+              },
+              defaults: {
+                prediction_market_id: market.id!,
+                user_address: trader_address,
+                p_token_balance: 0n,
+                f_token_balance: 0n,
+                total_collateral_in: 0n,
+              },
+              transaction,
+            });
+
+          if (!positionCreated) {
+            await models.PredictionMarketPosition.update(
+              {
+                p_token_balance: models.sequelize.literal(
+                  `p_token_balance - ${p_token_amount}`,
+                ) as unknown as bigint,
+                f_token_balance: models.sequelize.literal(
+                  `f_token_balance - ${f_token_amount}`,
+                ) as unknown as bigint,
+              },
+              { where: { id: position.id }, transaction },
+            );
+          }
+
+          // Decrement market total collateral
+          await models.PredictionMarket.update(
+            {
+              total_collateral: models.sequelize.literal(
+                `total_collateral - ${collateral_amount}`,
               ) as unknown as bigint,
             },
             { where: { id: market.id }, transaction },
@@ -232,6 +326,132 @@ export function PredictionMarketProjection(): Projection<typeof inputs> {
             { current_probability: probability },
             { where: { id: market.id }, transaction },
           );
+        });
+      },
+      PredictionMarketTokensRedeemed: async ({ payload }) => {
+        const {
+          market_id,
+          eth_chain_id,
+          transaction_hash,
+          trader_address,
+          collateral_amount,
+          p_token_amount,
+          f_token_amount,
+          timestamp,
+        } = payload;
+
+        const market = await models.PredictionMarket.findOne({
+          where: { market_id },
+        });
+        if (!market) {
+          log.warn(
+            `PredictionMarketTokensRedeemed: market not found for market_id=${market_id}`,
+          );
+          return;
+        }
+
+        await models.sequelize.transaction(async (transaction) => {
+          // Insert trade (idempotent via composite PK)
+          const [, tradeCreated] =
+            await models.PredictionMarketTrade.findOrCreate({
+              where: { eth_chain_id, transaction_hash },
+              defaults: {
+                eth_chain_id,
+                transaction_hash,
+                prediction_market_id: market.id!,
+                trader_address,
+                action: PredictionMarketTradeAction.Redeem,
+                collateral_amount,
+                p_token_amount,
+                f_token_amount,
+                timestamp,
+              },
+              transaction,
+            });
+
+          // Skip position updates if trade already existed (idempotency)
+          if (!tradeCreated) return;
+
+          // Upsert position (decrement winning token balance)
+          const [position, positionCreated] =
+            await models.PredictionMarketPosition.findOrCreate({
+              where: {
+                prediction_market_id: market.id!,
+                user_address: trader_address,
+              },
+              defaults: {
+                prediction_market_id: market.id!,
+                user_address: trader_address,
+                p_token_balance: 0n,
+                f_token_balance: 0n,
+                total_collateral_in: 0n,
+              },
+              transaction,
+            });
+
+          if (!positionCreated) {
+            const updates: Record<string, unknown> = {};
+            if (p_token_amount > 0n) {
+              updates.p_token_balance = models.sequelize.literal(
+                `p_token_balance - ${p_token_amount}`,
+              ) as unknown as bigint;
+            }
+            if (f_token_amount > 0n) {
+              updates.f_token_balance = models.sequelize.literal(
+                `f_token_balance - ${f_token_amount}`,
+              ) as unknown as bigint;
+            }
+            if (Object.keys(updates).length > 0) {
+              await models.PredictionMarketPosition.update(updates, {
+                where: { id: position.id },
+                transaction,
+              });
+            }
+          }
+        });
+      },
+      PredictionMarketProposalResolved: async ({ payload }) => {
+        const { market_id, winner } = payload;
+
+        const market = await models.PredictionMarket.findOne({
+          where: { market_id },
+        });
+        if (!market) {
+          log.warn(
+            `PredictionMarketProposalResolved: market not found for market_id=${market_id}`,
+          );
+          return;
+        }
+
+        // Idempotent: skip if already resolved
+        if (market.status === PredictionMarketStatus.Resolved) return;
+
+        await market.update({
+          status: PredictionMarketStatus.Resolved,
+          winner,
+          resolved_at: new Date(),
+        });
+      },
+      PredictionMarketMarketResolved: async ({ payload }) => {
+        const { market_id, winner } = payload;
+
+        const market = await models.PredictionMarket.findOne({
+          where: { market_id },
+        });
+        if (!market) {
+          log.warn(
+            `PredictionMarketMarketResolved: market not found for market_id=${market_id}`,
+          );
+          return;
+        }
+
+        // Idempotent: skip if already resolved
+        if (market.status === PredictionMarketStatus.Resolved) return;
+
+        await market.update({
+          status: PredictionMarketStatus.Resolved,
+          winner,
+          resolved_at: new Date(),
         });
       },
     },
