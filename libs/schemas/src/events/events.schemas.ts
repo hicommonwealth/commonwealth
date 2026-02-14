@@ -535,15 +535,24 @@ export const events = {
   }),
 
   PredictionMarketProposalResolved: z.object({
-    prediction_market_id: PG_INT,
     proposal_id: EVM_BYTES,
+    market_id: EVM_BYTES,
+    eth_chain_id: z.number(),
+    transaction_hash: EVM_TRANSACTION_HASH,
     winner: z.number().int().min(0).max(2),
-    resolved_at: z.coerce.date(),
+    timestamp: PG_INT,
   }),
 
   PredictionMarketMarketResolved: z.object({
-    prediction_market_id: PG_INT,
     market_id: EVM_BYTES,
+    eth_chain_id: z.number(),
+    transaction_hash: EVM_TRANSACTION_HASH,
+    winner: z.number().int().min(0).max(2),
+    timestamp: PG_INT,
+  }),
+
+  PredictionMarketResolved: z.object({
+    prediction_market_id: PG_INT,
     winner: z.number().int().min(0).max(2),
     resolved_at: z.coerce.date(),
   }),
