@@ -72,3 +72,12 @@ Each entry documents: date, feature, decisions, files changed, tests, and concer
 - Files: eventSignatures.ts, eventRegistry.ts, chain-event-utils.ts, PredictionMarket.projection.ts, prediction-market-mint.spec.ts
 - Changes: Added TokensMinted EVM event signature, BinaryVault contract source, mapper decoding raw logs to PredictionMarketTokensMinted events, and projection handler that inserts trades, upserts positions, and increments market total_collateral. All DB mutations in a single transaction with idempotency via composite PK.
 - Decisions: Used Sequelize literal for DECIMAL(78,0) increments to avoid bigint precision loss. BinaryVault source exported (not registered in EventRegistry) since contract addresses come from EvmEventSources DB table at deploy time. Skipped position/market updates on duplicate trade for idempotency.
+
+[2026-02-13] #13389 feat: implement prediction market SwapExecuted event pipeline
+- Files: eventSignatures.ts, eventRegistry.ts, chain-event-utils.ts, PredictionMarket.projection.ts, events.schemas.ts, prediction-market-swap.spec.ts
+- Changes: Added SwapExecuted event signature and FutarchyRouter contract source. Updated PredictionMarketSwapExecuted schema to use buy_pass/amount_in/amount_out fields. Implemented mapper decoding FutarchyRouterAbi logs and projection handler that inserts trades (SwapBuyPass/SwapBuyFail), updates positions (token exchange), and updates market current_probability.
+- Decisions: Probability derived as simple ratio: buyPass→amountOut/(amountIn+amountOut), buyFail→amountIn/(amountIn+amountOut). Swap sets collateral_amount=0 on trade record since no collateral is exchanged. Position defaults use 0n for the non-received token and total_collateral_in on new positions from swaps.
+
+[2026-02-13] #13389 fix: gate prediction market projection behind feature flag
+- Files: rascalConsumerMap.ts
+- Changes: Conditionally register PredictionMarketProjection in rascalConsumerMap only when config.MARKETS.FUTARCHY_ENABLED is true, matching the pattern used by the prediction market API router in internal-router.ts.
