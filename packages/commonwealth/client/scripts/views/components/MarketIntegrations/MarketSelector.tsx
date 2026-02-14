@@ -8,7 +8,7 @@ import './MarketSelector.scss';
 import { useMarketData } from './useMarketData';
 
 interface MarketSelectorProps {
-  communityId: string;
+  communityId?: string;
   hideHeader?: boolean;
 }
 
