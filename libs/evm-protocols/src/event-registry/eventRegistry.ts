@@ -1,5 +1,6 @@
 import { VoteGovernanceAbi } from '@commonxyz/common-governance-abis';
 import {
+  BinaryVaultAbi,
   CommunityNominationsAbi,
   CommunityStakeAbi,
   ContestGovernorAbi,
@@ -114,6 +115,14 @@ const voteGovernanceSource: ContractSource = {
     EvmEventSignatures.VoteGovernance.TokenVoteCast,
     EvmEventSignatures.VoteGovernance.AddressVoteCast,
   ],
+};
+
+// BinaryVault is deployed per prediction market; addresses are stored in
+// EvmEventSources at deploy time. Exported for use by the EVM worker when
+// building contract sources from the DB.
+export const binaryVaultSource: ContractSource = {
+  abi: BinaryVaultAbi,
+  eventSignatures: [EvmEventSignatures.PredictionMarket.TokensMinted],
 };
 
 const tokenBondingCurveSource: ContractSource = {

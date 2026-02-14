@@ -1,5 +1,6 @@
 import { VoteGovernanceAbi } from '@commonxyz/common-governance-abis';
 import {
+  BinaryVaultAbi,
   CommunityNominationsAbi,
   CommunityStakeAbi,
   ContestGovernorAbi,
@@ -346,6 +347,30 @@ const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
   };
 };
 
+const predictionMarketTokensMintedMapper: EvmMapper<
+  'PredictionMarketTokensMinted'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: BinaryVaultAbi,
+    eventName: 'TokensMinted',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketTokensMinted',
+    event_payload: {
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      trader_address: decoded.args.to,
+      collateral_amount: decoded.args.amount,
+      p_token_amount: decoded.args.amount,
+      f_token_amount: decoded.args.amount,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
 const communityNamespaceCreatedMapper: EvmMapper<
   'CommunityNamespaceCreated'
 > = (event: EvmEvent) => {
@@ -490,6 +515,10 @@ export const chainEventMappers: Record<string, EvmMapper<OutboxEvents>> = {
     recurringContestVoteMapper,
   [EvmEventSignatures.Contests.SingleContestVoterVoted]:
     singleContestVoteMapper,
+
+  // Prediction Markets
+  [EvmEventSignatures.PredictionMarket.TokensMinted]:
+    predictionMarketTokensMintedMapper,
 
   // TokenCommunityManager
   [EvmEventSignatures.TokenCommunityManager.CommunityNamespaceCreated]:

@@ -67,3 +67,8 @@ Each entry documents: date, feature, decisions, files changed, tests, and concer
 - Files: common_knowledge/Prediction-Markets.md
 - Changes: Replaced all PredictionMarketPolicy references with PredictionMarketProjection. Removed ProjectPredictionMarketTrade/Resolution command indirection pattern. Updated PM-4 to import ABIs from @commonxyz/common-protocol-abis instead of creating local files. Marked PM-1 and PM-2 (Slices 1+2) as completed. Added complete EVM event-to-mapper-to-projection mapping table with all 8 ABI event signatures. Updated all diagrams to show projection-based flow (no policy or system command boxes).
 - Decisions: Kept ProjectPredictionMarketTrade/Resolution schemas in prediction-market.schemas.ts as they define the shape of event payloads used by the projection.
+
+[2026-02-13] #13387 feat: implement prediction market TokensMinted event pipeline
+- Files: eventSignatures.ts, eventRegistry.ts, chain-event-utils.ts, PredictionMarket.projection.ts, prediction-market-mint.spec.ts
+- Changes: Added TokensMinted EVM event signature, BinaryVault contract source, mapper decoding raw logs to PredictionMarketTokensMinted events, and projection handler that inserts trades, upserts positions, and increments market total_collateral. All DB mutations in a single transaction with idempotency via composite PK.
+- Decisions: Used Sequelize literal for DECIMAL(78,0) increments to avoid bigint precision loss. BinaryVault source exported (not registered in EventRegistry) since contract addresses come from EvmEventSources DB table at deploy time. Skipped position/market updates on duplicate trade for idempotency.
