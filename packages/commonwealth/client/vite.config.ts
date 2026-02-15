@@ -52,6 +52,7 @@ export default defineConfig(({ mode }) => {
     ),
     'process.env.FLAG_BINANCE_WEB': JSON.stringify(env.FLAG_BINANCE_WEB),
     'process.env.FLAG_MARKETS': JSON.stringify(env.FLAG_MARKETS),
+    'process.env.FLAG_FUTARCHY': JSON.stringify(env.FLAG_FUTARCHY),
   };
 
   return {

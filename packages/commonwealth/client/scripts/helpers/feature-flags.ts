@@ -35,6 +35,7 @@ const featureFlags = {
   mcpIntegrationsEnabled: buildFlag(process.env.FLAG_MCP_INTEGRATIONS_ENABLED),
   binanceWeb: buildFlag(process.env.FLAG_BINANCE_WEB),
   markets: buildFlag(process.env.FLAG_MARKETS),
+  futarchy: buildFlag(process.env.FLAG_FUTARCHY),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

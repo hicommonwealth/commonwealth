@@ -1,4 +1,4 @@
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { DEFAULT_NAME, MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useTopicGating from 'hooks/useTopicGating';
@@ -169,9 +169,10 @@ const CommunityMembersPage = () => {
       ? 'last_active'
       : tableState.orderBy) as MemberResultsOrderBy,
     order_direction: tableState.orderDirection as APIOrderDirection,
-    ...(debouncedSearchTerm && {
-      search: debouncedSearchTerm,
-    }),
+    ...(debouncedSearchTerm &&
+      debouncedSearchTerm.length >= MIN_SEARCH_LENGTH && {
+        search: debouncedSearchTerm,
+      }),
     community_id: communityId,
     include_roles: true,
     ...(membershipsFilter && {

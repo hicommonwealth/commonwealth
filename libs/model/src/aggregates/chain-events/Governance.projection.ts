@@ -1,6 +1,6 @@
-import { logger, Policy } from '@hicommonwealth/core';
+import { logger, Projection } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import { models } from '../database';
+import { models } from '../../database';
 
 const log = logger(import.meta);
 
@@ -10,7 +10,7 @@ const inputs = {
   CmnAddressVoteCast: events.CmnAddressVoteCast,
 };
 
-export function GovernancePolicy(): Policy<typeof inputs> {
+export function GovernanceProjection(): Projection<typeof inputs> {
   return {
     inputs,
     body: {

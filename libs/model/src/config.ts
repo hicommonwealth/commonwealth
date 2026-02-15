@@ -107,6 +107,7 @@ const {
   SLACK_WEBHOOK_URL_ALL_ENG,
   SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
   FLAG_MARKETS,
+  FLAG_FUTARCHY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -362,6 +363,7 @@ export const config = configure(
     },
     MARKETS: {
       ENABLED: FLAG_MARKETS === 'true',
+      FUTARCHY_ENABLED: FLAG_FUTARCHY === 'true',
     },
   },
   z.object({
@@ -775,6 +777,7 @@ export const config = configure(
     }),
     MARKETS: z.object({
       ENABLED: z.boolean(),
+      FUTARCHY_ENABLED: z.boolean(),
     }),
   }),
 );

@@ -1,4 +1,4 @@
-import { config, logger, Policy } from '@hicommonwealth/core';
+import { config, logger, Projection } from '@hicommonwealth/core';
 import {
   EvmProtocolChain,
   getContestScore,
@@ -33,7 +33,7 @@ const inputs = {
   ContestContentUpvoted: events.ContestContentUpvoted,
 };
 
-export function UpgradeTierPolicy(): Policy<typeof inputs> {
+export function UpgradeTierProjection(): Projection<typeof inputs> {
   return {
     inputs,
     body: {

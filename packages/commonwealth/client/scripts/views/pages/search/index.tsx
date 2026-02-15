@@ -9,6 +9,7 @@ import {
 import useSidebarStore from 'state/ui/sidebar';
 import './index.scss';
 
+import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import useWindowResize from 'hooks/useWindowResize';
@@ -137,7 +138,9 @@ const SearchPage = () => {
     order_direction,
     thread_title_only: true,
     include_count: true,
-    enabled: activeTab === SearchScope.Threads && search_term?.length > 3,
+    enabled:
+      activeTab === SearchScope.Threads &&
+      search_term?.length >= MIN_SEARCH_LENGTH,
   });
 
   const {
@@ -152,7 +155,9 @@ const SearchPage = () => {
     limit: 20,
     order_by,
     order_direction,
-    enabled: activeTab === SearchScope.Replies && search_term.length > 3,
+    enabled:
+      activeTab === SearchScope.Replies &&
+      search_term.length >= MIN_SEARCH_LENGTH,
   });
 
   const {
@@ -166,7 +171,9 @@ const SearchPage = () => {
     limit: 20,
     order_by: 'tier',
     order_direction: 'DESC',
-    enabled: activeTab === SearchScope.Communities && search_term.length > 0,
+    enabled:
+      activeTab === SearchScope.Communities &&
+      search_term.length >= MIN_SEARCH_LENGTH,
   });
 
   const {

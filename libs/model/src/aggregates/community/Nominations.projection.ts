@@ -1,8 +1,8 @@
-import { config, logger, Policy } from '@hicommonwealth/core';
+import { config, logger, Projection } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { ZodUndefined } from 'zod';
-import { models } from '../database';
-import { mustExist } from '../middleware';
+import { models } from '../../database';
+import { mustExist } from '../../middleware';
 
 const log = logger(import.meta);
 
@@ -12,7 +12,10 @@ const inputs = {
   JudgeNominated: events.JudgeNominated,
 };
 
-export function NominationsWorker(): Policy<typeof inputs, ZodUndefined> {
+export function NominationsProjection(): Projection<
+  typeof inputs,
+  ZodUndefined
+> {
   return {
     inputs,
     body: {
