@@ -100,6 +100,10 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { SnapshotCreationCard } from './snapshot_creation_card';
+import {
+  resolveViewThreadRenderState,
+  shouldShowCreateCommentComposer,
+} from './viewThreadPage.contracts';
 
 type ViewThreadPageProps = {
   identifier: string;
@@ -440,15 +444,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return profilesMap;
   }, [fetchedProfiles]);
 
-  if (typeof identifier !== 'string' || fetchThreadError) {
+  const viewThreadRenderState = resolveViewThreadRenderState({
+    identifier,
+    fetchThreadError,
+    hasChainMeta: !!app.chain?.meta,
+    isLoading,
+    isLoadingContentBody,
+    contentUrlBodyToFetch,
+    thread,
+    activeChainId: app.activeChainId(),
+  });
+
+  if (viewThreadRenderState === 'fetch_error') {
     return <PageNotFound message={fetchThreadError?.message} />;
   }
 
-  if (
-    !app.chain?.meta ||
-    isLoading ||
-    (isLoadingContentBody && contentUrlBodyToFetch)
-  ) {
+  if (viewThreadRenderState === 'loading') {
     return (
       <CWPageLayout>
         <CWContentPage
@@ -459,11 +470,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     );
   }
 
-  if (
-    (!isLoading && !thread) ||
-    fetchThreadError ||
-    thread?.communityId !== app.activeChainId()
-  ) {
+  if (viewThreadRenderState === 'thread_not_found') {
     return <PageNotFound message="Thread not found" />;
   }
 
@@ -791,6 +798,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
+
+  const showCreateCommentComposer = shouldShowCreateCommentComposer({
+    thread,
+    fromDiscordBot,
+    isGloballyEditing,
+    isUserLoggedIn: user.isLoggedIn,
+  });
 
   return (
     <StickCommentProvider>
@@ -1165,18 +1179,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           isChatMode={isChatMode}
         />
         <WithDefaultStickyComment>
-          {thread &&
-            !thread.readOnly &&
-            !fromDiscordBot &&
-            !isGloballyEditing &&
-            user.isLoggedIn && (
-              <CreateComment
-                rootThread={thread}
-                canComment={permissions.CREATE_COMMENT.allowed}
-                aiCommentsToggleEnabled={!!effectiveAiCommentsToggleEnabled}
-                tooltipText={permissions.CREATE_COMMENT.tooltip}
-              />
-            )}
+          {showCreateCommentComposer && (
+            <CreateComment
+              rootThread={thread!}
+              canComment={permissions.CREATE_COMMENT.allowed}
+              aiCommentsToggleEnabled={!!effectiveAiCommentsToggleEnabled}
+              tooltipText={permissions.CREATE_COMMENT.tooltip}
+            />
+          )}
         </WithDefaultStickyComment>
 
         <StickyCommentElementSelector />
