@@ -17,7 +17,10 @@ beforeAll(() => {
     })),
   });
 
-  window.scrollTo = vi.fn();
+  window.scrollTo = ((arg1?: number | ScrollToOptions, arg2?: number) => {
+    void arg1;
+    void arg2;
+  }) as typeof window.scrollTo;
 
   if (!('ResizeObserver' in window)) {
     class ResizeObserverMock {

@@ -913,7 +913,7 @@ EPIC-6: Kill views/ + Final Cleanup
 │   ~20 LOC modify
 │
 └── 6.11: Final circular dependency audit + cleanup [blocked-by: 6.10]
-    Run: madge --circular, bundle, check-types, test-component, test-unit
+    Run: pnpm depcruise:circular, bundle, check-types, test-component, test-unit
     ~200 LOC modify
 ```
 
