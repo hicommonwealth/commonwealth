@@ -581,7 +581,26 @@ jobs:
       - name: Build server
         run: pnpm -F commonwealth build
 
-      - name: Run visual regression tests
+      - name: Check committed visual baselines
+        id: visual_baseline
+        run: |
+          BASELINE_COUNT="$(git ls-files packages/commonwealth/test/visual/__snapshots__ | wc -l | tr -d ' ')"
+          echo "count=${BASELINE_COUNT}" >> "$GITHUB_OUTPUT"
+          if [ "$BASELINE_COUNT" -gt 0 ]; then
+            echo "Using committed visual baselines (${BASELINE_COUNT} files)."
+          else
+            echo "::warning::No committed visual baselines found. Running update mode to produce bootstrap artifacts only."
+          fi
+
+      - name: Run visual regression tests (compare mode)
+        if: steps.visual_baseline.outputs.count != '0'
+        run: |
+          pnpm -F commonwealth bootstrap-test-db &&
+          (cd packages/commonwealth && SERVICE=web node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-visual)
+
+      - name: Bootstrap visual baselines (update mode, non-gating)
+        if: steps.visual_baseline.outputs.count == '0'
         run: |
           pnpm -F commonwealth bootstrap-test-db &&
           (cd packages/commonwealth && SERVICE=web node --import=extensionless/register --enable-source-maps ./build/server.js) &

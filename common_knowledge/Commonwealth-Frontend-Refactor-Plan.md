@@ -296,6 +296,7 @@ One smoke test per migrated feature page -- renders without crash with mock prov
 
 2. **Visual baseline strategy**
    Use **committed canonical baselines** for visual tests that are gating quality. Run compare mode (`test-visual`) in automated quality gates (nightly + release-candidate). Restrict baseline updates to dedicated PRs using `test-visual:update` with explicit human approval.
+   - Bootstrap note: if no committed baselines exist yet, CI may run update mode artifact generation once to seed the first baseline PR, then return to compare-mode gating.
 
 3. **Stateful/mature E2E policy**
    Keep mature/stateful-heavy coverage out of normal PR fast lane. Run full suites nightly and as **release-candidate blocking gates**.
