@@ -361,6 +361,119 @@ jobs:
 #      - name: Run EVM devnet integration tests
 #        run: pnpm -F commonwealth test-devnet:integration --allowOnly=false
 
+  e2e-smoke-tests:
+    name: E2E Smoke Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    services:
+      postgres:
+        image: hicommonwealth/cw_postgres:latest
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: common_test
+          POSTGRES_PASSWORD: edgeware
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - uses: ./.github/actions/e2e
+
+      - name: Build server
+        run: pnpm -F commonwealth build
+
+      - name: Run E2E smoke tests
+        run: |
+          pnpm -F commonwealth bootstrap-test-db &&
+          (cd packages/commonwealth && SERVICE=web node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-smoke --forbid-only)
+
+      - name: Upload E2E artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-smoke-artifacts
+          path: |
+            packages/commonwealth/test/e2e/test-results
+            packages/commonwealth/playwright-report
+          retention-days: 7
+
+  visual-regression-tests:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    services:
+      postgres:
+        image: hicommonwealth/cw_postgres:latest
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: common_test
+          POSTGRES_PASSWORD: edgeware
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - uses: ./.github/actions/e2e
+
+      - name: Build server
+        run: pnpm -F commonwealth build
+
+      - name: Run visual regression tests
+        run: |
+          pnpm -F commonwealth bootstrap-test-db &&
+          (cd packages/commonwealth && SERVICE=web node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-visual:update)
+
+      - name: Upload visual regression artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-artifacts
+          path: |
+            packages/commonwealth/test/visual/test-results
+            packages/commonwealth/test/visual/__snapshots__
+            packages/commonwealth/test/visual/visual-report
+          retention-days: 7
+
   report-coverage:
     name: Upload Test Coverage Report
     runs-on: ubuntu-latest

@@ -1,0 +1,10 @@
+# Playwright test output
+test-results/
+visual-report/
+playwright-report/
+blob-report/
+
+# Visual regression baselines — platform-specific (darwin vs linux),
+# so not committed. CI generates fresh baselines and uploads them as
+# artifacts for human inspection.
+__snapshots__/

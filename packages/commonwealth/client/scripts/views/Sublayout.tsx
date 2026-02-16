@@ -141,7 +141,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     (user.isWelcomeOnboardFlowComplete || !isWindowSmallInclusive) &&
     !(isWindowExtraSmall && isWelcomeOnboardModalOpen);
   return (
-    <div className="Sublayout">
+    <div className="Sublayout" data-testid="sublayout">
       {(!isWindowSmallInclusive || isWindowSmallToMedium) && (
         <CollapsableSidebarButton
           onMobile={isWindowExtraSmall}
@@ -162,7 +162,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
         onClose={() => setAuthModalType(undefined)}
         isOpen={!!authModalType}
       />
-      <div className="sidebar-and-body-container">
+      <div className="sidebar-and-body-container" data-testid="main-content">
         <Sidebar
           // @ts-expect-error StrictNullChecks
           isInsideCommunity={isInsideCommunity}
