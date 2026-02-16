@@ -13,7 +13,7 @@ type TopicIdentifierFromUrl = {
 };
 
 type TopicLike = {
-  id: number;
+  id?: number;
   name: string;
 };
 
@@ -121,7 +121,7 @@ export const getTopicValidationNavigationDecision = ({
       sanitizeTopicName(topic.name) === topicIdentifiersFromURL.topicName,
   );
 
-  if (!validTopic) {
+  if (!validTopic || typeof validTopic.id !== 'number') {
     return {
       type: 'navigate',
       replace: false,
