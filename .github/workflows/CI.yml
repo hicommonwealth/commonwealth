@@ -140,6 +140,28 @@ jobs:
       - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
         run: pnpm -F commonwealth run lint-diff-canary
 
+  commonwealth-boundary-lint:
+    name: Boundary Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Lint frontend architectural boundaries (diff-only)
+        env:
+          ESLINT_PLUGIN_DIFF_COMMIT: ${{ github.base_ref && format('origin/{0}', github.base_ref) || 'origin/master' }}
+        run: pnpm -F commonwealth lint-boundaries
+
 
   detect-broken-ts-expect-error:
     name: Detect Broken TS expect errors
