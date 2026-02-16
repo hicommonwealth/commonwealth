@@ -280,6 +280,26 @@ jobs:
           parallel: true
           files: libs/adapters/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info
 
+  commonwealth-component-tests:
+    name: Commonwealth Component Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Run component tests
+        run: pnpm -F commonwealth test-component -- --allowOnly=false
+
 
   commonwealth-evm-tests:
     name: EVM Devnet Tests
