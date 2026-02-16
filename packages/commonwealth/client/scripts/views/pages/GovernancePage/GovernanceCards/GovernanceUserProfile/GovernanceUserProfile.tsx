@@ -1,4 +1,6 @@
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
+import useGetERC20BalanceQuery from 'client/scripts/state/api/tokens/getERC20Balance';
 import useUserStore from 'client/scripts/state/ui/user';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import { CWIconButton } from 'client/scripts/views/components/component_kit/cw_icon_button';
@@ -9,10 +11,12 @@ import {
   handleMouseEnter,
   handleMouseLeave,
 } from 'client/scripts/views/menus/utils';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { formatAddressShort } from 'shared/utils';
+import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import { useCommunityStake } from 'views/components/CommunityStake';
+import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import './GovernanceUserProfile.scss';
 
 const GovernanceUserProfile = () => {
@@ -21,10 +25,56 @@ const GovernanceUserProfile = () => {
   const { data } = useFetchProfileByIdQuery({
     apiCallEnabled: userData.isLoggedIn,
   });
+  console.log('data => ', data);
 
   const { currentVoteWeight, stakeValue } = useCommunityStake({
     walletAddress: userData.activeAccount?.address || '',
   });
+
+  // Community/node and token info to derive token address and RPC
+  const { communityToken } = useTokenTradeWidget();
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityToken?.community_id || '',
+    enabled: !!communityToken?.community_id,
+    includeNodeInfo: true,
+  });
+
+  const tokenInfo = useMemo(() => {
+    if (!communityToken) return { address: '', symbol: '' };
+    // External pinned tokens use contract_address, launchpad tokens use token_address
+    const address =
+      (
+        communityToken as unknown as {
+          contract_address?: string;
+          token_address?: string;
+        }
+      ).contract_address ||
+      (communityToken as unknown as { token_address?: string }).token_address ||
+      '';
+    const symbol =
+      (communityToken as unknown as { symbol?: string }).symbol || 'TOKEN';
+    return { address, symbol };
+  }, [communityToken]);
+
+  const nodeRpc = community?.ChainNode?.url || '';
+
+  const { data: tokenBalance = '0' } = useGetERC20BalanceQuery({
+    userAddress: userData.activeAccount?.address || '',
+    tokenAddress: tokenInfo.address,
+    nodeRpc,
+    enabled: Boolean(
+      userData.activeAccount?.address && tokenInfo.address && nodeRpc,
+    ),
+  } as unknown as {
+    userAddress: string;
+    tokenAddress: string;
+    nodeRpc: string;
+    enabled?: boolean;
+  });
+
+  // CTA modal store for staking/locking
+  const { setModeOfManageCommunityStakeModal } =
+    useManageCommunityStakeModalStore();
 
   if (!data) return null;
 
@@ -92,10 +142,43 @@ const GovernanceUserProfile = () => {
       </div>
 
       <div className="profile-body">
-        <CWText>Total stake: {stakeValue}</CWText>
-        <CWText>
-          Total voting power: {currentVoteWeight?.toString() || '0'}
-        </CWText>
+        <div className="stats">
+          <div className="stat">
+            <CWText type="caption" className="stat-label">
+              {tokenInfo.symbol} balance
+            </CWText>
+            <CWText fontWeight="semiBold" className="stat-value">
+              {tokenBalance}
+            </CWText>
+          </div>
+          <div className="stat">
+            <CWText type="caption" className="stat-label">
+              Voting power (veCommon)
+            </CWText>
+            <CWText fontWeight="semiBold" className="stat-value">
+              {currentVoteWeight?.toString() || '0'}
+            </CWText>
+          </div>
+          <div className="stat">
+            <CWText type="caption" className="stat-label">
+              Total stake value (USD)
+            </CWText>
+            <CWText fontWeight="semiBold" className="stat-value">
+              {stakeValue ?? 0}
+            </CWText>
+          </div>
+        </div>
+        <div className="lock-cta">
+          <CWButton
+            label="Lock Tokens"
+            buttonWidth="full"
+            onClick={() => setModeOfManageCommunityStakeModal('buy')}
+          />
+          <CWText type="caption" className="lock-explainer">
+            Locking your {tokenInfo.symbol} increases governance voting power
+            via veCommon. Longer locks earn more voting weight.
+          </CWText>
+        </div>
       </div>
 
       <Link to={`/profile/id/${userData.id}`} className="user-info">
