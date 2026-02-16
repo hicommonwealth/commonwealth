@@ -194,10 +194,12 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 ## 2. Test Strategy
 
 ### Current State
-- **89 total test files**: 12 unit, 20 integration, 48 E2E, 9 devnet
+- **96 total spec test files** (repo audit on 2026-02-16): 14 unit, 20 integration, 51 E2E, 9 devnet, 2 visual
+- **Smoke coverage is minimal**: 2 files / 4 tagged `@smoke` tests
+- **E2E quality caveat**: 41 of 46 `e2eRegular` spec files use crash-only `generatePageCrashTestConfig`
 - **ZERO component tests** for React components
 - **Stack**: Vitest 1.6.1 + Playwright 1.44.0
-- **Missing**: @testing-library/react, no custom render helpers
+- **Missing**: `@testing-library/react`, `@testing-library/jest-dom`, `@testing-library/user-event`, no custom render helpers
 
 ### New Infrastructure to Add
 
@@ -247,35 +249,36 @@ One smoke test per migrated feature page -- renders without crash with mock prov
 
 ### E2E Coverage Gaps to Address Post-Refactor
 
-| Feature | Missing E2E | Priority |
-|---------|------------|----------|
-| Quests (create/list/detail) | No E2E exists | P1 |
-| LaunchToken flow | No E2E exists | P1 |
-| OnBoarding flow | No E2E exists | P1 |
-| GovernancePage (new, behind flag) | No E2E exists | P1 |
-| Leaderboard page | No E2E exists | P2 |
-| WalletPage (full page) | Only transactions covered | P2 |
-| ExplorePage tabs/filtering | No E2E exists | P2 |
-| ContestPage (public view) | Only admin tested | P2 |
+| Feature | Current E2E State | Priority |
+|---------|-------------------|----------|
+| Quests (create/list/detail) | No dedicated E2E | P1 |
+| LaunchToken flow | No dedicated E2E | P1 |
+| GovernancePage (`/governance`) | No direct route E2E | P1 |
+| Leaderboard (`/leaderboard`) | No direct route E2E | P1 |
+| WalletPage (`/wallet`) | Only `/myTransactions` crash coverage exists | P1 |
+| ContestPage public (`/contest/:id`) | No direct route E2E | P1 |
+| ExplorePage tabs/filtering | Crash/navigation-level only | P2 |
+| Discussions interactions | Partial; key interaction tests are skipped | P2 |
 
 ### Verification Gates Per PR
 
-**Every PR must pass:**
-1. `pnpm -r check-types` -- zero errors
-2. `pnpm lint-branch-warnings` -- zero new warnings
-3. `pnpm -F commonwealth bundle` -- production build succeeds
-4. `pnpm -F commonwealth test-unit` -- all unit tests pass
-5. `pnpm -F commonwealth test-component` -- all component tests pass (after setup)
+**PR-required (fast lane):**
+1. `pnpm -r check-types` -- zero type errors
+2. `pnpm lint-diff` -- no new lint violations
+3. `pnpm -F commonwealth bundle` -- production bundle succeeds
+4. `pnpm -F commonwealth test-unit` -- unit suite passes
+5. `pnpm -F commonwealth test-e2e-smoke --forbid-only` -- smoke suite passes
+6. `pnpm -F commonwealth test-component` -- required after EPIC-2.1 lands
 
-**Additional gates by PR type:**
+**Additional gates by PR type (automation-first, changed-file aware):**
 
 | PR Type | Extra Gate |
 |---------|-----------|
-| Dead code deletion | `grep -r 'deleted-filename' client/` returns 0 |
-| File move | No files at old location; bundle size doesn't grow >1% |
-| Feature migration | Relevant E2E tests pass; smoke test exists |
-| Boundary rules | `pnpm lint-boundaries` passes |
-| Final cleanup | `npx madge --circular client/scripts/` reports no cycles |
+| Route migration (`navigation/*Routes*`, `Router.tsx`) | Run route-matrix E2E subset for touched routes |
+| Privileged/admin/community-manage changes | Run security route-access E2E subset |
+| Boundary config/import-layer changes | `pnpm -F commonwealth lint-boundaries` (new script in EPIC-5) |
+| Final cleanup (`views/` deletion, alias removal) | `pnpm depcruise:circular` + no-legacy-import checks (new scripts in EPIC-6) |
+| Visual baseline update PR | Run `pnpm -F commonwealth test-visual:update` and require human approval |
 
 ### Regression Avoidance for File Moves
 
@@ -285,6 +288,68 @@ One smoke test per migrated feature page -- renders without crash with mock prov
 4. **`pnpm -F commonwealth bundle`** after every file-move PR
 5. **One feature per PR** -- never mix features, each PR independently revertable
 6. **tsconfig/vite aliases added before any moves** (standalone PR)
+
+### Automation-First Decision Log (locked 2026-02-16)
+
+1. **ComponentsShowcase mismatch (`/components`)**
+   Keep `/components` temporarily, mark as deprecated, and remove only after replacement visual targets are in place. This prevents noisy false failures in automated visual flows.
+
+2. **Visual baseline strategy**
+   Use **committed canonical baselines** for visual tests that are gating quality. Run compare mode (`test-visual`) in automated quality gates (nightly + release-candidate). Restrict baseline updates to dedicated PRs using `test-visual:update` with explicit human approval.
+
+3. **Stateful/mature E2E policy**
+   Keep mature/stateful-heavy coverage out of normal PR fast lane. Run full suites nightly and as **release-candidate blocking gates**.
+
+4. **Boundary rollout mode**
+   Start with **block-new-violations now** (diff-based) while legacy violations remain warning/allowlist for one sprint. Then switch to full blocking once legacy debt is burned down.
+
+5. **Human-in-the-loop checkpoints (required)**
+   - Visual baseline changes: explicit reviewer approval before merge.
+   - Release candidate promotion: explicit human release sign-off after full suite passes.
+   - Temporary boundary allowlist changes: explicit reviewer approval with expiry date.
+
+### Automation Execution Policy
+
+For this refactor program, automation should create issues, draft PRs, and run preconfigured test suites. Humans approve only high-impact checkpoints (baseline updates, release promotion, and temporary policy exceptions).
+
+### 4. Missing Tests Backlog (Phase 1: EPIC-2..EPIC-6)
+
+| Priority | Epic | Test Type | Scope | Risk Mitigated | Effort |
+|----------|------|-----------|-------|----------------|--------|
+| P0 | EPIC-2 | Unit | Shared util contract suite (`helpers/index`, `constants`, `formatting`, `dates`, `link`, `formValidations`) | Logical regressions during extraction/re-export | M |
+| P0 | EPIC-2 | Component (Vitest + jsdom) | Shared hooks suite (`useFlag`, `useDraft`, `useBeforeUnload`, `useWindowResize`, `useNecessaryEffect`, `useForceRerender`) | Functional and side-effect regressions in hook migration | M |
+| P0 | EPIC-2 | Unit/Integration | `trpcClient` contract tests (exports, header shape, query utils) before/after path move | API call and auth header regressions | S |
+| P0 | EPIC-2 | Static/Unit | Re-export compatibility tests for old → new paths (high-consumer modules) | Import path breakages after moves | S |
+| P0 | EPIC-3 | Component integration | `ViewThreadPage` split contract: loading, error, content, key CTA visibility | Functional/UI regressions from decomposition | M |
+| P0 | EPIC-3 | Component integration | `DiscussionsPage` split contract: filters, topic parsing, list rendering modes | Functional regressions in critical page behavior | M |
+| P1 | EPIC-3 | Component integration | `ExplorePage`, `GovernancePage`, `CommunityHomePage`, `HomePage` split smoke + key-state checks | UI regressions and state propagation issues | M |
+| P0 | EPIC-4 | E2E | Route migration matrix for touched feature entry routes in common/custom/general routing modes | Functional regressions from route rewiring | M |
+| P0 | EPIC-4 | E2E Security | Unauthorized-access checks for `/admin-panel` and community-manage routes | Security regressions on privileged surfaces | S |
+| P1 | EPIC-4 | E2E behavior | Quests create/list/detail | Missing feature coverage | M |
+| P1 | EPIC-4 | E2E behavior | LaunchToken happy-path render + key form interactions | Missing feature coverage | M |
+| P1 | EPIC-4 | E2E behavior | Governance page flag ON/OFF behavior + proposal navigation | Feature-flag and routing regressions | M |
+| P1 | EPIC-4 | E2E behavior | Wallet full-page (`/wallet`) and public contest page (`/contest/:id`) | Missing high-risk route coverage | M |
+| P1 | EPIC-5 | Static lint | Boundary rules + rule-test fixtures + CI enforcement (`lint-boundaries`) | Cross-feature coupling regressions | M |
+| P0 | EPIC-6 | Static lint | No-legacy-import checks (`views`, old aliases) + no-stub-import checks | Cleanup regressions after deletions | S |
+| P1 | EPIC-6 | Static analysis | Circular dependency gate via dependency-cruiser (`depcruise:circular`) | Runtime/logical regressions from cycles | S |
+| P1 | EPIC-6 | Visual | Deterministic key-page visual checks in compare mode | UI regressions during mass moves | M |
+
+### 5. Implementation Plan (Ordered, Incremental, Refactor-Safe)
+
+1. **Wave 0: Baseline + Tooling Contracts**
+   Reconcile plan metrics with current repo state and lock ownership matrix for EPIC-2..EPIC-6 tests. Keep visual policy locked to compare mode for gates and update mode only in baseline-update PRs.
+2. **Wave 1: EPIC-2 Safety Net First**
+   Add component infra (`vitest.component.config.ts`, `test/component/setup.ts`, `renderWithProviders`) and scripts (`test-component`, `test-component:watch`). Implement shared util/hook tests, plus `trpcClient` contract and re-export compatibility tests.
+3. **Wave 2: EPIC-3 Pre-Split Guards**
+   Add page contract tests for `ViewThreadPage` and `DiscussionsPage` before decomposition. Add focused component integration tests for `Explore/Governance/Home` containers.
+4. **Wave 3: EPIC-4 Migration-by-Wave Policy**
+   For each migration PR, require touched-route smoke coverage, one behavior scenario, and one security assertion for privileged pages. Fill missing E2E in priority order: Quests → LaunchToken → Governance → Wallet/Contest public → Leaderboard/Explore filters.
+5. **Wave 4: EPIC-5 Boundaries**
+   Add `eslint-plugin-boundaries` and `lint-boundaries` script. Roll out as block-new-violations immediately (diff-based), legacy violations warning/allowlist for one sprint, then full blocking.
+6. **Wave 5: EPIC-6 Cleanup Guards**
+   Add no-legacy-import and no-stub-import checks plus `depcruise:circular`. Remove legacy aliases and `views/` only after route matrix, smoke, and key behavior coverage are green.
+7. **Wave 6: Hardening + Automation**
+   Keep PR lane fast; run mature/stateful-heavy suites nightly and as release-candidate blocking gates. Keep human-in-the-loop approvals for visual baseline changes, RC promotion, and temporary boundary allowlist exceptions.
 
 ---
 
@@ -1725,15 +1790,22 @@ After each epic:
 1. `pnpm -r check-types` passes
 2. `pnpm -F commonwealth bundle` succeeds
 3. `pnpm -F commonwealth test-unit` passes
-4. `pnpm -F commonwealth test-component` passes (after EPIC-2)
-5. `pnpm lint-branch-warnings` clean
+4. `pnpm -F commonwealth test-e2e-smoke --forbid-only` passes
+5. `pnpm -F commonwealth test-component` passes (after EPIC-2)
+6. `pnpm lint-diff` clean
 
 Final verification (EPIC-6):
-- `npx madge --circular --extensions ts,tsx client/scripts/` -- no cycles
-- All E2E suites pass on staging
+- `pnpm depcruise:circular` (new script) -- no circular dependencies
+- `pnpm -F commonwealth test-e2e` passes
+- `pnpm -F commonwealth test-e2e-serial` passes
+- `pnpm -F commonwealth test-e2e-mature` passes
+- `pnpm -F commonwealth test-visual` passes in compare mode
 - No `views/` directory exists
 - No deprecated re-export stubs remain
+- No legacy aliases/imports remain (`views`, `helpers`, `hooks`, `controllers`, `models`)
+- Release-candidate promotion has explicit human sign-off
 
 ## Change Log
 
 - 260202: Updated by Codex; moved plan into Common Knowledge and added status section.
+- 260216: Updated by Codex with automation-first testing policy decisions (visual baseline gating, nightly+RC mature E2E, staged boundary enforcement, and human-in-the-loop approvals).
