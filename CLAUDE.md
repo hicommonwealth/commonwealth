@@ -340,6 +340,17 @@ const jwtSecret = config.AUTH.JWT_SECRET;
 - Foreign keys maintain referential integrity
 - Partitioned tables for large datasets
 
+**PostgreSQL type serialization in query schemas:**
+
+PostgreSQL returns `DECIMAL(78,0)` and `DATE`/`TIMESTAMP` columns as **strings**, not native JS types. This affects both raw SQL queries (`QueryTypes.SELECT`) and Sequelize ORM results for DECIMAL columns. Additionally, `BigInt` cannot be JSON-serialized for API responses.
+
+- **Entity schemas** (`libs/schemas/src/entities/`) use strict types (`PG_ETH = z.coerce.bigint()`, `z.coerce.date()`) — correct for in-memory use in commands, events, and projections
+- **Query output schemas** (`libs/schemas/src/queries/`) must create **View** types that `.extend()` the entity and override:
+  - `PG_ETH` fields → `z.string()`
+  - Date fields → `z.coerce.date().or(z.string())`
+- **Never use entity schemas with `PG_ETH` directly in query outputs** — always create a View type
+- See `LaunchpadTradeView` in `libs/schemas/src/queries/token.schemas.ts` for the established pattern
+
 ### Testing Strategy
 
 - **Unit tests**: Service/model libraries in `test/unit/`
