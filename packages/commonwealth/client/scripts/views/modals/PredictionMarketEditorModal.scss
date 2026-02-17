@@ -1,7 +1,7 @@
-@use '../../components/styles/shared.scss';
-@use '../../components/styles/mixins/border_radius';
-@use '../../components/styles/mixins/colors.module';
-@use '../../components/styles/mixins/media_queries';
+@use '../../styles/shared.scss';
+@use '../../styles/mixins/border_radius';
+@use '../../styles/mixins/colors.module';
+@use '../../styles/mixins/media_queries';
 
 .PredictionMarketEditorModal {
   .prompt-row {
