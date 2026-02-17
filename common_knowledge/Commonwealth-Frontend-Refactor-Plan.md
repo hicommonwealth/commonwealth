@@ -65,6 +65,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [ ] 4.15 Migrate Explore + Dashboard + HomePage + remaining
 - [ ] 4.16 Update ALL route definitions + verify
 - [ ] 4.17 Write smoke component tests for each migrated feature
+Timing annotation (EPIC-4): complete remaining behavior-depth E2E assertions inside the corresponding migration tickets (especially 4.7 Quests, 4.8 LaunchToken, 4.12 Governance, 4.2/4.10 Wallet+Contest, 4.15 Leaderboard/Explore). Use 4.16 as the consolidation gate for route+behavior readiness.
 
 ### EPIC-5: Enforce Boundaries
 - [ ] 5.1 Install eslint-plugin-boundaries + configure zones
@@ -84,6 +85,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [ ] 6.9 Delete old helpers/, hooks/, utils/, controllers/, stores/ dirs
 - [ ] 6.10 Update vite.config.ts to remove legacy aliases
 - [ ] 6.11 Final circular dependency audit + cleanup
+Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocking CI guard during 6.1-6.10. Promote to full `pnpm depcruise:circular` blocking only at 6.11 once pre-existing legacy cycles are burned down.
 
 ## 1. Hooks/Utils Extraction Spec
 
@@ -297,6 +299,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 2. **Visual baseline strategy**
    Use **committed canonical baselines** for visual tests that are gating quality. Run compare mode (`test-visual`) in automated quality gates (nightly + release-candidate). Restrict baseline updates to dedicated PRs using `test-visual:update` with explicit human approval.
    - Bootstrap note: if no committed baselines exist yet, CI may run update mode artifact generation once to seed the first baseline PR, then return to compare-mode gating.
+   - Timing annotation: remove the bootstrap fallback path in EPIC-6 Wave 6 once baselines are stable and consistently committed in normal PR and nightly runs.
 
 3. **Stateful/mature E2E policy**
    Keep mature/stateful-heavy coverage out of normal PR fast lane. Run full suites nightly and as **release-candidate blocking gates**.
@@ -347,12 +350,14 @@ Status update (2026-02-17): this PR delivers the full EPIC-2 infrastructure and 
    Add page contract tests for `ViewThreadPage` and `DiscussionsPage` before decomposition. Add focused component integration tests for `Explore/Governance/Home` containers.
 4. **Wave 3: EPIC-4 Migration-by-Wave Policy**
    For each migration PR, require touched-route smoke coverage, one behavior scenario, and one security assertion for privileged pages. Fill missing E2E in priority order: Quests → LaunchToken → Governance → Wallet/Contest public → Leaderboard/Explore filters.
+   Timing annotation: behavior-depth scenarios are implemented within each corresponding EPIC-4 migration ticket and validated again at 4.16 (not deferred to a post-EPIC cleanup).
 5. **Wave 4: EPIC-5 Boundaries**
    Add `eslint-plugin-boundaries` and `lint-boundaries` script. Roll out as block-new-violations immediately (diff-based), legacy violations warning/allowlist for one sprint, then full blocking.
 6. **Wave 5: EPIC-6 Cleanup Guards**
    Add no-legacy-import and no-stub-import checks plus `depcruise:circular`. Remove legacy aliases and `views/` only after route matrix, smoke, and key behavior coverage are green.
 7. **Wave 6: Hardening + Automation**
    Keep PR lane fast; run mature/stateful-heavy suites nightly and as release-candidate blocking gates. Keep human-in-the-loop approvals for visual baseline changes, RC promotion, and temporary boundary allowlist exceptions.
+   EPIC-6 hardening closeout: remove visual bootstrap fallback after baseline stability is demonstrated, and keep compare mode as the only gating mode.
 
 Execution status in PR #13406:
 1. Wave 0 completed (baseline reconciled + ownership/gating policy recorded).
@@ -926,6 +931,7 @@ EPIC-6: Kill views/ + Final Cleanup
 │
 └── 6.11: Final circular dependency audit + cleanup [blocked-by: 6.10]
     Run: pnpm depcruise:circular, bundle, check-types, test-component, test-unit
+    Transition note: switch from `pnpm depcruise:circular:diff` (guarding new cycles) to full `pnpm depcruise:circular` blocking at this step.
     ~200 LOC modify
 ```
 
