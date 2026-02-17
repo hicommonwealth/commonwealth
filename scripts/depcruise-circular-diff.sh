@@ -27,7 +27,73 @@ fi
 echo "Circular dependency guard candidate files:"
 printf '%s\n' "${CHANGED_TS_FILES[@]}"
 
+TMP_JSON="$(mktemp)"
+TMP_ERR="$(mktemp)"
+TMP_CHANGED="$(mktemp)"
+trap 'rm -f "$TMP_JSON" "$TMP_ERR" "$TMP_CHANGED"' EXIT
+
+printf '%s\n' "${CHANGED_TS_FILES[@]}" > "$TMP_CHANGED"
+
+set +e
 (
   cd "$ROOT_DIR"
-  NODE_OPTIONS='--max-old-space-size=8192' depcruise --config ./.dependency-cruiser.circular.cjs "${CHANGED_TS_FILES[@]}"
+  NODE_OPTIONS='--max-old-space-size=8192' depcruise \
+    --config ./.dependency-cruiser.circular.cjs \
+    -T json \
+    "${CHANGED_TS_FILES[@]}" > "$TMP_JSON" 2> "$TMP_ERR"
 )
+DEPCRUISE_EXIT=$?
+set -e
+
+if [ ! -s "$TMP_JSON" ]; then
+  echo "depcruise did not return a JSON report."
+  cat "$TMP_ERR"
+  exit "${DEPCRUISE_EXIT:-1}"
+fi
+
+if node - "$TMP_JSON" "$TMP_CHANGED" <<'NODE'
+const fs = require('node:fs');
+
+const [jsonPath, changedPath] = process.argv.slice(2);
+const report = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+const changedFiles = new Set(
+  fs
+    .readFileSync(changedPath, 'utf8')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean),
+);
+
+const circularEdges = [];
+
+for (const mod of report.modules || []) {
+  if (!changedFiles.has(mod.source)) continue;
+  for (const dep of mod.dependencies || []) {
+    if (!dep.circular) continue;
+    circularEdges.push({
+      source: mod.source,
+      target: dep.resolved || dep.module || '<unknown>',
+    });
+  }
+}
+
+if (circularEdges.length === 0) {
+  process.exit(0);
+}
+
+console.error('New circular dependency edges detected from changed files:');
+for (const edge of circularEdges) {
+  console.error(`  ${edge.source} -> ${edge.target}`);
+}
+process.exit(1);
+NODE
+then
+  if [ "$DEPCRUISE_EXIT" -ne 0 ]; then
+    echo "No new circular dependency edges introduced by changed files."
+    echo "Ignoring pre-existing cycles outside changed-file source edges."
+  else
+    echo "Circular dependency guard passed."
+  fi
+else
+  exit 1
+fi

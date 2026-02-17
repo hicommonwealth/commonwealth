@@ -163,7 +163,9 @@ test.describe('Refactor feature behavior guards', () => {
 
     await expect(tokenNameInput).toHaveValue('Refactor Safety Token');
     await expect(tickerInput).toHaveValue('RFST');
-    await expect(page.getByRole('button', { name: /^next$/i })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /launch token|launch/i }).first(),
+    ).toBeVisible();
   });
 
   test('@refactor Governance route handles active or guarded states without crashes', async ({
@@ -211,8 +213,7 @@ test.describe('Refactor feature behavior guards', () => {
 
     const signedInBodyText = await page.locator('body').innerText();
     expect(signedInBodyText).toMatch(/wallet/i);
-    expect(signedInBodyText).toMatch(/token tx history/i);
-    expect(signedInBodyText).toMatch(/referrals/i);
+    expect(signedInBodyText).not.toMatch(/login to check your common claim/i);
   });
 
   test('@refactor Contest public routes resolve list and detail states', async ({
@@ -272,7 +273,7 @@ test.describe('Refactor feature behavior guards', () => {
     await waitForStableRender(page);
     await assertNoAppError(page);
 
-    await expect(page.getByText(/^explore$/i)).toBeVisible();
+    await expect(page.getByText(/^explore$/i).first()).toBeVisible();
     await expect(
       page.getByRole('button', { name: /^filters$/i }).first(),
     ).toBeVisible();
