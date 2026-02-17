@@ -24,12 +24,12 @@ describe('isPredictionMarketFormValid', () => {
   });
 
   test('rejects empty prompt', () => {
-    expect(
-      isPredictionMarketFormValid({ ...validInput, prompt: '' }),
-    ).toBe(false);
-    expect(
-      isPredictionMarketFormValid({ ...validInput, prompt: '   ' }),
-    ).toBe(false);
+    expect(isPredictionMarketFormValid({ ...validInput, prompt: '' })).toBe(
+      false,
+    );
+    expect(isPredictionMarketFormValid({ ...validInput, prompt: '   ' })).toBe(
+      false,
+    );
   });
 
   test('rejects prompt over max length', () => {
@@ -52,16 +52,28 @@ describe('isPredictionMarketFormValid', () => {
 
   test('enforces duration bounds', () => {
     expect(
-      isPredictionMarketFormValid({ ...validInput, durationDays: DURATION_MIN - 1 }),
+      isPredictionMarketFormValid({
+        ...validInput,
+        durationDays: DURATION_MIN - 1,
+      }),
     ).toBe(false);
     expect(
-      isPredictionMarketFormValid({ ...validInput, durationDays: DURATION_MAX + 1 }),
+      isPredictionMarketFormValid({
+        ...validInput,
+        durationDays: DURATION_MAX + 1,
+      }),
     ).toBe(false);
     expect(
-      isPredictionMarketFormValid({ ...validInput, durationDays: DURATION_MIN }),
+      isPredictionMarketFormValid({
+        ...validInput,
+        durationDays: DURATION_MIN,
+      }),
     ).toBe(true);
     expect(
-      isPredictionMarketFormValid({ ...validInput, durationDays: DURATION_MAX }),
+      isPredictionMarketFormValid({
+        ...validInput,
+        durationDays: DURATION_MAX,
+      }),
     ).toBe(true);
   });
 
@@ -94,7 +106,10 @@ describe('isPredictionMarketFormValid', () => {
 
   test('rejects invalid collateral address', () => {
     expect(
-      isPredictionMarketFormValid({ ...validInput, collateralAddress: '0x123' }),
+      isPredictionMarketFormValid({
+        ...validInput,
+        collateralAddress: '0x123',
+      }),
     ).toBe(false);
     expect(
       isPredictionMarketFormValid({

@@ -2,10 +2,10 @@ import { trpc } from 'utils/trpcClient';
 
 const useDeployPredictionMarketMutation = () => {
   const utils = trpc.useUtils();
-  return (trpc as any).predictionMarket.deployPredictionMarket.useMutation({
-    onSuccess: async (data: { thread_id: number }) => {
-      await (utils as any).predictionMarket.getPredictionMarkets.invalidate({
-        thread_id: data.thread_id,
+  return trpc.predictionMarket.deployPredictionMarket.useMutation({
+    onSuccess: async (_data, variables) => {
+      await utils.predictionMarket.getPredictionMarkets.invalidate({
+        thread_id: variables.thread_id,
       });
     },
   });

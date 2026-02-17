@@ -4,17 +4,18 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useCreatePredictionMarketMutation } from 'state/api/predictionMarket';
 import type Thread from '../../models/Thread';
 import { CWLabel } from '../components/component_kit/cw_label';
-import { CWTextArea } from '../components/component_kit/cw_text_area';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { SelectList } from '../components/component_kit/cw_select_list';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWTextArea } from '../components/component_kit/cw_text_area';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import './PredictionMarketEditorModal.scss';
 import {
   DURATION_MAX,
   DURATION_MIN,
@@ -24,7 +25,6 @@ import {
   THRESHOLD_MAX,
   THRESHOLD_MIN,
 } from './predictionMarketEditorValidation';
-import './PredictionMarketEditorModal.scss';
 
 // Base Sepolia placeholder addresses; replace with chain config when available
 const COLLATERAL_OPTIONS = [
@@ -55,10 +55,13 @@ export const PredictionMarketEditorModal = ({
   const modalContainerRef = useRef<HTMLDivElement>(null);
 
   const [prompt, setPrompt] = useState('');
-  const [collateralOption, setCollateralOption] = useState(COLLATERAL_OPTIONS[0]);
+  const [collateralOption, setCollateralOption] = useState(
+    COLLATERAL_OPTIONS[0],
+  );
   const [customCollateralAddress, setCustomCollateralAddress] = useState('');
   const [durationDays, setDurationDays] = useState(14);
-  const [resolutionThreshold, setResolutionThreshold] = useState(THRESHOLD_DEFAULT);
+  const [resolutionThreshold, setResolutionThreshold] =
+    useState(THRESHOLD_DEFAULT);
   const [initialLiquidity, setInitialLiquidity] = useState('');
   const [phase, setPhase] = useState<Phase>('form');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -86,7 +89,7 @@ export const PredictionMarketEditorModal = ({
 
     try {
       setPhase('creating');
-      const market = await createMutation.mutateAsync({
+      await createMutation.mutateAsync({
         thread_id: thread.id,
         prompt: prompt.trim(),
         collateral_address: collateralAddress as `0x${string}`,
@@ -106,7 +109,9 @@ export const PredictionMarketEditorModal = ({
     } catch (err) {
       setPhase('error');
       const message =
-        err instanceof Error ? err.message : 'Failed to create prediction market';
+        err instanceof Error
+          ? err.message
+          : 'Failed to create prediction market';
       setErrorMessage(message);
       notifyError(message);
     }
@@ -197,12 +202,11 @@ export const PredictionMarketEditorModal = ({
             <CWTextInput
               value={String(durationDays)}
               onInput={(e) => {
-                const v = parseInt(
-                  (e.target as HTMLInputElement).value,
-                  10,
-                );
+                const v = parseInt((e.target as HTMLInputElement).value, 10);
                 if (!Number.isNaN(v))
-                  setDurationDays(Math.min(DURATION_MAX, Math.max(DURATION_MIN, v)));
+                  setDurationDays(
+                    Math.min(DURATION_MAX, Math.max(DURATION_MIN, v)),
+                  );
               }}
               placeholder={`${DURATION_MIN}-${DURATION_MAX}`}
             />
@@ -223,9 +227,7 @@ export const PredictionMarketEditorModal = ({
               min={THRESHOLD_MIN}
               max={THRESHOLD_MAX}
               value={resolutionThreshold}
-              onChange={(e) =>
-                setResolutionThreshold(Number(e.target.value))
-              }
+              onChange={(e) => setResolutionThreshold(Number(e.target.value))}
               aria-label="Resolution threshold percentage"
               style={{ width: '100%' }}
             />

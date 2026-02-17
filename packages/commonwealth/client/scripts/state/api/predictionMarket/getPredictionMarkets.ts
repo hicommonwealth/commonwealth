@@ -7,7 +7,7 @@ type GetPredictionMarketsParams = {
 };
 
 const useGetPredictionMarketsQuery = (params: GetPredictionMarketsParams) => {
-  return (trpc as any).predictionMarket.getPredictionMarkets.useQuery(params, {
+  return trpc.predictionMarket.getPredictionMarkets.useQuery(params, {
     enabled: !!params.thread_id,
   });
 };
