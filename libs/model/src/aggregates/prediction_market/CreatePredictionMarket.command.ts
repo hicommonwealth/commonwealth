@@ -75,7 +75,7 @@ export function CreatePredictionMarket(): Command<
           transaction,
         );
 
-        return market.toJSON();
+        return true;
       });
     },
   };
