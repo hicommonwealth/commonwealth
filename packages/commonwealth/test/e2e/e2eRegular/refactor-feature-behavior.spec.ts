@@ -277,10 +277,6 @@ test.describe('Refactor feature behavior guards', () => {
     await expect(
       page.getByRole('button', { name: /^filters$/i }).first(),
     ).toBeVisible();
-    await expect(
-      page
-        .getByPlaceholder(/search quests/i)
-        .or(page.getByPlaceholder(/search/i)),
-    ).toBeVisible();
+    await expect(page.getByPlaceholder(/search quests/i).first()).toBeVisible();
   });
 });
