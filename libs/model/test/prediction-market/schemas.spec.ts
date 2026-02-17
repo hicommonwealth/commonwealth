@@ -7,8 +7,6 @@ import {
   PredictionMarketStatus,
   PredictionMarketTrade,
   PredictionMarketTradeAction,
-  ProjectPredictionMarketResolution,
-  ProjectPredictionMarketTrade,
   ResolvePredictionMarket,
 } from '@hicommonwealth/schemas';
 import { describe, expect, it } from 'vitest';
@@ -93,24 +91,6 @@ const baseCancelCommand = {
   prediction_market_id: 1,
 };
 
-const baseProjectTradeCommand = {
-  market_id: `0x${'d'.repeat(64)}`,
-  eth_chain_id: 8453,
-  tx_hash: `0x${'e'.repeat(64)}`,
-  trader_address: '0xcccccccccccccccccccccccccccccccccccccccc',
-  action: PredictionMarketTradeAction.Mint,
-  collateral_amount: largeAmount,
-  p_token_amount: largeAmount,
-  f_token_amount: largeAmount,
-  timestamp: 1_700_000_002,
-};
-
-const baseProjectResolutionCommand = {
-  market_id: `0x${'f'.repeat(64)}`,
-  winner: 2,
-  resolved_at: new Date(),
-};
-
 describe('Prediction market schemas', () => {
   it('accepts a valid PredictionMarket payload', () => {
     const result = PredictionMarket.safeParse(basePredictionMarket);
@@ -189,25 +169,5 @@ describe('Prediction market schemas', () => {
 
     const invalid = CancelPredictionMarket.input.safeParse({});
     expect(invalid.success).toBe(false);
-  });
-
-  it('validates ProjectPredictionMarketTrade command input', () => {
-    const result = ProjectPredictionMarketTrade.input.safeParse(
-      baseProjectTradeCommand,
-    );
-    expect(result.success).toBe(true);
-
-    const invalid = ProjectPredictionMarketTrade.input.safeParse({
-      ...baseProjectTradeCommand,
-      action: 'bad-action',
-    });
-    expect(invalid.success).toBe(false);
-  });
-
-  it('validates ProjectPredictionMarketResolution command input', () => {
-    const result = ProjectPredictionMarketResolution.input.safeParse(
-      baseProjectResolutionCommand,
-    );
-    expect(result.success).toBe(true);
   });
 });

@@ -57,7 +57,7 @@ describe('Prediction Market Resolution', () => {
 
   async function createActiveMarket(tid?: number) {
     const tId = tid ?? thread_id;
-    const market = await command(CreatePredictionMarket(), {
+    await command(CreatePredictionMarket(), {
       actor: admin,
       payload: {
         thread_id: tId,
@@ -68,11 +68,15 @@ describe('Prediction Market Resolution', () => {
       },
     });
 
+    const market = await models.PredictionMarket.findOne({
+      where: { thread_id: tId },
+    });
+
     await command(DeployPredictionMarket(), {
       actor: admin,
       payload: {
         thread_id: tId,
-        prediction_market_id: market.id!,
+        prediction_market_id: market!.id!,
         vault_address: '0x0000000000000000000000000000000000000001',
         governor_address: '0x0000000000000000000000000000000000000002',
         router_address: '0x0000000000000000000000000000000000000003',
@@ -89,7 +93,7 @@ describe('Prediction Market Resolution', () => {
       id: Math.floor(Math.random() * 100000),
       name: 'PredictionMarketMarketCreated',
       payload: {
-        prediction_market_id: market.id!,
+        prediction_market_id: market!.id!,
         market_id: onChainMarketId,
         eth_chain_id,
         transaction_hash:
@@ -101,7 +105,7 @@ describe('Prediction Market Resolution', () => {
       id: Math.floor(Math.random() * 100000),
       name: 'PredictionMarketProposalCreated',
       payload: {
-        prediction_market_id: market.id!,
+        prediction_market_id: market!.id!,
         proposal_id: onChainProposalId,
         eth_chain_id,
         transaction_hash:
@@ -110,7 +114,7 @@ describe('Prediction Market Resolution', () => {
       },
     });
 
-    return { marketId: market.id!, threadId: tId };
+    return { marketId: market!.id!, threadId: tId };
   }
 
   describe('Event Signatures', () => {
@@ -341,7 +345,7 @@ describe('Prediction Market Resolution', () => {
         reaction_weights_sum: '0',
       });
 
-      const market = await command(CreatePredictionMarket(), {
+      await command(CreatePredictionMarket(), {
         actor: admin,
         payload: {
           thread_id: newThread!.id!,
@@ -352,11 +356,15 @@ describe('Prediction Market Resolution', () => {
         },
       });
 
+      const market = await models.PredictionMarket.findOne({
+        where: { thread_id: newThread!.id! },
+      });
+
       await command(DeployPredictionMarket(), {
         actor: admin,
         payload: {
           thread_id: newThread!.id!,
-          prediction_market_id: market.id!,
+          prediction_market_id: market!.id!,
           vault_address: '0x0000000000000000000000000000000000000001',
           governor_address: '0x0000000000000000000000000000000000000002',
           router_address: '0x0000000000000000000000000000000000000003',
@@ -368,18 +376,19 @@ describe('Prediction Market Resolution', () => {
         },
       });
 
-      const resolved = await command(ResolvePredictionMarket(), {
+      await command(ResolvePredictionMarket(), {
         actor: admin,
         payload: {
           thread_id: newThread!.id!,
-          prediction_market_id: market.id!,
+          prediction_market_id: market!.id!,
           winner: 1,
         },
       });
 
-      expect(resolved.status).toBe(schemas.PredictionMarketStatus.Resolved);
-      expect(resolved.winner).toBe(1);
-      expect(resolved.resolved_at).toBeDefined();
+      const resolved = await models.PredictionMarket.findByPk(market!.id!);
+      expect(resolved!.status).toBe(schemas.PredictionMarketStatus.Resolved);
+      expect(resolved!.winner).toBe(1);
+      expect(resolved!.resolved_at).toBeDefined();
 
       // Verify outbox event
       const resolveEvent = await models.Outbox.findOne({
@@ -399,7 +408,7 @@ describe('Prediction Market Resolution', () => {
         reaction_weights_sum: '0',
       });
 
-      const market = await command(CreatePredictionMarket(), {
+      await command(CreatePredictionMarket(), {
         actor: admin,
         payload: {
           thread_id: newThread!.id!,
@@ -410,12 +419,16 @@ describe('Prediction Market Resolution', () => {
         },
       });
 
+      const market = await models.PredictionMarket.findOne({
+        where: { thread_id: newThread!.id! },
+      });
+
       await expect(
         command(ResolvePredictionMarket(), {
           actor: admin,
           payload: {
             thread_id: newThread!.id!,
-            prediction_market_id: market.id!,
+            prediction_market_id: market!.id!,
             winner: 1,
           },
         }),
