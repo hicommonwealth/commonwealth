@@ -313,6 +313,12 @@ All Sequelize models in one file, aggregate directory with one command/query per
 - [x] PM-2 Slice 1+2 implemented: Create, Deploy commands + Projection for ProposalCreated/MarketCreated (PR #13372)
 - [x] Policy → Projection refactor applied (PR #13381): `PredictionMarket.projection.ts` replaces former `PredictionMarket.policy.ts`
 - [x] "Project..." command indirection removed — projection handles DB mutations directly
+- [x] PM-3 Slice 3 implemented: TokensMinted event pipeline (PR #13388)
+- [x] PM-3 Slice 4 implemented: SwapExecuted event pipeline (PR #13390)
+- [x] PM-3+PM-4 Slices 5-8 implemented: TokensMerged, ProposalResolved, MarketResolved, TokensRedeemed event pipelines + ResolvePredictionMarket and CancelPredictionMarket commands + GetPredictionMarketTrades and GetPredictionMarketPositions queries (PR #13392)
+- [x] All 8 EVM event mappers, signatures, and projection handlers complete
+- [x] Full tRPC router with all 7 endpoints behind FLAG_FUTARCHY
+- [ ] Frontend: React Query hooks, components, thread integration (PM-6, PM-7, PM-8) — not started
 
 ---
 
@@ -366,7 +372,7 @@ SLICE 2: Market Deployment  ✅ COMPLETED (PR #13372, #13381)
         |   [direct DB mutation, no command indirection]               |
         +--------------------------------------------------------------+
 
-SLICE 3: Mint Tokens
+SLICE 3: Mint Tokens  ✅ COMPLETED (PR #13388)
 =========================================================================================
   Actor            External Event             Projection                 Read Model
   -----            --------------             ----------                 ----------
@@ -387,7 +393,7 @@ SLICE 3: Mint Tokens
                                                              -> PositionView
                                                                 (p:100, f:100)
 
-SLICE 4: Swap (Express Prediction)
+SLICE 4: Swap (Express Prediction)  ✅ COMPLETED (PR #13390)
 =========================================================================================
   Actor            External Event             Projection                 Read Model
   -----            --------------             ----------                 ----------
@@ -408,7 +414,7 @@ SLICE 4: Swap (Express Prediction)
                                                              -> PositionView
                                                              -> ProbabilityView
 
-SLICE 5: Merge Tokens
+SLICE 5: Merge Tokens  ✅ COMPLETED (PR #13392)
 =========================================================================================
   Actor            External Event             Projection                 Read Model
   -----            --------------             ----------                 ----------
@@ -428,7 +434,7 @@ SLICE 5: Merge Tokens
                                                              -> TradeHistory
                                                              -> PositionView
 
-SLICE 6: Market Resolution
+SLICE 6: Market Resolution  ✅ COMPLETED (PR #13392)
 =========================================================================================
   Actor            Command / External         Event                      Read Model
   -----            ------------------         -----                      ----------
@@ -450,7 +456,7 @@ SLICE 6: Market Resolution
         |   Projection: same handler, idempotent           |
         +--------------------------------------------------+
 
-SLICE 7: Token Redemption
+SLICE 7: Token Redemption  ✅ COMPLETED (PR #13392)
 =========================================================================================
   Actor            External Event             Projection                 Read Model
   -----            --------------             ----------                 ----------
@@ -469,7 +475,7 @@ SLICE 7: Token Redemption
                                                              -> TradeHistory
                                                              -> PositionView
 
-SLICE 8: Market Cancellation
+SLICE 8: Market Cancellation  ✅ COMPLETED (PR #13392)
 =========================================================================================
   Actor            Command                    Event                      Read Model
   -----            -------                    -----                      ----------
@@ -672,9 +678,11 @@ Market lifecycle commands following existing aggregate patterns (like `aggregate
 
 ---
 
-### TICKET PM-3: Slice 3-7 -- Trade + Resolution Projection (Extend PredictionMarketProjection)
+### TICKET PM-3: Slice 3-7 -- Trade + Resolution Projection (Extend PredictionMarketProjection) -- ✅ COMPLETED
 
 **Size:** L | **Depends on:** PM-1, PM-2, PM-4 | **Blocks:** PM-5
+
+**Completed in:** PR #13388 (Slice 3: Mint), PR #13390 (Slice 4: Swap), PR #13392 (Slices 5-8: Merge, Resolution, Redemption, Cancellation)
 
 Extend `PredictionMarket.projection.ts` with handlers for all remaining on-chain events. The projection mutates the DB directly — no command indirection (no `ProjectPredictionMarketTrade.command.ts` or `ProjectPredictionMarketResolution.command.ts`).
 
@@ -716,9 +724,11 @@ Extend `PredictionMarket.projection.ts` with handlers for all remaining on-chain
 
 ---
 
-### TICKET PM-4: Event Signatures + Registry + Contract Helpers
+### TICKET PM-4: Event Signatures + Registry + Contract Helpers -- ✅ COMPLETED
 
 **Size:** M | **Depends on:** nothing | **Blocks:** PM-3
+
+**Completed in:** PR #13388 (Slice 3), PR #13390 (Slice 4), PR #13392 (Slices 5-8). Event signatures and registry entries added incrementally alongside each slice. Contract helpers file not created (not needed — ABIs used directly in mappers).
 
 Register event signatures and contract sources for chain event polling. ABIs are already published as `@commonxyz/common-protocol-abis@1.4.14` (already in `package.json`) — no ABI files need to be created.
 
@@ -766,9 +776,11 @@ import { BinaryVaultAbi, FutarchyGovernorAbi, FutarchyRouterAbi } from '@commonx
 
 ---
 
-### TICKET PM-5: tRPC API Routes + External Router
+### TICKET PM-5: tRPC API Routes + External Router -- ✅ COMPLETED
 
 **Size:** S | **Depends on:** PM-2 | **Blocks:** PM-6
+
+**Completed in:** PR #13372 (initial router with create, deploy, getMarkets), PR #13392 (added resolve, cancel, getTrades, getPositions endpoints). All 7 routes wired in `predictionMarket.ts` behind FLAG_FUTARCHY on internal-router.
 
 Wire up tRPC routes for all prediction market commands and queries.
 
@@ -910,25 +922,37 @@ See detailed test plan below.
     |
     +-------> PM-2 (Create/Deploy + Projection for ProposalCreated/MarketCreated) ✅ DONE
     |            |
-    |            +-------> PM-3 (Extend Projection: 6 new event handlers)
+    |            +-------> PM-3 (Extend Projection: 6 new event handlers) ✅ DONE
     |            |              ^
     |            |              |
-    |            +-------> PM-5 (tRPC Routes)
+    |            +-------> PM-5 (tRPC Routes) -- ✅ PARTIALLY DONE (router exists, endpoints wired)
     |                        |
     |                        +-------> PM-6 (React Query Hooks)
     |                                    |
     |                                    +-------> PM-7 (Frontend Components)
     |                                                 |
-    +-------> PM-4 (Event Sigs + Registry)--+         +-------> PM-8 (Feature Flag)
-              [imports ABIs from npm]       |         |
-                                            +-> PM-3  +-------> PM-9 (Testing)
+    +-------> PM-4 (Event Sigs + Registry) ✅ DONE    +-------> PM-8 (Feature Flag)
+              [imports ABIs from npm]                 |
+                                                      +-------> PM-9 (Testing)
 ```
 
-**Parallelizable work:**
+**Completed backend work (Slices 1-8):**
 
-- PM-4 can start now (no remaining dependencies)
-- PM-3 and PM-5 can run in parallel after PM-4
-- PM-6 and PM-3 can run in parallel after PM-5
+- All 8 EVM event mappers implemented in `chain-event-utils.ts`
+- All 8 projection handlers in `PredictionMarket.projection.ts`
+- All event signatures registered in `eventSignatures.ts`
+- All contract sources in `eventRegistry.ts`
+- `ResolvePredictionMarket` and `CancelPredictionMarket` commands created
+- `GetPredictionMarketTrades` and `GetPredictionMarketPositions` queries created
+- tRPC router updated with resolve, cancel, trades, and positions endpoints
+- Unit tests for all slices (merge, resolution, redemption, cancellation)
+
+**Remaining work:**
+
+- PM-6: React Query hooks (frontend)
+- PM-7: Frontend components (thread card, editor modal, trade modal, resolve modal)
+- PM-8: Feature flag UI gating
+- PM-9: Integration/E2E testing
 
 ---
 
@@ -1018,23 +1042,20 @@ See detailed test plan below.
 - `libs/model/src/models/associations.ts`
 - `libs/model/src/models/thread.ts`
 
-### Phase 2: Backend Aggregates + API (PM-2 + PM-4 + PM-5) -- ✅ PARTIALLY COMPLETED
+### Phase 2: Backend Aggregates + API (PM-2 + PM-4 + PM-5) -- ✅ COMPLETED
 
-**Completed files (PM-2):**
+**Completed files:**
 
-- `libs/model/src/aggregates/prediction_market/CreatePredictionMarket.command.ts` ✅
-- `libs/model/src/aggregates/prediction_market/DeployPredictionMarket.command.ts` ✅
-- `libs/model/src/aggregates/prediction_market/GetPredictionMarkets.query.ts` ✅
-- `libs/model/src/aggregates/prediction_market/PredictionMarket.projection.ts` ✅ (handles ProposalCreated + MarketCreated)
+- `libs/model/src/aggregates/prediction_market/CreatePredictionMarket.command.ts` ✅ (PR #13372)
+- `libs/model/src/aggregates/prediction_market/DeployPredictionMarket.command.ts` ✅ (PR #13372)
+- `libs/model/src/aggregates/prediction_market/ResolvePredictionMarket.command.ts` ✅ (PR #13392)
+- `libs/model/src/aggregates/prediction_market/CancelPredictionMarket.command.ts` ✅ (PR #13392)
+- `libs/model/src/aggregates/prediction_market/GetPredictionMarkets.query.ts` ✅ (PR #13372)
+- `libs/model/src/aggregates/prediction_market/GetPredictionMarketTrades.query.ts` ✅ (PR #13392)
+- `libs/model/src/aggregates/prediction_market/GetPredictionMarketPositions.query.ts` ✅ (PR #13392)
+- `libs/model/src/aggregates/prediction_market/PredictionMarket.projection.ts` ✅ (handles all 8 events)
 - `libs/model/src/aggregates/prediction_market/index.ts` ✅
-- `packages/commonwealth/server/api/predictionMarket.ts` ✅
-
-**Remaining files:**
-
-- `libs/model/src/aggregates/prediction_market/ResolvePredictionMarket.command.ts`
-- `libs/model/src/aggregates/prediction_market/CancelPredictionMarket.command.ts`
-- `libs/model/src/aggregates/prediction_market/GetPredictionMarketTrades.query.ts`
-- `libs/model/src/aggregates/prediction_market/GetPredictionMarketPositions.query.ts`
+- `packages/commonwealth/server/api/predictionMarket.ts` ✅ (all endpoints: create, deploy, resolve, cancel, getMarkets, getTrades, getPositions)
 
 **Modified files:**
 
@@ -1042,20 +1063,21 @@ See detailed test plan below.
 - `libs/model/src/middleware/auth.ts`
 - `packages/commonwealth/server/api/external-router.ts`
 
-### Phase 3: Chain Events Integration (PM-3 + PM-4)
-
-**New files:**
-
-- `libs/evm-protocols/src/common-protocol/contractHelpers/predictionMarket.ts`
+### Phase 3: Chain Events Integration (PM-3 + PM-4) -- ✅ COMPLETED
 
 **Modified files:**
 
-- `libs/model/src/aggregates/prediction_market/PredictionMarket.projection.ts` (extend with 6 new event handlers)
-- `libs/evm-protocols/src/event-registry/eventSignatures.ts` (8 event signatures)
-- `libs/evm-protocols/src/event-registry/eventRegistry.ts` (3 contract sources)
-- `libs/model/src/services/evmChainEvents/chain-event-utils.ts` (8 mappers)
+- `libs/model/src/aggregates/prediction_market/PredictionMarket.projection.ts` ✅ (all 8 event handlers)
+- `libs/evm-protocols/src/event-registry/eventSignatures.ts` ✅ (8 event signatures)
+- `libs/evm-protocols/src/event-registry/eventRegistry.ts` ✅ (3 contract sources: BinaryVault, FutarchyGovernor, FutarchyRouter)
+- `libs/model/src/services/evmChainEvents/chain-event-utils.ts` ✅ (8 mappers)
 
-**Note:** No ABI files to create — import from `@commonxyz/common-protocol-abis`. No policy file — projection handles all events with direct DB mutations. No `ProjectPredictionMarketTrade.command.ts` or `ProjectPredictionMarketResolution.command.ts` — these are anti-patterns per the enforced architecture rule.
+**Notes:** Contract helpers file (`predictionMarket.ts`) was not created — ABIs are used directly in mappers from `@commonxyz/common-protocol-abis`. No policy file — projection handles all events with direct DB mutations. No `ProjectPredictionMarketTrade.command.ts` or `ProjectPredictionMarketResolution.command.ts` — these are anti-patterns per the enforced architecture rule.
+
+**Implementation details (PR #13392):**
+- `ResolvePredictionMarket` command emits `PredictionMarketResolved` event (distinct from EVM-originated `ProposalResolved`/`MarketResolved`)
+- EVM event schemas use `market_id`/`proposal_id` (on-chain identifiers); projection looks up market by on-chain ID
+- Redeem mapper maps `outcome=1` to p_token, `outcome=2` to f_token
 
 ### Phase 4: Frontend (PM-6 + PM-7 + PM-8)
 
