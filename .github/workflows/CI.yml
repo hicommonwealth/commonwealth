@@ -189,8 +189,8 @@ jobs:
       - name: Block new deprecated stub imports (diff-only)
         run: pnpm -F commonwealth no-stub-imports
 
-      - name: Circular dependency guard (warning mode during migration)
-        run: pnpm depcruise:circular:warn
+      - name: Circular dependency guard (diff-only, blocking)
+        run: pnpm depcruise:circular:diff
 
 
   detect-broken-ts-expect-error:

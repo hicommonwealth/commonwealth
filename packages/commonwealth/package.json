@@ -81,6 +81,7 @@
     "test-e2e": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 ./test/e2e/e2eRegular/*",
     "test-e2e-mature": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 ./test/e2e/mature/*",
     "test-e2e-refactor": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 --grep @refactor ./test/e2e/e2eRegular/*",
+    "test-e2e-stateful": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 ./test/e2e/e2eStateful/*",
     "test-e2e-serial": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*",
     "test-e2e-smoke": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 --grep @smoke ./test/e2e/e2eRegular/*",
     "test-visual": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/visual/playwright.visual.config.ts",

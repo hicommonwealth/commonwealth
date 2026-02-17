@@ -14,6 +14,7 @@
     "clean": "chmod u+x scripts/clean-modules.sh && ./scripts/clean-modules.sh",
     "db-all": "pnpm -F model db-all",
     "depcruise:circular": "NODE_OPTIONS='--max-old-space-size=8192' depcruise --config ./.dependency-cruiser.circular.cjs packages/commonwealth/client/scripts",
+    "depcruise:circular:diff": "chmod u+x scripts/depcruise-circular-diff.sh && ./scripts/depcruise-circular-diff.sh",
     "depcruise:circular:warn": "pnpm depcruise:circular || true",
     "dependency-graph": "npx depcruise packages/commonwealth/server.ts -T archi | dot -T svg > dependency-graph.svg",
     "dump-db": "pnpm -F model dump-db",
