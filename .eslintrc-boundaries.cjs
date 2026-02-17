@@ -51,7 +51,7 @@ module.exports = {
   },
   rules: {
     'boundaries/element-types': [
-      'warn',
+      'error',
       {
         default: 'allow',
         rules: [

@@ -157,9 +157,13 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Validate boundary fixture contracts
+        run: pnpm -F commonwealth test-boundaries-fixtures
+
       - name: Lint frontend architectural boundaries (diff-only)
         env:
           ESLINT_PLUGIN_DIFF_COMMIT: ${{ github.base_ref && format('origin/{0}', github.base_ref) || 'origin/master' }}
+          BOUNDARY_LINT_WARN_ONLY: "false"
         run: pnpm -F commonwealth lint-boundaries
 
   commonwealth-cleanup-guards:
