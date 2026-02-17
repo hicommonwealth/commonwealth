@@ -1,5 +1,6 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { z } from 'zod';
 import { models } from '../../database';
 
 export function GetPredictionMarketPositions(): Query<
@@ -17,7 +18,11 @@ export function GetPredictionMarketPositions(): Query<
         order: [['updated_at', 'DESC']],
       });
 
-      return positions.map((p) => p.toJSON());
+      // Sequelize returns DECIMAL(78,0) as strings at runtime,
+      // matching the View schema (PG_ETH → z.string())
+      return positions.map((p) => p.toJSON()) as unknown as z.infer<
+        typeof schemas.GetPredictionMarketPositions.output
+      >;
     },
   };
 }

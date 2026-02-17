@@ -15,9 +15,11 @@ export function GetPredictionMarketTrades(): Query<
       const { prediction_market_id, cursor, limit } = payload;
       const offset = limit! * (cursor! - 1);
 
-      const results = await models.sequelize.query<
-        z.infer<typeof schemas.PredictionMarketTrade> & { total?: number }
-      >(
+      // PG returns DECIMAL(78,0) as strings, matching the View schema
+      type TradeRow = z.infer<typeof schemas.PredictionMarketTradeView> & {
+        total?: number;
+      };
+      const results = await models.sequelize.query<TradeRow>(
         `SELECT *, count(*) OVER() AS total
          FROM "PredictionMarketTrades"
          WHERE prediction_market_id = :prediction_market_id
