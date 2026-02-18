@@ -4,7 +4,7 @@ visual-report/
 playwright-report/
 blob-report/
 
-# Visual regression baselines — platform-specific (darwin vs linux),
-# so not committed. CI generates fresh baselines and uploads them as
-# artifacts for human inspection.
+# Canonical linux visual baselines are generated via
+# `.github/workflows/visual-baseline-update.yml` and can be committed
+# with `git add -f`.
 __snapshots__/

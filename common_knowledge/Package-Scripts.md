@@ -66,6 +66,73 @@ If you add a script to the `package.json` file, please add documentation for it 
   + [add-component-showcase](#add-component-showcase)
   + [send-cosmos-notifs](#send-cosmos-notifs)
   + [send-notification-digest-emails](#send-notification-digest-emails)
+* [Refactor Hardening Additions (2026-02-17)](#refactor-hardening-additions-2026-02-17)
+
+## Refactor Hardening Additions (2026-02-17)
+
+These scripts were introduced/standardized for the Phase-1 frontend refactor hardening program (EPIC-2..EPIC-6).
+
+### Component coverage
+
+- `test-component`
+  - Definition: `NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true vitest --config ./vitest.component.config.ts run test/component`
+  - Description: Runs React component tests (hooks + page contracts) in jsdom.
+
+- `test-component:watch`
+  - Definition: `NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true vitest --config ./vitest.component.config.ts test/component`
+  - Description: Watch mode for component tests.
+
+### E2E refactor coverage
+
+- `test-e2e-refactor`
+  - Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 --grep @refactor ./test/e2e/e2eRegular/*`
+  - Description: Runs the refactor-risk subset (route matrix, security, behavior) tagged `@refactor`.
+
+- `test-e2e-stateful`
+  - Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 ./test/e2e/e2eStateful/*`
+  - Description: Runs stateful end-to-end journeys used for nightly/release-candidate hardening.
+
+### Boundary and cleanup guards
+
+- `lint-boundaries`
+  - Definition: `chmod u+x ./scripts/lint-boundaries-diff.sh && ./scripts/lint-boundaries-diff.sh`
+  - Description: Diff-scoped architectural boundary lint (blocking for new violations).
+
+- `test-boundaries-fixtures`
+  - Definition: `chmod u+x ./scripts/test-boundaries-fixtures.sh && ./scripts/test-boundaries-fixtures.sh`
+  - Description: Validates boundary rule behavior against allow/deny fixtures to prevent config drift.
+
+- `no-legacy-imports`
+  - Definition: `chmod u+x ./scripts/no-legacy-imports-diff.sh && ./scripts/no-legacy-imports-diff.sh`
+  - Description: Blocks newly introduced legacy aliases/imports (`views`, `helpers`, `hooks`, etc.) in changed frontend files.
+
+- `no-stub-imports`
+  - Definition: `chmod u+x ./scripts/no-stub-imports-diff.sh && ./scripts/no-stub-imports-diff.sh`
+  - Description: Blocks newly introduced imports from deprecated stub paths.
+
+### Circular dependency checks (root `package.json`)
+
+- `depcruise:circular`
+  - Definition: `NODE_OPTIONS='--max-old-space-size=8192' depcruise --config ./.dependency-cruiser.circular.cjs packages/commonwealth/client/scripts`
+  - Description: Full circular dependency audit for client scripts.
+
+- `depcruise:circular:diff`
+  - Definition: `chmod u+x scripts/depcruise-circular-diff.sh && ./scripts/depcruise-circular-diff.sh`
+  - Description: Blocking diff-scoped circular guard that fails only on cycles introduced from changed-file source edges.
+
+- `depcruise:circular:warn`
+  - Definition: `pnpm depcruise:circular || true`
+  - Description: Non-blocking variant retained for transitional/debug use.
+
+### Visual policy scripts
+
+- `test-visual`
+  - Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/visual/playwright.visual.config.ts`
+  - Description: Visual regression compare mode (CI gate path).
+
+- `test-visual:update`
+  - Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/visual/playwright.visual.config.ts --update-snapshots`
+  - Description: Baseline refresh mode for dedicated baseline-update workflows/PRs.
 
 ## Build Scripts
 
