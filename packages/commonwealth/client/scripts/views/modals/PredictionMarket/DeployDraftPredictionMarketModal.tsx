@@ -5,15 +5,15 @@ import PredictionMarket from 'helpers/ContractHelpers/predictionMarket';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import { useDeployPredictionMarketMutation } from 'state/api/predictionMarket';
 import useUserStore from 'state/ui/user';
-import type Thread from '../../models/Thread';
-import { CWText } from '../components/component_kit/cw_text';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import type Thread from '../../../models/Thread';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../components/component_kit/new_designs/CWModal';
+} from '../../components/component_kit/new_designs/CWModal';
 import { deployPredictionMarketOnChain } from './deployPredictionMarketOnChain';
 import './PredictionMarketEditorModal.scss';
 

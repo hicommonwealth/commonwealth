@@ -9,20 +9,20 @@ import {
 } from 'state/api/predictionMarket';
 import useUserStore from 'state/ui/user';
 import { trpc } from 'utils/trpcClient';
-import type Thread from '../../models/Thread';
-import { CWLabel } from '../components/component_kit/cw_label';
-import { CWText } from '../components/component_kit/cw_text';
-import { CWTextArea } from '../components/component_kit/cw_text_area';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWForm } from '../components/component_kit/new_designs/CWForm';
+import type Thread from '../../../models/Thread';
+import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWTextArea } from '../../components/component_kit/cw_text_area';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWForm } from '../../components/component_kit/new_designs/CWForm';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../components/component_kit/new_designs/CWModal';
-import { CWSelectList } from '../components/component_kit/new_designs/CWSelectList';
-import { CWTextInput } from '../components/component_kit/new_designs/CWTextInput';
+} from '../../components/component_kit/new_designs/CWModal';
+import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
+import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { deployPredictionMarketOnChain } from './deployPredictionMarketOnChain';
 import './PredictionMarketEditorModal.scss';
 import {

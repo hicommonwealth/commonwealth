@@ -6,7 +6,7 @@ import type Thread from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { PredictionMarketEditorModal } from '../../modals/PredictionMarketEditorModal';
+import { PredictionMarketEditorModal } from '../../modals/PredictionMarket/PredictionMarketEditorModal';
 import { ThreadPredictionMarketCard } from './ThreadPredictionMarketCard';
 import './poll_cards.scss';
 

@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
 import PredictionMarket from '../../../client/scripts/helpers/ContractHelpers/predictionMarket';
-import { deployPredictionMarketOnChain } from '../../../client/scripts/views/modals/deployPredictionMarketOnChain';
+import { deployPredictionMarketOnChain } from '../../../client/scripts/views/modals/PredictionMarket/deployPredictionMarketOnChain';
 
 const params = {
   eth_chain_id: 84532,

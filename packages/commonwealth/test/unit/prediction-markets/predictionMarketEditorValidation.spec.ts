@@ -6,7 +6,7 @@ import {
   PROMPT_MAX_LENGTH,
   THRESHOLD_MAX,
   THRESHOLD_MIN,
-} from '../../../client/scripts/views/modals/predictionMarketEditorValidation';
+} from '../../../client/scripts/views/modals/PredictionMarket/predictionMarketEditorValidation';
 
 const validAddress = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
 

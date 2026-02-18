@@ -5,7 +5,7 @@ import { CWContentPageCard } from '../../components/component_kit/CWContentPageC
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
-import { DeployDraftPredictionMarketModal } from '../../modals/DeployDraftPredictionMarketModal';
+import { DeployDraftPredictionMarketModal } from '../../modals/PredictionMarket/DeployDraftPredictionMarketModal';
 import './poll_cards.scss';
 
 type PredictionMarketResult = {
