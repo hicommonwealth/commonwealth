@@ -112,9 +112,6 @@ const ThreadTokenWidget = ({
     () => (isThreadCreationMode ? (_val: number) => {} : setTokenGainAmount),
     [isThreadCreationMode, setTokenGainAmount],
   );
-  const currentIsLoadingTokenGain = isThreadCreationMode
-    ? isLoadingThreadFormTokenGain
-    : isLoadingTokenGain;
   const setCurrentIsLoadingTokenGain = useMemo(
     () =>
       isThreadCreationMode ? (_val: boolean) => {} : setIsLoadingTokenGain,
