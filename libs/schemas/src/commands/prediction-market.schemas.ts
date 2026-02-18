@@ -1,16 +1,6 @@
 import { z } from 'zod';
 import { ThreadContext } from '../context';
-import {
-  PredictionMarket,
-  PredictionMarketTradeAction,
-} from '../entities/prediction-market.schemas';
-import {
-  EVM_ADDRESS,
-  EVM_BYTES,
-  EVM_TRANSACTION_HASH,
-  PG_ETH,
-  PG_INT,
-} from '../utils';
+import { EVM_ADDRESS, PG_INT } from '../utils';
 
 export const CreatePredictionMarket = {
   input: z.object({
@@ -20,7 +10,7 @@ export const CreatePredictionMarket = {
     duration: PG_INT,
     resolution_threshold: z.number(),
   }),
-  output: PredictionMarket,
+  output: z.boolean(),
   context: ThreadContext,
 };
 
@@ -37,7 +27,7 @@ export const DeployPredictionMarket = {
     start_time: z.coerce.date(),
     end_time: z.coerce.date(),
   }),
-  output: PredictionMarket,
+  output: z.boolean(),
   context: ThreadContext,
 };
 
@@ -47,7 +37,7 @@ export const ResolvePredictionMarket = {
     prediction_market_id: PG_INT,
     winner: z.number().int().min(0).max(2),
   }),
-  output: PredictionMarket,
+  output: z.boolean(),
   context: ThreadContext,
 };
 
@@ -58,33 +48,4 @@ export const CancelPredictionMarket = {
   }),
   output: z.boolean(),
   context: ThreadContext,
-};
-
-export const ProjectPredictionMarketTrade = {
-  input: z.object({
-    market_id: EVM_BYTES,
-    eth_chain_id: PG_INT,
-    tx_hash: EVM_TRANSACTION_HASH,
-    trader_address: EVM_ADDRESS,
-    action: z.enum(
-      Object.values(PredictionMarketTradeAction) as [
-        PredictionMarketTradeAction,
-        ...PredictionMarketTradeAction[],
-      ],
-    ),
-    collateral_amount: PG_ETH,
-    p_token_amount: PG_ETH,
-    f_token_amount: PG_ETH,
-    timestamp: PG_INT,
-  }),
-  output: z.object({}).optional(),
-};
-
-export const ProjectPredictionMarketResolution = {
-  input: z.object({
-    market_id: EVM_BYTES,
-    winner: z.number().int().min(0).max(2),
-    resolved_at: z.coerce.date(),
-  }),
-  output: z.object({}).optional(),
 };

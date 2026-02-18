@@ -54,7 +54,7 @@ describe('Prediction Market Cancel', () => {
       reaction_weights_sum: '0',
     });
 
-    const market = await command(CreatePredictionMarket(), {
+    await command(CreatePredictionMarket(), {
       actor: admin,
       payload: {
         thread_id: newThread!.id!,
@@ -65,19 +65,22 @@ describe('Prediction Market Cancel', () => {
       },
     });
 
-    expect(market.status).toBe(schemas.PredictionMarketStatus.Draft);
+    const market = await models.PredictionMarket.findOne({
+      where: { thread_id: newThread!.id! },
+    });
+    expect(market!.status).toBe(schemas.PredictionMarketStatus.Draft);
 
     const result = await command(CancelPredictionMarket(), {
       actor: admin,
       payload: {
         thread_id: newThread!.id!,
-        prediction_market_id: market.id!,
+        prediction_market_id: market!.id!,
       },
     });
 
     expect(result).toBe(true);
 
-    const cancelled = await models.PredictionMarket.findByPk(market.id!);
+    const cancelled = await models.PredictionMarket.findByPk(market!.id!);
     expect(cancelled!.status).toBe(schemas.PredictionMarketStatus.Cancelled);
 
     // Verify outbox event
@@ -89,7 +92,7 @@ describe('Prediction Market Cancel', () => {
     expect(
       (cancelEvent!.event_payload as { prediction_market_id: number })
         .prediction_market_id,
-    ).toBe(market.id);
+    ).toBe(market!.id);
   });
 
   it('should cancel an active prediction market', async () => {
@@ -102,7 +105,7 @@ describe('Prediction Market Cancel', () => {
       reaction_weights_sum: '0',
     });
 
-    const market = await command(CreatePredictionMarket(), {
+    await command(CreatePredictionMarket(), {
       actor: admin,
       payload: {
         thread_id: newThread!.id!,
@@ -113,11 +116,15 @@ describe('Prediction Market Cancel', () => {
       },
     });
 
+    const market = await models.PredictionMarket.findOne({
+      where: { thread_id: newThread!.id! },
+    });
+
     await command(DeployPredictionMarket(), {
       actor: admin,
       payload: {
         thread_id: newThread!.id!,
-        prediction_market_id: market.id!,
+        prediction_market_id: market!.id!,
         vault_address: '0x0000000000000000000000000000000000000001',
         governor_address: '0x0000000000000000000000000000000000000002',
         router_address: '0x0000000000000000000000000000000000000003',
@@ -133,13 +140,13 @@ describe('Prediction Market Cancel', () => {
       actor: admin,
       payload: {
         thread_id: newThread!.id!,
-        prediction_market_id: market.id!,
+        prediction_market_id: market!.id!,
       },
     });
 
     expect(result).toBe(true);
 
-    const cancelled = await models.PredictionMarket.findByPk(market.id!);
+    const cancelled = await models.PredictionMarket.findByPk(market!.id!);
     expect(cancelled!.status).toBe(schemas.PredictionMarketStatus.Cancelled);
   });
 
@@ -153,7 +160,7 @@ describe('Prediction Market Cancel', () => {
       reaction_weights_sum: '0',
     });
 
-    const market = await command(CreatePredictionMarket(), {
+    await command(CreatePredictionMarket(), {
       actor: admin,
       payload: {
         thread_id: newThread!.id!,
@@ -164,6 +171,10 @@ describe('Prediction Market Cancel', () => {
       },
     });
 
+    const market = await models.PredictionMarket.findOne({
+      where: { thread_id: newThread!.id! },
+    });
+
     // Manually set to resolved
     await models.PredictionMarket.update(
       {
@@ -171,7 +182,7 @@ describe('Prediction Market Cancel', () => {
         winner: 1,
         resolved_at: new Date(),
       },
-      { where: { id: market.id } },
+      { where: { id: market!.id } },
     );
 
     await expect(
@@ -179,7 +190,7 @@ describe('Prediction Market Cancel', () => {
         actor: admin,
         payload: {
           thread_id: newThread!.id!,
-          prediction_market_id: market.id!,
+          prediction_market_id: market!.id!,
         },
       }),
     ).rejects.toThrow(

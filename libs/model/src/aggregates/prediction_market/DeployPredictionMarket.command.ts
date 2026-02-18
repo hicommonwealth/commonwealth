@@ -84,7 +84,7 @@ export function DeployPredictionMarket(): Command<
           transaction,
         );
 
-        return market.toJSON();
+        return true;
       });
     },
   };

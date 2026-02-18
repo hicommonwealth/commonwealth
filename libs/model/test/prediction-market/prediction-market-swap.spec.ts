@@ -42,7 +42,7 @@ describe('Prediction Market Swap', () => {
     thread_id = thread!.id!;
 
     // Create and deploy a prediction market
-    const market = await command(CreatePredictionMarket(), {
+    await command(CreatePredictionMarket(), {
       actor: admin,
       payload: {
         thread_id,
@@ -52,7 +52,10 @@ describe('Prediction Market Swap', () => {
         resolution_threshold: 0.5,
       },
     });
-    marketId = market.id!;
+    const market = await models.PredictionMarket.findOne({
+      where: { thread_id },
+    });
+    marketId = market!.id!;
 
     await command(DeployPredictionMarket(), {
       actor: admin,
