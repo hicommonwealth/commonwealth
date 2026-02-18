@@ -47,6 +47,7 @@ const api = {
   configuration: configuration.trpcRouter,
   mcp: mcp.trpcRouter,
   tokenAllocation: tokenAllocation.trpcRouter,
+  predictionMarket: predictionMarket.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
@@ -55,10 +56,6 @@ if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
 
 if (config.ALCHEMY.AA.FLAG_COMMON_WALLET) {
   api['wallet'] = wallet.trpcRouter;
-}
-
-if (config.MARKETS.FUTARCHY_ENABLED) {
-  api['predictionMarket'] = predictionMarket.trpcRouter;
 }
 
 const PATH = '/api/internal';

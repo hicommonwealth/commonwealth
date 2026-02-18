@@ -62,7 +62,7 @@ export function ResolvePredictionMarket(): Command<
           transaction,
         );
 
-        return market.toJSON();
+        return true;
       });
     },
   };

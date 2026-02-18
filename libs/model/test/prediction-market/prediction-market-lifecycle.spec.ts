@@ -52,15 +52,19 @@ describe('Prediction Market Lifecycle', () => {
       resolution_threshold: 0.5,
     };
 
-    const market = await command(CreatePredictionMarket(), {
+    await command(CreatePredictionMarket(), {
       actor: admin,
       payload: createPayload,
     });
 
-    expect(market.id).toBeDefined();
-    expect(market.status).toBe(schemas.PredictionMarketStatus.Draft);
-    expect(market.eth_chain_id).toBe(eth_chain_id);
-    expect(market.thread_id).toBe(thread_id);
+    const market = await models.PredictionMarket.findOne({
+      where: { thread_id },
+    });
+    expect(market).toBeDefined();
+    expect(market!.id).toBeDefined();
+    expect(market!.status).toBe(schemas.PredictionMarketStatus.Draft);
+    expect(market!.eth_chain_id).toBe(eth_chain_id);
+    expect(market!.thread_id).toBe(thread_id);
 
     // Verify outbox
     const createEvent = await models.Outbox.findOne({
@@ -68,12 +72,12 @@ describe('Prediction Market Lifecycle', () => {
       order: [['event_id', 'DESC']],
     });
     expect(createEvent).toBeDefined();
-    expect((createEvent!.event_payload as { id: number }).id).toBe(market.id);
+    expect((createEvent!.event_payload as { id: number }).id).toBe(market!.id);
 
     // 2. Deploy Prediction Market (Active)
     const deployPayload = {
       thread_id,
-      prediction_market_id: market.id!,
+      prediction_market_id: market!.id!,
       vault_address: '0x0000000000000000000000000000000000000001',
       governor_address: '0x0000000000000000000000000000000000000002',
       router_address: '0x0000000000000000000000000000000000000003',
@@ -84,13 +88,14 @@ describe('Prediction Market Lifecycle', () => {
       end_time: new Date(Date.now() + 86400 * 7 * 1000),
     };
 
-    const deployedMarket = await command(DeployPredictionMarket(), {
+    await command(DeployPredictionMarket(), {
       actor: admin,
       payload: deployPayload,
     });
 
-    expect(deployedMarket.status).toBe(schemas.PredictionMarketStatus.Active);
-    expect(deployedMarket.vault_address).toBe(deployPayload.vault_address);
+    const deployedMarket = await models.PredictionMarket.findByPk(market!.id!);
+    expect(deployedMarket!.status).toBe(schemas.PredictionMarketStatus.Active);
+    expect(deployedMarket!.vault_address).toBe(deployPayload.vault_address);
 
     // Verify outbox
     const deployEvent = await models.Outbox.findOne({
@@ -101,7 +106,7 @@ describe('Prediction Market Lifecycle', () => {
     expect(
       (deployEvent!.event_payload as { prediction_market_id: number })
         .prediction_market_id,
-    ).toBe(market.id);
+    ).toBe(market!.id);
 
     // 3. Reconcile ProposalCreated event via Projection
     const projection = PredictionMarketProjection();
@@ -110,7 +115,7 @@ describe('Prediction Market Lifecycle', () => {
       id: 1,
       name: 'PredictionMarketProposalCreated',
       payload: {
-        prediction_market_id: market.id!,
+        prediction_market_id: market!.id!,
         proposal_id: proposalId,
         eth_chain_id,
         transaction_hash: '0xhash1',
@@ -119,7 +124,7 @@ describe('Prediction Market Lifecycle', () => {
     });
 
     const reconciledMarket1 = await models.PredictionMarket.findByPk(
-      market.id!,
+      market!.id!,
     );
     expect(reconciledMarket1!.proposal_id).toBe(proposalId);
 
@@ -129,7 +134,7 @@ describe('Prediction Market Lifecycle', () => {
       id: 2,
       name: 'PredictionMarketMarketCreated',
       payload: {
-        prediction_market_id: market.id!,
+        prediction_market_id: market!.id!,
         market_id: marketId,
         eth_chain_id,
         transaction_hash: '0xhash2',
@@ -138,7 +143,7 @@ describe('Prediction Market Lifecycle', () => {
     });
 
     const reconciledMarket2 = await models.PredictionMarket.findByPk(
-      market.id!,
+      market!.id!,
     );
     expect(reconciledMarket2!.market_id).toBe(marketId);
   });
