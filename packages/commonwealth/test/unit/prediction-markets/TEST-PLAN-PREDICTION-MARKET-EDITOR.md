@@ -2,6 +2,8 @@
 
 Step-by-step manual test plan for the prediction market create-and-deploy flow (issue #13374). Follow these steps as a regular user would.
 
+**Note for reviewers / deploy:** The FutarchyGovernor address in `libs/evm-protocols/src/common-protocol/chainConfig.ts` (e.g. Base Sepolia) is currently `ZERO_ADDRESS`. It must be updated to the deployed contract address before on-chain deployment will work.
+
 ---
 
 ## Prerequisites
@@ -50,7 +52,7 @@ Step-by-step manual test plan for the prediction market create-and-deploy flow (
 9. Click **“Create and Deploy”**.
 10. You should see a short **loading** state: “Creating draft…”.
 11. Then one of:
-    - **If deploy is not configured for this chain:** A success message like “Prediction market draft created. On-chain deployment is not configured for this chain.” and the **modal closes**. The “Add a prediction market” card is replaced by a **Prediction market** card showing the draft (prompt + “Status: Draft”). As thread author you should see a **“Complete deployment”** button on that card.
+    - **If deploy is not configured for this chain:** A success message like “Prediction market draft created. On-chain deployment is not configured for this chain.” and the **modal closes**. The “Add a prediction market” card is replaced by a **Prediction market** card showing the draft (prompt + Draft status chip). As thread author you should see a **“Complete deployment”** button on that card.
     - **If wallet is not connected:** An error like “Wallet not connected. Connect a wallet to deploy on-chain.” and the modal stays open with the message visible.
 12. **Pass criteria:** Modal opens, form validation works, draft is created and modal closes when deploy is not configured; draft card appears with “Complete deployment” for the author.
 
@@ -111,7 +113,7 @@ Step-by-step manual test plan for the prediction market create-and-deploy flow (
 **Goal:** When a draft already exists and the viewer is the thread author, they can complete it (deploy on-chain) from the draft card.
 
 1. Start from a thread that has a **draft** prediction market (e.g. from Test 1).
-2. As the **thread author**, you should see a **Prediction market** card with the draft prompt, “Status: Draft”, and a **“Complete deployment”** button.
+2. As the **thread author**, you should see a **Prediction market** card with the draft prompt, a Draft status chip, and a **“Complete deployment”** button.
 3. **If deploy is not configured:** Click **“Complete deployment”**. A modal opens; “Deploy on-chain” is disabled and a note explains that deployment is not configured for this chain.
 4. **If deploy is configured:** Click **“Complete deployment”**. A modal opens with the draft prompt and a **“Deploy on-chain”** button. Click it. You should see “Deploying on-chain…” then a wallet prompt to sign. After confirming, the draft is deployed and the card updates to “Status: Active” (or the list refetches).
 5. **Pass criteria:** Author sees “Complete deployment” on draft card; modal runs deploy-only flow (no new draft created); UI updates after success.
@@ -167,6 +169,6 @@ Step-by-step manual test plan for the prediction market create-and-deploy flow (
 
 ## Notes
 
-- **Governor address:** Set `FutarchyGovernor` in `libs/evm-protocols/src/common-protocol/chainConfig.ts` for the chain. Without it, only drafts are created; “Complete deployment” stays disabled until configured.
+- **Governor address (chainConfig):** Set `FutarchyGovernor` in `libs/evm-protocols/src/common-protocol/chainConfig.ts` for the chain. The value is currently `ZERO_ADDRESS` for Base Sepolia and **must be updated** when the Futarchy governor contract is deployed. Without a non-zero address, only drafts are created; “Complete deployment” stays disabled until configured.
 - **Chain:** Use a community whose chain matches the governor config (e.g. Base Sepolia 84532).
 - **One market per thread:** After a market exists (draft or deployed), the “Add a prediction market” card is replaced by the **Prediction market** card. For a draft, the thread author sees **“Complete deployment”** to deploy on-chain later.
