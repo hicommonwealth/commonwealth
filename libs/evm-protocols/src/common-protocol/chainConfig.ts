@@ -93,6 +93,8 @@ export const factoryContracts: FactoryContractsType = {
     CommunityNominations: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
     TokenLaunchpad: '0x1fB82e534F0E81527970BFA3096ED1b728922ff8',
     TokenBondingCurve: '0x3b3A346A679fd721710D778551766A71482926dd',
+    // TODO: Replace with deployed FutarchyGovernor when available (getFutarchyGovernorAddressFromChainConfig treats zero as unset).
+    FutarchyGovernor: ZERO_ADDRESS,
     chainId: 84532,
   },
   [ValidChains.Blast]: {

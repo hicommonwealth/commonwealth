@@ -1,16 +1,13 @@
 import { describe, expect, test } from 'vitest';
-import {
-  getFutarchyGovernorAddress,
-  isFutarchyDeployConfigured,
-} from '../../../client/scripts/views/modals/futarchyConfig';
+import PredictionMarket from '../../../client/scripts/helpers/ContractHelpers/predictionMarket';
 
-describe('futarchyConfig', () => {
-  test('getFutarchyGovernorAddress returns null when no env or static config', () => {
-    expect(getFutarchyGovernorAddress(84532)).toBeNull();
-    expect(getFutarchyGovernorAddress(8453)).toBeNull();
+describe('predictionMarket address lookup', () => {
+  test('getGovernorAddress returns null when not configured', () => {
+    expect(PredictionMarket.getGovernorAddress(84532)).toBeNull();
+    expect(PredictionMarket.getGovernorAddress(8453)).toBeNull();
   });
 
-  test('isFutarchyDeployConfigured is false when address is null', () => {
-    expect(isFutarchyDeployConfigured(84532)).toBe(false);
+  test('isDeployConfigured is false when address is null', () => {
+    expect(PredictionMarket.isDeployConfigured(84532)).toBe(false);
   });
 });

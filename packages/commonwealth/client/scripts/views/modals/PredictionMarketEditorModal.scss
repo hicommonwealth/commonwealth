@@ -4,6 +4,10 @@
 @use '../../styles/mixins/media_queries';
 
 .PredictionMarketEditorModal {
+  .CWModalBody {
+    overflow: scroll !important;
+  }
+
   .prompt-row {
     margin-bottom: 16px;
   }

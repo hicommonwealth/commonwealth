@@ -4,3 +4,19 @@
   display: flex;
   padding: 16px;
 }
+
+.PredictionMarketCard {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .prediction-prompt {
+    margin: 0;
+  }
+
+  .complete-deployment-button {
+    margin-top: 4px;
+    align-self: flex-start;
+  }
+}
