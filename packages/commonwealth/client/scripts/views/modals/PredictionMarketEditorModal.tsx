@@ -1,7 +1,13 @@
 import React, { useRef, useState } from 'react';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { useCreatePredictionMarketMutation } from 'state/api/predictionMarket';
+import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
+import {
+  useCreatePredictionMarketMutation,
+  useDeployPredictionMarketMutation,
+} from 'state/api/predictionMarket';
+import useUserStore from 'state/ui/user';
+import { trpc } from 'utils/trpcClient';
 import type Thread from '../../models/Thread';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { SelectList } from '../components/component_kit/cw_select_list';
@@ -15,6 +21,8 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { deployPredictionMarketOnChain } from './deployPredictionMarketOnChain';
+import { isFutarchyDeployConfigured } from './futarchyConfig';
 import './PredictionMarketEditorModal.scss';
 import {
   DURATION_MAX,
@@ -66,7 +74,26 @@ export const PredictionMarketEditorModal = ({
   const [phase, setPhase] = useState<Phase>('form');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const user = useUserStore();
+  const activeAddress = user.activeAccount?.address ?? '';
+  const { data: community } = useGetCommunityByIdQuery({
+    id:
+      thread?.community_id ??
+      (thread as { communityId?: string })?.communityId ??
+      '',
+    includeNodeInfo: true,
+    enabled: !!thread?.id,
+  });
+  const chainRpc =
+    (community as { ChainNode?: { url?: string } } | undefined)?.ChainNode
+      ?.url ?? '';
+  const ethChainId =
+    (community as { ChainNode?: { eth_chain_id?: number } } | undefined)
+      ?.ChainNode?.eth_chain_id ?? 0;
+
   const createMutation = useCreatePredictionMarketMutation();
+  const deployMutation = useDeployPredictionMarketMutation();
+  const utils = trpc.useUtils();
 
   const collateralAddress =
     collateralOption.value === 'custom'
@@ -93,16 +120,78 @@ export const PredictionMarketEditorModal = ({
         thread_id: thread.id,
         prompt: prompt.trim(),
         collateral_address: collateralAddress as `0x${string}`,
-        duration: durationDays,
+        duration: durationDays * 86400,
         resolution_threshold: resolutionThreshold / 100,
       });
 
+      if (!activeAddress) {
+        setPhase('error');
+        setErrorMessage(
+          'Wallet not connected. Connect a wallet to deploy on-chain.',
+        );
+        notifyError('Wallet not connected.');
+        return;
+      }
+
+      const deployConfigured =
+        ethChainId && chainRpc && isFutarchyDeployConfigured(ethChainId);
+
+      if (!deployConfigured) {
+        notifySuccess(
+          'Prediction market draft created. On-chain deployment is not configured for this chain.',
+        );
+        setPhase('success');
+        onSuccess?.();
+        onModalClose();
+        return;
+      }
+
       setPhase('deploying');
 
-      // On-chain deployment: Governor.propose() and then deployPredictionMarket with tx result.
-      // Contract encoding and wallet signing will be wired when Futarchy contract helpers
-      // are available. For now we create the draft and close; full deploy flow in a follow-up.
-      notifySuccess('Prediction market draft created.');
+      const marketsData =
+        await utils.predictionMarket.getPredictionMarkets.fetch({
+          thread_id: thread.id,
+          limit: 1,
+          offset: 0,
+        });
+      const results = (
+        marketsData as { results?: { id: number }[] } | undefined
+      )?.results;
+      const predictionMarketId =
+        Array.isArray(results) && results[0] ? results[0].id : null;
+
+      if (predictionMarketId == null) {
+        setPhase('error');
+        setErrorMessage('Could not find the created prediction market.');
+        notifyError('Could not find the created prediction market.');
+        return;
+      }
+
+      const payload = await deployPredictionMarketOnChain({
+        eth_chain_id: ethChainId,
+        chain_rpc: chainRpc,
+        user_address: activeAddress,
+        prompt: prompt.trim(),
+        collateral_address: collateralAddress as `0x${string}`,
+        duration_days: durationDays,
+        resolution_threshold: resolutionThreshold / 100,
+        initial_liquidity: initialLiquidity.trim() || '0',
+      });
+
+      await deployMutation.mutateAsync({
+        thread_id: thread.id,
+        prediction_market_id: predictionMarketId,
+        vault_address: payload.vault_address,
+        governor_address: payload.governor_address,
+        router_address: payload.router_address,
+        strategy_address: payload.strategy_address,
+        p_token_address: payload.p_token_address,
+        f_token_address: payload.f_token_address,
+        start_time: payload.start_time,
+        end_time: payload.end_time,
+      });
+
+      notifySuccess('Prediction market created and deployed.');
       setPhase('success');
       onSuccess?.();
       onModalClose();
