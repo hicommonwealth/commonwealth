@@ -77,10 +77,7 @@ export const PredictionMarketEditorModal = ({
   const user = useUserStore();
   const activeAddress = user.activeAccount?.address ?? '';
   const { data: community } = useGetCommunityByIdQuery({
-    id:
-      thread?.community_id ??
-      (thread as { communityId?: string })?.communityId ??
-      '',
+    id: thread?.communityId ?? '',
     includeNodeInfo: true,
     enabled: !!thread?.id,
   });
@@ -152,7 +149,6 @@ export const PredictionMarketEditorModal = ({
         await utils.predictionMarket.getPredictionMarkets.fetch({
           thread_id: thread.id,
           limit: 1,
-          offset: 0,
         });
       const results = (
         marketsData as { results?: { id: number }[] } | undefined
