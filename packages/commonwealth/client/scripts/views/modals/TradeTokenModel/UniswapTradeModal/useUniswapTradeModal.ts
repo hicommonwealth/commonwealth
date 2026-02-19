@@ -9,8 +9,8 @@ import {
 import { isMagicUser as checkIfMagicUser } from 'client/scripts/utils/magicNetworkUtils';
 import MagicWebWalletController from 'controllers/app/webWallets/MagicWebWallet';
 import WebWalletController from 'controllers/app/web_wallets';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { uniswapTokenListConfig } from 'views/modals/TradeTokenModel/UniswapTradeModal/tokenListConfig';
 import {

@@ -1,7 +1,7 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import type { Topic } from 'models/Topic';
 import React, { useEffect, useState } from 'react';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import app from 'state';
 import {
   useFetchTopicsQuery,

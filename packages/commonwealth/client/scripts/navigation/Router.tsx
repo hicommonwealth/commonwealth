@@ -1,4 +1,3 @@
-import { useFlag } from 'hooks/useFlag';
 import CustomDomainRoutes from 'navigation/CustomDomainRoutes';
 import React from 'react';
 import {
@@ -7,6 +6,7 @@ import {
   Route,
   RouterProvider,
 } from 'react-router-dom';
+import { useFlag } from 'shared/hooks/useFlag';
 import { fetchCachedCustomDomain } from 'state/api/configuration';
 import { withLayout } from 'views/Layout';
 import { PageNotFound } from 'views/pages/404';

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import React, { ComponentProps } from 'react';
 import Drawer from 'react-modern-drawer';
 
-import useBrowserWindow from 'hooks/useBrowserWindow';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 
 import { ComponentType } from '../../types';
 

@@ -1,11 +1,11 @@
 import { STAKE_ID } from '@hicommonwealth/evm-protocols';
-import useAppStatus from 'hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityStakeEvent,
 } from 'shared/analytics/types';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import { useUpdateCommunityStake } from 'state/api/communityStake';
 import useUserStore from 'state/ui/user';
 import {

@@ -1,8 +1,8 @@
 import { buildCreateGroupInput } from 'client/scripts/state/api/groups/createGroup';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import app from 'state';
 import { useCreateGroupMutation } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';

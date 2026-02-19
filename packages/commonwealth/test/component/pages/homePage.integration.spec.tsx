@@ -14,6 +14,10 @@ vi.mock('hooks/useFlag', () => ({
   useFlag: useFlagMock,
 }));
 
+vi.mock('shared/hooks/useFlag', () => ({
+  useFlag: useFlagMock,
+}));
+
 vi.mock('state/ui/modals', () => ({
   useManageCommunityStakeModalStore: useManageCommunityStakeModalStoreMock,
 }));

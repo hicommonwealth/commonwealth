@@ -1,5 +1,5 @@
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCallback, useMemo } from 'react';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
 import { sidebarStore } from 'state/ui/sidebar';
 import { isWindowSmallInclusive } from '../component_kit/helpers';
 import { verifyCachedToggleTree } from './helpers';

@@ -1,7 +1,7 @@
 import moment from 'moment';
 import React, { useState } from 'react';
 
-import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
+import useManageDocumentTitle from 'shared/hooks/useManageDocumentTitle';
 import { CardsCollection } from 'views/components/cards_collection';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
