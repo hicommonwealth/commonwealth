@@ -46,7 +46,9 @@ export async function deployPredictionMarketOnChain(
       addr.walletId?.toLowerCase().includes('magic'),
   );
 
-  let provider: string | unknown = params.chain_rpc;
+  // Use wallet provider for signing (required for eth_sendTransaction).
+  // RPC URLs don't support signing; only Magic needs explicit provider.
+  let provider: string | unknown = undefined;
   if (isMagicAddress) {
     await fetchNodes();
     const controller = new MagicWebWalletController();

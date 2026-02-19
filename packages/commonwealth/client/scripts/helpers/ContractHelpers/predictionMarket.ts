@@ -7,7 +7,7 @@ import {
   BinaryVaultAbi,
   FutarchyGovernorAbi,
 } from '@commonxyz/common-protocol-abis';
-import { factoryContracts } from '@hicommonwealth/evm-protocols';
+import { erc20Abi, factoryContracts } from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { decodeEventLog, type Address } from 'viem';
 import type { AbiItem } from 'web3-utils';
@@ -105,7 +105,51 @@ class PredictionMarket extends ContractBase {
   ): Promise<{
     logs?: Array<{ address?: string; data?: string; topics?: string[] }>;
   }> {
+    initialLiquidityWei = 1000000000000000000n;
+    resolutionThresholdBps = 550000000000000000n;
+    console.log('comes here => ', {
+      proposalId,
+      marketId,
+      collateralAddress,
+      durationSeconds,
+      resolutionThresholdBps,
+      initialLiquidityWei,
+      fromAddress,
+    });
     this.isInitialized();
+    console.log('comes here 2 => ', this.contract);
+
+    // Approve governor to spend collateral before propose (required when initialLiquidity > 0).
+    // Matches common-protocol prediction_market_helpers_frontend: approve then propose.
+    if (initialLiquidityWei > 0n) {
+      const collateralToken = new this.web3.eth.Contract(
+        erc20Abi as unknown as AbiItem[],
+        collateralAddress,
+      );
+      const spender = this.contractAddress;
+      const currentAllowance = BigInt(
+        (await collateralToken.methods
+          .allowance(fromAddress, spender)
+          .call()) as string,
+      );
+      if (currentAllowance < initialLiquidityWei) {
+        try {
+          await collateralToken.methods
+            .approve(spender, initialLiquidityWei)
+            .send({ from: fromAddress });
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          if (/user rejected|denied|reject/i.test(msg)) {
+            throw new Error('Approval was rejected by the user.');
+          }
+          if (/insufficient funds|not enough balance/i.test(msg)) {
+            throw new Error('Insufficient collateral balance for approval.');
+          }
+          throw err;
+        }
+      }
+    }
+
     const tx = this.contract.methods.propose(
       proposalId,
       marketId,
@@ -114,6 +158,7 @@ class PredictionMarket extends ContractBase {
       resolutionThresholdBps,
       initialLiquidityWei,
     );
+    console.log('comes here 3 => ', tx);
     try {
       const gas = await tx.estimateGas({ from: fromAddress });
       return await tx.send({
@@ -121,6 +166,7 @@ class PredictionMarket extends ContractBase {
         gas: String(BigInt(gas.toString()) + 100000n),
       });
     } catch (err) {
+      console.log('comes here 4 => ', err);
       const msg = err instanceof Error ? err.message : String(err);
       if (/user rejected|denied|reject/i.test(msg)) {
         throw new Error('Transaction was rejected by the user.');
