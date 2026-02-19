@@ -1,4 +1,17 @@
 import { describe, expect, test, vi } from 'vitest';
+
+// Avoid loading @polkadot/extension-dapp (requires window) via ContractBase -> web_wallets
+vi.mock('../../../client/scripts/controllers/app/web_wallets', () => ({
+  default: {
+    get Instance() {
+      return {
+        availableWallets: () => [],
+        getByName: () => null,
+      };
+    },
+  },
+}));
+
 import PredictionMarket from '../../../client/scripts/helpers/ContractHelpers/predictionMarket';
 import { deployPredictionMarketOnChain } from '../../../client/scripts/views/modals/PredictionMarket/deployPredictionMarketOnChain';
 
