@@ -94,6 +94,7 @@ import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { LinkedUrlCard } from './LinkedUrlCard';
 import { ThreadPollCard } from './ThreadPollCard';
 import { ThreadPollEditorCard } from './ThreadPollEditorCard';
+import { ThreadPredictionMarketCard } from './ThreadPredictionMarketCard';
 import { EditBody } from './edit_body';
 import './index.scss';
 import { LinkedProposalsCard } from './linked_proposals_card';
@@ -122,6 +123,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
   const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+  const futarchyEnabled = useFlag('futarchy');
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [savedEdits, setSavedEdits] = useState('');
@@ -730,6 +732,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       threadAlreadyHasPolling={!pollsData?.length}
                     />
                   )}
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(futarchyEnabled && thread
+      ? [
+          {
+            label: 'Prediction Market',
+            item: (
+              <div className="cards-column">
+                <ThreadPredictionMarketCard thread={thread} />
               </div>
             ),
           },

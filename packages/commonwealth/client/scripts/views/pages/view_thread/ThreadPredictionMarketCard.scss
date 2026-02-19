@@ -1,0 +1,184 @@
+@use '../../../styles/shared.scss';
+
+.ThreadPredictionMarketCard {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  .prediction-market-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+
+      .market-prompt {
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .status-badge {
+        align-self: flex-start;
+
+        &.status-draft {
+          background-color: var(--neutral-100);
+          color: var(--neutral-700);
+        }
+
+        &.status-active {
+          background-color: var(--primary-100);
+          color: var(--primary-700);
+        }
+
+        &.status-resolved {
+          background-color: var(--success-100);
+          color: var(--success-700);
+        }
+
+        &.status-cancelled {
+          background-color: var(--destructive-100);
+          color: var(--destructive-700);
+        }
+      }
+    }
+
+    .cancel-button {
+      flex-shrink: 0;
+    }
+  }
+
+  &.empty-state {
+    .empty-state-message {
+      color: var(--neutral-600);
+      text-align: center;
+      padding: 8px 0;
+    }
+  }
+
+  .probability-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .probability-labels {
+      display: flex;
+      justify-content: space-between;
+
+      .pass-label {
+        color: var(--success-700);
+        font-weight: 600;
+      }
+
+      .fail-label {
+        color: var(--destructive-700);
+        font-weight: 600;
+      }
+    }
+
+    .probability-bar {
+      display: flex;
+      height: 32px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--neutral-200);
+
+      .probability-pass {
+        background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+        transition: width 0.3s ease;
+      }
+
+      .probability-fail {
+        background: linear-gradient(90deg, #f87171 0%, #ef4444 100%);
+        transition: width 0.3s ease;
+      }
+    }
+  }
+
+  .market-info-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .info-label {
+        color: var(--neutral-600);
+      }
+
+      .info-value {
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+    }
+  }
+
+  &.skeleton {
+    .prediction-market-header {
+      .skeleton-badge {
+        width: 60px;
+        height: 24px;
+        background: var(--neutral-200);
+        border-radius: 4px;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+
+      .skeleton-prompt {
+        width: 70%;
+        height: 20px;
+        background: var(--neutral-200);
+        border-radius: 4px;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+    }
+
+    .probability-section {
+      .skeleton-bar {
+        width: 100%;
+        height: 32px;
+        background: var(--neutral-200);
+        border-radius: 8px;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+    }
+
+    .market-info-section {
+      .skeleton-text {
+        width: 100px;
+        height: 16px;
+        background: var(--neutral-200);
+        border-radius: 4px;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+    }
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 12px;
+    gap: 12px;
+
+    .market-info-section {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+}
