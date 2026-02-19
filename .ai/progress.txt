@@ -106,3 +106,96 @@ Each AI run should append an entry with:
   * Confirm light theme colors match design system and are consistent
   * Validate that status tag colors align with UX expectations
   * Check that CWSelectList dropdowns work correctly with react-select API
+
+---
+
+[2026-01-09] Refactor: Market discovery APIs to state/api/markets pattern
+- Completed GitHub issue #13288
+- Key implementation decisions:
+  * Moved market discovery functions from client/scripts/services/ to client/scripts/state/api/markets/
+  * Created React Query hooks (useDiscoverKalshiMarketsQuery, useDiscoverPolymarketMarketsQuery) following existing patterns from communities/, snapshots/, communityStake/
+  * Added Kalshi and Polymarket API endpoints to ExternalEndpoints in config.ts
+  * Added proper TypeScript interfaces for API responses (KalshiEvent, PolymarketMarketResponse)
+  * Improved Polymarket error handling with array validation and proper error logging
+  * Added limit parameter (200) to Polymarket API to match Kalshi behavior
+  * Each hook exports both the raw fetch function (discoverKalshiMarkets, discoverPolymarketMarkets) and the hook (useDiscoverKalshiMarketsQuery, useDiscoverPolymarketMarketsQuery)
+  * Set 5-minute stale time for both APIs to balance freshness with performance
+  * Removed the now-empty client/scripts/services/ directory
+- Files changed:
+  * packages/commonwealth/client/scripts/state/api/config.ts - Added kalshi and polymarket to ExternalEndpoints
+  * packages/commonwealth/client/scripts/state/api/markets/discoverKalshiMarkets.ts - New file with typed Kalshi API hook
+  * packages/commonwealth/client/scripts/state/api/markets/discoverPolymarketMarkets.ts - New file with typed Polymarket API hook
+  * packages/commonwealth/client/scripts/state/api/markets/index.ts - Barrel export for markets module
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/useMarketData.ts - Updated imports to use new hooks
+  * packages/commonwealth/client/scripts/services/kalshiApi.ts - Deleted
+  * packages/commonwealth/client/scripts/services/polymarketApi.ts - Deleted
+- Tests: No unit tests added (external API integrations, manual verification required)
+- Type checking: No market-related type errors (pre-existing Soneium errors unrelated to changes)
+- Linting: All checks pass
+- Concerns for reviewers:
+  * Verify Kalshi markets load correctly in the Markets page UI
+  * Verify Polymarket markets load correctly (improved error handling should help debug issues)
+  * Test search filtering across both providers
+  * Check browser console for any API errors or CORS issues
+- Commit: 5a6a55cef6
+- Follow-up fix for Polymarket CORS issue:
+  * Polymarket API (gamma-api.polymarket.com) does not include CORS headers, blocking browser requests
+  * Kalshi API works fine in browser (has Access-Control-Allow-Origin header)
+  * Solution: Created backend proxy endpoint for Polymarket API calls
+  * Added DiscoverExternalMarkets schema and ExternalMarket type to @hicommonwealth/schemas
+  * Created DiscoverExternalMarkets.query.ts in model package to proxy Polymarket API
+  * Added discoverExternalMarkets endpoint to community tRPC router
+  * Updated frontend useDiscoverPolymarketMarketsQuery to use tRPC proxy instead of direct fetch
+  * Commit: d75672d776
+- Unified all market providers through backend proxy:
+  * Extended DiscoverExternalMarkets to support all providers (kalshi, polymarket, all)
+  * Added filters (search, category) and limit parameter to API
+  * Server-side filtering applied after fetching from external APIs
+  * Created single useDiscoverExternalMarketsQuery hook replacing separate Kalshi/Polymarket hooks
+  * Removed client-side discoverKalshiMarkets.ts and discoverPolymarketMarkets.ts
+  * Removed kalshi/polymarket endpoints from client config.ts (now only on backend)
+  * Simplified useMarketData.ts - no more client-side filtering needed
+  * Commit: b10692a4ae
+- Fixed Polymarket API to use /events endpoint (not /markets):
+  * /markets returns individual outcomes (e.g., 10 deportation buckets as separate items)
+  * /events returns grouped events (single "How many will Trump deport?" event)
+  * Added active=true filter to only return active events
+  * Both APIs now return unique, open events without duplicates
+  * Commit: 052c07c9c9
+
+[2026-01-09] Feature: Automated PR creation script
+- Completed GitHub issue #13290
+- Created .ai/create-pr.sh script that automates GitHub PR creation from current branch
+- Key implementation decisions:
+  * Followed existing .ai/ script patterns (colors, gh CLI checks, error handling)
+  * Used grep for ticket extraction instead of bash regex for macOS compatibility (bash 3.2)
+  * Supports multiple branch naming conventions: author/type-number-desc, type/number-desc, number-desc
+  * Uses GitHub CLI (gh) for all GitHub operations (PR creation, issue lookup, assignments)
+  * Generates PR body with "Closes #ticket" reference following GitHub conventions
+  * Auto-assigns PR and referenced issue to executing user (@me)
+  * Includes comprehensive error handling: gh not installed, not authenticated, detached HEAD, existing PR, uncommitted changes
+- Files changed:
+  * .ai/create-pr.sh (new file - 310 lines)
+  * .ai/progress.txt (updated with progress notes)
+- Tests: Script tested with --help flag, dry-run mode, and branch extraction verification
+- Concerns for reviewers:
+  * Script requires gh CLI to be installed and authenticated
+  * PR title defaults to issue title if available, otherwise derived from branch name
+  * The script is interactive and requires user confirmation before creating PR
+- Commit: 979ff661dc
+
+---
+
+[2026-01-12] #13294 feat: add external links to betting market cards
+- Files: types.ts, MarketCard.tsx, MarketCard.scss, MarketsAppPage.tsx, MarketsAppPage.scss, getExternalMarketUrl.spec.ts
+- Changes: Added clickable external links to provider pills on both admin MarketCard and MarketsAppPage. Users can navigate to Polymarket/Kalshi pages.
+- Decisions: URL format: Polymarket `/event/{slug}`, Kalshi `/markets/{base_ticker}/{title_slug}/{full_ticker}` (extracts base ticker, slugifies title)
+- Issues: None
+
+---
+
+[2026-01-23] #13307 chore: migrate Alchemy endpoints from alchemyapi.io to g.alchemy.com
+- Files: libs/model/src/tester/seedDb.ts, libs/model/migrations/20260123111500-migrate-alchemy-endpoints.js
+- Changes: Updated test seed database URLs from deprecated alchemyapi.io to new g.alchemy.com domain. Added database migration to update existing ChainNodes with old Alchemy URLs.
+- Decisions: Migration handles both HTTPS and WSS URL format changes. ethers 5.7.2 compatible with new endpoints (6.x upgrade out of scope)
+- Issues: Review migration carefully - WSS URL transformation is complex (removes .ws. prefix, adds /ws before API key)

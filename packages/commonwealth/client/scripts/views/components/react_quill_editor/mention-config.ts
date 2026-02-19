@@ -1,4 +1,4 @@
-import { MCP_MENTION_SYMBOL } from '@hicommonwealth/shared';
+import { MCP_MENTION_SYMBOL, MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import { SearchScope } from 'models/SearchQuery';
 import { z } from 'zod';
 import { SearchEntityResult } from '../../../../../../../libs/model/src/aggregates/search';
@@ -7,7 +7,7 @@ export const MENTION_CONFIG = {
   MAX_SEARCH_RESULTS: 10,
   MAX_MENTIONS_PER_POST: 5,
   CONTEXT_DATA_DAYS: 30,
-  MIN_SEARCH_LENGTH: 3,
+  MIN_SEARCH_LENGTH,
   SEARCH_DEBOUNCE_MS: 500,
 } as const;
 

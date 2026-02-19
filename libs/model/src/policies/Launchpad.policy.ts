@@ -2,11 +2,7 @@ import { Policy, command, logger } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { RefreshCommunityMemberships } from '../aggregates/community';
-import {
-  CreateToken,
-  LinkGovernanceAddress,
-  ProjectLaunchpadTrade,
-} from '../aggregates/token';
+import { CreateToken, LinkGovernanceAddress } from '../aggregates/token';
 import { models } from '../database';
 import { systemActor } from '../middleware';
 
@@ -74,31 +70,38 @@ export function LaunchpadPolicy(): Policy<typeof inputs> {
         });
       },
       LaunchpadTokenTraded: async ({ payload }) => {
-        const output = await command(ProjectLaunchpadTrade(), {
-          actor: systemActor({}),
-          payload,
+        // derive community_id from token to refresh memberships
+        const token_address = payload.token_address.toLowerCase();
+        const token = await models.LaunchpadToken.findOne({
+          where: { token_address },
+          attributes: ['namespace'],
         });
+        if (!token) return;
+
+        const community = await models.Community.findOne({
+          where: { namespace: token.namespace },
+          attributes: ['id'],
+        });
+        if (!community) return;
 
         // when token associated with a community, refresh token holder memberships
-        if (output?.community_id) {
-          const group_ids = await findTokenHolderGroups(
-            output.community_id,
-            payload.token_address,
-          );
-          if (group_ids.length)
-            await command(RefreshCommunityMemberships(), {
-              actor: systemActor({}),
-              payload: {
-                community_id: output.community_id,
-                group_id: group_ids[0].id,
-                refresh_all: true,
-              },
-            }).catch((err) => {
-              log.error(
-                `Failed to refresh token holder memberships for community ${output.community_id}: ${err}`,
-              );
-            });
-        }
+        const group_ids = await findTokenHolderGroups(
+          community.id,
+          payload.token_address,
+        );
+        if (group_ids.length)
+          await command(RefreshCommunityMemberships(), {
+            actor: systemActor({}),
+            payload: {
+              community_id: community.id,
+              group_id: group_ids[0].id,
+              refresh_all: true,
+            },
+          }).catch((err) => {
+            log.error(
+              `Failed to refresh token holder memberships for community ${community.id}: ${err}`,
+            );
+          });
       },
     },
   };

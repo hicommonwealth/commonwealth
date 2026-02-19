@@ -5,7 +5,6 @@ export enum LocalStorageKeys {
   HasSeenOnboarding = 'has-seen-onboarding',
   HasSeenNotifications = 'has-seen-notifications',
   DarkModeState = 'dark-mode-state',
-  HasMobileAppOnboarded = 'has-mobile-app-onboarded',
 }
 
 export const getLocalStorageItem = (key: LocalStorageKeys) => {
@@ -49,4 +48,44 @@ export const setLocalStorageItem = (
 
 export const removeLocalStorageItem = (key: LocalStorageKeys) => {
   localStorage.removeItem(key);
+};
+
+// Defaults will clear all items in localStorage older than 10 minutes.
+// This only removes items from localStorage; it does not clear in-memory stores.
+export const clearLocalStorage = (
+  prefix = 'cwstore',
+  maxAge: number = 10 * 60 * 1000,
+) => {
+  if (!localStorage) {
+    throw new Error('cannot clear localStorage, not found!');
+  }
+
+  console.log(
+    `Clearing localStorage of items with prefix "${prefix}", older than ${
+      maxAge / (60 * 1000)
+    } minutes...`,
+  );
+  const now = Date.now();
+  let nCleared = 0;
+  const nItems = localStorage.length;
+
+  for (let i = 0; i < nItems; ++i) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(prefix)) {
+      const storageItem: { timestamp: number } = JSON.parse(
+        // @ts-expect-error StrictNullChecks
+        localStorage.getItem(key),
+      );
+      if (now - storageItem.timestamp > maxAge) {
+        localStorage.removeItem(key);
+        nCleared++;
+
+        // decrement loop counter on remove, because the removal changes the length of the map
+        --i;
+      }
+    }
+  }
+  console.log(
+    `Viewed ${nItems} items in localStorage and cleared ${nCleared}.`,
+  );
 };

@@ -1,7 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { discoverKalshiMarkets } from '../../../services/kalshiApi';
-import { discoverPolymarketMarkets } from '../../../services/polymarketApi';
+import { useDiscoverExternalMarketsQuery } from 'state/api/markets';
 import { trpc } from '../../../utils/trpcClient';
 import { Market, MarketFilters } from './types';
 
@@ -10,76 +8,97 @@ export function useMarketData(communityId: string) {
     search: '',
     provider: 'all',
     category: 'all',
+    status: 'all',
+    sortOrder: 'newest',
   });
 
   const trpcUtils = trpc.useUtils();
 
-  // Fetch markets already saved to the community
-  const { data: savedMarkets, isLoading: isLoadingSaved } =
-    trpc.community.getMarkets.useQuery({
-      community_id: communityId,
-    });
+  const { data: savedMarketsData, isLoading: isLoadingSaved } =
+    trpc.community.getMarkets.useInfiniteQuery(
+      {
+        community_id: communityId,
+        limit: 50, // Fetch more to check subscriptions
+      },
+      {
+        enabled: !!communityId,
+        initialCursor: 1,
+        getNextPageParam: (lastPage) => {
+          const nextPageNum = lastPage.page + 1;
+          if (nextPageNum <= lastPage.totalPages) {
+            return nextPageNum;
+          }
+          return undefined;
+        },
+      },
+    );
 
-  // Fetch discovered markets from Kalshi API
-  const { data: discoveredKalshiMarkets, isLoading: isLoadingKalshi } =
-    useQuery<Market[], Error>({
-      queryKey: ['kalshiMarkets', filters],
-      queryFn: () => discoverKalshiMarkets(filters),
-      enabled: filters.provider === 'all' || filters.provider === 'kalshi',
-    });
+  const savedMarkets = savedMarketsData?.pages.flatMap((page) => page.results);
 
-  // Fetch discovered markets from Polymarket API
-  const { data: discoveredPolymarketMarkets, isLoading: isLoadingPolymarket } =
-    useQuery<Market[], Error>({
-      queryKey: ['polymarketMarkets', filters],
-      queryFn: () => discoverPolymarketMarkets(filters),
-      enabled: filters.provider === 'all' || filters.provider === 'polymarket',
-    });
+  const {
+    data: discoveredMarkets,
+    isLoading: isLoadingDiscovered,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useDiscoverExternalMarketsQuery({
+    filters,
+    limit: 20, // Use consistent pagination
+  });
 
-  const discoveredMarkets = useMemo(() => {
-    const kalshiMarkets = discoveredKalshiMarkets || [];
-    const polymarketMarkets = discoveredPolymarketMarkets || [];
-    return [...kalshiMarkets, ...polymarketMarkets];
-  }, [discoveredKalshiMarkets, discoveredPolymarketMarkets]);
+  // Fetch all categories from an unfiltered query (completely independent of current filters)
+  // This ensures all categories remain visible in the dropdown even when filters are applied
+  // We use a separate query key by always using 'all' for category and status, and empty search
+  const { data: allMarketsForCategories } = useDiscoverExternalMarketsQuery({
+    filters: {
+      search: '',
+      provider: filters.provider,
+      category: 'all',
+      status: 'all',
+      sortOrder: 'newest',
+    },
+    limit: 50, // Maximum allowed by schema - should be enough to get most categories
+    enabled: !!communityId, // Only enable if we have a communityId
+  });
 
   const categories = useMemo(() => {
-    const allCategories = discoveredMarkets.map((market) => market.category);
-    return ['all', ...Array.from(new Set(allCategories))];
-  }, [discoveredMarkets]);
+    // Always use the unfiltered categories query - never fall back to filtered discoveredMarkets
+    // This ensures categories don't disappear when a category filter is applied
+    // If allMarketsForCategories hasn't loaded yet, return empty array (will show 'all' only)
+    if (!allMarketsForCategories || allMarketsForCategories.length === 0) {
+      return ['all'];
+    }
+
+    const allCategories = allMarketsForCategories
+      .map((market) => market.category)
+      .filter((cat) => cat && cat.trim() !== ''); // Filter out empty/null categories
+
+    const uniqueCategories = Array.from(new Set(allCategories)).sort();
+    return ['all', ...uniqueCategories];
+  }, [allMarketsForCategories]); // Only depend on allMarketsForCategories, not discoveredMarkets
 
   const savedMarketIds = useMemo(() => {
-    return savedMarkets
+    return savedMarkets && savedMarkets.length > 0
       ? new Set<string>(savedMarkets.map((m) => m.slug))
       : new Set<string>();
   }, [savedMarkets]);
 
-  const filteredDiscoveredMarkets = useMemo(() => {
-    // Client-side filtering if 'tickers' parameter is not sufficient or if 'title' needs to be searched
-    let filtered = discoveredMarkets;
-
-    if (filters.search) {
-      filtered = filtered.filter((market) =>
-        market.question.toLowerCase().includes(filters.search.toLowerCase()),
-      );
-    }
-    if (filters.provider !== 'all') {
-      filtered = filtered.filter(
-        (market) => market.provider === filters.provider,
-      );
-    }
-    if (filters.category !== 'all') {
-      filtered = filtered.filter(
-        (market) => market.category === filters.category,
-      );
-    }
-
-    return filtered;
-  }, [discoveredMarkets, filters]);
-
   const { mutate: subscribeMarket, isPending: isSubscribing } =
-    trpc.community.subscribeMarket.useMutation();
+    trpc.community.subscribeMarket.useMutation({
+      onSuccess: () => {
+        void trpcUtils.community.getMarkets.invalidate({
+          community_id: communityId,
+        });
+      },
+    });
   const { mutate: unsubscribeMarket, isPending: isUnsubscribing } =
-    trpc.community.unsubscribeMarket.useMutation();
+    trpc.community.unsubscribeMarket.useMutation({
+      onSuccess: () => {
+        void trpcUtils.community.getMarkets.invalidate({
+          community_id: communityId,
+        });
+      },
+    });
 
   const onSubscribe = (market: Market) => {
     subscribeMarket({
@@ -91,9 +110,7 @@ export function useMarketData(communityId: string) {
       start_time: market.startTime ?? new Date(), // TODO: make sure we have a start time
       end_time: market.endTime ?? new Date(), // TODO: make sure we have an end time
       status: market.status as 'open',
-    });
-    void trpcUtils.community.getMarkets.invalidate({
-      community_id: communityId,
+      image_url: market.imageUrl,
     });
   };
 
@@ -102,20 +119,20 @@ export function useMarketData(communityId: string) {
       community_id: communityId,
       slug: market.slug,
     });
-    void trpcUtils.community.getMarkets.invalidate({
-      community_id: communityId,
-    });
   };
 
   return {
     filters,
     setFilters,
-    markets: filteredDiscoveredMarkets,
+    markets: discoveredMarkets || [],
     categories,
-    isLoading: isLoadingKalshi || isLoadingSaved || isLoadingPolymarket,
+    isLoading: isLoadingDiscovered || isLoadingSaved,
     savedMarketIds,
     onSubscribe,
     onUnsubscribe,
     isSaving: isSubscribing || isUnsubscribing,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
   };
 }

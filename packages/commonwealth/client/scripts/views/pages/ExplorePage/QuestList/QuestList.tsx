@@ -1,7 +1,6 @@
 import { QuestActionMeta } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import { isQuestActionComplete, QuestAction, XPLog } from 'helpers/quest';
-import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -42,7 +41,6 @@ const QuestList = ({
   hideSearchTag,
 }: QuestListProps) => {
   const navigate = useCommonNavigate();
-  const xpEnabled = useFlag('xp');
   const user = useUserStore();
 
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
@@ -71,7 +69,6 @@ const QuestList = ({
     // dont show system quests in quest lists for communities
     include_system_quests: questsForCommunityId ? false : true,
     include_active_only: filters.activeOnly || false,
-    enabled: xpEnabled,
   });
   // OKX<>Common quest is to be hidden from this display only, it should be
   // visible in other places and user's cab still earn aura for it.
@@ -84,7 +81,7 @@ const QuestList = ({
       user_id: user.id,
       from: moment().startOf('week').toDate(),
       to: moment().endOf('week').toDate(),
-      enabled: user.isLoggedIn && xpEnabled,
+      enabled: user.isLoggedIn,
     });
 
   const handleFetchMoreQuests = () => {
@@ -101,7 +98,7 @@ const QuestList = ({
     navigate('/leaderboard', {}, null);
   };
 
-  if (!xpEnabled || (isLoadingXPProgression && user.isLoggedIn)) return <></>;
+  if (isLoadingXPProgression && user.isLoggedIn) return <></>;
 
   return (
     <div className="QuestList">
@@ -150,11 +147,7 @@ const QuestList = ({
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : quests.length === 0 ? (
-        <div
-          className={clsx('empty-placeholder', {
-            'my-16': xpEnabled,
-          })}
-        >
+        <div className={clsx('empty-placeholder', 'my-16')}>
           <CWText type="h2" className="empty-quests" isCentered>
             No quests yet. Contact your community admin or reach out to the
             Common team to launch a native quest.

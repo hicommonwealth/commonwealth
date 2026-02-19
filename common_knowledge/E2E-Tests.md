@@ -35,15 +35,19 @@ test('Can click on Sign in button', async ({ page: Page }) => {
 
 ## File Structure
 
-E2E tests are housed in the following subdirectories of `/test/E2E`:
+E2E tests are housed in the following subdirectories of `packages/commonwealth/test/e2e`:
 
-- `/E2EStateful`: This relies on the DB to be set up with a dump of the test entities.
+- `/e2eStateful`: Stateful journeys that assume seeded entities and carry multi-step progression.
 
-- `/E2ESerial`: The tests in this suite will be run in serial (Avoids race conditions).
+- `/e2eSerial`: Tests that must run in serial to avoid race conditions.
 
-- `/E2ERegular`: The tests in this suite are set up with a default empty DB (need to make your own test entities) as well as being run in parallel.
+- `/e2eRegular`: Main E2E suite. Includes smoke checks, route matrix checks, security checks, and feature behavior tests.
 
-Corresponding package scripts for running tests may be found in [Package-Scripts.md](../knowledge_base/Package-Scripts.md).
+Additionally:
+- `/mature`: Longer-running maturity scenarios.
+- `/helpers`: Shared fixtures/selectors/auth and navigation helpers.
+
+Corresponding package scripts for running tests are documented in [Package-Scripts.md](./Package-Scripts.md).
 
 At the file level, each testing file should represent one and only one URI route. See for example `discussions.spec.ts`. This file should only ever navigate to `/discussions`.
 
@@ -69,26 +73,36 @@ Local development is preferred over CI development. We should make use of all th
 
 ### Locally
 
-To run E2E tests locally you must first run `E2E-start-server`. When the server is ready, run `test-E2E`.
+To run E2E tests locally:
+1. Start server stack with mocked wallet support:
+   - `pnpm -F commonwealth e2e-start-server`
+2. Run the desired suite:
+   - `pnpm -F commonwealth test-e2e` (regular)
+   - `pnpm -F commonwealth test-e2e-smoke` (smoke-tagged subset)
+   - `pnpm -F commonwealth test-e2e-refactor` (`@refactor` coverage subset)
+   - `pnpm -F commonwealth test-e2e-serial` (serial-only suite)
+   - `pnpm -F commonwealth test-e2e-mature` (mature suite)
+   - `pnpm -F commonwealth test-e2e-stateful` (stateful suite)
 
-- `E2E-start-server`: Starts the server and injects a mocked metamask object. It allows you to have a default
-metamask account without needing to have the metamask extension installed.
-
-- `test-E2E`: Runs playwright on all the tests in the E2E folder.
+CI runs with `--forbid-only`; use the same flag locally when validating PR-readiness.
 
 ### On CI
 
-Because we can't manually check if the server has started, we rely on `wait-server` to wait for the server to be ready before we run the `test-E2E`.
+CI uses `wait-server` to gate test start and runs purpose-specific jobs:
+- smoke + refactor route safety checks in PR lane
+- serial suite in production-server checks
+- mature + serial + stateful suites in the scheduled/manual refactor-hardening workflow
+- visual checks in compare mode, with a separate baseline update workflow
 
 ## Debugging E2E Tests
 
 When E2E tests fail, we record a video of the failed run. These videos can be viewed and navigated via Playwright's [Trace Viewer](https://trace.playwright.dev/).
 
-- If you add `--debug` to the `test-E2E` command, it will open a debug box which will allow you to step through the code line by line, and allow you to test locators to see which elements it will grab. `npx playwright test --debug ...`
+- If you add `--debug` to an E2E command, Playwright opens an interactive debug UI for step-through execution and locator inspection. Example: `pnpm -F commonwealth test-e2e -- --debug`
 
-- Locally: These video is stored in the test-results folder. They are named after the name of the test that failed and produced it.
+- Locally: Videos are stored in the `test-results` folder and named after the failing test.
 
-- CI: These videos are stored in the artifacts. They can be found and downlaoded at the bottom of the summary page.
+- CI: Videos are uploaded as workflow artifacts and can be downloaded from the run summary page.
 
 ## Change Log
 

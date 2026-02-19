@@ -4,9 +4,8 @@ import { useFlag } from 'hooks/useFlag';
 import React, { useRef, useState } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { PageNotFound } from 'views/pages/404';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal';
 import IdeaLaunchpad from '../ExplorePage/IdeaLaunchpad';
 import { TrendingCommunitiesPreview } from '../user_dashboard/TrendingCommunitiesPreview/TrendingCommunitiesPreview';
 import ActiveContestList from './ActiveContestList/ActiveContestList';
@@ -18,7 +17,6 @@ import IOSBanner from './iOSBanner';
 
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const homePageEnabled = useFlag('homePage');
   const mobileDownloadEnabled = useFlag('mobileDownload');
 
   const {
@@ -27,10 +25,6 @@ const HomePage = () => {
   } = useManageCommunityStakeModalStore();
 
   const [selectedCommunityId] = useState<string>();
-
-  if (!homePageEnabled) {
-    return <PageNotFound />;
-  }
 
   return (
     <CWPageLayout ref={containerRef} className="ExplorePageLayout">

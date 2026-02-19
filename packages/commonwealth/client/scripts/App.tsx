@@ -7,16 +7,10 @@ import React, { StrictMode } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
-import { DisableMavaOnMobile } from 'views/components/DisableMavaOnMobile';
-import ForceMobileAuth from 'views/components/ForceMobileAuth';
 import MoonPayProvider from 'views/components/MoonPayProvider';
-import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
-import { ReactNativeLogForwarder } from 'views/components/ReactNativeBridge/ReactNativeLogForwarder';
-import { ReactNativeScrollToTopListener } from 'views/components/ReactNativeBridge/ReactNativeScrollToTopListener';
 import { Splash } from './Splash';
 import { trpc, trpcClient } from './utils/trpcClient';
 import FarcasterFrameProvider from './views/components/FarcasterProvider';
-import OnBoardingWrapperForMobile from './views/pages/OnBoarding/OnBoardingWrapperForMobile';
 
 const App = () => {
   const { isLoading } = useInitApp();
@@ -26,28 +20,16 @@ const App = () => {
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
           <trpc.Provider client={trpcClient} queryClient={queryClient}>
-            <DisableMavaOnMobile />
-            <ReactNativeLogForwarder />
             <FarcasterFrameProvider>
               {/*@ts-expect-error StrictNullChecks*/}
               <OpenFeatureProvider client={undefined}>
                 {isLoading ? (
                   <Splash />
                 ) : (
-                  // Add Those components back in when we are ready to use Privy
-                  // <PrivyMobileAuthenticator>
-                  // <DefaultPrivyProvider>
+                  // Add auth providers back in when we are ready to use Privy.
                   <MoonPayProvider>
-                    <ForceMobileAuth>
-                      <OnBoardingWrapperForMobile>
-                        <ReactNativeBridgeUser />
-                        <ReactNativeScrollToTopListener />
-                        <Router />
-                      </OnBoardingWrapperForMobile>
-                    </ForceMobileAuth>
+                    <Router />
                   </MoonPayProvider>
-                  // </DefaultPrivyProvider>
-                  // </PrivyMobileAuthenticator>
                 )}
                 <ToastContainer />
                 {import.meta.env.DEV && (

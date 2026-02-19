@@ -4,7 +4,6 @@ import {
   CommunityTierMap,
   hasCommunityTierClientInfo,
 } from '@hicommonwealth/shared';
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
@@ -53,8 +52,6 @@ export const CWRelatedCommunityCard = ({
   const navigate = useCommonNavigate();
   const { isAddedToHomeScreen } = useAppStatus();
   const user = useUserStore();
-
-  const trustLevelEnabled = useFlag('trustLevel');
 
   const { stakeEnabled, stakeValue, stakeChange } = useCommunityCardPrice({
     community,
@@ -149,8 +146,7 @@ export const CWRelatedCommunityCard = ({
                 <CWText type="h5" title={community?.name} fontWeight="medium">
                   {community?.name}
                 </CWText>
-                {trustLevelEnabled &&
-                  community?.tier &&
+                {community?.tier &&
                   community.tier !== CommunityTierMap.Unverified &&
                   (() => {
                     const tier = community.tier as CommunityTierMap;

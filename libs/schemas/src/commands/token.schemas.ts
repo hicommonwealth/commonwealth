@@ -26,13 +26,6 @@ export const CreateLaunchpadTrade = {
   output: LaunchpadTradeView.nullish(),
 };
 
-export const ProjectLaunchpadTrade = {
-  input: events.LaunchpadTokenTraded,
-  output: z.object({
-    community_id: z.string().optional(),
-  }),
-};
-
 export const LinkGovernanceAddress = {
   input: events.CommunityNamespaceCreated,
   output: z.object({}),

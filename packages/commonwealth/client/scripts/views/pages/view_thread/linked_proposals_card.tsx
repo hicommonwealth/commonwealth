@@ -9,7 +9,7 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import type Thread from '../../../models/Thread';
-import { ProposalState } from '../../components/NewThreadFormModern/NewThreadForm';
+import { ProposalState } from '../../components/NewThreadForm/types';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';

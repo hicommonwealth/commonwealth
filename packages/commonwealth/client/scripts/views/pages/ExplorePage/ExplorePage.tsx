@@ -13,21 +13,21 @@ import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/ind
 import { useFetchGlobalActivityQuery } from '../../../state/api/feeds/fetchUserActivity';
 import { trpc } from '../../../utils/trpcClient';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal';
 import XPTable from '../Leaderboard/XPTable/XPTable';
 import AllTabContent from './AllTabContent';
 import CommunitiesList from './CommunitiesList';
 import ExploreContestList from './ExploreContestList';
 import './ExplorePage.scss';
 import IdeaLaunchpad from './IdeaLaunchpad';
+import MarketsList from './MarketsList';
 import QuestList from './QuestList';
 import { ThreadFeed } from './ThreadFeed/ThreadFeed';
 import TokensList from './TokensList';
 
 const ExplorePage = () => {
   const containerRef = useRef();
-  const launchpadEnabled = useFlag('launchpad');
-  const questsEnabled = useFlag('xp');
+  const marketsEnabled = useFlag('markets');
   const navigate = useCommonNavigate();
   const [searchParams] = useSearchParams();
   const [searchText, setSearchText] = useState<string>('');
@@ -39,8 +39,9 @@ const ExplorePage = () => {
     { value: 'users', label: 'Users' },
     { value: 'contests', label: 'Contests' },
     { value: 'threads', label: 'Threads' },
-    ...(questsEnabled ? [{ value: 'quests', label: 'Quests' }] : []),
-    ...(launchpadEnabled ? [{ value: 'tokens', label: 'Tokens' }] : []),
+    { value: 'quests', label: 'Quests' },
+    { value: 'tokens', label: 'Tokens' },
+    ...(marketsEnabled ? [{ value: 'markets', label: 'Markets' }] : []),
   ];
 
   // Add state for tracking active tab
@@ -104,24 +105,20 @@ const ExplorePage = () => {
         </div>
 
         {/* Conditionally render content based on active tab */}
-        {launchpadEnabled
-          ? activeTab === 'tokens' && (
-              <TokensList
-                hideHeader
-                searchText={searchText}
-                onClearSearch={() => setSearchText('')}
-              />
-            )
-          : null}
-        {questsEnabled
-          ? activeTab === 'quests' && (
-              <QuestList
-                hideHeader
-                searchText={searchText}
-                onClearSearch={() => setSearchText('')}
-              />
-            )
-          : null}
+        {activeTab === 'tokens' && (
+          <TokensList
+            hideHeader
+            searchText={searchText}
+            onClearSearch={() => setSearchText('')}
+          />
+        )}
+        {activeTab === 'quests' && (
+          <QuestList
+            hideHeader
+            searchText={searchText}
+            onClearSearch={() => setSearchText('')}
+          />
+        )}
         {activeTab === 'contests' && (
           <ExploreContestList
             hideHeader
@@ -146,6 +143,13 @@ const ExplorePage = () => {
               onClearSearch={() => setSearchText('')}
             />
           </div>
+        )}
+        {marketsEnabled && activeTab === 'markets' && (
+          <MarketsList
+            hideHeader
+            searchText={searchText}
+            onClearSearch={() => setSearchText('')}
+          />
         )}
 
         {/* All tab - show all content types */}

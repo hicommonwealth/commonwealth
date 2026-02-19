@@ -1,0 +1,10 @@
+# Playwright test output
+test-results/
+visual-report/
+playwright-report/
+blob-report/
+
+# Canonical linux visual baselines are generated via
+# `.github/workflows/visual-baseline-update.yml` and can be committed
+# with `git add -f`.
+__snapshots__/
