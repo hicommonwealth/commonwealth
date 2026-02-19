@@ -24,7 +24,7 @@ if [ "${#CHANGED_TS_FILES[@]}" -eq 0 ]; then
   exit 0
 fi
 
-STUB_REGEX="(helpers/(constants|formatting|dates|link)|hooks/(useDraft|useBeforeUnload|useWindowResize|useNecessaryEffect|useForceRerender)|utils/trpcClient)"
+STUB_REGEX="(helpers/(constants|formatting|dates|link)|hooks/(useDraft|useBeforeUnload|useWindowResize|useNecessaryEffect|useForceRerender))"
 IMPORT_PREFIX_REGEX="(from|import\\(|require\\()[[:space:]]*['\"][^'\"]*"
 IMPORT_SUFFIX_REGEX="([./'\"]|$)"
 
