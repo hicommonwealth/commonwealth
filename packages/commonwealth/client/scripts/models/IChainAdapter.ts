@@ -1,10 +1,10 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import type { ChainBase } from '@hicommonwealth/shared';
 import type { Coin } from 'adapters/currency';
+import { clearLocalStorage } from 'helpers/localStorage';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import { clearLocalStorage } from 'stores/PersistentStore';
 import { z } from 'zod';
 import { darkModeStore } from '../state/ui/darkMode/darkMode';
 import Account from './Account';

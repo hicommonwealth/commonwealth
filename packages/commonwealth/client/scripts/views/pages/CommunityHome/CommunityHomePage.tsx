@@ -6,7 +6,6 @@ import {
   RATE_LIMIT_MESSAGE,
   RateLimitErrorType,
 } from 'helpers/rateLimit';
-import { useFlag } from 'hooks/useFlag';
 import type { DeltaStatic } from 'quill';
 import React, { useRef, useState } from 'react';
 import app from 'state';
@@ -27,7 +26,7 @@ import {
   createDeltaFromText,
   getTextFromDelta,
 } from 'views/components/react_quill_editor';
-import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal';
 import ActiveContestList from '../HomePage/ActiveContestList/ActiveContestList';
 import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
 import XpQuestList from '../HomePage/XpQuestList/XpQuestList';
@@ -44,7 +43,6 @@ const CommunityHome = () => {
   const user = useUserStore();
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const xpEnabled = useFlag('xp');
   const chain = app.chain.meta.id;
 
   const communityId = app.activeChainId() || '';
@@ -163,7 +161,7 @@ const CommunityHome = () => {
           />
           <ActiveContestList isCommunityHomePage />
           {communityToken && <CommunityTransactions />}
-          {xpEnabled && <XpQuestList communityIdFilter={chain} />}
+          <XpQuestList communityIdFilter={chain} />
           <CWModal
             size="small"
             content={

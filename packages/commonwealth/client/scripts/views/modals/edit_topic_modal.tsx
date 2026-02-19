@@ -44,7 +44,6 @@ export const EditTopicModal = ({
   onModalClose,
   noRedirect,
 }: EditTopicModalProps) => {
-  const privateTopicsEnabled = useFlag('privateTopics');
   const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
   const {
@@ -333,15 +332,13 @@ export const EditTopicModal = ({
             disabled={!!topic.archived_at}
           />
         )}
-        {privateTopicsEnabled && (
-          <CWCheckbox
-            label="Private topic"
-            checked={isPrivate}
-            onChange={() => setIsPrivate(!isPrivate)}
-            disabled={!!topic.archived_at}
-          />
-        )}
-        {privateTopicsEnabled && isPrivate && (
+        <CWCheckbox
+          label="Private topic"
+          checked={isPrivate}
+          onChange={() => setIsPrivate(!isPrivate)}
+          disabled={!!topic.archived_at}
+        />
+        {isPrivate && (
           <CWSelectList
             isMulti
             label="Allowed groups"

@@ -191,3 +191,11 @@ Each AI run should append an entry with:
 - Changes: Added clickable external links to provider pills on both admin MarketCard and MarketsAppPage. Users can navigate to Polymarket/Kalshi pages.
 - Decisions: URL format: Polymarket `/event/{slug}`, Kalshi `/markets/{base_ticker}/{title_slug}/{full_ticker}` (extracts base ticker, slugifies title)
 - Issues: None
+
+---
+
+[2026-01-23] #13307 chore: migrate Alchemy endpoints from alchemyapi.io to g.alchemy.com
+- Files: libs/model/src/tester/seedDb.ts, libs/model/migrations/20260123111500-migrate-alchemy-endpoints.js
+- Changes: Updated test seed database URLs from deprecated alchemyapi.io to new g.alchemy.com domain. Added database migration to update existing ChainNodes with old Alchemy URLs.
+- Decisions: Migration handles both HTTPS and WSS URL format changes. ethers 5.7.2 compatible with new endpoints (6.x upgrade out of scope)
+- Issues: Review migration carefully - WSS URL transformation is complex (removes .ws. prefix, adds /ws before API key)

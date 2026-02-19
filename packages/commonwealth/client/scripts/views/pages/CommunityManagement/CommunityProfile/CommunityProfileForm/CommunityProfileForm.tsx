@@ -2,7 +2,6 @@ import { DefaultPage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
-import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useCallback, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
@@ -61,8 +60,6 @@ const CommunityProfileForm = () => {
       error: string;
     }[]
   >([]);
-
-  const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isCommunityLoading } =
@@ -431,23 +428,21 @@ const CommunityProfileForm = () => {
             />
           </section>
 
-          {aiCommentsFeatureEnabled && (
-            <section className="ai-features-section">
-              <div className="header">
-                <CWText type="h4">Enable AI Features</CWText>
-                <div className="controls">
-                  <CWText type="b1">
-                    Control AI functionality for your community. When disabled,
-                    AI features like smart replies, comment suggestions and AI
-                    assistants will be hidden from all community members,
-                    regardless of their personal settings.
-                  </CWText>
+          <section className="ai-features-section">
+            <div className="header">
+              <CWText type="h4">Enable AI Features</CWText>
+              <div className="controls">
+                <CWText type="b1">
+                  Control AI functionality for your community. When disabled, AI
+                  features like smart replies, comment suggestions and AI
+                  assistants will be hidden from all community members,
+                  regardless of their personal settings.
+                </CWText>
 
-                  <CWToggle name="aiFeaturesEnabled" hookToForm size="large" />
-                </div>
+                <CWToggle name="aiFeaturesEnabled" hookToForm size="large" />
               </div>
-            </section>
-          )}
+            </div>
+          </section>
 
           <section className="default-page-section">
             <div className="header">

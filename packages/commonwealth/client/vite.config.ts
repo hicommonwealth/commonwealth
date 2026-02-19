@@ -27,37 +27,20 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_MOBILE_DOWNLOAD': JSON.stringify(
       env.FLAG_MOBILE_DOWNLOAD,
     ),
-    'process.env.FLAG_NEW_EDITOR': JSON.stringify(env.FLAG_NEW_EDITOR),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
-    'process.env.FLAG_LAUNCHPAD': JSON.stringify(env.FLAG_LAUNCHPAD),
-    'process.env.FLAG_NEW_CONTEST_PAGE': JSON.stringify(
-      env.FLAG_NEW_CONTEST_PAGE,
-    ),
-    'process.env.FLAG_REFERRALS': JSON.stringify(env.FLAG_REFERRALS),
     'process.env.FLAG_ONCHAIN_REFERRALS': JSON.stringify(
       env.FLAG_ONCHAIN_REFERRALS,
     ),
-    'process.env.FLAG_REWARDS_PAGE': JSON.stringify(env.FLAG_REWARDS_PAGE),
-    'process.env.FLAG_NEW_MOBILE_NAV': JSON.stringify(env.FLAG_NEW_MOBILE_NAV),
-    'process.env.FLAG_XP': JSON.stringify(env.FLAG_XP),
-    'process.env.FLAG_HOMEPAGE': JSON.stringify(env.FLAG_HOMEPAGE),
-    'process.env.FLAG_AI_COMMENTS': JSON.stringify(env.FLAG_AI_COMMENTS),
     'process.env.FLAG_NEW_GOVERNANCE_PAGE': JSON.stringify(
       env.FLAG_NEW_GOVERNANCE_PAGE,
     ),
-    'process.env.FLAG_PRIVY': JSON.stringify(env.FLAG_PRIVY),
     'process.env.FLAG_JUDGE_CONTEST': JSON.stringify(env.FLAG_JUDGE_CONTEST),
     'process.env.FLAG_TOKENIZED_THREADS': JSON.stringify(
       env.FLAG_TOKENIZED_THREADS,
     ),
-    'process.env.FLAG_TRUST_LEVEL': JSON.stringify(env.FLAG_TRUST_LEVEL),
-    'process.env.FLAG_PARTNERSHIP_WALLET': JSON.stringify(
-      env.FLAG_PARTNERSHIP_WALLET,
-    ),
     'process.env.FLAG_NEW_PROFILE_PAGE': JSON.stringify(
       env.FLAG_NEW_PROFILE_PAGE,
     ),
-    'process.env.FLAG_PRIVATE_TOPICS': JSON.stringify(env.FLAG_PRIVATE_TOPICS),
     'process.env.FLAG_CRECIMIENTO_HACKATHON': JSON.stringify(
       env.FLAG_CRECIMIENTO_HACKATHON,
     ),
@@ -67,11 +50,9 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_MCP_INTEGRATIONS_ENABLED': JSON.stringify(
       env.FLAG_MCP_INTEGRATIONS_ENABLED,
     ),
-    'process.env.FLAG_GATE_WALLET': JSON.stringify(env.FLAG_GATE_WALLET),
     'process.env.FLAG_BINANCE_WEB': JSON.stringify(env.FLAG_BINANCE_WEB),
-    'process.env.FLAG_MOONPAY_FUNDS': JSON.stringify(env.FLAG_MOONPAY_FUNDS),
-    'process.env.FLAG_CLAIMS': JSON.stringify(env.FLAG_CLAIMS),
     'process.env.FLAG_MARKETS': JSON.stringify(env.FLAG_MARKETS),
+    'process.env.FLAG_FUTARCHY': JSON.stringify(env.FLAG_FUTARCHY),
   };
 
   return {
@@ -98,7 +79,6 @@ export default defineConfig(({ mode }) => {
         '@atomone/govgen-types-long/govgen/gov/v1beta1/query',
         'react-virtuoso',
         'bn.js',
-        'commonwealth-mdxeditor',
         'quill-magic-url',
         'react-beautiful-dnd',
         'react-quill',

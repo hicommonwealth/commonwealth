@@ -1,0 +1,4 @@
+# Playwright test output (videos, traces, screenshots on failure)
+test-results/
+playwright-report/
+blob-report/

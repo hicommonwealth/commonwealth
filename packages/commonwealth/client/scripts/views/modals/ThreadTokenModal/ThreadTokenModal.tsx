@@ -6,7 +6,7 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
-import { ThreadTokenWidget } from '../../components/NewThreadFormLegacy/ToketWidget';
+import { ThreadTokenWidget } from '../../components/NewThreadForm/ToketWidget';
 import './ThreadTokenModal.scss';
 
 import { ChainNode, Community } from '@hicommonwealth/schemas';

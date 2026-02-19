@@ -31,8 +31,6 @@ const ProfileActivity = ({
   communities,
 }: ProfileActivityProps) => {
   const newProfilePageEnabled = useFlag('newProfilePage');
-  const xpEnabled = useFlag('xp');
-
   const [selectedActivity, setSelectedActivity] = useState(
     ProfileActivityType.Comments,
   );
@@ -67,15 +65,13 @@ const ProfileActivity = ({
             }}
             isSelected={selectedActivity === ProfileActivityType.MyTokens}
           />
-          {xpEnabled && (
-            <CWTab
-              label="Aura"
-              onClick={() => {
-                setSelectedActivity(ProfileActivityType.Aura);
-              }}
-              isSelected={selectedActivity === ProfileActivityType.Aura}
-            />
-          )}
+          <CWTab
+            label="Aura"
+            onClick={() => {
+              setSelectedActivity(ProfileActivityType.Aura);
+            }}
+            isSelected={selectedActivity === ProfileActivityType.Aura}
+          />
           {newProfilePageEnabled && (
             <CWTab
               label={

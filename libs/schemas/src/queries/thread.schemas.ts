@@ -1,4 +1,4 @@
-import { LinkSource } from '@hicommonwealth/shared';
+import { LinkSource, MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
 import { AuthContext, ThreadContext, VerifiedContext } from '../context';
 import {
@@ -318,7 +318,7 @@ export const GetActiveThreads = {
 export const SearchThreads = {
   input: PaginationParamsSchema.extend({
     community_id: z.string(),
-    search_term: z.string(),
+    search_term: z.string().min(MIN_SEARCH_LENGTH),
     thread_title_only: z.coerce.boolean().default(false),
     include_count: z.coerce.boolean().default(false),
     order_by: z

@@ -1,4 +1,3 @@
-import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import { useGetClaimAddressQuery } from 'state/api/tokenAllocations';
 import useUserStore from 'state/ui/user';
@@ -17,13 +16,8 @@ const AirdropClaims = ({ onConnectNewAddress }: AirdropClaimsProps) => {
   const user = useUserStore();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const claimsEnabled = useFlag('claims');
   const { data: claimAddresses, isLoading: isLoadingClaimAddresses } =
-    useGetClaimAddressQuery({ enabled: claimsEnabled && user.isLoggedIn });
-
-  if (!claimsEnabled) {
-    return <></>;
-  }
+    useGetClaimAddressQuery({ enabled: user.isLoggedIn });
 
   if (!user.isLoggedIn) {
     return (

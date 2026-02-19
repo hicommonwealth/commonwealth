@@ -16,6 +16,7 @@ export * from './mcp.schemas';
 export * from './notification.schemas';
 export * from './pinned-token.schemas';
 export * from './poll.schemas';
+export * from './prediction-market.schemas';
 export * from './quest.schemas';
 export * from './reaction.schemas';
 export * from './referral.schemas';

@@ -1,9 +1,12 @@
 import { VoteGovernanceAbi } from '@commonxyz/common-governance-abis';
 import {
+  BinaryVaultAbi,
   CommunityNominationsAbi,
   CommunityStakeAbi,
   ContestGovernorAbi,
   ContestGovernorSingleAbi,
+  FutarchyGovernorAbi,
+  FutarchyRouterAbi,
   LPBondingCurveAbi,
   NamespaceFactoryAbi,
   ReferralFeeManagerAbi,
@@ -346,6 +349,145 @@ const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
   };
 };
 
+const predictionMarketTokensMintedMapper: EvmMapper<
+  'PredictionMarketTokensMinted'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: BinaryVaultAbi,
+    eventName: 'TokensMinted',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketTokensMinted',
+    event_payload: {
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      trader_address: decoded.args.to,
+      collateral_amount: decoded.args.amount,
+      p_token_amount: decoded.args.amount,
+      f_token_amount: decoded.args.amount,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
+const predictionMarketTokensMergedMapper: EvmMapper<
+  'PredictionMarketTokensMerged'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: BinaryVaultAbi,
+    eventName: 'TokensMerged',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketTokensMerged',
+    event_payload: {
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      trader_address: decoded.args.from,
+      collateral_amount: decoded.args.amount,
+      p_token_amount: decoded.args.amount,
+      f_token_amount: decoded.args.amount,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
+const predictionMarketSwapExecutedMapper: EvmMapper<
+  'PredictionMarketSwapExecuted'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: FutarchyRouterAbi,
+    eventName: 'SwapExecuted',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketSwapExecuted',
+    event_payload: {
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      trader_address: decoded.args.user,
+      buy_pass: decoded.args.buyPass,
+      amount_in: decoded.args.amountIn,
+      amount_out: decoded.args.amountOut,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
+const predictionMarketTokensRedeemedMapper: EvmMapper<
+  'PredictionMarketTokensRedeemed'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: BinaryVaultAbi,
+    eventName: 'TokensRedeemed',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketTokensRedeemed',
+    event_payload: {
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      trader_address: decoded.args.to,
+      collateral_amount: decoded.args.amount,
+      p_token_amount: decoded.args.outcome === 1 ? decoded.args.amount : 0n,
+      f_token_amount: decoded.args.outcome === 2 ? decoded.args.amount : 0n,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
+const predictionMarketProposalResolvedMapper: EvmMapper<
+  'PredictionMarketProposalResolved'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: FutarchyGovernorAbi,
+    eventName: 'ProposalResolved',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketProposalResolved',
+    event_payload: {
+      proposal_id: decoded.args.proposalId,
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      winner: decoded.args.winner,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
+const predictionMarketMarketResolvedMapper: EvmMapper<
+  'PredictionMarketMarketResolved'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: BinaryVaultAbi,
+    eventName: 'MarketResolved',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketMarketResolved',
+    event_payload: {
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      winner: decoded.args.winner,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
 const communityNamespaceCreatedMapper: EvmMapper<
   'CommunityNamespaceCreated'
 > = (event: EvmEvent) => {
@@ -490,6 +632,20 @@ export const chainEventMappers: Record<string, EvmMapper<OutboxEvents>> = {
     recurringContestVoteMapper,
   [EvmEventSignatures.Contests.SingleContestVoterVoted]:
     singleContestVoteMapper,
+
+  // Prediction Markets
+  [EvmEventSignatures.PredictionMarket.TokensMinted]:
+    predictionMarketTokensMintedMapper,
+  [EvmEventSignatures.PredictionMarket.TokensMerged]:
+    predictionMarketTokensMergedMapper,
+  [EvmEventSignatures.PredictionMarket.SwapExecuted]:
+    predictionMarketSwapExecutedMapper,
+  [EvmEventSignatures.PredictionMarket.TokensRedeemed]:
+    predictionMarketTokensRedeemedMapper,
+  [EvmEventSignatures.PredictionMarket.ProposalResolved]:
+    predictionMarketProposalResolvedMapper,
+  [EvmEventSignatures.PredictionMarket.MarketResolved]:
+    predictionMarketMarketResolvedMapper,
 
   // TokenCommunityManager
   [EvmEventSignatures.TokenCommunityManager.CommunityNamespaceCreated]:

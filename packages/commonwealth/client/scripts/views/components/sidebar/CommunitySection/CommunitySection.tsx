@@ -5,7 +5,6 @@ import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import { PageNotFound } from 'client/scripts/views/pages/404';
 import { findDenominationString } from 'helpers/findDenomination';
-import { useFlag } from 'hooks/useFlag';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
@@ -19,7 +18,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sidebar/helpers';
 import { SubscriptionButton } from 'views/components/subscription_button';
-import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
@@ -48,7 +47,6 @@ export const CommunitySection = ({
   showSkeleton,
   isInsideCommunity,
 }: CommunitySectionProps) => {
-  const launchpadEnabled = useFlag('launchpad');
   const [profile, setProfile] = useState<NewProfile>();
   const [errorCode, setErrorCode] = useState<ProfileError>(ProfileError.None);
 
@@ -167,7 +165,7 @@ export const CommunitySection = ({
           </>
         )}
 
-        {launchpadEnabled && <TokenTradeWidget />}
+        <TokenTradeWidget />
 
         <CWDivider />
         <DiscussionSection

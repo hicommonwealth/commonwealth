@@ -150,8 +150,8 @@ export const factoryContracts: FactoryContractsType = {
     ReferralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
     // veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
     CommunityNominations: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
-    TokenLaunchpad: '0x1fB82e534F0E81527970BFA3096ED1b728922ff8',
-    TokenBondingCurve: '0x3b3A346A679fd721710D778551766A71482926dd',
+    TokenLaunchpad: '0x57299785Beae152185d13e6CC331315e2D71A2FD',
+    TokenBondingCurve: '0xdB4920FBDB879171D2A71fCbb1f7c9F8Fc59fa2e',
     chainId: 31337,
   },
   [ValidChains.Soneium]: {
