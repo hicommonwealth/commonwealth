@@ -93,7 +93,9 @@ export const factoryContracts: FactoryContractsType = {
     CommunityNominations: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
     TokenLaunchpad: '0x1fB82e534F0E81527970BFA3096ED1b728922ff8',
     TokenBondingCurve: '0x3b3A346A679fd721710D778551766A71482926dd',
-    FutarchyGovernor: '0xc87d40D41CC4b9f945e6B09e35b836Af04b86285',
+    BinaryVault: '0xb3608fCB7Fa532aDC3cc10A66aF630A30cdB5E29',
+    FutarchyRouter: '0x7074A056B3ff6eCFBCc2F390a752cd0B00bAe53e',
+    FutarchyGovernor: '0x158F43491Ea75081752Dec4b906ECb3708250AdE',
     chainId: 84532,
   },
   [ValidChains.Blast]: {
