@@ -1,11 +1,12 @@
 import { slugify } from '@hicommonwealth/shared';
-import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { getProposalUrlPath } from 'identifiers';
 import _ from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
+import useForceRerender from 'shared/hooks/useForceRerender';
+import useManageDocumentTitle from 'shared/hooks/useManageDocumentTitle';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
 import app from 'state';
 import { usePoolParamsQuery } from 'state/api/chainParams';
 import {
@@ -17,7 +18,6 @@ import {
 } from 'state/api/proposals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import type { AnyProposal } from '../../../models/types';
 import CWAccordView from '../../components/component_kit/CWAccordView/CWAccordView';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';

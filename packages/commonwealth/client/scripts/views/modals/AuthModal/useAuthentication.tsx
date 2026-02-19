@@ -38,6 +38,8 @@ import _ from 'lodash';
 import { Magic } from 'magic-sdk';
 import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import app, { initAppState } from 'state';
 import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
 import { fetchNodes } from 'state/api/nodes';
@@ -55,8 +57,6 @@ import {
 } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import { getAddressFromWallet } from '../../../helpers/wallet';
-import useAppStatus from '../../../hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 import { openConfirmation } from '../confirmation_modal';

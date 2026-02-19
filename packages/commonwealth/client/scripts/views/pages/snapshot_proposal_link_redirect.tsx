@@ -1,6 +1,6 @@
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
 import { getSnapshotProposalQuery } from 'state/api/snapshots';
 import { LoadingIndicator } from '../components/LoadingIndicator/LoadingIndicator';
 import { PageNotFound } from './404';

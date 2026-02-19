@@ -5,7 +5,7 @@ const { mockUseBrowserWindow } = vi.hoisted(() => ({
   mockUseBrowserWindow: vi.fn(),
 }));
 
-vi.mock('hooks/useBrowserWindow', () => ({
+vi.mock('shared/hooks/useBrowserWindow', () => ({
   default: mockUseBrowserWindow,
 }));
 

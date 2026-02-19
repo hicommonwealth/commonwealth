@@ -1,7 +1,7 @@
 import { ValidChains } from '@hicommonwealth/evm-protocols';
-import useNecessaryEffect from 'client/scripts/hooks/useNecessaryEffect';
 import { Magic } from 'magic-sdk';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { getMagicForChain } from 'utils/magicNetworkUtils';
 import Web3 from 'web3';

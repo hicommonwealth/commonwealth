@@ -1,9 +1,9 @@
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import Permissions from 'client/scripts/utils/Permissions';
 import { notifySuccess } from 'controllers/app/notifications';
 import AddressInfo from 'models/AddressInfo';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
+import { useFlag } from 'shared/hooks/useFlag';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';

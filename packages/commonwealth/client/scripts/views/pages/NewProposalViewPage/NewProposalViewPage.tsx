@@ -3,14 +3,14 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'client/scripts/helpers/snapshot_utils';
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
-import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
+import useForceRerender from 'shared/hooks/useForceRerender';
+import useManageDocumentTitle from 'shared/hooks/useManageDocumentTitle';
 import app from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import { LoadingIndicator } from '../../components/LoadingIndicator/LoadingIndicator';
 import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
 import CWAccordView from '../../components/component_kit/CWAccordView/CWAccordView';

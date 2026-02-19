@@ -4,14 +4,14 @@ import {
   PRODUCTION_DOMAIN,
   UserFriendlyActionMap,
 } from '@hicommonwealth/shared';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
 } from '../../../../../../shared/analytics/types';
-import useAppStatus from '../../../../hooks/useAppStatus';
 import CWBanner from '../new_designs/CWBanner';
 import { CWTag } from '../new_designs/CWTag';
 import './CWGatedTopicBanner.scss';

@@ -18,8 +18,8 @@ import {
   doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { ZodError } from 'zod';
 import './QuestActionSubForm.scss';
 import {

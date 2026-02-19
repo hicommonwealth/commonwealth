@@ -1,5 +1,5 @@
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import React, { useState } from 'react';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import useGrowlStore from 'state/ui/growl';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWGrowl } from 'views/components/component_kit/cw_growl';

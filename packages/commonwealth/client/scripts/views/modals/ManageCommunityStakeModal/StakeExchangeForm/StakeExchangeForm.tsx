@@ -2,13 +2,14 @@ import { calculateVoteWeight, STAKE_ID } from '@hicommonwealth/evm-protocols';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityStakeEvent,
 } from 'shared/analytics/types';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import app from 'state';
 import {
   useBuyStakeMutation,
@@ -33,7 +34,6 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
-import useAppStatus from '../../../../hooks/useAppStatus';
 import { trpc } from '../../../../utils/trpcClient';
 import useAuthentication from '../../../modals/AuthModal/useAuthentication';
 import { useStakeExchange } from '../hooks';

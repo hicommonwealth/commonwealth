@@ -1,8 +1,8 @@
-import useAppStatus from 'hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { MixpanelCommunityCreationEvent } from 'shared/analytics/types';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import './LaunchToken.scss';
 import QuickTokenLaunchForm from './QuickTokenLaunchForm';

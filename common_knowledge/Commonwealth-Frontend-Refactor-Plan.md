@@ -29,7 +29,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [~] 2.3 Migrate shared reusable hooks to shared/hooks/ — audited 17-hook move to `client/scripts/shared/hooks/*` + legacy `client/scripts/hooks/*` re-export stubs in progress via issue #13413
 - [~] 2.4 Migrate shared utility helpers to shared/utils/ — shared helper/util module set migrated to `client/scripts/shared/utils/*` with legacy compatibility stubs in progress via issue #13414
 - [~] 2.5 Migrate trpcClient to shared/api/ — source moved to `client/scripts/shared/api/trpcClient.ts` with legacy `utils/trpcClient.ts` compatibility re-export in progress via issue #13415
-- [ ] 2.6 Update consumer imports for shared hooks
+- [~] 2.6 Update consumer imports for shared hooks — consumer callsites rewired from legacy `hooks/*` paths to `shared/hooks/*` for migrated EPIC-2.3 hooks in progress via issue #13416
 - [ ] 2.7 Update consumer imports for shared utils (batch 1)
 - [ ] 2.8 Update consumer imports for shared utils (batch 2)
 - [~] 2.9 Write unit tests for extracted shared utils (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline contract suite added under `test/unit/epic2`; extend post-move assertions as modules relocate

@@ -1,10 +1,10 @@
 import clsx from 'clsx';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { RangeStatic } from 'quill';
 import MagicUrl from 'quill-magic-url';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import ReactQuill, { Quill } from 'react-quill';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import type { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
 import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';

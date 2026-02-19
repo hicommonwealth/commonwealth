@@ -1,8 +1,8 @@
 import { WalletId } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import useUserStore from 'state/ui/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import {

@@ -1,6 +1,5 @@
 import { DEFAULT_NAME, MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'helpers/constants';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -10,6 +9,8 @@ import {
   MixpanelPageViewEvent,
   MixpanelPageViewEventPayload,
 } from 'shared/analytics/types';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import app from 'state';
 import {
   useGetCommunityByIdQuery,
@@ -34,7 +35,6 @@ import {
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import useAppStatus from '../../../../hooks/useAppStatus';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import LeaderboardSection from './LeaderboardSection';

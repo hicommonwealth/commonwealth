@@ -1,6 +1,7 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import React, { useEffect, useState } from 'react';
+import useManageDocumentTitle from 'shared/hooks/useManageDocumentTitle';
 import app from 'state';
 import {
   useDepositParamsQuery,
@@ -15,7 +16,6 @@ import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndic
 import { ProposalCard } from 'views/components/ProposalCard';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
-import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
 import { CardsCollection } from '../components/cards_collection';
 import { CWText } from '../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';

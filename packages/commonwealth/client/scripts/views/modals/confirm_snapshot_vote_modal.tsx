@@ -3,11 +3,11 @@ import React from 'react';
 import { formatBigNumberShort } from 'adapters/currency';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import useUserStore from 'state/ui/user';
 import { notifyError } from '../../controllers/app/notifications';
 import { castVote } from '../../helpers/snapshot_utils';
-import useAppStatus from '../../hooks/useAppStatus';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {

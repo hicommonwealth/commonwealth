@@ -1,6 +1,6 @@
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 
 const useWindowResize = ({ setMenu }) => {
   const [resizing, setResizing] = useState(false);

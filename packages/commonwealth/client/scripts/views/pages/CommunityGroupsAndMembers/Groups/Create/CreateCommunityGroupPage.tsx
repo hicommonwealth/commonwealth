@@ -1,15 +1,15 @@
 import { buildCreateGroupInput } from 'client/scripts/state/api/groups/createGroup';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import app from 'state';
 import { useCreateGroupMutation } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
-import useAppStatus from '../../../../../hooks/useAppStatus';
 import { PageNotFound } from '../../../404';
 import { GroupForm } from '../common/GroupForm';
 import { makeGroupDataBaseAPIPayload } from '../common/helpers';

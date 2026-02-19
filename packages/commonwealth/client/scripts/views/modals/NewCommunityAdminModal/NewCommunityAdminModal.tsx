@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 import { formatAddressShort } from 'helpers';
 import _ from 'lodash';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -17,8 +19,6 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from '../../../../../shared/analytics/types';
-import useAppStatus from '../../../hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import './NewCommunityAdminModal.scss';
 
 interface NewCommunityAdminModalProps {

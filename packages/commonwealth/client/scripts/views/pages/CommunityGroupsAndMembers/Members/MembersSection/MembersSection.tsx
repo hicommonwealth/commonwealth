@@ -1,8 +1,8 @@
 import { Role, WalletId } from '@hicommonwealth/shared';
-import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import { formatAddressShort } from 'helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { Avatar } from 'views/components/Avatar';

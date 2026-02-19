@@ -11,8 +11,6 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'client/scripts/helpers/snapshot_utils';
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
-import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
@@ -22,8 +20,6 @@ import {
 import { weightedVotingValueToLabel } from 'helpers';
 import { isRateLimitError, RATE_LIMIT_MESSAGE } from 'helpers/rateLimit';
 import { detectURL } from 'helpers/threads';
-import useAppStatus from 'hooks/useAppStatus';
-import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
@@ -37,6 +33,10 @@ import React, {
   useState,
 } from 'react';
 import { useLocation } from 'react-router-dom';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
+import { useFlag } from 'shared/hooks/useFlag';
+import useForceRerender from 'shared/hooks/useForceRerender';
 import app from 'state';
 import { useAiCompletion } from 'state/api/ai';
 import {

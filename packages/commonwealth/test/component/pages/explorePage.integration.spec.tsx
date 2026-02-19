@@ -18,7 +18,7 @@ const {
   useFetchTokenUsdRateQueryMock: vi.fn(),
 }));
 
-vi.mock('hooks/useFlag', () => ({
+vi.mock('shared/hooks/useFlag', () => ({
   useFlag: useFlagMock,
 }));
 

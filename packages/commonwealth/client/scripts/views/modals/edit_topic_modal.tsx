@@ -19,11 +19,11 @@ import {
 import { openConfirmation } from './confirmation_modal';
 
 import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
+import { useFlag } from 'shared/hooks/useFlag';
 import useFetchGroupsQuery from 'state/api/groups/fetchGroups';
 import { useGroupTopicUpdater } from 'state/api/groups/useGroupTopicUpdater';
 import useGetTopicByIdQuery from 'state/api/topics/getTopicById';

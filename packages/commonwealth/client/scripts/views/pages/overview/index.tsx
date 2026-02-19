@@ -1,6 +1,5 @@
 import { generateTopicIdentifiersFromUrl } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
-import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import useTopicGating from 'client/scripts/hooks/useTopicGating';
 import { ThreadFeaturedFilterTypes } from 'client/scripts/models/types';
 import useGetActiveThreadsQuery from 'client/scripts/state/api/threads/getActiveThreads';
@@ -8,6 +7,7 @@ import useUserStore from 'client/scripts/state/ui/user';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import app from 'state';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTable } from '../../components/component_kit/new_designs/CWTable';

@@ -5,6 +5,8 @@ import withRouter, { useCommonNavigate } from 'navigation/helpers';
 import React, { ReactNode, Suspense, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
 import app from 'state';
 import { useSelectCommunityMutation } from 'state/api/communities/selectCommunity';
 import {
@@ -18,8 +20,6 @@ import { MobileScrollBuffer } from 'views/components/MobileNavigation/MobileScro
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { z } from 'zod';
-import useAppStatus from '../hooks/useAppStatus';
-import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import { useGetCommunityByIdQuery } from '../state/api/communities';
 import { useUpdateUserMutation } from '../state/api/user';
 import CWLayoutBanner from './CWLayoutBanner/CWLayoutBanner';

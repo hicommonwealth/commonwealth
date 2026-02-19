@@ -8,10 +8,11 @@ import {
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import app from 'state';
 import {
   useDepositParamsQuery,
@@ -23,7 +24,6 @@ import {
   minimalToNaturalDenom,
   naturalDenomToMinimal,
 } from '../../../../../shared/utils';
-import useAppStatus from '../../../hooks/useAppStatus';
 import { Skeleton } from '../../components/Skeleton';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';

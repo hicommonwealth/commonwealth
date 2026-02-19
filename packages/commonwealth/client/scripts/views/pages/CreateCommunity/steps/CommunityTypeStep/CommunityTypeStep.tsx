@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import AddressInfo from 'models/AddressInfo';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCommunitySelector, {
   SelectedCommunity,
@@ -12,13 +13,12 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from '../../../../../../../shared/analytics/types';
-import { useBrowserAnalyticsTrack } from '../../../../../hooks/useBrowserAnalyticsTrack';
 import { communityTypeOptions } from './helpers';
 
 import { ChainBase } from '@hicommonwealth/shared';
+import useAppStatus from 'shared/hooks/useAppStatus';
 import useUserStore from 'state/ui/user';
 import { AuthModal } from 'views/modals/AuthModal';
-import useAppStatus from '../../../../../hooks/useAppStatus';
 import './CommunityTypeStep.scss';
 
 interface CommunityTypeStepProps {

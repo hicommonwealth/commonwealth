@@ -1,6 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { CosmosProposal } from 'client/scripts/controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import app from 'client/scripts/state';
 import {
@@ -8,6 +7,7 @@ import {
   useCompletedCosmosProposalsQuery,
 } from 'client/scripts/state/api/proposals';
 import React, { useEffect, useState } from 'react';
+import { useFlag } from 'shared/hooks/useFlag';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
 import { LoadingIndicator } from '../../components/LoadingIndicator/LoadingIndicator';
 import { PageNotFound } from '../404';

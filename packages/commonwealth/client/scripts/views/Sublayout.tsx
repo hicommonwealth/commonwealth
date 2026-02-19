@@ -1,16 +1,16 @@
 import clsx from 'clsx';
-import useBrowserWindow from 'hooks/useBrowserWindow';
-import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
 import { matchRoutes, useLocation, useSearchParams } from 'react-router-dom';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
+import { useFlag } from 'shared/hooks/useFlag';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
+import useStickyHeader from 'shared/hooks/useStickyHeader';
+import useWindowResize from 'shared/hooks/useWindowResize';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import { useFlag } from '../hooks/useFlag';
 import { useHandleInviteLink } from '../hooks/useHandleInviteLink';
-import useNecessaryEffect from '../hooks/useNecessaryEffect';
-import useStickyHeader from '../hooks/useStickyHeader';
 import {
   useAuthModalStore,
   useInviteLinkModal,

@@ -7,9 +7,10 @@ import {
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { z } from 'zod';
@@ -17,7 +18,6 @@ import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
 } from '../../../../../../../shared/analytics/types';
-import useAppStatus from '../../../../../hooks/useAppStatus';
 import { useCommunityCardPrice } from '../../../../../hooks/useCommunityCardPrice';
 import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';

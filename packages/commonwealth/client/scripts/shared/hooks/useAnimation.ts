@@ -1,5 +1,5 @@
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useState } from 'react';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
 
 interface useAnimationProps {
   transitionDuration?: string;

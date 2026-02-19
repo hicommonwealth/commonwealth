@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 
 import './ProfileActivity.scss';
 
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import type Comment from 'models/Comment';
 import type Thread from 'models/Thread';
 import type { IUniqueId } from 'models/interfaces';
+import { useFlag } from 'shared/hooks/useFlag';
 import type { UserCommunities } from 'state/ui/user/user';
 import { CWTab, CWTabsRow } from '../../component_kit/new_designs/CWTabs';
 import ProfileActivityContent, {

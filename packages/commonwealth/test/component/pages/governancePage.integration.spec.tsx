@@ -31,7 +31,7 @@ const {
   },
 }));
 
-vi.mock('client/scripts/hooks/useFlag', () => ({
+vi.mock('shared/hooks/useFlag', () => ({
   useFlag: useFlagMock,
 }));
 

@@ -3,8 +3,8 @@ import { isMobile } from 'react-device-detect';
 
 import './cw_sidebar_menu.scss';
 
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';

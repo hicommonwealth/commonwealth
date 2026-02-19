@@ -9,8 +9,6 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'client/scripts/helpers/snapshot_utils';
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import { AnyProposal } from 'client/scripts/models/types';
 import useGetThreadByIdQuery from 'client/scripts/state/api/threads/getThreadById';
@@ -18,10 +16,7 @@ import useGetThreadToken from 'client/scripts/state/api/tokens/getThreadToken';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -34,6 +29,13 @@ import React, {
 } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
+import { useFlag } from 'shared/hooks/useFlag';
+import useForceRerender from 'shared/hooks/useForceRerender';
+import useManageDocumentTitle from 'shared/hooks/useManageDocumentTitle';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import app from 'state';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useFetchProfilesByAddressesQuery from 'state/api/profiles/fetchProfilesByAddress';
@@ -59,8 +61,6 @@ import { PageNotFound } from 'views/pages/404';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { z } from 'zod';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
-import useAppStatus from '../../../hooks/useAppStatus';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import { Link, LinkSource } from '../../../models/Thread';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';

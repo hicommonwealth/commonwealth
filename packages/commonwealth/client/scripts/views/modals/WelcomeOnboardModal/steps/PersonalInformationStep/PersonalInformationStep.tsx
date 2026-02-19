@@ -1,9 +1,9 @@
 import { DEFAULT_NAME, WalletId } from '@hicommonwealth/shared';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { usernameSchema } from 'helpers/formValidations/common';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
 import {
   useFetchProfileByIdQuery,
   useSearchProfilesQuery,

@@ -1,7 +1,6 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, {
   useCallback,
@@ -10,6 +9,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import app from 'state';
 import {
   useGetCommunityByIdQuery,
@@ -38,7 +39,6 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelPageViewEvent,
 } from '../../../../../shared/analytics/types';
-import useAppStatus from '../../../hooks/useAppStatus';
 import Permissions from '../../../utils/Permissions';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import AppliedFiltersAndTagsRow from './AppliedFiltersAndTagsRow';

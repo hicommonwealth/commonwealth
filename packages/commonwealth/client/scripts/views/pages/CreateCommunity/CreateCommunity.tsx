@@ -2,8 +2,8 @@ import React from 'react';
 
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
 
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
-import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import CommunityOnchainTransactions from './steps/CommunityOnchainTransactions';
 import { TransactionType } from './steps/CommunityOnchainTransactions/helpers/transactionUtils';
 import CommunityTypeStep from './steps/CommunityTypeStep';
@@ -11,9 +11,9 @@ import SuccessStep from './steps/SuccessStep';
 import useCreateCommunity from './useCreateCommunity';
 import { CreateCommunityStep, getFormSteps } from './utils';
 
-import { useFlag } from 'client/scripts/hooks/useFlag';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useFlag } from 'shared/hooks/useFlag';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import useAppStatus from '../../../hooks/useAppStatus';
 import './CreateCommunity.scss';
 import CommunityInformationStep from './steps/CommunityInformationStep';
 

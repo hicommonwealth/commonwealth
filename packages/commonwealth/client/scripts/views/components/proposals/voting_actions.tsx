@@ -6,9 +6,9 @@ import {
   CosmosProposal,
   CosmosVote,
 } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React, { useMemo, useState } from 'react';
 import { MixpanelGovernanceEvents } from 'shared/analytics/types';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import app from 'state';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
@@ -18,9 +18,9 @@ import { getChainDecimals } from 'client/scripts/controllers/app/webWallets/util
 import { CosmosProposalV1AtomOne } from 'client/scripts/controllers/chain/cosmos/gov/atomone/proposal-v1';
 import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
 import moment from 'moment';
+import useAppStatus from 'shared/hooks/useAppStatus';
 import useUserStore from 'state/ui/user';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
-import useAppStatus from '../../../hooks/useAppStatus';
 import { calculateTimeRemaining } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard/utils';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 

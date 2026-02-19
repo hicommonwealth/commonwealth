@@ -1,11 +1,11 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useFlag } from 'shared/hooks/useFlag';
 import app from 'state';
 import AuthButton from 'views/components/AuthButton';
 import {

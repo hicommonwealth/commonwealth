@@ -6,9 +6,10 @@ import {
   loadMultipleSpacesData,
 } from 'helpers/snapshot_utils';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { Link, LinkSource } from 'models/Thread';
 import React, { useState } from 'react';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import app from 'state';
 import {
   useAddThreadLinksMutation,
@@ -20,7 +21,6 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionEventPayload,
 } from '../../../../shared/analytics/types';
-import useAppStatus from '../../hooks/useAppStatus';
 import type Thread from '../../models/Thread';
 import { ProposalStatusModalContent } from './ProposalStatusModalContent';
 

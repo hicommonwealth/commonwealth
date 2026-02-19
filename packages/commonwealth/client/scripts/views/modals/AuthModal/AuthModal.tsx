@@ -1,7 +1,7 @@
 import { WalletSsoSource } from '@hicommonwealth/shared';
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { getUniqueUserAddresses } from 'helpers/user';
 import React, { useEffect, useState } from 'react';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import { useAuthModalStore, useWelcomeOnboardModal } from 'state/ui/modals';
 import { AuthTypes } from 'views/components/AuthButton/types';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';

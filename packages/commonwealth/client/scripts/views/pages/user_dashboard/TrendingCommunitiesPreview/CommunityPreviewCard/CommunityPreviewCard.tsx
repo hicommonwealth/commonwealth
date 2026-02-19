@@ -4,7 +4,6 @@ import {
   CommunityTierMap,
   hasCommunityTierClientInfo,
 } from '@hicommonwealth/shared';
-import useDeferredConditionTriggerCallback from 'client/scripts/hooks/useDeferredConditionTriggerCallback';
 import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
@@ -12,6 +11,7 @@ import { CWButton } from 'client/scripts/views/components/component_kit/new_desi
 import { AuthModal } from 'client/scripts/views/modals/AuthModal';
 import clsx from 'clsx';
 import React from 'react';
+import useDeferredConditionTriggerCallback from 'shared/hooks/useDeferredConditionTriggerCallback';
 import { smartTrim } from 'shared/utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';

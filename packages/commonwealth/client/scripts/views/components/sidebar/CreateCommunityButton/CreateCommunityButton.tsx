@@ -3,13 +3,13 @@ import React from 'react';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from '../../../../../../shared/analytics/types';
-import useAppStatus from '../../../../hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from '../../../../hooks/useBrowserAnalyticsTrack';
 import { ButtonHeight } from '../../component_kit/new_designs/CWButton/CWButton';
 import './CreateCommunityButton.scss';
 
