@@ -27,7 +27,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 2.1 Set up component test infrastructure (260219) PR TBD — added `renderWithProviders` contract coverage for route overrides, provider overrides, and query client isolation
 - [x] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases (260219) PR TBD — added scoped TS/Vite aliases for `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, `features/*` and scaffolded `client/scripts/shared/*` + `client/scripts/features/`
 - [x] 2.3 Migrate shared reusable hooks to shared/hooks/ (260219) PR TBD — moved 17 shared hooks to `client/scripts/shared/hooks/*` with legacy `hooks/*` stubs; bundle + component tests pass (`test-unit` blocked locally by Postgres.app trust-auth permissions)
-- [ ] 2.4 Migrate shared utility helpers to shared/utils/
+- [x] 2.4 Migrate shared utility helpers to shared/utils/ (260219) PR TBD — moved shared helpers + selected `utils/*` modules into `client/scripts/shared/utils/*` with compatibility stubs; validated via `pnpm -r check-types`, `pnpm -F commonwealth bundle`, and EPIC-2 contract tests
 - [ ] 2.5 Migrate trpcClient to shared/api/
 - [ ] 2.6 Update consumer imports for shared hooks
 - [ ] 2.7 Update consumer imports for shared utils (batch 1)
