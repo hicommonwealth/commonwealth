@@ -27,7 +27,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [~] 2.1 Set up component test infrastructure (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline Vitest component harness + provider render helper merged; EPIC-2.1 hardening contract coverage (route/provider/query-client isolation) in progress via issue #13411
 - [~] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases — scoped `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, and `features/*` mappings + `client/scripts/shared/*` scaffolding are in progress via issue #13412 while preserving existing `packages/commonwealth/shared/*` imports
 - [~] 2.3 Migrate shared reusable hooks to shared/hooks/ — audited 17-hook move to `client/scripts/shared/hooks/*` + legacy `client/scripts/hooks/*` re-export stubs in progress via issue #13413
-- [ ] 2.4 Migrate shared utility helpers to shared/utils/
+- [~] 2.4 Migrate shared utility helpers to shared/utils/ — shared helper/util module set migrated to `client/scripts/shared/utils/*` with legacy compatibility stubs in progress via issue #13414
 - [ ] 2.5 Migrate trpcClient to shared/api/
 - [ ] 2.6 Update consumer imports for shared hooks
 - [ ] 2.7 Update consumer imports for shared utils (batch 1)
