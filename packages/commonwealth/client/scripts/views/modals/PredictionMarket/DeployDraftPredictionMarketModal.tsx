@@ -169,8 +169,9 @@ export const DeployDraftPredictionMarketModal = ({
         </CWText>
         {!deployConfigured && (
           <CWText type="caption" className="help-text">
-            On-chain deployment is not configured for this chain. Set
-            FutarchyGovernor in libs/evm-protocols chainConfig.
+            On-chain deployment is configured only for Base Sepolia (chain ID
+            84532). This community’s chain ID is {ethChainId || 'unknown'}. If
+            you’re on Base Sepolia, rebuild evm-protocols and restart the app.
           </CWText>
         )}
         {errorMessage && (
