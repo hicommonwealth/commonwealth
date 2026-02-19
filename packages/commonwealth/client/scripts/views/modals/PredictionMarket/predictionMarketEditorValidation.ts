@@ -7,6 +7,8 @@ export const DURATION_MAX = 90;
 export const THRESHOLD_MIN = 51;
 export const THRESHOLD_MAX = 99;
 export const THRESHOLD_DEFAULT = 55;
+/** Contract requires initial liquidity > 0 ("Liquidity required" otherwise). */
+export const INITIAL_LIQUIDITY_MIN = 0.000001;
 
 const POSITIVE_DECIMAL_REGEX = /^\d+(\.\d+)?$/;
 
@@ -48,12 +50,14 @@ export const predictionMarketEditorFormSchema = z
       ),
     initialLiquidity: z
       .string()
+      .min(1, 'Initial liquidity is required (contract requires > 0)')
       .refine(
         (v) =>
-          !v ||
-          v.trim() === '' ||
-          (POSITIVE_DECIMAL_REGEX.test(v.trim()) && Number(v.trim()) > 0),
-        { message: 'Initial liquidity must be a positive number' },
+          POSITIVE_DECIMAL_REGEX.test(v.trim()) &&
+          Number(v.trim()) >= INITIAL_LIQUIDITY_MIN,
+        {
+          message: `Initial liquidity must be at least ${INITIAL_LIQUIDITY_MIN} (contract requires > 0)`,
+        },
       ),
   })
   .refine(
@@ -94,9 +98,9 @@ export function isPredictionMarketFormValid({
     return false;
   if (!EVM_ADDRESS_STRICT_REGEX.test(collateralAddress)) return false;
   if (
-    initialLiquidity !== '' &&
-    (!POSITIVE_DECIMAL_REGEX.test(initialLiquidity) ||
-      Number(initialLiquidity) <= 0)
+    !initialLiquidity.trim() ||
+    !POSITIVE_DECIMAL_REGEX.test(initialLiquidity) ||
+    Number(initialLiquidity) < INITIAL_LIQUIDITY_MIN
   )
     return false;
   return true;

@@ -62,7 +62,7 @@ const INITIAL_FORM_VALUES = {
   customCollateralAddress: '',
   durationDays: 14,
   resolutionThreshold: THRESHOLD_DEFAULT,
-  initialLiquidity: '',
+  initialLiquidity: '1',
 };
 
 export const PredictionMarketEditorModal = ({
@@ -100,7 +100,6 @@ export const PredictionMarketEditorModal = ({
     resolutionThreshold: number;
     initialLiquidity: string;
   }) => {
-    console.log('values => ', values);
     if (!thread?.id) return;
     const collateralAddress =
       values.collateralOption.value === 'custom'

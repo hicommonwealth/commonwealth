@@ -44,13 +44,14 @@ function randomBytes32(): `0x${string}` {
     .join('')}` as `0x${string}`;
 }
 
-function parseInitialLiquidityWei(value: string): bigint {
+/** Parse human-readable token amount to smallest units (e.g. "10", 6 decimals → 10_000_000n). */
+function parseTokenAmount(value: string, decimals: number): bigint {
   if (!value || value.trim() === '') return 0n;
   const trimmed = value.trim();
   const dot = trimmed.indexOf('.');
   const whole = dot === -1 ? trimmed : trimmed.slice(0, dot);
-  const frac = dot === -1 ? '' : trimmed.slice(dot + 1).slice(0, 18);
-  const combined = whole + frac.padEnd(18, '0').slice(0, 18);
+  const frac = dot === -1 ? '' : trimmed.slice(dot + 1).slice(0, decimals);
+  const combined = whole + frac.padEnd(decimals, '0').slice(0, decimals);
   return BigInt(combined || '0');
 }
 
@@ -99,25 +100,22 @@ class PredictionMarket extends ContractBase {
     marketId: `0x${string}`,
     collateralAddress: `0x${string}`,
     durationSeconds: bigint,
-    resolutionThresholdBps: bigint,
+    resolutionThreshold: bigint,
     initialLiquidityWei: bigint,
     fromAddress: string,
   ): Promise<{
     logs?: Array<{ address?: string; data?: string; topics?: string[] }>;
   }> {
-    initialLiquidityWei = 1000000000000000000n;
-    resolutionThresholdBps = 550000000000000000n;
     console.log('comes here => ', {
       proposalId,
       marketId,
       collateralAddress,
       durationSeconds,
-      resolutionThresholdBps,
+      resolutionThreshold,
       initialLiquidityWei,
       fromAddress,
     });
     this.isInitialized();
-    console.log('comes here 2 => ', this.contract);
 
     // Approve governor to spend collateral before propose (required when initialLiquidity > 0).
     // Matches common-protocol prediction_market_helpers_frontend: approve then propose.
@@ -155,10 +153,9 @@ class PredictionMarket extends ContractBase {
       marketId,
       collateralAddress,
       durationSeconds,
-      resolutionThresholdBps,
+      resolutionThreshold,
       initialLiquidityWei,
     );
-    console.log('comes here 3 => ', tx);
     try {
       const gas = await tx.estimateGas({ from: fromAddress });
       return await tx.send({
@@ -166,7 +163,6 @@ class PredictionMarket extends ContractBase {
         gas: String(BigInt(gas.toString()) + 100000n),
       });
     } catch (err) {
-      console.log('comes here 4 => ', err);
       const msg = err instanceof Error ? err.message : String(err);
       if (/user rejected|denied|reject/i.test(msg)) {
         throw new Error('Transaction was rejected by the user.');
@@ -186,19 +182,33 @@ class PredictionMarket extends ContractBase {
     const proposalId = randomBytes32();
     const marketId = randomBytes32();
     const durationSeconds = BigInt(params.duration_days * 86400);
-    const resolutionThresholdBps = BigInt(
-      Math.round(params.resolution_threshold * 10000),
+    // Contract expects resolution threshold in 1e18 scale
+    const resolutionThresholdWei = BigInt(
+      Math.round(params.resolution_threshold * 1e18),
     );
-    const initialLiquidityWei = parseInitialLiquidityWei(
-      params.initial_liquidity,
-    );
+
+    // Use collateral token decimals so amount matches balance
+    let initialLiquidityWei = 0n;
+    const liquidityInput = params.initial_liquidity?.trim();
+    if (liquidityInput && liquidityInput !== '0') {
+      const collateralToken = new this.web3.eth.Contract(
+        erc20Abi as unknown as AbiItem[],
+        params.collateral_address,
+      );
+      const decimals = Number(
+        (await collateralToken.methods.decimals().call()) as string | number,
+      );
+      const decimalsNum =
+        typeof decimals === 'number' && !Number.isNaN(decimals) ? decimals : 18;
+      initialLiquidityWei = parseTokenAmount(liquidityInput, decimalsNum);
+    }
 
     const rawReceipt = await this.propose(
       proposalId,
       marketId,
       params.collateral_address,
       durationSeconds,
-      resolutionThresholdBps,
+      resolutionThresholdWei,
       initialLiquidityWei,
       params.user_address,
     );
