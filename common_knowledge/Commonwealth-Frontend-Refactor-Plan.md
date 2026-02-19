@@ -24,7 +24,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 1.10 Remove MDX editor (commonwealth-mdxeditor) (260205) PR https://github.com/hicommonwealth/commonwealth/pull/13338 — remove mdx editor
 
 ### EPIC-2: Shared Infrastructure
-- [~] 2.1 Set up component test infrastructure (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline Vitest component harness + provider render helper merged; keep hardening as routes/features migrate
+- [x] 2.1 Set up component test infrastructure (260219) PR TBD — added `renderWithProviders` contract coverage for route overrides, provider overrides, and query client isolation
 - [~] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases — repo already uses `packages/commonwealth/shared/*`; finalize scoped alias strategy for `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, and `features/*` before file moves
 - [ ] 2.3 Migrate shared reusable hooks to shared/hooks/
 - [ ] 2.4 Migrate shared utility helpers to shared/utils/
