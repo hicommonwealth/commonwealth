@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { type DependencyList, useEffect } from 'react';
 
 /**
  * A wrapper around useEffect
@@ -15,12 +15,11 @@ import { useEffect } from 'react';
  *
  * @deprecated Avoid using as this encourage incorrect hook usage/memoization.
  */
-const useNecessaryEffect = (cb: () => any, deps: any[]) => {
+const useNecessaryEffect = (cb: () => void, deps: DependencyList) => {
   useEffect(() => {
     const timerId = setTimeout(cb);
 
     return () => clearTimeout(timerId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps]);
 };
 

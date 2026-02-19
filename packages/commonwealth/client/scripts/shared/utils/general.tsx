@@ -239,11 +239,11 @@ export const isCommandClick = (
 
 // Handle command click and normal clicks
 export const handleRedirectClicks = (
-  navigate: any,
+  navigate: (redirectLink: string) => void,
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   redirectLink: string,
   activeChainId: string | null,
-  callback: () => any,
+  callback: () => void,
 ) => {
   if (isCommandClick(e)) {
     if (activeChainId) {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { type DependencyList, useEffect, useMemo, useState } from 'react';
 import {
   isWindowExtraSmall,
   isWindowLarge,
@@ -11,16 +11,16 @@ import {
   isWindowSmallToMedium,
 } from 'views/components/component_kit/helpers';
 
-type IuseBrowserWindow = {
-  onResize?: () => any;
-  resizeListenerUpdateDeps?: any[];
+type UseBrowserWindowProps = {
+  onResize?: () => void;
+  resizeListenerUpdateDeps?: DependencyList;
 };
 
 const useBrowserWindow = ({
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onResize = () => {},
   resizeListenerUpdateDeps = [],
-}: IuseBrowserWindow) => {
+}: UseBrowserWindowProps) => {
   /**
    * Window size
    */
@@ -45,7 +45,7 @@ const useBrowserWindow = ({
     };
   }, []);
 
-  const dependencyArray = useMemo(
+  const dependencyArray = useMemo<DependencyList>(
     () => [...resizeListenerUpdateDeps],
     [resizeListenerUpdateDeps],
   );
