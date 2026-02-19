@@ -24,18 +24,20 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 1.10 Remove MDX editor (commonwealth-mdxeditor) (260205) PR https://github.com/hicommonwealth/commonwealth/pull/13338 — remove mdx editor
 
 ### EPIC-2: Shared Infrastructure
-- [ ] 2.1 Set up component test infrastructure
-- [ ] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases
+- [~] 2.1 Set up component test infrastructure (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline Vitest component harness + provider render helper merged; keep hardening as routes/features migrate
+- [~] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases — repo already uses `packages/commonwealth/shared/*`; finalize scoped alias strategy for `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, and `features/*` before file moves
 - [ ] 2.3 Migrate shared reusable hooks to shared/hooks/
 - [ ] 2.4 Migrate shared utility helpers to shared/utils/
 - [ ] 2.5 Migrate trpcClient to shared/api/
 - [ ] 2.6 Update consumer imports for shared hooks
 - [ ] 2.7 Update consumer imports for shared utils (batch 1)
 - [ ] 2.8 Update consumer imports for shared utils (batch 2)
-- [ ] 2.9 Write unit tests for extracted shared utils
-- [ ] 2.10 Write component tests for extracted shared hooks
+- [~] 2.9 Write unit tests for extracted shared utils (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline contract suite added under `test/unit/epic2`; extend post-move assertions as modules relocate
+- [~] 2.10 Write component tests for extracted shared hooks (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline hook tests added for 6 high-signal hooks; extend as additional hooks move
 - [ ] 2.11 Create feature directory stubs + migrate feature-specific helpers
 - [ ] 2.12 Migrate feature-specific hooks to feature dirs
+
+EPIC-2 audit note (2026-02-19): milestone `#136` has Epic-1 and test-hardening merged (`#13405` via PR `#13406`), while Epic-2 structural moves/import rewires remain open.
 
 ### EPIC-3: Normalize Components
 - [ ] 3.1 Decouple useCommunityContests
@@ -89,7 +91,7 @@ Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocki
 
 ## 1. Hooks/Utils Extraction Spec
 
-### Shared Hooks --> `client/scripts/shared/hooks/`
+### Shared Hooks --> `client/scripts/shared/hooks/` (physical destination; import namespaces defined in Import Update Strategy)
 
 | Hook | Source | Consumers | Move-Together |
 |------|--------|-----------|---------------|
@@ -105,6 +107,7 @@ Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocki
 | `useBeforeUnload` | `hooks/useBeforeUnload.ts` | form components | -- |
 | `useForceRerender` | `hooks/useForceRerender.ts` | 6 files (post-consolidation) | -- |
 | `useDraft` | `hooks/useDraft.tsx` | thread forms, comments | -- |
+| `useDeviceProfile` | `hooks/useDeviceProfile.ts` | device-specific UX conditions | -- |
 | `useInitApp` | `hooks/useInitApp.ts` | App.tsx | -- |
 | `useManageDocumentTitle` | `hooks/useManageDocumentTitle.ts` | Layout | -- |
 | `useDeferredConditionTriggerCallback` | `hooks/useDeferredConditionTriggerCallback.ts` | various | -- |
@@ -123,8 +126,6 @@ Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocki
 | `useNetworkSwitching` | `features/wallet/hooks/` |
 | `useInitChainIfNeeded` | `features/governance/hooks/` |
 | `useJoinCommunityBanner` | `features/communities/hooks/` |
-| `useReactNativeWebView` | `features/mobile/hooks/` |
-| `useMobileRPCSender/Receiver` | `features/mobile/hooks/` |
 | `useGetAllCosmosProposals` | `features/governance/hooks/cosmos/` |
 | `useShowImage` | `features/discussions/hooks/` |
 
@@ -140,6 +141,8 @@ Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocki
 
 ### Shared Utils --> `client/scripts/shared/utils/`
 
+Note: `packages/commonwealth/shared/*` already exists and is used today (`shared/utils`, `shared/analytics`, `shared/adapters`, etc.). Epic-2 extracted helper modules should use scoped imports (`shared/utils/<module>`, `shared/hooks/<module>`, `shared/api/<module>`) backed by explicit alias mapping, not a blanket `shared/* -> client/scripts/shared/*` remap.
+
 | File | Source | Consumers | Notes |
 |------|--------|-----------|-------|
 | `general.ts` (split from `helpers/index.tsx`) | `helpers/index.tsx` | **56 files** | Re-export stub mandatory |
@@ -152,9 +155,9 @@ Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocki
 | `link.ts` | `helpers/link.ts` | 4 files | URL validation + social links |
 | `formValidations/` | `helpers/formValidations/` | ~10 files | Move as directory |
 | `feature-flags.ts` | `helpers/feature-flags.ts` | 2 files | Move with useFlag |
-| `clipboard.ts` | `utils/clipboard.ts` | 12 files | Consolidate with helpers/clipboard.ts |
-| `downloadDataAsFile.ts`, `imageCompression.ts` | `utils/` | ~3 each | Straightforward |
-| `permissions.ts` | `utils/Permissions.ts` | ~5 files | Straightforward |
+| `clipboard.ts` | `utils/clipboard.ts` | 12 files | Straightforward |
+| `downloadDataAsFile.ts`, `ImageCompression.ts` | `utils/` | ~3 each | Straightforward |
+| `Permissions.ts` | `utils/Permissions.ts` | ~5 files | Straightforward |
 | `tooltipTexts.ts` | `helpers/tooltipTexts.ts` | ~8 files | Pure strings |
 | `awsHelpers.ts` | `helpers/awsHelpers.ts` | ~3 files | External services |
 
@@ -185,8 +188,12 @@ Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocki
 
 ### Import Update Strategy
 
-1. Add tsconfig paths `"shared/*"` and `"features/*"` BEFORE any moves
-2. Add vite resolve aliases for `shared` and `features`
+1. Add scoped tsconfig paths BEFORE any moves:
+   - `shared/hooks/*` -> `client/scripts/shared/hooks/*`
+   - `shared/utils/*` -> `client/scripts/shared/utils/*`
+   - `shared/api/*` -> `client/scripts/shared/api/*`
+   - `features/*` -> `client/scripts/features/*`
+2. Add matching Vite aliases for scoped namespaces above; do **not** blanket-remap `shared/*` because `packages/commonwealth/shared/*` is already live
 3. Use `git mv` for all moves (preserves blame)
 4. Create deprecated re-export stubs for files with 10+ consumers
 5. Update consumers in batches; delete stubs when grep confirms zero direct imports
@@ -195,7 +202,7 @@ Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocki
 
 ## 2. Test Strategy
 
-### Current State (Repo Audit: 2026-02-17, includes PR #13406)
+### Current State (Repo Audit: 2026-02-19, post-merge of PR #13406)
 - **115 total spec test files**: 19 unit, 20 integration, 54 E2E, 9 devnet, 2 visual, 11 component
 - **Smoke coverage**: 3 files / 5 tagged `@smoke` tests
 - **E2E quality caveat**: 12 of 49 `e2eRegular` files are still crash-only, but refactor-critical routes now have behavior/security assertions under `@refactor`
@@ -203,7 +210,7 @@ Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocki
 - **Stack (lockfile-resolved)**: Vitest 1.6.1 + Playwright 1.44.0
 - **Testing-library infra is present**: `@testing-library/react` `^16.3.2`, `@testing-library/jest-dom` `^6.9.1`, `@testing-library/user-event` `^14.6.1`
 
-### Infrastructure Implemented in This PR
+### Infrastructure Already Merged (PR #13406, merged 2026-02-18)
 
 **Dependencies** (devDependencies in `packages/commonwealth/package.json`):
 - `@testing-library/react`
@@ -225,7 +232,7 @@ Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocki
 "test-component:watch": "NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true vitest --config ./vitest.component.config.ts test/component"
 ```
 
-### Coverage Added in This PR
+### Coverage Added (merged in PR #13406)
 
 **EPIC-2 safety-net tests:**
 - Shared infrastructure unit contracts: `packages/commonwealth/test/unit/epic2/sharedInfrastructure.utils.contract.spec.ts`
@@ -249,7 +256,7 @@ Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocki
   - `packages/commonwealth/test/component/pages/governancePage.integration.spec.tsx`
   - `packages/commonwealth/test/component/pages/communityHomePage.integration.spec.tsx`
 
-### E2E Coverage Status After This PR
+### E2E Coverage Status (post-PR #13406)
 
 | Feature | Current E2E State | Priority |
 |---------|-------------------|----------|
@@ -686,12 +693,14 @@ EPIC-2: Shared Infrastructure
 │
 ├── 2.2: Create shared/ directory scaffolding + tsconfig/vite aliases [blocked-by: EPIC-1]
 │   new dirs: client/scripts/shared/{hooks,utils,api}, client/scripts/features/
-│   modify: tsconfig.json, client/vite.config.ts
-│   ~30 LOC modify
+│   modify: packages/commonwealth/tsconfig.json, packages/commonwealth/client/vite.config.ts
+│   NOTE: keep existing package-level `shared/*` imports intact; add scoped aliases
+│         (`shared/hooks/*`, `shared/utils/*`, `shared/api/*`, `features/*`) only
+│   ~40 LOC modify
 │   reviewer: full-stack
 │
 ├── 2.3: Migrate shared reusable hooks to shared/hooks/ [blocked-by: 2.2, 1.5]
-│   move: 16 hooks via git mv
+│   move: 17 hooks via git mv (including `useDeviceProfile`)
 │   create: shared/hooks/index.ts barrel, hooks/index.ts re-export stub
 │   ~500 LOC move, ~80 LOC new
 │   reviewer: frontend
@@ -724,23 +733,26 @@ EPIC-2: Shared Infrastructure
 │   reviewer: frontend
 │
 ├── 2.9: Write unit tests for extracted shared utils [blocked-by: 2.4] [PARALLEL w/ 2.6-2.8]
-│   new: 8 test files, ~600 LOC
+│   baseline merged: `test/unit/epic2/*.spec.ts` in PR #13406
+│   new in this wave: post-move assertions + alias-resolution coverage for extracted modules
 │   reviewer: frontend
 │
 ├── 2.10: Write component tests for extracted shared hooks [blocked-by: 2.1, 2.3] [PARALLEL]
-│   new: 6 test files, ~400 LOC
+│   baseline merged: 6 hook specs in `test/component/hooks/*` (PR #13406)
+│   new in this wave: extend suite as additional hooks are moved to shared/hooks
 │   reviewer: frontend
 │
 ├── 2.11: Create feature directory stubs + migrate feature-specific helpers [blocked-by: 2.2]
 │   new dirs: features/{quests,governance,tokens,explore,blockchain,wallet,
-│             discussions,auth,contests,notifications,communities,search,mobile}/
+│             discussions,auth,contests,notifications,communities,search}/
 │   move: 10 helper files/directories
 │   HIGH-IMPACT: quest.ts (23 consumers), snapshot_utils.ts (23), ContractHelpers/ (30)
 │   ~3000 LOC move
 │   reviewer: frontend
 │
 └── 2.12: Migrate feature-specific hooks to feature dirs [blocked-by: 2.2, 2.3]
-    move: 14 hooks to respective feature directories
+    move: 12 hooks to respective feature directories
+    NOTE: React Native hooks removed in EPIC-1.8 are intentionally excluded
     ~800 LOC move
     reviewer: frontend
 ```
@@ -1116,9 +1128,8 @@ client/scripts/                    ~152,000 LOC   ~1,850 files
 │   ├── markets/                       ~500
 │   │   └── pages/ (MarketsAppPage)
 │   │
-│   └── mobile/                      ~1,000
-│       ├── pages/ (MobileAppRedirect)
-│       └── hooks/ (useMobileRPCSender, etc.)
+│   └── mobile/                      removed in EPIC-1.8
+│       └── React Native bridge + MobileAppRedirect deleted (PR #13347)
 │
 ├── shared/                         ~28,000  18%    ~350 files  ← TRULY SHARED CODE
 │   ├── components/
@@ -1127,7 +1138,7 @@ client/scripts/                    ~152,000 LOC   ~1,850 files
 │   │   ├── SublayoutHeader/          1,959
 │   │   ├── MarkdownEditor/           1,958
 │   │   ├── Profile/                  2,070
-│   │   ├── Privy/                      807
+│   │   ├── Privy/                     removed in EPIC-1.7 (PR #13348)
 │   │   ├── menus/                      500
 │   │   └── (20+ small shared components)
 │   ├── hooks/                        1,200
@@ -1245,12 +1256,11 @@ Per the meeting note "must remove workers / things that don't / shouldn't remain
 **Found in client:**
 - `client/public/firebase-messaging-sw.js` -- Firebase Cloud Messaging service worker for Knock push notifications. **Active/in-use.** Handles push event display and notification click routing. Should keep.
 - `client/public/manifest.json` -- PWA manifest ("Common App", standalone display). Review with product whether PWA support is still desired.
-- `hooks/mobile/useMobileRPCSender.ts` + `useMobileRPCEventReceiver.ts` -- React Native WebView bridge (postMessage). **Active for mobile app.** Moving to `features/mobile/hooks/` in EPIC-2.
-- `hooks/useReactNativeWebView.ts` -- RN WebView detection + `isMobileApp()`. Same as above.
+- React Native bridge hooks/pages were removed in EPIC-1.8 (`PR #13347`); no `hooks/mobile/*` bridge code remains in current repo state.
 
 **No traditional Web Workers or SharedWorkers found.** No `.worker.ts` files, no `new Worker()` calls.
 
-**Action:** No client-side workers need removal. The Firebase SW and mobile bridge are functional. The PWA manifest (`manifest.json`) may warrant a product review on whether to keep PWA support.
+**Action:** No additional client-side worker removals required. Keep Firebase SW as-is; review PWA manifest (`manifest.json`) with product if PWA support scope changes.
 
 ---
 
