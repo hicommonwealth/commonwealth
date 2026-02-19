@@ -16,7 +16,7 @@ describe('isPredictionMarketFormValid', () => {
     durationDays: 14,
     resolutionThreshold: 55,
     collateralAddress: validAddress,
-    initialLiquidity: '',
+    initialLiquidity: '1',
   };
 
   test('accepts valid form', () => {

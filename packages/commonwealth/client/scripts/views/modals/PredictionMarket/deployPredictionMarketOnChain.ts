@@ -4,10 +4,10 @@
  * deployPredictionMarket mutation.
  */
 
-import MagicWebWalletController from 'controllers/app/webWallets/MagicWebWallet';
+import MagicWebWalletController from 'client/scripts/controllers/app/webWallets/MagicWebWallet';
 import PredictionMarket, {
   type DeployPredictionMarketPayload,
-} from 'helpers/ContractHelpers/predictionMarket';
+} from 'client/scripts/helpers/ContractHelpers/predictionMarket';
 import { fetchNodes } from 'state/api/nodes';
 import { userStore } from 'state/ui/user';
 

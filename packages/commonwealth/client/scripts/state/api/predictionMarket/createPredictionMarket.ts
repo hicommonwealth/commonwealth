@@ -1,4 +1,4 @@
-import { trpc } from 'utils/trpcClient';
+import { trpc } from 'client/scripts/utils/trpcClient';
 
 // predictionMarket router is conditionally registered when MARKETS.FUTARCHY_ENABLED
 const useCreatePredictionMarketMutation = () => {

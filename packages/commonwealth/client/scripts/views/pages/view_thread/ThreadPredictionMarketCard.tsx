@@ -1,5 +1,5 @@
+import type Thread from 'client/scripts/models/Thread';
 import React, { useState } from 'react';
-import type Thread from '../../../models/Thread';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';

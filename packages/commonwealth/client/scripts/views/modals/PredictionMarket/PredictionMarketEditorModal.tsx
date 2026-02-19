@@ -1,15 +1,18 @@
 import React, { useRef, useState } from 'react';
 
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import PredictionMarket from 'helpers/ContractHelpers/predictionMarket';
+import {
+  notifyError,
+  notifySuccess,
+} from 'client/scripts/controllers/app/notifications';
+import PredictionMarket from 'client/scripts/helpers/ContractHelpers/predictionMarket';
+import type Thread from 'client/scripts/models/Thread';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import {
   useCreatePredictionMarketMutation,
   useDeployPredictionMarketMutation,
 } from 'state/api/predictionMarket';
 import useUserStore from 'state/ui/user';
-import { trpc } from 'utils/trpcClient';
-import type Thread from '../../../models/Thread';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';

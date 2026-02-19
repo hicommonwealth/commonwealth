@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import PredictionMarket from 'helpers/ContractHelpers/predictionMarket';
+import {
+  notifyError,
+  notifySuccess,
+} from 'client/scripts/controllers/app/notifications';
+import PredictionMarket from 'client/scripts/helpers/ContractHelpers/predictionMarket';
+import type Thread from 'client/scripts/models/Thread';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import { useDeployPredictionMarketMutation } from 'state/api/predictionMarket';
 import useUserStore from 'state/ui/user';
-import type Thread from '../../../models/Thread';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';

@@ -1,4 +1,4 @@
-import { trpc } from 'utils/trpcClient';
+import { trpc } from 'client/scripts/utils/trpcClient';
 
 const useDeployPredictionMarketMutation = () => {
   const utils = trpc.useUtils();

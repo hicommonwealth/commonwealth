@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-import { useFlag } from 'hooks/useFlag';
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import type Thread from 'client/scripts/models/Thread';
 import { useGetPredictionMarketsQuery } from 'state/api/predictionMarket';
-import type Thread from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';

@@ -1,4 +1,4 @@
-import { trpc } from 'utils/trpcClient';
+import { trpc } from 'client/scripts/utils/trpcClient';
 
 type GetPredictionMarketsParams = {
   thread_id: number;
