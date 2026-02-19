@@ -10,8 +10,7 @@ import QuestForm from './QuestForm';
 const CreateQuest = () => {
   const user = useUserStore();
 
-  if (!user.isLoggedIn || !Permissions.isSiteAdmin())
-    return <PageNotFound />;
+  if (!user.isLoggedIn || !Permissions.isSiteAdmin()) return <PageNotFound />;
 
   return (
     <CWPageLayout>

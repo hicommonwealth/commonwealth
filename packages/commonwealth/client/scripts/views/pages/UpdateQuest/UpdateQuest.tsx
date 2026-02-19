@@ -96,8 +96,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
     shouldRun: !!quest,
   });
 
-  if (!user.isLoggedIn || !Permissions.isSiteAdmin())
-    return <PageNotFound />;
+  if (!user.isLoggedIn || !Permissions.isSiteAdmin()) return <PageNotFound />;
 
   if (
     isLoadingQuest ||

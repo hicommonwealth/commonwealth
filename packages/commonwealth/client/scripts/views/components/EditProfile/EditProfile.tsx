@@ -5,7 +5,6 @@ import {
   usernameSchema,
 } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
-import { useFlag } from 'hooks/useFlag';
 import AddressInfo from 'models/AddressInfo';
 import NewProfile from 'models/NewProfile';
 import { useCommonNavigate } from 'navigation/helpers';

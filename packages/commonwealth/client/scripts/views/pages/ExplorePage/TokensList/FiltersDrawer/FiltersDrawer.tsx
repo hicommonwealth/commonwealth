@@ -158,8 +158,7 @@ export const FiltersDrawer = ({
                           }
                           disabled={
                             filters.withTokenSortBy ===
-                              TokenSortOptions.MostRecent ||
-                            !hasAppliedFilters
+                              TokenSortOptions.MostRecent || !hasAppliedFilters
                           }
                         />
                       ),
