@@ -25,7 +25,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 
 ### EPIC-2: Shared Infrastructure
 - [~] 2.1 Set up component test infrastructure (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline Vitest component harness + provider render helper merged; EPIC-2.1 hardening contract coverage (route/provider/query-client isolation) in progress via issue #13411
-- [~] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases — repo already uses `packages/commonwealth/shared/*`; finalize scoped alias strategy for `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, and `features/*` before file moves
+- [~] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases — scoped `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, and `features/*` mappings + `client/scripts/shared/*` scaffolding are in progress via issue #13412 while preserving existing `packages/commonwealth/shared/*` imports
 - [ ] 2.3 Migrate shared reusable hooks to shared/hooks/
 - [ ] 2.4 Migrate shared utility helpers to shared/utils/
 - [ ] 2.5 Migrate trpcClient to shared/api/
