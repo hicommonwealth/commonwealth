@@ -1,13 +1,2 @@
-import { useCallback, useState } from 'react';
-
-const useForceRerender = () => {
-  const [, setState] = useState({});
-
-  const forceRerender = useCallback(() => {
-    setState({});
-  }, []);
-
-  return forceRerender;
-};
-
-export default useForceRerender;
+export * from 'shared/hooks/useForceRerender';
+export { default } from 'shared/hooks/useForceRerender';
