@@ -25,7 +25,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 
 ### EPIC-2: Shared Infrastructure
 - [x] 2.1 Set up component test infrastructure (260219) PR TBD — added `renderWithProviders` contract coverage for route overrides, provider overrides, and query client isolation
-- [~] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases — repo already uses `packages/commonwealth/shared/*`; finalize scoped alias strategy for `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, and `features/*` before file moves
+- [x] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases (260219) PR TBD — added scoped TS/Vite aliases for `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, `features/*` and scaffolded `client/scripts/shared/*` + `client/scripts/features/`
 - [ ] 2.3 Migrate shared reusable hooks to shared/hooks/
 - [ ] 2.4 Migrate shared utility helpers to shared/utils/
 - [ ] 2.5 Migrate trpcClient to shared/api/
