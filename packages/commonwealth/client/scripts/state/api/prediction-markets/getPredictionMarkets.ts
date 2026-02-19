@@ -1,4 +1,4 @@
-import { trpc } from 'utils/trpcClient';
+import { trpc } from 'client/scripts/utils/trpcClient';
 
 const PREDICTION_MARKETS_STALE_TIME = 30 * 1000; // 30 seconds
 

@@ -1,5 +1,6 @@
 import { PredictionMarketStatus } from '@hicommonwealth/schemas';
-import type Thread from 'models/Thread';
+import type Thread from 'client/scripts/models/Thread';
+import { openConfirmation } from 'client/scripts/views/modals/confirmation_modal';
 import moment from 'moment';
 import React from 'react';
 import {
@@ -7,7 +8,6 @@ import {
   useGetPredictionMarketsQuery,
 } from 'state/api/prediction-markets';
 import useUserStore from 'state/ui/user';
-import { openConfirmation } from 'views/modals/confirmation_modal';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
