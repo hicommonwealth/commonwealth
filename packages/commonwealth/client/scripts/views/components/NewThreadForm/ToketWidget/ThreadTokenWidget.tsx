@@ -118,7 +118,8 @@ const ThreadTokenWidget = ({
     [isThreadCreationMode, setIsLoadingTokenGain],
   );
 
-  const safeCurrentAmount = currentAmount || '0';
+  const displayAmount = currentAmount ?? '';
+  const safeCurrentAmountForCalc = displayAmount === '' ? '0' : displayAmount;
   const safeCurrentTokenGainAmount = currentTokenGainAmount || 0;
 
   const safeSetCurrentAmount = setCurrentAmount || (() => {});
@@ -127,8 +128,8 @@ const ThreadTokenWidget = ({
     const fetchTokenGain = async () => {
       if (
         !tokenLaunchpad ||
-        !safeCurrentAmount ||
-        parseFloat(safeCurrentAmount) <= 0 ||
+        !safeCurrentAmountForCalc ||
+        parseFloat(safeCurrentAmountForCalc) <= 0 ||
         (isThreadCreationMode ? false : !threadToken?.token_address)
       ) {
         setCurrentTokenGainAmount(0);
@@ -137,11 +138,11 @@ const ThreadTokenWidget = ({
 
       try {
         setCurrentIsLoadingTokenGain(true);
-        const inputAmount = parseFloat(safeCurrentAmount);
+        const inputAmount = parseFloat(safeCurrentAmountForCalc);
         const amountInWei = inputAmount * 1e18;
 
         if (isThreadCreationMode) {
-          await calculateTokenGain?.(safeCurrentAmount);
+          await calculateTokenGain?.(safeCurrentAmountForCalc);
         } else {
           const tokenAddress = threadToken?.token_address;
           if (!tokenAddress) {
@@ -170,7 +171,7 @@ const ThreadTokenWidget = ({
 
     void fetchTokenGain();
   }, [
-    safeCurrentAmount,
+    safeCurrentAmountForCalc,
     tokenLaunchpad,
     threadToken?.token_address,
     ethChainId,
@@ -204,7 +205,11 @@ const ThreadTokenWidget = ({
       }
 
       if (onThreadCreated) {
-        await onThreadCreated(0, safeCurrentAmount, safeCurrentTokenGainAmount);
+        await onThreadCreated(
+          0,
+          safeCurrentAmountForCalc,
+          safeCurrentTokenGainAmount,
+        );
       }
       return;
     }
@@ -219,12 +224,15 @@ const ThreadTokenWidget = ({
       return;
     }
 
-    if (!safeCurrentAmount || parseFloat(safeCurrentAmount) <= 0) {
+    if (
+      !safeCurrentAmountForCalc ||
+      parseFloat(safeCurrentAmountForCalc) <= 0
+    ) {
       notifyError('Please enter a valid amount');
       return;
     }
 
-    if (parseFloat(safeCurrentAmount) > parseFloat(userBalance)) {
+    if (parseFloat(safeCurrentAmountForCalc) > parseFloat(userBalance)) {
       notifyError('Insufficient balance');
       return;
     }
@@ -240,7 +248,7 @@ const ThreadTokenWidget = ({
     }
 
     try {
-      const amountInWei = parseFloat(safeCurrentAmount) * 1e18;
+      const amountInWei = parseFloat(safeCurrentAmountForCalc) * 1e18;
       const minAmountOut = Math.round(safeCurrentTokenGainAmount * 0.95 * 1e18);
 
       const payload = {
@@ -276,7 +284,7 @@ const ThreadTokenWidget = ({
       }
 
       notifySuccess('Thread token purchased successfully!');
-      safeSetCurrentAmount('0');
+      safeSetCurrentAmount('');
     } catch (error) {
       notifyError('Failed to purchase thread token');
       console.error('Purchase error:', error);
@@ -299,12 +307,15 @@ const ThreadTokenWidget = ({
       return;
     }
 
-    if (!safeCurrentAmount || parseFloat(safeCurrentAmount) <= 0) {
+    if (
+      !safeCurrentAmountForCalc ||
+      parseFloat(safeCurrentAmountForCalc) <= 0
+    ) {
       notifyError('Please enter a valid amount');
       return;
     }
 
-    if (parseFloat(safeCurrentAmount) > parseFloat(userTokenBalance)) {
+    if (parseFloat(safeCurrentAmountForCalc) > parseFloat(userTokenBalance)) {
       notifyError('Insufficient token balance');
       return;
     }
@@ -320,7 +331,7 @@ const ThreadTokenWidget = ({
     }
 
     try {
-      const amountToken = parseFloat(safeCurrentAmount) * 1e18;
+      const amountToken = parseFloat(safeCurrentAmountForCalc) * 1e18;
 
       const payload = {
         chainRpc,
@@ -339,7 +350,7 @@ const ThreadTokenWidget = ({
       });
 
       notifySuccess('Thread token sold successfully!');
-      safeSetCurrentAmount('0');
+      safeSetCurrentAmount('');
     } catch (error) {
       notifyError('Failed to sell thread token');
       console.error('Sell error:', error);
@@ -429,15 +440,14 @@ const ThreadTokenWidget = ({
         <div className="amount-input-section">
           <input
             type="text"
-            value={safeCurrentAmount}
+            value={displayAmount}
             onChange={handleAmountChange}
-            placeholder="0"
             className="amount-input"
           />
           <div className="input-currency">
             <CWText type="b2">
-              {parseFloat(safeCurrentAmount) > 0
-                ? `${safeCurrentAmount} ${
+              {parseFloat(safeCurrentAmountForCalc) > 0
+                ? `${safeCurrentAmountForCalc} ${
                     isThreadCreationMode || !isSellMode
                       ? primaryTokenSymbol
                       : threadToken?.symbol || 'TOKEN'
@@ -510,8 +520,8 @@ const ThreadTokenWidget = ({
                 ? isSelling
                 : isBuying) ||
             isCreatingTokenTrade ||
-            parseFloat(safeCurrentAmount) <= 0 ||
-            parseFloat(safeCurrentAmount) >
+            parseFloat(safeCurrentAmountForCalc) <= 0 ||
+            parseFloat(safeCurrentAmountForCalc) >
               parseFloat(
                 isThreadCreationMode || !isSellMode
                   ? userBalance
