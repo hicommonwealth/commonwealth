@@ -68,9 +68,6 @@ const {
   TWITTER_ACCESS_TOKEN,
   TWITTER_ACCESS_TOKEN_SECRET,
   SKALE_PRIVATE_KEY,
-  PRIVY_FLAG,
-  PRIVY_APP_ID,
-  PRIVY_APP_SECRET,
   FLAG_USE_RUNWARE,
   RUNWARE_API_KEY,
   CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
@@ -106,22 +103,11 @@ const {
   AI_BOT_USER_ADDRESS,
   MAGNA_API_KEY,
   MAGNA_API_URL,
-  MAGNA_EVENT,
-  MAGNA_EVENT_DESC,
-  MAGNA_CONTRACT_ID,
-  MAGNA_TOKEN,
-  MAGNA_TOKEN_ID,
-  MAGNA_TOKEN_ADDRESS,
-  MAGNA_UNLOCK_SCHEDULE_ID,
-  MAGNA_UNLOCK_START_AT,
   MAGNA_BATCH_SIZE,
-  MAGNA_INITIAL_PERCENTAGE,
-  MAGNA_CLIFF_DATE,
-  MAGNA_CONTRACT_ADDRESS,
-  MAGNA_END_REGISTRATION_DATE,
   SLACK_WEBHOOK_URL_ALL_ENG,
   SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
-  FLAG_CLAIMS,
+  FLAG_MARKETS,
+  FLAG_FUTARCHY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -281,11 +267,6 @@ export const config = configure(
     SKALE: {
       PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
     },
-    PRIVY: {
-      FLAG_ENABLED: PRIVY_FLAG === 'true',
-      APP_ID: PRIVY_APP_ID,
-      APP_SECRET: PRIVY_APP_SECRET,
-    },
     IMAGE_GENERATION: {
       FLAG_USE_RUNWARE: FLAG_USE_RUNWARE === 'true' || false,
       RUNWARE_API_KEY: RUNWARE_API_KEY,
@@ -372,24 +353,7 @@ export const config = configure(
     MAGNA: {
       API_URL: MAGNA_API_URL || 'https://api.test.magna.com',
       API_KEY: MAGNA_API_KEY || '', // This is the gateway to magna API integration, starting with syncing allocations
-      EVENT: MAGNA_EVENT || 'magna-test',
-      EVENT_DESC: MAGNA_EVENT_DESC || 'Magna Test Event',
-      CONTRACT_ID: MAGNA_CONTRACT_ID || '00000000-0000-0000-0000-000000000000',
-      TOKEN: MAGNA_TOKEN || 'COMMON',
-      TOKEN_ID: MAGNA_TOKEN_ID || '00000000-0000-0000-0000-000000000000',
-      TOKEN_ADDRESS:
-        MAGNA_TOKEN_ADDRESS || '0x0000000000000000000000000000000000000000',
-      UNLOCK_SCHEDULE_ID:
-        MAGNA_UNLOCK_SCHEDULE_ID || '00000000-0000-0000-0000-000000000000',
-      UNLOCK_START_AT: new Date(MAGNA_UNLOCK_START_AT || '2026-12-31'),
-      INITIAL_PERCENTAGE: parseFloat(MAGNA_INITIAL_PERCENTAGE || '0.5'),
-      CLIFF_DATE: new Date(MAGNA_CLIFF_DATE || '2026-12-31'),
       BATCH_SIZE: parseInt(MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE, 10),
-      CONTRACT_ADDRESS:
-        MAGNA_CONTRACT_ADDRESS || '0x45Bd2f58008b7D0942E36E6827A037eef60AF7D6',
-      END_REGISTRATION_DATE: MAGNA_END_REGISTRATION_DATE
-        ? new Date(MAGNA_END_REGISTRATION_DATE)
-        : undefined,
     },
     SLACK: {
       CHANNELS: {
@@ -397,8 +361,9 @@ export const config = configure(
         MAGNA_NOTIFS: SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
       },
     },
-    CLAIMS: {
-      ENABLED: FLAG_CLAIMS === 'true',
+    MARKETS: {
+      ENABLED: FLAG_MARKETS === 'true',
+      FUTARCHY_ENABLED: FLAG_FUTARCHY === 'true',
     },
   },
   z.object({
@@ -672,15 +637,6 @@ export const config = configure(
           }),
         ),
     }),
-    PRIVY: z
-      .object({
-        FLAG_ENABLED: z.boolean(),
-        APP_ID: z.string().optional(),
-        APP_SECRET: z.string().optional(),
-      })
-      .refine(
-        (data) => !(data.FLAG_ENABLED && (!data.APP_ID || !data.APP_SECRET)),
-      ),
     IMAGE_GENERATION: z
       .object({
         FLAG_USE_RUNWARE: z.boolean().optional(),
@@ -811,19 +767,7 @@ export const config = configure(
     MAGNA: z.object({
       API_URL: z.url(),
       API_KEY: z.string(),
-      EVENT: z.string().min(5),
-      EVENT_DESC: z.string().min(5),
-      CONTRACT_ID: z.uuid(),
-      TOKEN: z.string().min(1),
-      TOKEN_ID: z.uuid(),
-      TOKEN_ADDRESS: z.string().min(1),
-      UNLOCK_SCHEDULE_ID: z.uuid(),
-      UNLOCK_START_AT: z.date(),
-      INITIAL_PERCENTAGE: z.number().min(0.01).max(0.99),
-      CLIFF_DATE: z.date(),
       BATCH_SIZE: z.number(),
-      CONTRACT_ADDRESS: z.string(),
-      END_REGISTRATION_DATE: z.date().optional(),
     }),
     SLACK: z.object({
       CHANNELS: z.object({
@@ -831,8 +775,9 @@ export const config = configure(
         MAGNA_NOTIFS: z.string().optional(),
       }),
     }),
-    CLAIMS: z.object({
+    MARKETS: z.object({
       ENABLED: z.boolean(),
+      FUTARCHY_ENABLED: z.boolean(),
     }),
   }),
 );

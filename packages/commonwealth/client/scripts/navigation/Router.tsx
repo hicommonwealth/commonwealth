@@ -1,9 +1,11 @@
+import { useFlag } from 'hooks/useFlag';
 import CustomDomainRoutes from 'navigation/CustomDomainRoutes';
 import React from 'react';
 import {
   createBrowserRouter,
   createRoutesFromElements,
   Route,
+  RouterProvider,
 } from 'react-router-dom';
 import { fetchCachedCustomDomain } from 'state/api/configuration';
 import { withLayout } from 'views/Layout';
@@ -15,13 +17,18 @@ export type RouteFeatureFlags = {};
 
 const Router = () => {
   const { isCustomDomain } = fetchCachedCustomDomain() || {};
+  const marketsEnabled = useFlag('markets');
 
-  return createBrowserRouter(
+  const router = createBrowserRouter(
     createRoutesFromElements([
       ...GeneralRoutes(),
-      ...(isCustomDomain ? CustomDomainRoutes() : CommonDomainRoutes()),
+      ...(isCustomDomain
+        ? CustomDomainRoutes(marketsEnabled)
+        : CommonDomainRoutes(marketsEnabled)),
       <Route key="routes" path="*" element={withLayout(PageNotFound, {})} />,
     ]),
   );
+
+  return <RouterProvider router={router} />;
 };
 export default Router;

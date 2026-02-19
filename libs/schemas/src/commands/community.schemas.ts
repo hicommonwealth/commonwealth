@@ -17,6 +17,7 @@ import { AuthContext, TopicContext, VerifiedContext } from '../context';
 import { MCPServer } from '../entities';
 import { Community } from '../entities/community.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
+import { MarketStatus, Markets } from '../entities/market.schemas';
 import { PinnedToken } from '../entities/pinned-token.schemas';
 import { StakeTransaction } from '../entities/stake.schemas';
 import { Tags } from '../entities/tag.schemas';
@@ -224,6 +225,7 @@ export const CreateTopic = {
         vote_weight_multiplier: true,
         chain_node_id: true,
         allow_tokenized_threads: true,
+        secondary_tokens: true,
       }),
     ),
   output: z.object({
@@ -280,8 +282,8 @@ export const ToggleArchiveTopic = {
 };
 
 const GroupMetadata = z.object({
-  name: z.string(),
-  description: z.string(),
+  name: z.string().max(40),
+  description: z.string().max(250),
   groupImageUrl: z.string().nullish(),
   required_requirements: PG_INT.nullish(),
   membership_ttl: PG_INT.optional(),
@@ -521,4 +523,29 @@ export const RefreshWeightedVotes = {
     community_id: z.string(),
   }),
   context: TopicContext,
+};
+
+export const SubscribeMarket = {
+  input: z.object({
+    community_id: z.string(),
+    provider: z.enum(Markets),
+    slug: z.string(),
+    question: z.string(),
+    category: z.string(),
+    start_time: z.coerce.date(),
+    end_time: z.coerce.date(),
+    status: z.enum(MarketStatus),
+    image_url: z.string().nullish(),
+  }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const UnsubscribeMarket = {
+  input: z.object({
+    community_id: z.string(),
+    slug: z.string(),
+  }),
+  output: z.boolean(),
+  context: AuthContext,
 };

@@ -36,6 +36,8 @@ const {
   SEND_WEBHOOKS,
   SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP,
   DISABLE_LOCAL_QUEUE_PURGE,
+  CLEANUP_DEPRECATED_QUEUES,
+  RABBITMQ_MANAGEMENT_URL,
   R2_ACCESS_KEY_ID,
   R2_SECRET_ACCESS_KEY,
   R2_ACCOUNT_ID,
@@ -53,7 +55,9 @@ export const config = configure(
     },
     BROKER: {
       RABBITMQ_URI: (RABBITMQ_URI || CLOUDAMQP_URL) ?? DEFAULTS.RABBITMQ_URI,
+      RABBITMQ_MANAGEMENT_URL: RABBITMQ_MANAGEMENT_URL,
       DISABLE_LOCAL_QUEUE_PURGE: DISABLE_LOCAL_QUEUE_PURGE === 'true',
+      CLEANUP_DEPRECATED_QUEUES: CLEANUP_DEPRECATED_QUEUES !== 'false',
       RABBITMQ_FRAME_SIZE: RABBITMQ_FRAME_SIZE
         ? parseInt(RABBITMQ_FRAME_SIZE)
         : undefined,
@@ -113,10 +117,21 @@ export const config = configure(
           defaultCheck: DEFAULTS.RABBITMQ_URI,
         }),
       ),
+      RABBITMQ_MANAGEMENT_URL: z
+        .string()
+        .optional()
+        .describe(
+          'RabbitMQ Management API URL (e.g. http://guest:guest@localhost:15672) for deprecated queue cleanup',
+        ),
       DISABLE_LOCAL_QUEUE_PURGE: z
         .boolean()
         .describe(
           'Disable purging all messages in queues when a consumer starts up',
+        ),
+      CLEANUP_DEPRECATED_QUEUES: z
+        .boolean()
+        .describe(
+          'Auto-cleanup deprecated RabbitMQ queues on broker init (requires RABBITMQ_MANAGEMENT_URL)',
         ),
       RABBITMQ_FRAME_SIZE: z.number().optional(),
     }),

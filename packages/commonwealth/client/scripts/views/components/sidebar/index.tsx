@@ -50,7 +50,7 @@ export const Sidebar = ({
   }, [menuVisible, onMobile, recentlyUpdatedVisibility]);
 
   return (
-    <div className={sidebarClass} style={{ left }}>
+    <div className={sidebarClass} style={{ left }} data-testid="sidebar">
       {isInsideCommunity ? (
         <div className="sidebar-header-wrapper">
           <SidebarHeader

@@ -1,5 +1,4 @@
 import { calculateTotalXPForQuestActions, QuestAction } from 'helpers/quest';
-import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
@@ -21,12 +20,10 @@ const TotalQuestXPTag = ({
   hideGainedXp = false,
 }: TotalQuestXPTagProps) => {
   const user = useUserStore();
-  const xpEnabled = useFlag('xp');
-
   const { data: xpProgressions = [] } = useGetXPs({
     user_id: user.id,
     quest_id: questId,
-    enabled: user.isLoggedIn && xpEnabled && !hideGainedXp,
+    enabled: user.isLoggedIn && !hideGainedXp,
   });
 
   const gainedXP =

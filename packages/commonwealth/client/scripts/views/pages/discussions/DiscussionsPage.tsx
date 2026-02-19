@@ -17,6 +17,13 @@ import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { HeaderWithFilters } from './HeaderWithFilters';
+import {
+  DISCUSSIONS_VIEWS,
+  filterVisibleThreads,
+  getTopicValidationNavigationDecision,
+  resolveDiscussionsViewFromTab,
+  shouldShowPrivateTopicBlock,
+} from './discussionsPage.contracts';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import {
@@ -40,7 +47,7 @@ import useTopicGating from 'hooks/useTopicGating';
 import { ThreadKind } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
-import { prettyVoteWeight } from 'shared/adapters/currency';
+import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useCreateThreadMutation, {
   buildCreateThreadInput,
@@ -50,7 +57,6 @@ import { saveToClipboard } from 'utils/clipboard';
 import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 // eslint-disable-next-line max-len
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import TokenBanner from 'views/components/TokenBanner';
@@ -81,14 +87,12 @@ export type ListContainerProps = React.HTMLProps<HTMLDivElement> & {
 };
 
 const VIEWS = [
-  { value: 'all', label: 'All' },
-  { value: 'overview', label: 'Overview' },
-  { value: 'cardview', label: 'Cardview' },
+  { value: DISCUSSIONS_VIEWS.ALL, label: 'All' },
+  { value: DISCUSSIONS_VIEWS.OVERVIEW, label: 'Overview' },
+  { value: DISCUSSIONS_VIEWS.CARDVIEW, label: 'Cardview' },
 ];
 
 const DiscussionsPage = () => {
-  const privateTopicsEnabled = useFlag('privateTopics');
-
   const [selectedView, setSelectedView] = useState<string>();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -118,13 +122,7 @@ const DiscussionsPage = () => {
   const tabStatus = searchParams.get('tab');
 
   useLayoutEffect(() => {
-    if (tabStatus === 'overview') {
-      setSelectedView(VIEWS[1].value);
-    } else if (tabStatus === 'cardview') {
-      setSelectedView(VIEWS[2].value);
-    } else {
-      setSelectedView(VIEWS[0].value);
-    }
+    setSelectedView(resolveDiscussionsViewFromTab(tabStatus));
   }, [tabStatus]);
 
   const topicIdentifiersFromURL = generateTopicIdentifiersFromUrl(
@@ -220,12 +218,11 @@ const DiscussionsPage = () => {
     );
     // Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
     // Checks both for mobile device and inner window size for desktop responsiveness
-    const filtered = threads.filter((t) => {
-      if (!includeSpamThreads && t.markedAsSpamAt) return null;
-      if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt)
-        return null;
-      if (isOnArchivePage && !t.archivedAt) return null;
-      return t;
+    const filtered = filterVisibleThreads<Thread>({
+      threads,
+      includeSpamThreads,
+      includeArchivedThreads,
+      isOnArchivePage,
     });
     setFilteredThreads(filtered);
   }, [
@@ -239,37 +236,24 @@ const DiscussionsPage = () => {
 
   //checks for malformed url in topics and redirects if the topic does not exist
   useEffect(() => {
-    if (
-      !isLoadingTopics &&
-      topicIdentifiersFromURL &&
-      topicIdentifiersFromURL.topicName !== 'archived' &&
-      topicIdentifiersFromURL.topicName !== 'overview' &&
-      tabStatus !== 'overview'
-    ) {
-      // Don't redirect if we're on a discussion page
-      if (location.pathname.includes('/discussion/')) {
-        return;
-      }
+    const topicValidationDecision = getTopicValidationNavigationDecision({
+      isLoadingTopics,
+      topicIdentifiersFromURL,
+      tabStatus,
+      pathname: location.pathname,
+      topics,
+      sanitizeTopicName,
+      generateUrlPartForTopicIdentifiers,
+    });
 
-      const validTopic = topics?.find(
-        (topic) =>
-          sanitizeTopicName(topic?.name) === topicIdentifiersFromURL.topicName,
-      );
-      if (!validTopic) {
-        navigate('/discussions');
-      }
-      if (
-        validTopic &&
-        (!topicIdentifiersFromURL.topicId ||
-          topicIdentifiersFromURL.topicId !== validTopic.id)
-      ) {
-        const identifier = generateUrlPartForTopicIdentifiers(
-          validTopic?.id,
-          validTopic.name,
-        );
-        navigate(`/discussions/${encodeURI(identifier)}`, { replace: true });
+    if (topicValidationDecision.type === 'navigate') {
+      if (topicValidationDecision.replace) {
+        navigate(topicValidationDecision.target, { replace: true });
+      } else {
+        navigate(topicValidationDecision.target);
       }
     }
+
     if (topicIdentifiersFromURL?.topicName === 'overview') {
       setSelectedView(VIEWS[1].value);
     }
@@ -295,13 +279,25 @@ const DiscussionsPage = () => {
 
   const voteWeight =
     isTopicWeighted && voteBalance
-      ? prettyVoteWeight(
-          formatDecimalToWei(voteBalance, topicObj!.token_decimals ?? 18),
-          topicObj!.token_decimals,
+      ? prettyCompoundVoteWeight(
+          [
+            {
+              wei: formatDecimalToWei(
+                voteBalance,
+                topicObj!.token_decimals ?? 18,
+              ),
+              tokenNumDecimals: topicObj!.token_decimals,
+              multiplier: topicObj!.vote_weight_multiplier || 1,
+              tokenSymbol: topicObj?.token_symbol || undefined,
+            },
+            ...(topicObj?.secondary_tokens || []).map((token) => ({
+              wei: '0', // TODO: fetch actual balance for secondary tokens
+              tokenNumDecimals: token.token_decimals,
+              multiplier: token.vote_weight_multiplier,
+              tokenSymbol: token.token_symbol,
+            })),
+          ],
           topicObj!.weighted_voting as TopicWeightedVoting,
-          topicObj!.vote_weight_multiplier || 1,
-          undefined,
-          topicObj?.token_symbol || undefined,
         )
       : '';
 
@@ -392,10 +388,11 @@ const DiscussionsPage = () => {
   };
 
   if (
-    privateTopicsEnabled &&
-    isPrivateTopic &&
-    !isAllowedMember &&
-    !bypassGating
+    shouldShowPrivateTopicBlock({
+      isPrivateTopic,
+      isAllowedMember,
+      bypassGating,
+    })
   ) {
     return (
       <StickCommentProvider mode="thread">

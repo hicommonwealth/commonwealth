@@ -38,7 +38,6 @@ export const CreateTopicSection = ({
   onGroupsSelected,
   topicFormData,
 }: CreateTopicSectionProps) => {
-  const privateTopicsEnabled = useFlag('privateTopics');
   const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
   const communityId = app.activeChainId() || '';
@@ -256,23 +255,21 @@ export const CreateTopicSection = ({
               />
             )}
           </div>
-          {privateTopicsEnabled && (
-            <CWCheckbox
-              label={
-                <div>
-                  <CWText type="b2">Private topic</CWText>
-                  <CWText type="caption" className="checkbox-label-caption">
-                    Only members of the selected group will be able to see and
-                    contribute to this topic. Admins always have access by
-                    default.
-                  </CWText>
-                </div>
-              }
-              checked={isPrivate}
-              onChange={() => setIsPrivate(!isPrivate)}
-            />
-          )}
-          {privateTopicsEnabled && isPrivate && (
+          <CWCheckbox
+            label={
+              <div>
+                <CWText type="b2">Private topic</CWText>
+                <CWText type="caption" className="checkbox-label-caption">
+                  Only members of the selected group will be able to see and
+                  contribute to this topic. Admins always have access by
+                  default.
+                </CWText>
+              </div>
+            }
+            checked={isPrivate}
+            onChange={() => setIsPrivate(!isPrivate)}
+          />
+          {isPrivate && (
             <CWSelectList
               isMulti
               label="Allowed groups"

@@ -1,5 +1,4 @@
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
-import { OpenFeature } from '@openfeature/web-sdk';
+import { DEFAULT_NAME, MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useTopicGating from 'hooks/useTopicGating';
@@ -47,9 +46,6 @@ import {
   SearchFilters,
 } from './index.types';
 
-const client = OpenFeature.getClient();
-const referralsEnabled = client.getBooleanValue('referrals', false);
-
 enum TabValues {
   AllMembers = 'all-members',
   Leaderboard = 'leaderboard',
@@ -58,9 +54,7 @@ enum TabValues {
 
 const TABS = [
   { value: TabValues.AllMembers, label: 'All members' },
-  ...(referralsEnabled
-    ? [{ value: TabValues.Leaderboard, label: 'Leaderboard' }]
-    : []),
+  { value: TabValues.Leaderboard, label: 'Leaderboard' },
   { value: TabValues.Groups, label: 'Groups' },
 ];
 
@@ -175,9 +169,10 @@ const CommunityMembersPage = () => {
       ? 'last_active'
       : tableState.orderBy) as MemberResultsOrderBy,
     order_direction: tableState.orderDirection as APIOrderDirection,
-    ...(debouncedSearchTerm && {
-      search: debouncedSearchTerm,
-    }),
+    ...(debouncedSearchTerm &&
+      debouncedSearchTerm.length >= MIN_SEARCH_LENGTH && {
+        search: debouncedSearchTerm,
+      }),
     community_id: communityId,
     include_roles: true,
     ...(membershipsFilter && {

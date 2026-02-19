@@ -2,7 +2,10 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import './linked_addresses.scss';
 
-import { getChainIcon } from 'client/scripts/utils/chainUtils';
+import {
+  getChainIcon,
+  getWalletIconName,
+} from 'client/scripts/utils/chainUtils';
 import { notifyError } from 'controllers/app/notifications';
 import { formatAddressShort } from 'shared/utils';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -44,7 +47,7 @@ type LinkedAddressesProps = {
 };
 
 const Address = ({ addressInfo }: AddressProps) => {
-  const { address, walletId, community } = addressInfo;
+  const { address, walletId, walletSsoSource, community } = addressInfo;
 
   // Get community data to determine chain base
   const { data: fetchedCommunity } = useGetCommunityByIdQuery({
@@ -60,7 +63,7 @@ const Address = ({ addressInfo }: AddressProps) => {
           iconSize="small"
         />
         <CWIdentificationTag
-          iconLeft={walletId}
+          iconLeft={getWalletIconName(walletId, walletSsoSource)}
           address={`\u2022 ${formatAddressShort(address)}`}
         />
       </div>
@@ -144,7 +147,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
 
   const { profile, addresses, refreshProfiles } = props;
   const user = useUserStore();
-  const { data: claimAddress } = useGetClaimAddressQuery({
+  const { data: claimAddresses } = useGetClaimAddressQuery({
     enabled: user.isLoggedIn,
   });
 
@@ -163,12 +166,12 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
       isBulkDelete: boolean,
       community: string,
     ) => {
-      if (
-        val &&
-        claimAddress?.address &&
-        selectedAddress?.address?.toLowerCase() ===
-          claimAddress.address.toLowerCase()
-      ) {
+      const hasAddressInClaimAddresses = claimAddresses?.some(
+        (claimAddress) =>
+          claimAddress.address?.toLowerCase() ===
+          selectedAddress?.address?.toLowerCase(),
+      );
+      if (val && hasAddressInClaimAddresses) {
         notifyError(
           'You cannot disconnect the address saved for claiming rewards.',
         );
@@ -180,7 +183,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
       setIsBulkDeleteState(val ? isBulkDelete : false);
       setSelectedCommunity(val ? community : null);
     },
-    [claimAddress],
+    [claimAddresses],
   );
 
   const rowData = useMemo(

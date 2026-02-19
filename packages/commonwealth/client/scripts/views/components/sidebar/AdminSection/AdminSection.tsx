@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { handleRedirectClicks } from 'helpers';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
@@ -10,6 +11,7 @@ import { useSidebarTreeToggle } from '../useSidebarTreeToggle';
 
 const AdminSection = () => {
   const communityId = app.activeChainId() || '';
+  const marketsEnabled = useFlag('markets');
 
   const navigate = useCommonNavigate();
   const location = useLocation();
@@ -25,6 +27,10 @@ const AdminSection = () => {
   );
   const matchesCommunityIntegrationsRoute = matchRoutes(
     [{ path: '/manage/integrations' }, { path: ':scope/manage/integrations' }],
+    location,
+  );
+  const matchesMarketIntegrationsRoute = matchRoutes(
+    [{ path: '/manage/markets' }, { path: ':scope/manage/markets' }],
     location,
   );
   const matchesCommunityTopicsRoute = matchRoutes(
@@ -89,6 +95,28 @@ const AdminSection = () => {
           communityId,
           () => {
             setToggleTree(`children.integrations.toggledState`, toggle);
+          },
+        );
+      },
+    },
+    {
+      title: 'Market Integrations',
+      containsChildren: false,
+      displayData: null,
+      hasDefaultToggle: false,
+      isActive: !!matchesMarketIntegrationsRoute,
+      isVisible: marketsEnabled,
+      isUpdated: false,
+      onClick: (e, toggle: boolean) => {
+        e.preventDefault();
+        resetSidebarState();
+        handleRedirectClicks(
+          navigate,
+          e,
+          `/manage/markets`,
+          communityId,
+          () => {
+            setToggleTree(`children.marketIntegrations.toggledState`, toggle);
           },
         );
       },

@@ -1,5 +1,6 @@
 import * as govAbis from '@commonxyz/common-governance-abis';
 import * as abis from '@commonxyz/common-protocol-abis';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 
 // Chains with deployed namespace factories. As new chains are enabled, add here.
 
@@ -16,6 +17,7 @@ export enum ValidChains {
   SKALE_TEST = 974399131,
   // SKALE = 1564830818,
   Anvil = 31337,
+  Soneium = 1868,
 }
 
 const chains = Object.entries(ValidChains)
@@ -89,8 +91,8 @@ export const factoryContracts: FactoryContractsType = {
     // veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
     VoteGovernance: '0x959982eFDa4ed7840a67CF56042e46ad16A1EF88',
     CommunityNominations: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
-    TokenLaunchpad: '0x2518d4d38547953C6d96a9cDB76F25A0c0630c43',
-    TokenBondingCurve: '0x815D6c411eeCaB081FF76dBcF05484B0991CE55C',
+    TokenLaunchpad: '0x1fB82e534F0E81527970BFA3096ED1b728922ff8',
+    TokenBondingCurve: '0x3b3A346A679fd721710D778551766A71482926dd',
     chainId: 84532,
   },
   [ValidChains.Blast]: {
@@ -105,6 +107,8 @@ export const factoryContracts: FactoryContractsType = {
     LPBondingCurve: '0x4bF195932E20Dc8459419Bc93a84B713bED20f38',
     TokenCommunityManager: '0x84A0CFb53a77202777fdbc845e7A5bb214311e88',
     ReferralFeeManager: '0x9d3BE262bed6F3A0AAb4E97c0232071EF730632f',
+    TokenLaunchpad: '0x2B70EB40C86c9A4F899D4eb8C688D2D5Eb6181f8',
+    TokenBondingCurve: '0x70540bcDb2C8faBE2503374DfaBc4cE149184CBe',
     chainId: 8453,
   },
   [ValidChains.Linea]: {
@@ -146,9 +150,14 @@ export const factoryContracts: FactoryContractsType = {
     ReferralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
     // veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
     CommunityNominations: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
-    TokenLaunchpad: '0x2518d4d38547953C6d96a9cDB76F25A0c0630c43',
-    TokenBondingCurve: '0x815D6c411eeCaB081FF76dBcF05484B0991CE55C',
+    TokenLaunchpad: '0x57299785Beae152185d13e6CC331315e2D71A2FD',
+    TokenBondingCurve: '0xdB4920FBDB879171D2A71fCbb1f7c9F8Fc59fa2e',
     chainId: 31337,
+  },
+  [ValidChains.Soneium]: {
+    NamespaceFactory: ZERO_ADDRESS,
+    CommunityStake: ZERO_ADDRESS,
+    chainId: 1868,
   },
 };
 

@@ -6,20 +6,23 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
 
+function bigIntFromSci(str: string): bigint {
+  return BigInt(Math.trunc(Number(str)));
+}
+
 export const approveTokenTransfer = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tokenContract: any,
   spender: string,
-  amount: string,
+  amount: bigint,
   walletAddress: string,
 ) => {
   try {
     const allowance = await tokenContract.methods
       .allowance(walletAddress, spender)
       .call();
-    const bigIntAmount = BigInt(Number(amount));
-    if (BigInt(allowance) < bigIntAmount) {
-      await tokenContract.methods.approve(spender, bigIntAmount).send({
+    if (BigInt(allowance) < amount) {
+      await tokenContract.methods.approve(spender, amount).send({
         from: walletAddress,
       });
     }
@@ -52,7 +55,7 @@ export const launchPostToken = async (
     await approveTokenTransfer(
       tokenContract,
       bondingCurveAddress,
-      initPurchaseAmount.toString(),
+      BigInt(initPurchaseAmount),
       walletAddress,
     );
     const txReceipt = await contract.methods
@@ -69,6 +72,7 @@ export const launchPostToken = async (
         connectorWeight,
         threadId,
         exchangeToken,
+        initPurchaseAmount,
         initPurchaseAmount,
       )
       .send({ from: walletAddress, value: 1e15 });
@@ -90,18 +94,20 @@ export const buyPostToken = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   paymentTokenContract: any,
 ) => {
+  const safeAmountIn = bigIntFromSci(amountIn);
+  const safMinAmountOut = bigIntFromSci(minAmountOut);
   try {
     await approveTokenTransfer(
       paymentTokenContract,
       contract.options.address,
-      amountIn,
+      safeAmountIn,
       walletAddress,
     );
     const feeAmount = await contract.methods
-      .getETHFeeAmount(tokenAddress, amountIn, true)
+      .getETHFeeAmount(tokenAddress, safeAmountIn, true)
       .call();
     const txReceipt = await contract.methods
-      .buyToken(tokenAddress, amountIn, minAmountOut)
+      .buyToken(tokenAddress, safeAmountIn, safMinAmountOut)
       .send({ from: walletAddress, value: feeAmount });
     return txReceipt;
   } catch (error) {
@@ -120,18 +126,20 @@ export const sellPostToken = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tokenContract: any,
 ) => {
+  const safeAmountIn = bigIntFromSci(amount);
+  const safeMinAmountOut = bigIntFromSci(minAmountOut);
   try {
     await approveTokenTransfer(
       tokenContract,
       contract.options.address,
-      amount,
+      safeAmountIn,
       walletAddress,
     );
     const feeAmount = await contract.methods
-      .getETHFeeAmount(tokenAddress, amount, false)
+      .getETHFeeAmount(tokenAddress, safeAmountIn, false)
       .call();
     const txReceipt = await contract.methods
-      .sellToken(tokenAddress, amount, minAmountOut)
+      .sellToken(tokenAddress, safeAmountIn, safeMinAmountOut)
       .send({ from: walletAddress, value: feeAmount });
     return txReceipt;
   } catch (error) {
@@ -190,16 +198,18 @@ export const transferPostLiquidity = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   paymentTokenContract: any,
 ) => {
+  const safeAmountIn = bigIntFromSci(amountIn);
+  const safeMinAmountOut = bigIntFromSci(minAmountOut);
   try {
     await approveTokenTransfer(
       paymentTokenContract,
       contract.options.address,
-      amountIn,
+      safeAmountIn,
       walletAddress,
     );
 
     const txReceipt = await contract.methods
-      .transferLiquidity(tokenAddress, amountIn, minAmountOut)
+      .transferLiquidity(tokenAddress, safeAmountIn, safeMinAmountOut)
       .send({ from: walletAddress, value: 0 });
     return txReceipt;
   } catch (error) {
@@ -235,5 +245,6 @@ export const getPostPrice = async (
   isBuy: boolean,
 ) => {
   const price = await contract.methods.getPrice(tokenAddress, amountIn, isBuy);
-  return price.call();
+  const returnPrice = await price.call();
+  return returnPrice;
 };

@@ -2,7 +2,6 @@ import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
-import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
@@ -85,6 +84,7 @@ const CommunityOnchainVerificationIntegration = lazy(
   () =>
     import('views/pages/CommunityManagement/OnchainVerificationIntegration'),
 );
+const MarketsAppPage = lazy(() => import('views/pages/MarketsAppPage'));
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -124,7 +124,7 @@ const newProposalViewPage = lazy(
   () => import('../views/pages/NewProposalViewPage'),
 );
 
-const CustomDomainRoutes = () => {
+const CustomDomainRoutes = (marketsEnabled: boolean) => {
   return [
     <Route
       key="/"
@@ -188,11 +188,6 @@ const CustomDomainRoutes = () => {
       key="/home"
       path="/home"
       element={withLayout(HomePage, { type: 'common' })}
-    />,
-    <Route
-      key="/mobile-signin"
-      path="/mobile-signin"
-      element={withLayout(MobileSignIn, { type: 'common' })}
     />,
     <Route
       key="/search"
@@ -399,6 +394,17 @@ const CustomDomainRoutes = () => {
         scoped: true,
       })}
     />,
+    ...(marketsEnabled
+      ? [
+          <Route
+            key="/markets-app"
+            path="/markets-app"
+            element={withLayout(MarketsAppPage, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : []),
     <Route
       key="/manage/integrations/token"
       path="/manage/integrations/token"
