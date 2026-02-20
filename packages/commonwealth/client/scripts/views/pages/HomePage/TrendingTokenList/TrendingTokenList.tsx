@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import { APIOrderDirection } from 'helpers/constants';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
@@ -45,13 +45,22 @@ const TrendingTokensList = ({
   }>({ isOpen: false, tradeConfig: undefined });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const { register, trigger } = useDeferredConditionTriggerCallback({
     shouldRunTrigger: user.isLoggedIn,
   });
 
+  // Increase limit for carousel variants to ensure smooth scrolling
+  const fetchLimit = useMemo(() => {
+    if (variant === 'trending' || variant === 'recent') {
+      return Math.max(limit, 30); // Fetch at least 30 tokens for carousel
+    }
+    return limit;
+  }, [variant, limit]);
+
   const { data: tokensList, isInitialLoading } = useFetchTokensQuery({
     cursor: 1,
-    limit,
+    limit: fetchLimit,
     with_stats: variant !== 'recent',
     order_by: (() => {
       if (variant === 'trending') return '24_hr_pct_change';
@@ -65,13 +74,18 @@ const TrendingTokensList = ({
   });
   const tokens = (tokensList?.pages || [])
     .flatMap((page) => page.results)
-    .slice(0, limit);
+    .slice(0, fetchLimit);
 
-  const listRef = useRef<HTMLDivElement>(null);
+  // Duplicate tokens for seamless infinite scroll (only for carousel variants)
+  const carouselTokens = useMemo(() => {
+    if ((variant === 'trending' || variant === 'recent') && tokens.length > 0) {
+      // Duplicate the array 3 times for seamless loop
+      return [...tokens, ...tokens, ...tokens];
+    }
+    return tokens;
+  }, [tokens, variant]);
 
-  useEffect(() => {
-    listRef.current?.scrollTo({ left: 0 });
-  }, []);
+  const isCarousel = variant === 'trending' || variant === 'recent';
 
   const openAuthModalOrTriggerCallback = () => {
     if (user.isLoggedIn) {
@@ -116,33 +130,50 @@ const TrendingTokensList = ({
           </CWText>
         </div>
       ) : (
-        <div className="list" ref={listRef}>
-          {(tokens || []).map((token) => {
-            return (
-              <TrendingToken
-                key={token.name}
-                token={token as LaunchpadToken}
-                onCTAClick={(mode) => {
-                  register({
-                    cb: () => {
-                      handleCTAClick(
-                        mode,
-                        token as z.infer<typeof TokenWithCommunity>,
-                      );
-                    },
-                  });
-                  openAuthModalOrTriggerCallback();
-                }}
-                onCardBodyClick={() =>
-                  navigateToCommunity({
-                    navigate,
-                    path: '',
-                    chain: token.community_id,
-                  })
-                }
-              />
-            );
+        <div
+          className={clsx('list', {
+            'carousel-container': isCarousel,
           })}
+          onMouseEnter={() => isCarousel && setIsPaused(true)}
+          onMouseLeave={() => isCarousel && setIsPaused(false)}
+        >
+          <div
+            className={clsx('carousel-track', {
+              carousel: isCarousel,
+              paused: isPaused && isCarousel,
+            })}
+          >
+            {(isCarousel ? carouselTokens : tokens).map((token, index) => {
+              // Use a unique key that includes index for duplicated items
+              const uniqueKey = isCarousel
+                ? `${token.name}-${index}`
+                : token.name;
+              return (
+                <TrendingToken
+                  key={uniqueKey}
+                  token={token as LaunchpadToken}
+                  onCTAClick={(mode) => {
+                    register({
+                      cb: () => {
+                        handleCTAClick(
+                          mode,
+                          token as z.infer<typeof TokenWithCommunity>,
+                        );
+                      },
+                    });
+                    openAuthModalOrTriggerCallback();
+                  }}
+                  onCardBodyClick={() =>
+                    navigateToCommunity({
+                      navigate,
+                      path: '',
+                      chain: token.community_id,
+                    })
+                  }
+                />
+              );
+            })}
+          </div>
         </div>
       )}
       <AuthModal
