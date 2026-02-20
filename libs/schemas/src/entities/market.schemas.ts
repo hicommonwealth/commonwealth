@@ -17,6 +17,10 @@ export const Market = z.object({
   end_time: z.coerce.date().describe('The end time of the market'),
   status: z.enum(MarketStatus).describe('The status of the market'),
   image_url: z.string().nullish().describe('The image URL for the market'),
+  is_globally_featured: z
+    .boolean()
+    .optional()
+    .describe('Whether this market is featured globally in explore page'),
   created_at: z.coerce
     .date()
     .optional()

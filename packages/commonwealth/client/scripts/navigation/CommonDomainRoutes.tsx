@@ -123,6 +123,7 @@ const NewSnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/NewSnapshotProposal'),
 );
 const AdminPanelPage = lazy(() => import('views/pages/AdminPanel'));
+const ManageMarketsPage = lazy(() => import('views/pages/ManageMarketsPage'));
 
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
@@ -502,6 +503,11 @@ const CommonDomainRoutes = (marketsEnabled: boolean) => {
       key="/admin-panel"
       path="/admin-panel"
       element={withLayout(AdminPanelPage, { type: 'common' })}
+    />,
+    <Route
+      key="/manageMarkets"
+      path="/manageMarkets"
+      element={withLayout(ManageMarketsPage, { type: 'common' })}
     />,
     ...(marketsEnabled
       ? [

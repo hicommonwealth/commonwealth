@@ -527,7 +527,12 @@ export const RefreshWeightedVotes = {
 
 export const SubscribeMarket = {
   input: z.object({
-    community_id: z.string(),
+    community_id: z
+      .string()
+      .optional()
+      .describe(
+        'Community ID. If not provided (site admin only), subscribes globally.',
+      ),
     provider: z.enum(Markets),
     slug: z.string(),
     question: z.string(),
@@ -543,7 +548,12 @@ export const SubscribeMarket = {
 
 export const UnsubscribeMarket = {
   input: z.object({
-    community_id: z.string(),
+    community_id: z
+      .string()
+      .optional()
+      .describe(
+        'Community ID. If not provided (site admin only), unsubscribes globally.',
+      ),
     slug: z.string(),
   }),
   output: z.boolean(),

@@ -17,23 +17,10 @@ export function GetMarkets(): Query<typeof schemas.GetMarkets> {
 
       const { community_id, limit = 20, cursor = 1 } = payload;
 
-      const countResult = await models.sequelize.query<{ count: string }>(
-        `
-        SELECT COUNT(*) as count
-        FROM 
-          "CommunityMarkets" cm
-          JOIN "Markets" m ON cm.market_id = m.id
-        WHERE 
-          cm.community_id = :community_id
-      `,
-        {
-          replacements: { community_id },
-          type: QueryTypes.SELECT,
-        },
-      );
-
-      const totalResults = parseInt(countResult[0]?.count || '0', 10);
-
+      // This query supports two modes:
+      // 1. All markets: When community_id is not provided, returns all markets in the system
+      // 2. Community markets: When community_id is provided, returns markets subscribed
+      //    to that specific community via CommunityMarkets join table
       const pagination = formatSequelizePagination({
         limit,
         cursor,
@@ -41,6 +28,30 @@ export function GetMarkets(): Query<typeof schemas.GetMarkets> {
         order_direction: 'DESC',
       });
 
+      // Build conditional WHERE clause and JOIN based on community_id
+      const whereClause = community_id
+        ? 'WHERE cm.community_id = :community_id'
+        : '';
+      const joinClause = community_id
+        ? 'FROM "CommunityMarkets" cm JOIN "Markets" m ON cm.market_id = m.id'
+        : 'FROM "Markets" m';
+
+      // Count query
+      const countResult = await models.sequelize.query<{ count: string }>(
+        `
+        SELECT COUNT(*) as count
+        ${joinClause}
+        ${whereClause}
+      `,
+        {
+          replacements: community_id ? { community_id } : {},
+          type: QueryTypes.SELECT,
+        },
+      );
+
+      const totalResults = parseInt(countResult[0]?.count || '0', 10);
+
+      // Markets query
       const markets = await models.sequelize.query<
         z.infer<typeof schemas.MarketView>
       >(
@@ -55,19 +66,17 @@ export function GetMarkets(): Query<typeof schemas.GetMarkets> {
           m.end_time,
           m.status,
           m.image_url,
+          m.is_globally_featured,
           m.created_at,
           m.updated_at
-        FROM 
-          "CommunityMarkets" cm
-          JOIN "Markets" m ON cm.market_id = m.id
-        WHERE 
-          cm.community_id = :community_id
+        ${joinClause}
+        ${whereClause}
         ORDER BY m.created_at DESC
         LIMIT :limit OFFSET :offset
       `,
         {
           replacements: {
-            community_id,
+            ...(community_id ? { community_id } : {}),
             limit: pagination.limit,
             offset: pagination.offset,
           },
