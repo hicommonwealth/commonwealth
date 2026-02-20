@@ -4,7 +4,6 @@ import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useFlag } from 'shared/hooks/useFlag';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import CWTab from 'views/components/component_kit/new_designs/CWTabs/CWTab';
@@ -82,12 +81,6 @@ const ExplorePage = () => {
     <CWPageLayout ref={containerRef} className="ExplorePageLayout">
       <div className="ExplorePage">
         <div className="header-section">
-          <div className="description">
-            <CWText type="h1" fontWeight="semiBold">
-              Explore
-            </CWText>
-          </div>
-
           <IdeaLaunchpad />
 
           <CWTextInput
