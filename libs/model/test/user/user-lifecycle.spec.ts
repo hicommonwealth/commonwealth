@@ -225,7 +225,7 @@ describe('User lifecycle', () => {
         payload: {
           name: 'xp quest 1',
           description: chance.sentence(),
-          image_url: chance.url(),
+          image_url: 'https://example.com/image.png',
           community_id,
           start_date: dayjs().add(2, 'day').toDate(),
           end_date: dayjs().add(3, 'day').toDate(),
@@ -427,7 +427,7 @@ describe('User lifecycle', () => {
         payload: {
           name: 'xp quest 2',
           description: chance.sentence(),
-          image_url: chance.url(),
+          image_url: 'https://example.com/image.png',
           start_date: dayjs().add(2, 'day').toDate(),
           end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 100,
@@ -839,7 +839,7 @@ describe('User lifecycle', () => {
         payload: {
           name: 'xp concurrent 1',
           description: chance.sentence(),
-          image_url: chance.url(),
+          image_url: 'https://example.com/image.png',
           community_id,
           start_date: dayjs().add(2, 'day').toDate(),
           end_date: dayjs().add(3, 'day').toDate(),
@@ -852,7 +852,7 @@ describe('User lifecycle', () => {
         payload: {
           name: 'xp concurrent 2',
           description: chance.sentence(),
-          image_url: chance.url(),
+          image_url: 'https://example.com/image.png',
           community_id,
           start_date: dayjs().add(2, 'day').toDate(),
           end_date: dayjs().add(3, 'day').toDate(),
@@ -932,7 +932,7 @@ describe('User lifecycle', () => {
         payload: {
           name: 'xp quest with low cap',
           description: chance.sentence(),
-          image_url: chance.url(),
+          image_url: 'https://example.com/image.png',
           community_id,
           start_date: dayjs().add(2, 'day').toDate(),
           end_date: dayjs().add(3, 'day').toDate(),
@@ -1036,7 +1036,7 @@ describe('User lifecycle', () => {
         payload: {
           name: 'xp quest for memberships',
           description: chance.sentence(),
-          image_url: chance.url(),
+          image_url: 'https://example.com/image.png',
           start_date: dayjs().add(2, 'day').toDate(),
           end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 200,
@@ -1100,7 +1100,7 @@ describe('User lifecycle', () => {
         payload: {
           name: 'xp quest for wallet linking',
           description: chance.sentence(),
-          image_url: chance.url(),
+          image_url: 'https://example.com/image.png',
           start_date: dayjs().add(2, 'day').toDate(),
           end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 200,

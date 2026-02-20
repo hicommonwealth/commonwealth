@@ -14,7 +14,7 @@ describe('Contests metadata commands lifecycle', () => {
   const payout_structure = [10, 90];
   const prize_percentage = 1;
   const funding_token_address = 'funding-address';
-  const image_url = 'url';
+  const image_url = 'https://example.com/contest.png';
   const interval = 10;
   const ticker = 'XYZ';
   const decimals = 18;
@@ -237,7 +237,7 @@ describe('Contests metadata commands lifecycle', () => {
           community_id,
           contest_address,
           name: 'xxx',
-          image_url: 'https://blah',
+          image_url: 'https://example.com/updated.png',
         },
       });
 
@@ -269,7 +269,7 @@ describe('Contests metadata commands lifecycle', () => {
             community_id,
             contest_address,
             name: 'xxx',
-            image_url: 'https://blah',
+            image_url: 'https://example.com/updated.png',
           },
         },
       );
@@ -279,7 +279,7 @@ describe('Contests metadata commands lifecycle', () => {
         contest_address,
         name: 'xxx',
         community_id,
-        image_url: 'https://blah',
+        image_url: 'https://example.com/updated.png',
         funding_token_address,
         prize_percentage,
         payout_structure,
