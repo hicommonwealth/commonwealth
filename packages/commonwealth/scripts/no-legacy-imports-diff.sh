@@ -89,7 +89,9 @@ for file_path in "${CHANGED_TS_FILES[@]}"; do
     fi
 
     clean_line="${added_line#+}"
-    if matches_legacy_import "$clean_line"; then
+    if matches_legacy_import "$clean_line" \
+      && ! [[ "$clean_line" =~ \'client/scripts/ ]] \
+      && ! [[ "$clean_line" =~ \"client/scripts/ ]]; then
       key="$(legacy_import_key "$clean_line")"
       if [ -n "$key" ] && grep -Fqx -- "$key" "$removed_lines_file"; then
         reduced_removed_lines_file="$(mktemp)"

@@ -24,7 +24,7 @@ if [ "${#CHANGED_TS_FILES[@]}" -eq 0 ]; then
   exit 0
 fi
 
-STUB_PATH_REGEX="(helpers/(constants|formatting|dates|link)|hooks/(useDraft|useBeforeUnload|useWindowResize|useNecessaryEffect|useForceRerender)|utils/trpcClient)"
+STUB_PATH_REGEX="(helpers/(constants|formatting|dates|link)|hooks/(useDraft|useBeforeUnload|useWindowResize|useNecessaryEffect|useForceRerender))"
 STUB_ALIAS_REGEX="(from|import\\(|require\\()[[:space:]]*['\"]${STUB_PATH_REGEX}([./'\"]|$)"
 STUB_RELATIVE_REGEX="(from|import\\(|require\\()[[:space:]]*['\"](\\./|\\.\\./)+${STUB_PATH_REGEX}([./'\"]|$)"
 
