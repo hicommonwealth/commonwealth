@@ -24,8 +24,8 @@ import {
   CWTabsRow,
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import useCommunityContests from 'client/scripts/views/pages/CommunityManagement/Contests/useCommunityContests';
-import { useFlag } from 'hooks/useFlag';
 import React, { useMemo, useState } from 'react';
+import { useFlag } from 'shared/hooks/useFlag';
 import app from 'state';
 import { AddressItem, CheckboxOption, RadioOption } from './AddressItem';
 import './ManageOnchainModal.scss';

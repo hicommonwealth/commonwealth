@@ -1,11 +1,11 @@
 import { slugify } from '@hicommonwealth/shared';
-import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { getProposalUrlPath } from 'identifiers';
 import _ from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
+import useForceRerender from 'shared/hooks/useForceRerender';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
 import app from 'state';
 import { usePoolParamsQuery } from 'state/api/chainParams';
 import {

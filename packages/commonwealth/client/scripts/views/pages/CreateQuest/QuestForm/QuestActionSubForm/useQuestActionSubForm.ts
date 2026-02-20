@@ -4,8 +4,8 @@ import {
 } from '@hicommonwealth/schemas';
 import { numberNonDecimalGTZeroValidationSchema } from 'helpers/formValidations/common';
 import { splitCamelOrPascalCase } from 'helpers/string';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useEffect } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { useCWRepetitionCycleRadioButton } from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { ValidationFnProps } from 'views/components/component_kit/CWRepetitionCycleRadioButton/types';
 import { doesConfigAllowContentIdField } from '../helpers';

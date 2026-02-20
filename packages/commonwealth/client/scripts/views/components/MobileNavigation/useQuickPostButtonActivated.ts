@@ -1,4 +1,4 @@
-import useBrowserWindow from 'hooks/useBrowserWindow';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import app from 'state';
 
 export function useQuickPostButtonActivated(): boolean {

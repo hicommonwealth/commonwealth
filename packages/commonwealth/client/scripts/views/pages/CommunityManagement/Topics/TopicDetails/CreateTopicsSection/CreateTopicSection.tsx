@@ -1,8 +1,8 @@
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchGroupsQuery } from 'state/api/groups';

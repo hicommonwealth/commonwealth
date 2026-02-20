@@ -1,8 +1,8 @@
 import React from 'react';
 
 import tokenCommunityIsLiveImg from 'assets/img/tokenCommunityIsLive.png';
-import { useAnimation } from 'hooks/useAnimation';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
+import { useAnimation } from 'shared/hooks/useAnimation';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 

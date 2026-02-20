@@ -3,14 +3,14 @@ import React, { useState } from 'react';
 import commonUrl from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
 import shape2Url from 'assets/img/shapes/shape2.svg';
-import useAppStatus from 'hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
   BaseMixpanelPayload,
   MixpanelContestEvents,
 } from 'shared/analytics/types';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import { useFlag } from 'shared/hooks/useFlag';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';

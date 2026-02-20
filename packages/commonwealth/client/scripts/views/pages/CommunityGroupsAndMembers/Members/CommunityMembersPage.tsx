@@ -1,6 +1,5 @@
 import { DEFAULT_NAME, MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'helpers/constants';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -10,6 +9,7 @@ import {
   MixpanelPageViewEvent,
   MixpanelPageViewEventPayload,
 } from 'shared/analytics/types';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import app from 'state';
 import {
   useGetCommunityByIdQuery,

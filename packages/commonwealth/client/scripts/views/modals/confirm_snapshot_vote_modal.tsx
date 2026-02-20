@@ -3,7 +3,7 @@ import React from 'react';
 import { formatBigNumberShort } from 'adapters/currency';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import useUserStore from 'state/ui/user';
 import { notifyError } from '../../controllers/app/notifications';
 import { castVote } from '../../helpers/snapshot_utils';

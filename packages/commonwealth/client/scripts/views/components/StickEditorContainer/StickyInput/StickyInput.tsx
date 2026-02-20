@@ -1,7 +1,6 @@
 import { CompletionModel, ContentType } from '@hicommonwealth/shared';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { notifyError } from 'controllers/app/notifications';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useMentionExtractor } from 'hooks/useMentionExtractor';
 import { Thread } from 'models/Thread';
 import type { Topic } from 'models/Topic';
@@ -13,6 +12,7 @@ import React, {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import { useAiCompletion } from 'state/api/ai';
 import {
   generateCommentPrompt,

@@ -1,5 +1,5 @@
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import { MutableRefObject, useEffect } from 'react';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 
 // There is no way to apply styles to first element of wrapped element with CSS.
 // This function calculates when the AuthorAndPublishInfo container is becoming

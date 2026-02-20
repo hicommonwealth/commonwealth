@@ -1,6 +1,6 @@
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { MutableRefObject } from 'react';
+import { useFlag } from 'shared/hooks/useFlag';
 import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
 import CWSectionHeader from 'views/components/component_kit/new_designs/CWSectionHeader';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';

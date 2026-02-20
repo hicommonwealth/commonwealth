@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 import { MixpanelSnapshotEvents } from 'analytics/types';
-import useAppStatus from 'hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import { PollCardProps, VoteInformation } from 'views/components/Polls';
 
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';

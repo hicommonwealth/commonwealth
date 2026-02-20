@@ -4,9 +4,9 @@ import {
   PRODUCTION_DOMAIN,
   UserFriendlyActionMap,
 } from '@hicommonwealth/shared';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,

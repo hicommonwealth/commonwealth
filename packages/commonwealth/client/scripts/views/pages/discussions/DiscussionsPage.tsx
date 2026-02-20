@@ -42,12 +42,12 @@ import { useFetchNodesQuery } from 'client/scripts/state/api/nodes';
 import { useDateCursor } from 'client/scripts/state/api/threads/dateCursor';
 import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
-import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
 import { ThreadKind } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
 import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
+import useManageDocumentTitle from 'shared/hooks/useManageDocumentTitle';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useCreateThreadMutation, {
   buildCreateThreadInput,

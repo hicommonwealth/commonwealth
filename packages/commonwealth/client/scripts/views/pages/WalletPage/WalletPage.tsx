@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
-import useBrowserWindow from 'hooks/useBrowserWindow';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import { useGetLaunchpadTradesQuery } from 'state/api/tokens';
 import {
   useGetUserReferralFeesQuery,

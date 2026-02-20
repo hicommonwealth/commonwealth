@@ -24,9 +24,9 @@ if [ "${#CHANGED_TS_FILES[@]}" -eq 0 ]; then
   exit 0
 fi
 
-STUB_REGEX="(helpers/(constants|formatting|dates|link)|hooks/(useDraft|useBeforeUnload|useWindowResize|useNecessaryEffect|useForceRerender))"
-IMPORT_PREFIX_REGEX="(from|import\\(|require\\()[[:space:]]*['\"][^'\"]*"
-IMPORT_SUFFIX_REGEX="([./'\"]|$)"
+STUB_PATH_REGEX="(helpers/(constants|formatting|dates|link)|hooks/(useDraft|useBeforeUnload|useWindowResize|useNecessaryEffect|useForceRerender))"
+STUB_ALIAS_REGEX="(from|import\\(|require\\()[[:space:]]*['\"]${STUB_PATH_REGEX}([./'\"]|$)"
+STUB_RELATIVE_REGEX="(from|import\\(|require\\()[[:space:]]*['\"](\\./|\\.\\./)+${STUB_PATH_REGEX}([./'\"]|$)"
 
 violations=0
 
@@ -36,8 +36,8 @@ for file_path in "${CHANGED_TS_FILES[@]}"; do
       continue
     fi
 
-    if echo "$added_line" | grep -Eq "${IMPORT_PREFIX_REGEX}${STUB_REGEX}${IMPORT_SUFFIX_REGEX}"; then
-      clean_line="${added_line#+}"
+    clean_line="${added_line#+}"
+    if [[ "$clean_line" =~ $STUB_ALIAS_REGEX ]] || [[ "$clean_line" =~ $STUB_RELATIVE_REGEX ]]; then
       echo "Stub import guard violation: ${file_path}"
       echo "  + ${clean_line}"
       violations=$((violations + 1))

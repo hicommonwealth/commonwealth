@@ -24,12 +24,12 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 1.10 Remove MDX editor (commonwealth-mdxeditor) (260205) PR https://github.com/hicommonwealth/commonwealth/pull/13338 — remove mdx editor
 
 ### EPIC-2: Shared Infrastructure
-- [~] 2.1 Set up component test infrastructure (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline Vitest component harness + provider render helper merged; keep hardening as routes/features migrate
-- [~] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases — repo already uses `packages/commonwealth/shared/*`; finalize scoped alias strategy for `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, and `features/*` before file moves
-- [ ] 2.3 Migrate shared reusable hooks to shared/hooks/
-- [ ] 2.4 Migrate shared utility helpers to shared/utils/
-- [ ] 2.5 Migrate trpcClient to shared/api/
-- [ ] 2.6 Update consumer imports for shared hooks
+- [x] 2.1 Set up component test infrastructure (260219) PR TBD — added `renderWithProviders` contract coverage for route overrides, provider overrides, and query client isolation
+- [x] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases (260219) PR TBD — added scoped TS/Vite aliases for `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, `features/*` and scaffolded `client/scripts/shared/*` + `client/scripts/features/`
+- [x] 2.3 Migrate shared reusable hooks to shared/hooks/ (260219) PR TBD — moved 17 shared hooks to `client/scripts/shared/hooks/*` with legacy `hooks/*` stubs; bundle + component tests pass (`test-unit` blocked locally by Postgres.app trust-auth permissions)
+- [x] 2.4 Migrate shared utility helpers to shared/utils/ (260219) PR TBD — moved shared helpers + selected `utils/*` modules into `client/scripts/shared/utils/*` with compatibility stubs; validated via `pnpm -r check-types`, `pnpm -F commonwealth bundle`, and EPIC-2 contract tests
+- [x] 2.5 Migrate trpcClient to shared/api/ (260219) PR TBD — moved `utils/trpcClient.ts` source to `shared/api/trpcClient.ts` with legacy stub; validated by `pnpm -F commonwealth check-types`, `pnpm -F commonwealth bundle`, and `test/unit/epic2/trpcClient.contract.spec.ts`
+- [x] 2.6 Update consumer imports for shared hooks (260219) PR TBD — rewired app consumers from `hooks/<sharedHook>` to `shared/hooks/<sharedHook>` (feature-specific hooks intentionally left on legacy paths); build/typecheck/component suites pass
 - [ ] 2.7 Update consumer imports for shared utils (batch 1)
 - [ ] 2.8 Update consumer imports for shared utils (batch 2)
 - [~] 2.9 Write unit tests for extracted shared utils (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline contract suite added under `test/unit/epic2`; extend post-move assertions as modules relocate
