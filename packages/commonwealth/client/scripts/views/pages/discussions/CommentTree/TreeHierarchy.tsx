@@ -10,7 +10,6 @@ import {
   useUserAiSettingsStore,
 } from 'client/scripts/state/ui/user/userAiSettings';
 import clsx from 'clsx';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, {
   useCallback,
   useEffect,
@@ -19,6 +18,7 @@ import React, {
   useState,
 } from 'react';
 import { Virtuoso } from 'react-virtuoso';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import useUserStore from 'state/ui/user';

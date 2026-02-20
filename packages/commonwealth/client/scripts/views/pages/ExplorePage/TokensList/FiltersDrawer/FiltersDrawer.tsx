@@ -1,5 +1,5 @@
-import { useFlag } from 'hooks/useFlag';
 import React from 'react';
+import { useFlag } from 'shared/hooks/useFlag';
 import CWAccordion from 'views/components/CWAccordion';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer, {
@@ -158,8 +158,7 @@ export const FiltersDrawer = ({
                           }
                           disabled={
                             filters.withTokenSortBy ===
-                              TokenSortOptions.MostRecent ||
-                            !hasAppliedFilters
+                              TokenSortOptions.MostRecent || !hasAppliedFilters
                           }
                         />
                       ),

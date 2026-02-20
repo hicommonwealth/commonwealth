@@ -3,8 +3,8 @@
 // - this should be the only component having "Crecimiento Hackathon" event specific changes (for easy removal later on)
 // https://github.com/hicommonwealth/commonwealth/milestone/133
 
-import { useFlag } from 'hooks/useFlag';
 import React from 'react';
+import { useFlag } from 'shared/hooks/useFlag';
 import AuthButton from '../../components/AuthButton';
 import '../../components/AuthButton/AuthButton.scss';
 import { CWText } from '../../components/component_kit/cw_text';

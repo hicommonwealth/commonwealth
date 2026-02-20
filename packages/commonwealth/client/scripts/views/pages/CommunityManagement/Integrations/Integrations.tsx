@@ -1,6 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import { useFlag } from 'hooks/useFlag';
 import React from 'react';
+import { useFlag } from 'shared/hooks/useFlag';
 import app from 'state';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
 import CustomTOS from './CustomTOS';

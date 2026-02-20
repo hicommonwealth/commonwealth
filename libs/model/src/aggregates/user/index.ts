@@ -1,4 +1,5 @@
 export * from './CreateApiKey.command';
+export * from './CreateUnverifiedUser.projection';
 export * from './DeleteApiKey.command';
 export * from './DistributeSkale.command';
 export * from './FinishUpdateEmail.command';
@@ -21,4 +22,5 @@ export * from './signIn/SignIn.command';
 export * from './UpdateEmail.command';
 export * from './UpdateSettings.command';
 export * from './UpdateUser.command';
+export * from './UpgradeTier.projection';
 export * from './Xp.projection';

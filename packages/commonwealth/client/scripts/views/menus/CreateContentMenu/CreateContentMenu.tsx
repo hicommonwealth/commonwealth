@@ -219,10 +219,7 @@ export const CreateContentSidebar = ({
           }, 200);
         },
       }}
-      menuItems={getCreateContentMenuItems(
-        navigate,
-        createDiscordBotConfig,
-      )}
+      menuItems={getCreateContentMenuItems(navigate, createDiscordBotConfig)}
     />
   );
 };

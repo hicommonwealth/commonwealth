@@ -140,6 +140,58 @@ jobs:
       - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
         run: pnpm -F commonwealth run lint-diff-canary
 
+  commonwealth-boundary-lint:
+    name: Boundary Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Validate boundary fixture contracts
+        run: pnpm -F commonwealth test-boundaries-fixtures
+
+      - name: Lint frontend architectural boundaries (diff-only)
+        env:
+          ESLINT_PLUGIN_DIFF_COMMIT: ${{ github.base_ref && format('origin/{0}', github.base_ref) || 'origin/master' }}
+          BOUNDARY_LINT_WARN_ONLY: "false"
+        run: pnpm -F commonwealth lint-boundaries
+
+  commonwealth-cleanup-guards:
+    name: Cleanup Guards
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Block new legacy alias/import usage (diff-only)
+        run: pnpm -F commonwealth no-legacy-imports
+
+      - name: Block new deprecated stub imports (diff-only)
+        run: pnpm -F commonwealth no-stub-imports
+
+      - name: Circular dependency guard (diff-only, blocking)
+        run: pnpm depcruise:circular:diff
+
 
   detect-broken-ts-expect-error:
     name: Detect Broken TS expect errors
@@ -280,6 +332,26 @@ jobs:
           parallel: true
           files: libs/adapters/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info
 
+  commonwealth-component-tests:
+    name: Commonwealth Component Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Run component tests
+        run: pnpm -F commonwealth test-component -- --allowOnly=false
+
 
   commonwealth-evm-tests:
     name: EVM Devnet Tests
@@ -360,6 +432,194 @@ jobs:
 #
 #      - name: Run EVM devnet integration tests
 #        run: pnpm -F commonwealth test-devnet:integration --allowOnly=false
+
+  e2e-smoke-tests:
+    name: E2E Smoke Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    services:
+      postgres:
+        image: hicommonwealth/cw_postgres:latest
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: common_test
+          POSTGRES_PASSWORD: edgeware
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - uses: ./.github/actions/e2e
+
+      - name: Build server
+        run: pnpm -F commonwealth build
+
+      - name: Run E2E smoke tests
+        run: |
+          pnpm -F commonwealth bootstrap-test-db &&
+          (cd packages/commonwealth && SERVICE=web node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-smoke --forbid-only)
+
+      - name: Upload E2E artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-smoke-artifacts
+          path: |
+            packages/commonwealth/test/e2e/test-results
+            packages/commonwealth/playwright-report
+          retention-days: 7
+
+  e2e-refactor-tests:
+    name: E2E Refactor Route Safety Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    services:
+      postgres:
+        image: hicommonwealth/cw_postgres:latest
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: common_test
+          POSTGRES_PASSWORD: edgeware
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - uses: ./.github/actions/e2e
+
+      - name: Build server
+        run: pnpm -F commonwealth build
+
+      - name: Run E2E refactor route safety tests
+        run: |
+          pnpm -F commonwealth bootstrap-test-db &&
+          (cd packages/commonwealth && SERVICE=web node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-refactor --forbid-only)
+
+      - name: Upload E2E refactor artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-refactor-artifacts
+          path: |
+            packages/commonwealth/test/e2e/test-results
+            packages/commonwealth/playwright-report
+          retention-days: 7
+
+  visual-regression-tests:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    services:
+      postgres:
+        image: hicommonwealth/cw_postgres:latest
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: common_test
+          POSTGRES_PASSWORD: edgeware
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - uses: ./.github/actions/e2e
+
+      - name: Build server
+        run: pnpm -F commonwealth build
+
+      - name: Check committed visual baselines
+        id: visual_baseline
+        run: |
+          BASELINE_COUNT="$(git ls-files packages/commonwealth/test/visual/__snapshots__ | wc -l | tr -d ' ')"
+          echo "count=${BASELINE_COUNT}" >> "$GITHUB_OUTPUT"
+          if [ "$BASELINE_COUNT" -gt 0 ]; then
+            echo "Using committed visual baselines (${BASELINE_COUNT} files)."
+          else
+            echo "::warning::No committed visual baselines found. Running update mode to produce bootstrap artifacts only."
+          fi
+
+      - name: Run visual regression tests (compare mode)
+        if: steps.visual_baseline.outputs.count != '0'
+        run: |
+          pnpm -F commonwealth bootstrap-test-db &&
+          (cd packages/commonwealth && SERVICE=web node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-visual)
+
+      - name: Bootstrap visual baselines (update mode, non-gating)
+        if: steps.visual_baseline.outputs.count == '0'
+        run: |
+          pnpm -F commonwealth bootstrap-test-db &&
+          (cd packages/commonwealth && SERVICE=web node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-visual:update)
+
+      - name: Upload visual regression artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-artifacts
+          path: |
+            packages/commonwealth/test/visual/test-results
+            packages/commonwealth/test/visual/__snapshots__
+            packages/commonwealth/test/visual/visual-report
+          retention-days: 7
 
   report-coverage:
     name: Upload Test Coverage Report

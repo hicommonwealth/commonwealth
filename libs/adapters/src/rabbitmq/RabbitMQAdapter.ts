@@ -18,6 +18,25 @@ import { Message } from 'amqplib';
 import { AckOrNack, default as Rascal } from 'rascal';
 
 /**
+ * Derives the RabbitMQ Management HTTP API URL from an AMQP URI.
+ * Only works for local/CI URIs (localhost/127.0.0.1) where the management
+ * plugin is on port 15672 with default guest:guest credentials.
+ */
+export function deriveManagementUrl(amqpUri: string): string | undefined {
+  try {
+    const url = new URL(amqpUri);
+    if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+      const user = url.username || 'guest';
+      const pass = url.password || 'guest';
+      return `http://${user}:${pass}@${url.hostname}:15672`;
+    }
+  } catch {
+    // invalid URI — skip derivation
+  }
+  return undefined;
+}
+
+/**
  * Build a retry strategy function based on custom retry strategies map.
  *
  * @param {Function} customRetryStrategiesMap - A function which maps errors to retry strategies. The function should
@@ -338,6 +357,90 @@ export class RabbitMQAdapter implements Broker {
       return `${event.name}.${RoutingKeyTags.Contest}`;
     } else {
       return `${event.name}`;
+    }
+  }
+
+  /**
+   * Removes deprecated queues that exist on the RabbitMQ server but are not
+   * in the current Rascal configuration. Empty queues are deleted; non-empty
+   * queues trigger a warning log.
+   *
+   * Requires the RabbitMQ Management HTTP API (management plugin).
+   * @param managementUrl - Full Management API URL with auth, e.g.
+   *   http://guest:guest@localhost:15672
+   */
+  public async cleanupDeprecatedQueues(managementUrl: string): Promise<void> {
+    if (!this._initialized || !this.broker) {
+      this._log.warn(
+        'Cannot cleanup deprecated queues: adapter not initialized',
+      );
+      return;
+    }
+
+    const expectedQueues = new Set<string>(
+      Object.keys(this._rawVhost.queues || {}),
+    );
+
+    const vhost = Object.keys(this._rabbitMQConfig.vhosts!)[0];
+    const encodedVhost = encodeURIComponent(vhost);
+    const baseUrl = managementUrl.replace(/\/+$/, '');
+
+    // Parse credentials from URL for Authorization header
+    const parsedUrl = new URL(baseUrl);
+    const headers: Record<string, string> = {};
+    if (parsedUrl.username) {
+      headers['Authorization'] =
+        `Basic ${Buffer.from(`${decodeURIComponent(parsedUrl.username)}:${decodeURIComponent(parsedUrl.password)}`).toString('base64')}`;
+      parsedUrl.username = '';
+      parsedUrl.password = '';
+    }
+    const cleanBaseUrl = parsedUrl.toString().replace(/\/+$/, '');
+
+    const listUrl = `${cleanBaseUrl}/api/queues/${encodedVhost}`;
+    const response = await fetch(listUrl, { headers });
+    if (!response.ok) {
+      this._log.warn(
+        `Failed to list queues from RabbitMQ Management API: ${response.status} ${response.statusText}`,
+      );
+      return;
+    }
+
+    const queues: Array<{ name: string; messages: number }> =
+      await response.json();
+
+    const deprecated = queues.filter(
+      (q) => !expectedQueues.has(q.name) && q.name.endsWith('Queue'),
+    );
+
+    if (deprecated.length === 0) {
+      this._log.info(
+        `Deprecated queue cleanup: ${queues.length} queues found, none deprecated`,
+      );
+      return;
+    }
+
+    this._log.info(
+      `Deprecated queue cleanup: found ${deprecated.length} deprecated queue(s)`,
+    );
+
+    for (const queue of deprecated) {
+      if (queue.messages === 0) {
+        const deleteUrl = `${cleanBaseUrl}/api/queues/${encodedVhost}/${encodeURIComponent(queue.name)}`;
+        const deleteRes = await fetch(deleteUrl, { method: 'DELETE', headers });
+        if (deleteRes.ok || deleteRes.status === 204) {
+          this._log.info(
+            `Deprecated queue '${queue.name}' removed (was empty)`,
+          );
+        } else {
+          this._log.warn(
+            `Failed to delete deprecated queue '${queue.name}': ${deleteRes.status}`,
+          );
+        }
+      } else {
+        this._log.warn(
+          `Deprecated queue '${queue.name}' has ${queue.messages} pending messages — skipping cleanup`,
+        );
+      }
     }
   }
 

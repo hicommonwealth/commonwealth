@@ -7,28 +7,30 @@ import {
 } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
+  ChainEvents,
+  Community,
   CommunityGoalsPolicy,
   Contest,
   ContestWorker,
-  CreateUnverifiedUser,
   DiscordBotPolicy,
   EventStreamPolicy,
   FarcasterWorker,
-  GovernancePolicy,
   LaunchpadPolicy,
-  NominationsWorker,
   NotificationsPolicy,
   NotificationsSettingsPolicy,
-  ReactionWorker,
+  PredictionMarket,
+  Reaction,
+  Token,
   TwitterEngagementPolicy,
   User,
+  config,
 } from '@hicommonwealth/model';
 
 const _ContestWorker: Consumer<ReturnType<typeof ContestWorker>> = {
   consumer: ContestWorker,
   retryStrategy: buildRetryStrategy(undefined, 20_000),
   hooks: {
-    beforeHandleEvent: (topic, event, context) => {
+    beforeHandleEvent: (_topic, _event, context) => {
       context.start = Date.now();
     },
     afterHandleEvent: (topic, event, context) => {
@@ -84,32 +86,38 @@ const _NotificationsPolicy = {
   },
 };
 
-const _ReactionWorker = {
-  consumer: ReactionWorker,
+const _ReactionWorkerProjection = {
+  consumer: Reaction.ReactionWorkerProjection,
 };
 
-const _GovernancePolicy = {
-  consumer: GovernancePolicy,
+const _GovernanceProjection = {
+  consumer: ChainEvents.GovernanceProjection,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   ChainEventPolicy,
+  Community.ChainEventProjection,
+  Community.NominationsProjection,
   DiscordBotPolicy,
   Contest.Contests,
-  NominationsWorker,
+  Contest.FarcasterContestProjection,
   FarcasterWorker,
   EventStreamPolicy,
   NotificationsSettingsPolicy,
-  CreateUnverifiedUser,
+  User.CreateUnverifiedUser,
+  Token.LaunchpadTradeProjection,
   TwitterEngagementPolicy,
   CommunityGoalsPolicy,
   LaunchpadPolicy,
+  ...(config.MARKETS.FUTARCHY_ENABLED
+    ? [PredictionMarket.PredictionMarketProjection]
+    : []),
   _ContestWorker,
-  _GovernancePolicy,
+  _GovernanceProjection,
   _FarcasterWorker,
   _Xp,
   _NotificationsSettingsPolicy,
   _NotificationsPolicy,
-  _ReactionWorker,
+  _ReactionWorkerProjection,
 ];

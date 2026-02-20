@@ -1,7 +1,7 @@
 import { generateUrlPartForTopicIdentifiers } from '@hicommonwealth/shared';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { useGetTopicByIdQuery } from 'state/api/topics';
 import { LoadingIndicator } from '../components/LoadingIndicator/LoadingIndicator';
 

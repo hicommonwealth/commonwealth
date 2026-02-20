@@ -1,5 +1,5 @@
-import useForceRerender from 'hooks/useForceRerender';
 import { useEffect } from 'react';
+import useForceRerender from 'shared/hooks/useForceRerender';
 
 interface UseContestCardRerenderProps {
   isActive?: boolean;
