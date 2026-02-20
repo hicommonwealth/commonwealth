@@ -10,6 +10,7 @@ import {
 import useCreateCommunityMutation, {
   buildCreateCommunityInput,
 } from 'state/api/communities/createCommunity';
+import { useFetchNodesQuery } from 'state/api/nodes';
 import CommunityInformationForm from 'views/components/CommunityInformationForm/CommunityInformationForm';
 import { useTurnstile } from 'views/components/useTurnstile';
 // eslint-disable-next-line max-len
@@ -35,6 +36,7 @@ const CommunityInformationStep = ({
   handleSelectedChainId,
 }: CommunityInformationStepProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
+  useFetchNodesQuery(); // necessary in order to get the sorted chains
 
   const {
     turnstileToken,

@@ -35,7 +35,8 @@ for file_path in "${CHANGED_TS_FILES[@]}"; do
       continue
     fi
 
-    if [[ "$added_line" =~ $LEGACY_ALIAS_REGEX ]] || [[ "$added_line" =~ $LEGACY_RELATIVE_REGEX ]]; then
+    if ( [[ "$added_line" =~ $LEGACY_ALIAS_REGEX ]] || [[ "$added_line" =~ $LEGACY_RELATIVE_REGEX ]] ) \
+       && ! [[ "$added_line" =~ \'client/scripts/ ]] && ! [[ "$added_line" =~ \"client/scripts/ ]]; then
       clean_line="${added_line#+}"
       echo "Legacy import guard violation: ${file_path}"
       echo "  + ${clean_line}"

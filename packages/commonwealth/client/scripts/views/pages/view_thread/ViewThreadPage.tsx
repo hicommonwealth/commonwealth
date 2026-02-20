@@ -94,6 +94,7 @@ import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { LinkedUrlCard } from './LinkedUrlCard';
 import { ThreadPollCard } from './ThreadPollCard';
 import { ThreadPollEditorCard } from './ThreadPollEditorCard';
+import { ThreadPredictionMarketEditorCard } from './ThreadPredictionMarketEditorCard';
 import { EditBody } from './edit_body';
 import './index.scss';
 import { LinkedProposalsCard } from './linked_proposals_card';
@@ -122,6 +123,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
   const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+  const futarchyEnabled = useFlag('futarchy');
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [savedEdits, setSavedEdits] = useState('');
@@ -697,7 +699,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         ]
       : []),
     ...(pollsData?.length > 0 ||
-    (isAuthor && (!app.chain?.meta?.admin_only_polling || isAdmin))
+    (isAuthor && (!app.chain?.meta?.admin_only_polling || isAdmin)) ||
+    (isAuthor && futarchyEnabled)
       ? [
           {
             label: 'Polls',
@@ -730,6 +733,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       threadAlreadyHasPolling={!pollsData?.length}
                     />
                   )}
+                {isAuthor && futarchyEnabled && thread && (
+                  <ThreadPredictionMarketEditorCard thread={thread} />
+                )}
               </div>
             ),
           },
