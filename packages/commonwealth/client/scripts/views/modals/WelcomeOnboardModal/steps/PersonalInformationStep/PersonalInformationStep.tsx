@@ -11,7 +11,6 @@ import {
 // eslint-disable-next-line max-len
 import { useUpdateSubscriptionPreferencesMutation } from 'state/api/trpc/subscription/useUpdateSubscriptionPreferencesMutation';
 import {
-  useUpdateUserEmailMutation,
   useUpdateUserEmailSettingsMutation,
   useUpdateUserMutation,
 } from 'state/api/user';
@@ -48,7 +47,6 @@ const PersonalInformationStep = ({
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
 
   const user = useUserStore();
-  const { mutateAsync: updateEmail } = useUpdateUserEmailMutation({});
   const { mutateAsync: updateEmailSettings } =
     useUpdateUserEmailSettingsMutation();
   const { refetch: refetchProfileData } = useFetchProfileByIdQuery({
@@ -147,11 +145,6 @@ const PersonalInformationStep = ({
         name: values.username.trim(),
       },
     });
-
-    // set email for notifications
-    if (values.email) {
-      await updateEmail({ email: values.email });
-    }
 
     if (values.enableAccountNotifications) {
       await updateSubscriptionPreferences({
