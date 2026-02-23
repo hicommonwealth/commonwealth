@@ -151,7 +151,7 @@ export const CommentCard = ({
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
   const [streamingText, setStreamingText] = useState('');
-  const { generateCompletion } = useAiCompletion();
+  const { generateCompletion, cancel: cancelCompletion } = useAiCompletion();
   const utils = trpc.useUtils();
 
   // Fetch community details
@@ -169,11 +169,16 @@ export const CommentCard = ({
     existingNumberOfComments: 0,
   });
 
-  // Use ref for generateCompletion to avoid effect re-runs
+  // Use refs for generateCompletion and cancel to avoid effect re-runs
   const generateCompletionRef = useRef(generateCompletion);
   useEffect(() => {
     generateCompletionRef.current = generateCompletion;
   }, [generateCompletion]);
+
+  const cancelCompletionRef = useRef(cancelCompletion);
+  useEffect(() => {
+    cancelCompletionRef.current = cancelCompletion;
+  }, [cancelCompletion]);
 
   // Use ref for utils to avoid effect re-runs
   const utilsRef = useRef(utils);
@@ -274,19 +279,14 @@ export const CommentCard = ({
     if (!isStreamingAIReply || !streamingModelId) return;
 
     // Prevent duplicate requests (e.g., from React StrictMode in development)
-    // The ref persists across re-mounts, so the second mount will skip starting a new request
     if (
       streamingStateRef.current.inProgress &&
       streamingStateRef.current.commentId === comment.id
     ) {
-      console.log(
-        '[AI Reply] Request already in progress, skipping duplicate',
-        { commentId: comment.id },
-      );
       return;
     }
 
-    // Mark as in progress - this ref is checked when processing chunks/completion
+    // Mark as in progress
     streamingStateRef.current = {
       inProgress: true,
       commentId: comment.id,
@@ -294,16 +294,11 @@ export const CommentCard = ({
 
     let accumulatedText = '';
 
-    console.log('[AI Reply] Starting new request', {
-      commentId: comment.id,
-    });
-
     const generateAIReply = async () => {
       try {
         setStreamingText('');
 
         // For root-level AI comments (isRootComment), pass threadId instead of parentCommentId
-        // The comment.id is actually the thread ID in this case
         await generateCompletionRef.current(
           {
             communityId: comment.community_id,
@@ -317,8 +312,6 @@ export const CommentCard = ({
           },
           {
             onChunk: (chunk) => {
-              // Check the shared ref state - this works across StrictMode re-mounts
-              // because the ref persists and shows the request is still in progress
               if (
                 streamingStateRef.current.inProgress &&
                 streamingStateRef.current.commentId === comment.id
@@ -328,7 +321,6 @@ export const CommentCard = ({
               }
             },
             onComplete: (completedText, commentPayload) => {
-              // Check ref state before processing completion
               if (
                 !streamingStateRef.current.inProgress ||
                 streamingStateRef.current.commentId !== comment.id
@@ -336,40 +328,15 @@ export const CommentCard = ({
                 return;
               }
 
-              console.log('[AI Reply] onComplete triggered', {
-                textLength: completedText?.length,
-                hasError: completedText?.startsWith('Error generating reply'),
-                commentId: comment.id,
-                hasCommentPayload: !!commentPayload,
-              });
-
-              // Server creates the AI comment automatically
               if (
                 completedText &&
                 !completedText.startsWith('Error generating reply')
               ) {
-                console.log(
-                  '[AI Reply] Completion finished, server created comment',
-                  { commentPayload: !!commentPayload },
-                );
                 setStreamingText('');
-              } else {
-                console.warn(
-                  '[AI Reply] onComplete called with invalid text:',
-                  {
-                    textLength: completedText?.length,
-                    startsWithError: completedText?.startsWith(
-                      'Error generating reply',
-                    ),
-                    text: completedText?.substring(0, 100),
-                  },
-                );
               }
 
-              // Notify completion with comment payload
               onStreamingCompleteRef.current?.(commentPayload);
 
-              // Reset state
               streamingStateRef.current = {
                 inProgress: false,
                 commentId: null,
@@ -423,10 +390,9 @@ export const CommentCard = ({
 
     void generateAIReply();
 
-    // Note: We intentionally do NOT reset the ref on cleanup.
-    // This allows the request started by the first mount to continue processing
-    // even after StrictMode cleanup, since the second mount will skip starting
-    // a new request and the ref will still show "in progress".
+    return () => {
+      cancelCompletionRef.current();
+    };
   }, [
     isStreamingAIReply,
     streamingModelId,

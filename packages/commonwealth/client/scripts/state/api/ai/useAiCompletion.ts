@@ -3,7 +3,7 @@ import {
   CompletionOptions,
   DEFAULT_COMPLETION_MODEL,
 } from '@hicommonwealth/shared';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { userStore } from 'state/ui/user';
 
 /**
@@ -16,8 +16,12 @@ export enum AICompletionType {
   Poll = 'poll',
 }
 
-// Delimiter sent by backend after streaming content before JSON payload
+// Delimiters sent by backend in streaming responses
 const COMMENT_PAYLOAD_DELIMITER = '\n__COMMENT_PAYLOAD__\n';
+const STREAM_ERROR_PREFIX = '\n__STREAM_ERROR__\n';
+const COMMENT_ERROR_DELIMITER = '\n__COMMENT_ERROR__\n';
+
+const STREAM_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
 
 interface AiCompletionOptions extends Partial<CompletionOptions> {
   onChunk?: (chunk: string) => void;
@@ -26,6 +30,7 @@ interface AiCompletionOptions extends Partial<CompletionOptions> {
     commentPayload?: Record<string, unknown>,
   ) => void | Promise<void>;
   onError?: (error: Error) => void;
+  onCommentError?: (error: string) => void;
   webSearchEnabled?: boolean;
 }
 
@@ -52,8 +57,7 @@ export interface AICompletionInput {
 interface CompletionError {
   error: string;
   status?: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -67,15 +71,23 @@ export const useAiCompletion = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [completion, setCompletion] = useState<string>('');
+  const activeControllerRef = useRef<AbortController | null>(null);
+
+  const cancel = useCallback(() => {
+    activeControllerRef.current?.abort();
+    activeControllerRef.current = null;
+  }, []);
 
   const generateCompletion = useCallback(
     async (input: AICompletionInput, options?: AiCompletionOptions) => {
-      const requestId = Math.random().toString(36).substr(2, 9);
-      console.log(`[${requestId}] Starting AI completion request`, {
-        completionType: input.completionType,
-        model: input.model || options?.model,
-        stream: input.stream !== false,
-      });
+      // Cancel any prior in-flight request
+      activeControllerRef.current?.abort();
+
+      const controller = new AbortController();
+      activeControllerRef.current = controller;
+
+      // 2-minute timeout
+      const timeoutId = setTimeout(() => controller.abort(), STREAM_TIMEOUT_MS);
 
       setIsLoading(true);
       setError(null);
@@ -103,22 +115,13 @@ export const useAiCompletion = () => {
           jwt: userStore.getState().jwt,
         };
 
-        console.log(`[${requestId}] Sending request to /api/aicompletion`, {
-          bodySize: JSON.stringify(requestBody).length,
-          stream: streamMode,
-        });
-
         const response = await fetch('/api/aicompletion', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(requestBody),
-        });
-
-        console.log(`[${requestId}] Received response`, {
-          status: response.status,
-          statusText: response.statusText,
+          signal: controller.signal,
         });
 
         if (!response.ok) {
@@ -132,13 +135,10 @@ export const useAiCompletion = () => {
           }
 
           const errorMessage = errorData.error || `Error ${response.status}`;
-          console.error('API error:', errorData);
           throw new Error(errorMessage);
         }
 
         if (streamMode) {
-          console.log(`[${requestId}] Starting streaming response processing`);
-
           if (!response.body) {
             throw new Error('ReadableStream not supported in this browser.');
           }
@@ -146,74 +146,82 @@ export const useAiCompletion = () => {
           const reader = response.body.getReader();
           const decoder = new TextDecoder();
 
-          let chunkCount = 0;
+          // Abort the reader when the signal fires
+          controller.signal.addEventListener('abort', () => {
+            reader.cancel().catch(() => {});
+          });
+
           let fullStreamContent = '';
 
           while (true) {
             const { done, value } = await reader.read();
-            chunkCount++;
 
             if (done) {
-              // Check for comment payload delimiter
-              let commentPayload: Record<string, unknown> | undefined;
+              // Extract delimited sections from accumulated stream content
               let displayText = fullStreamContent;
+              let commentPayload: Record<string, unknown> | undefined;
 
-              if (fullStreamContent.includes(COMMENT_PAYLOAD_DELIMITER)) {
-                const delimiterIndex = fullStreamContent.indexOf(
+              // Check for stream error
+              if (fullStreamContent.includes(STREAM_ERROR_PREFIX)) {
+                const errIdx = fullStreamContent.indexOf(STREAM_ERROR_PREFIX);
+                displayText = fullStreamContent.substring(0, errIdx);
+                const errMsg = fullStreamContent
+                  .substring(errIdx + STREAM_ERROR_PREFIX.length)
+                  .trim();
+                throw new Error(errMsg || 'Streaming error');
+              }
+
+              // Check for comment creation error
+              if (fullStreamContent.includes(COMMENT_ERROR_DELIMITER)) {
+                const errIdx = fullStreamContent.indexOf(
+                  COMMENT_ERROR_DELIMITER,
+                );
+                displayText = fullStreamContent.substring(0, errIdx);
+                const errPayload = fullStreamContent
+                  .substring(errIdx + COMMENT_ERROR_DELIMITER.length)
+                  .trim();
+                options?.onCommentError?.(
+                  errPayload || 'Failed to create comment',
+                );
+              }
+
+              // Check for comment payload
+              if (displayText.includes(COMMENT_PAYLOAD_DELIMITER)) {
+                const delimiterIndex = displayText.indexOf(
                   COMMENT_PAYLOAD_DELIMITER,
                 );
-                displayText = fullStreamContent.substring(0, delimiterIndex);
-                const jsonPayload = fullStreamContent
+                const jsonPayload = displayText
                   .substring(delimiterIndex + COMMENT_PAYLOAD_DELIMITER.length)
                   .trim();
+                displayText = displayText.substring(0, delimiterIndex);
 
                 try {
                   commentPayload = JSON.parse(jsonPayload);
-                  console.log(`[${requestId}] Parsed comment payload`, {
-                    commentId: commentPayload?.id,
-                  });
-                } catch (parseError) {
-                  console.error(
-                    `[${requestId}] Failed to parse comment payload:`,
-                    parseError,
-                    { jsonPayload: jsonPayload.substring(0, 100) },
-                  );
+                } catch {
+                  // payload parse failure is non-fatal
                 }
               }
 
               accumulatedText = displayText;
               setCompletion(displayText);
 
-              console.log(`[${requestId}] Streaming completed`, {
-                totalChunks: chunkCount,
-                totalLength: displayText.length,
-                hasCommentPayload: !!commentPayload,
-              });
-
-              try {
-                await options?.onComplete?.(displayText, commentPayload);
-              } catch (callbackError) {
-                console.error(`[${requestId}] Error in onComplete callback:`, {
-                  error:
-                    callbackError instanceof Error
-                      ? callbackError.message
-                      : String(callbackError),
-                });
-                throw callbackError;
-              }
+              await options?.onComplete?.(displayText, commentPayload);
               break;
             }
 
             const chunk = decoder.decode(value, { stream: true });
-
-            if (chunk.startsWith('\nError:')) {
-              console.error(`[${requestId}] Error chunk received:`, chunk);
-              throw new Error(chunk.substring(8));
-            }
-
             fullStreamContent += chunk;
 
-            // Only update displayed text up to the delimiter if it appears mid-stream
+            // Check for stream error mid-stream
+            if (fullStreamContent.includes(STREAM_ERROR_PREFIX)) {
+              const errIdx = fullStreamContent.indexOf(STREAM_ERROR_PREFIX);
+              const errMsg = fullStreamContent
+                .substring(errIdx + STREAM_ERROR_PREFIX.length)
+                .trim();
+              throw new Error(errMsg || 'Streaming error');
+            }
+
+            // Only update displayed text up to any delimiter if it appears mid-stream
             let displayChunk = chunk;
             if (fullStreamContent.includes(COMMENT_PAYLOAD_DELIMITER)) {
               const delimiterIndex = fullStreamContent.indexOf(
@@ -223,7 +231,6 @@ export const useAiCompletion = () => {
                 0,
                 delimiterIndex,
               );
-              // Calculate what portion of the current chunk should be displayed
               const previousDisplayedLength = accumulatedText.length;
               displayChunk = preDelimiterContent.substring(
                 previousDisplayedLength,
@@ -251,23 +258,25 @@ export const useAiCompletion = () => {
           options?.onComplete?.(accumulatedText);
         }
       } catch (err) {
+        // Ignore AbortError — it means the request was intentionally cancelled
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          return accumulatedText;
+        }
+
         const tempError = err instanceof Error ? err : new Error(String(err));
-        console.error(`[${requestId}] AI completion error:`, {
-          error: tempError.message,
-          stack: tempError.stack,
-        });
+        console.error('AI completion error:', tempError.message);
         setError(tempError);
 
         try {
           options?.onError?.(tempError);
-        } catch (errorCallbackErr) {
-          console.error(
-            `[${requestId}] Error in onError callback:`,
-            errorCallbackErr,
-          );
+        } catch {
+          // swallow callback errors
         }
       } finally {
-        console.log(`[${requestId}] AI completion request finished`);
+        clearTimeout(timeoutId);
+        if (activeControllerRef.current === controller) {
+          activeControllerRef.current = null;
+        }
         setIsLoading(false);
       }
 
@@ -278,6 +287,7 @@ export const useAiCompletion = () => {
 
   return {
     generateCompletion,
+    cancel,
     completion,
     isLoading,
     error,

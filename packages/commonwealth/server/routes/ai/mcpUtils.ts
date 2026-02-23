@@ -3,6 +3,7 @@ import { extractMCPMentions } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import {
   CommonMCPServerWithHeaders,
+  filterServersWithWhitelist,
   withMCPAuthUsername,
 } from '@hicommonwealth/model/services';
 
@@ -37,8 +38,9 @@ export async function getAllMCPServers(
 }
 
 /**
- * Extracts MCP servers mentioned in a comment body
- * Returns the servers that match the mentions found in the text
+ * Extracts MCP servers mentioned in a comment body.
+ * Returns servers that match the mentions, with whitelist filtering already applied.
+ * Callers can pass the result directly to buildMCPClientOptions.
  */
 export async function getMentionedMCPServers(
   communityId: string,
@@ -62,14 +64,17 @@ export async function getMentionedMCPServers(
     ),
   );
 
-  if (mentionedServers.length > 0) {
+  // Apply whitelist filtering so downstream callers don't need to
+  const filteredServers = filterServersWithWhitelist(mentionedServers);
+
+  if (filteredServers.length > 0) {
     log.info(
-      `[${requestId}] Found ${mentionedServers.length} mentioned MCP servers`,
+      `[${requestId}] Found ${filteredServers.length} mentioned MCP servers`,
       {
-        serverHandles: mentionedServers.map((s) => s.handle),
+        serverHandles: filteredServers.map((s) => s.handle),
       },
     );
   }
 
-  return mentionedServers;
+  return filteredServers;
 }

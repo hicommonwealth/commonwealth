@@ -7,14 +7,17 @@ import {
 } from '@hicommonwealth/shared';
 import OpenAI from 'openai';
 import { z } from 'zod';
-import { extractMCPMentions } from '../..';
 
 export type CommonMCPServerWithHeaders = z.infer<typeof MCPServer> & {
   headers?: Record<string, string>;
 };
 
-// Function to filter servers and their tools based on whitelist
-function filterServersWithWhitelist(
+/**
+ * Filters servers and their tools based on the tool whitelist.
+ * Exported so callers (e.g. getMentionedMCPServers) can apply it before
+ * passing servers to buildMCPClientOptions.
+ */
+export function filterServersWithWhitelist(
   servers: CommonMCPServerWithHeaders[],
 ): CommonMCPServerWithHeaders[] {
   return servers.map((server) => {
@@ -60,28 +63,18 @@ If no specific server is mentioned, you can provide general assistance based on 
 
 Always use the appropriate MCP tools when available to provide accurate, up-to-date information about Commonwealth communities, threads, users, and other relevant data.`;
 
-// build reusable MCP client options
+/**
+ * Build OpenAI Responses API options for MCP tool use.
+ *
+ * Expects `servers` to already be mention-filtered and whitelist-filtered
+ * (use `getMentionedMCPServers` + `filterServersWithWhitelist` upstream).
+ */
 export function buildMCPClientOptions(
   userInput: string,
-  allServers: CommonMCPServerWithHeaders[],
+  servers: CommonMCPServerWithHeaders[],
   previousResponseId: string | null,
 ): OpenAI.Responses.ResponseCreateParamsStreaming {
-  // Extract MCP mentions from user input
-  const extractedMentions = extractMCPMentions(userInput);
-
-  // Match extracted mentions with available servers by handle and id
-  const mentionedServers = allServers.filter((server) =>
-    extractedMentions.some(
-      (mention) =>
-        mention.handle === server.handle && mention.id === String(server.id),
-    ),
-  );
-
-  // Apply whitelist filtering to mentioned servers
-  const filteredServers = filterServersWithWhitelist(mentionedServers);
-
-  // Build MCP tools array with allowed_tools filter for each server
-  const mcpTools = filteredServers.map((server) => ({
+  const mcpTools = servers.map((server) => ({
     type: 'mcp' as const,
     server_label: server.handle!,
     server_url: server.server_url!,
@@ -92,7 +85,7 @@ export function buildMCPClientOptions(
 
   return {
     model: DEFAULT_COMPLETION_MODEL,
-    instructions: buildSystemPrompt(filteredServers),
+    instructions: buildSystemPrompt(servers),
     tools: mcpTools,
     input: sanitizeContent(userInput),
     previous_response_id: previousResponseId,

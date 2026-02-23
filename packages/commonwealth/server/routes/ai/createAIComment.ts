@@ -29,22 +29,6 @@ export async function createAIComment(
   content: string,
 ): Promise<AICommentCreationResult> {
   try {
-    // Calculate expiration time for token record
-    const expires_at = new Date();
-    expires_at.setMinutes(
-      expires_at.getMinutes() + DEFAULT_TOKEN_EXPIRATION_MINUTES,
-    );
-
-    // Create the token record first (for audit trail)
-    const tokenRecord = await models.AICompletionToken.create({
-      user_id: userId,
-      community_id: communityId,
-      thread_id: threadId,
-      parent_comment_id: parentCommentId ?? undefined,
-      content,
-      expires_at,
-    });
-
     // Get the bot user with address
     const botUserData = await getBotUser();
     if (!botUserData) {
@@ -89,7 +73,6 @@ export async function createAIComment(
     }
 
     // Create comment as bot user
-    // parent_id is undefined for root-level comments, or the parent comment ID for nested replies
     const result = await command(Comment.CreateComment(), {
       actor: {
         user: {
@@ -105,18 +88,29 @@ export async function createAIComment(
       },
     });
 
-    // Mark the token as used and store the comment_id
-    await models.AICompletionToken.update(
-      { used_at: new Date(), comment_id: result!.id },
-      { where: { id: tokenRecord.id } },
+    // Create audit token record AFTER successful comment creation
+    // This prevents orphaned token records if comment creation fails
+    const expires_at = new Date();
+    expires_at.setMinutes(
+      expires_at.getMinutes() + DEFAULT_TOKEN_EXPIRATION_MINUTES,
     );
+
+    await models.AICompletionToken.create({
+      user_id: userId,
+      community_id: communityId,
+      thread_id: threadId,
+      parent_comment_id: parentCommentId ?? undefined,
+      content,
+      expires_at,
+      used_at: new Date(),
+      comment_id: result!.id,
+    });
 
     log.info('AI comment created successfully', {
       commentId: result!.id,
-      tokenId: tokenRecord.id,
     });
 
-    // Return the comment object directly - UI handles view transformation
+    // Return the comment object directly — UI handles view transformation
     return {
       success: true,
       commentId: result!.id,

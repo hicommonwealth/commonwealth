@@ -31,11 +31,11 @@ export function generatePromptForType(
 export interface ModelSelectionResult {
   modelId: string;
   addOpenAiWebSearchOptions: boolean;
-  error?: string;
 }
 
 /**
- * Determines the model ID based on configuration and web search requirements
+ * Determines the model ID based on configuration and web search requirements.
+ * Throws if the model/webSearch combination is unsupported.
  */
 export function selectModel(
   model: CompletionModel,
@@ -58,12 +58,9 @@ export function selectModel(
         modelId = 'gpt-4o-mini-search-preview';
         addOpenAiWebSearchOptions = true;
       } else {
-        return {
-          modelId: model,
-          addOpenAiWebSearchOptions: false,
-          error:
-            'Web search is only supported for gpt-4o and gpt-4o-mini with OpenAI',
-        };
+        throw new Error(
+          'Web search is only supported for gpt-4o and gpt-4o-mini with OpenAI',
+        );
       }
     }
   }
