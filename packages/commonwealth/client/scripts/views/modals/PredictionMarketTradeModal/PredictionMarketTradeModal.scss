@@ -1,0 +1,58 @@
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+
+.PredictionMarketTradeModal {
+  .prediction-prompt {
+    margin-bottom: 12px;
+  }
+
+  .balances-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .tabs-row {
+    margin-bottom: 16px;
+  }
+
+  .PredictionMarketTradeModal-tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .label {
+      margin: 0;
+    }
+
+    .amount-input {
+      max-width: 200px;
+    }
+
+    .help {
+      color: colors.$neutral-600;
+    }
+
+    .summary {
+      margin: 4px 0 0;
+    }
+
+    .toggle-row {
+      display: flex;
+      gap: 8px;
+    }
+  }
+
+  .loading-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .error-message {
+    color: colors.$rorange-500;
+    margin-bottom: 12px;
+  }
+}

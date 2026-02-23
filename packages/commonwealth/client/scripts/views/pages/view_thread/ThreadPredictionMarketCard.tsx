@@ -6,6 +6,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { DeployDraftPredictionMarketModal } from '../../modals/PredictionMarket/DeployDraftPredictionMarketModal';
+import { PredictionMarketTradeModal } from '../../modals/PredictionMarketTradeModal';
 import './poll_cards.scss';
 
 type PredictionMarketResult = {
@@ -16,6 +17,13 @@ type PredictionMarketResult = {
   duration?: number;
   resolution_threshold?: number;
   collateral_address?: string;
+  vault_address?: string | null;
+  router_address?: string | null;
+  market_id?: string | null;
+  p_token_address?: string | null;
+  f_token_address?: string | null;
+  eth_chain_id?: number;
+  winner?: number | null;
   created_at?: string;
   [key: string]: unknown;
 };
@@ -56,8 +64,13 @@ export const ThreadPredictionMarketCard = ({
   isAuthor = false,
 }: ThreadPredictionMarketCardProps) => {
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
+  const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
   const isDraft = market.status === 'draft';
   const canCompleteDraft = isDraft && isAuthor;
+  const canTrade =
+    (market.status === 'active' || market.status === 'resolved') &&
+    market.vault_address &&
+    market.router_address;
 
   return (
     <>
@@ -73,18 +86,32 @@ export const ThreadPredictionMarketCard = ({
               label={statusLabel[market.status] ?? market.status}
               type={statusTagType(market.status)}
             />
-            {canCompleteDraft && (
-              <CWButton
-                buttonHeight="sm"
-                buttonType="primary"
-                label="Complete deployment"
-                className="complete-deployment-button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsDeployModalOpen(true);
-                }}
-              />
-            )}
+            <div className="PredictionMarketCard-actions">
+              {canCompleteDraft && (
+                <CWButton
+                  buttonHeight="sm"
+                  buttonType="primary"
+                  label="Complete deployment"
+                  className="complete-deployment-button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsDeployModalOpen(true);
+                  }}
+                />
+              )}
+              {canTrade && (
+                <CWButton
+                  buttonHeight="sm"
+                  buttonType="secondary"
+                  label="Trade"
+                  className="trade-button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsTradeModalOpen(true);
+                  }}
+                />
+              )}
+            </div>
           </div>
         }
       />
@@ -100,6 +127,19 @@ export const ThreadPredictionMarketCard = ({
         }
         onClose={() => setIsDeployModalOpen(false)}
         open={isDeployModalOpen}
+      />
+      <CWModal
+        size="medium"
+        content={
+          <PredictionMarketTradeModal
+            market={market}
+            threadCommunityId={thread?.communityId ?? ''}
+            onClose={() => setIsTradeModalOpen(false)}
+            onSuccess={() => setIsTradeModalOpen(false)}
+          />
+        }
+        onClose={() => setIsTradeModalOpen(false)}
+        open={isTradeModalOpen}
       />
     </>
   );

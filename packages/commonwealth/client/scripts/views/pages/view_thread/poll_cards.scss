@@ -15,8 +15,15 @@
     margin: 0;
   }
 
-  .complete-deployment-button {
+  .PredictionMarketCard-actions {
+    display: flex;
+    gap: 8px;
     margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .complete-deployment-button,
+  .trade-button {
     align-self: flex-start;
   }
 }
