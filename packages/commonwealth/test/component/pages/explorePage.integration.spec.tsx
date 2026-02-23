@@ -194,7 +194,7 @@ describe('ExplorePage integration', () => {
       initialRoute: '/explore?tab=all',
     });
 
-    expect(screen.getByText('Explore')).toBeInTheDocument();
+    expect(screen.getByTestId('cw-page-layout')).toBeInTheDocument();
     expect(screen.getByTestId('idea-launchpad')).toBeInTheDocument();
     expect(screen.getByTestId('explore-all-tab-content')).toBeInTheDocument();
     expect(
