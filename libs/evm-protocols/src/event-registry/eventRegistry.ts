@@ -1,9 +1,12 @@
 import { VoteGovernanceAbi } from '@commonxyz/common-governance-abis';
 import {
+  BinaryVaultAbi,
   CommunityNominationsAbi,
   CommunityStakeAbi,
   ContestGovernorAbi,
   ContestGovernorSingleAbi,
+  FutarchyGovernorAbi,
+  FutarchyRouterAbi,
   LPBondingCurveAbi,
   LaunchpadAbi,
   NamespaceFactoryAbi,
@@ -114,6 +117,35 @@ const voteGovernanceSource: ContractSource = {
     EvmEventSignatures.VoteGovernance.TokenVoteCast,
     EvmEventSignatures.VoteGovernance.AddressVoteCast,
   ],
+};
+
+// BinaryVault is deployed per prediction market; addresses are stored in
+// EvmEventSources at deploy time. Exported for use by the EVM worker when
+// building contract sources from the DB.
+export const binaryVaultSource: ContractSource = {
+  abi: BinaryVaultAbi,
+  eventSignatures: [
+    EvmEventSignatures.PredictionMarket.TokensMinted,
+    EvmEventSignatures.PredictionMarket.TokensMerged,
+    EvmEventSignatures.PredictionMarket.TokensRedeemed,
+    EvmEventSignatures.PredictionMarket.MarketResolved,
+  ],
+};
+
+// FutarchyRouter is deployed per prediction market; addresses are stored in
+// EvmEventSources at deploy time. Exported for use by the EVM worker when
+// building contract sources from the DB.
+export const futarchyRouterSource: ContractSource = {
+  abi: FutarchyRouterAbi,
+  eventSignatures: [EvmEventSignatures.PredictionMarket.SwapExecuted],
+};
+
+// FutarchyGovernor is deployed per prediction market; addresses are stored in
+// EvmEventSources at deploy time. Exported for use by the EVM worker when
+// building contract sources from the DB.
+export const futarchyGovernorSource: ContractSource = {
+  abi: FutarchyGovernorAbi,
+  eventSignatures: [EvmEventSignatures.PredictionMarket.ProposalResolved],
 };
 
 const tokenBondingCurveSource: ContractSource = {

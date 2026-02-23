@@ -8,6 +8,7 @@ export * from './groupSnapshot.schemas';
 export * from './mcp-server.schemas';
 export * from './pagination';
 export * from './poll.schemas';
+export * from './prediction-market.schemas';
 export * from './quest.schemas';
 export * from './subscription.schemas';
 export * from './super-admin.schemas';

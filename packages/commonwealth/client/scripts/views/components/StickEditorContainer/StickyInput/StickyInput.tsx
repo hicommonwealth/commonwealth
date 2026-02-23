@@ -1,7 +1,6 @@
 import { CompletionModel, ContentType } from '@hicommonwealth/shared';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { notifyError } from 'controllers/app/notifications';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useMentionExtractor } from 'hooks/useMentionExtractor';
 import { Thread } from 'models/Thread';
 import type { Topic } from 'models/Topic';
@@ -13,6 +12,7 @@ import React, {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import { AICompletionType, useAiCompletion } from 'state/api/ai';
 import useSidebarStore from 'state/ui/sidebar';
 import { useAIFeatureEnabled, useUserAiSettingsStore } from 'state/ui/user';
@@ -29,7 +29,7 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import {
   NewThreadForm,
   NewThreadFormHandles,
-} from 'views/components/NewThreadFormLegacy/NewThreadForm';
+} from 'views/components/NewThreadForm/NewThreadForm';
 import {
   createDeltaFromText,
   ReactQuillEditor,

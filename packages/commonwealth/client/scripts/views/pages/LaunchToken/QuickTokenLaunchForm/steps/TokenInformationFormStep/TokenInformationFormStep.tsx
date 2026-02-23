@@ -1,15 +1,15 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
-import useAppStatus from 'hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from 'shared/analytics/types';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';

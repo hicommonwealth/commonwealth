@@ -13,8 +13,8 @@ import {
 } from '@hicommonwealth/shared';
 import { AICompletionType, useAiCompletion } from 'client/scripts/state/api/ai';
 import clsx from 'clsx';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { useCreateCommentMutation } from 'state/api/comments';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';

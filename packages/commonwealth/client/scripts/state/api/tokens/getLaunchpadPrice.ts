@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import Web3 from 'web3';
 
 const PRICE_STALE_TIME = 5000;
+const PRECISION = 10n ** 18n;
 
 export const useGetLaunchpadPriceQuery = (
   rpc: string,
@@ -43,11 +44,15 @@ export const useGetLaunchpadPriceQuery = (
     staleTime: PRICE_STALE_TIME,
     enabled: !!contract && !!tokenAddress && enabled,
     queryFn: async () => {
-      const price =
-        contract &&
-        contract.methods &&
-        contract.methods.getPrice(tokenAddress, amountIn, isBuy);
-      return (await price?.call()) as bigint | undefined;
+      if (!contract) return undefined;
+
+      const tokensOut: bigint = BigInt(
+        await contract.methods.getPrice(tokenAddress, amountIn, isBuy).call(),
+      );
+
+      if (tokensOut === 0n) return undefined;
+
+      return (PRECISION * 1n) / tokensOut;
     },
   });
 };

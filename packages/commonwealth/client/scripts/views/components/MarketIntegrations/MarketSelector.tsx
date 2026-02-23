@@ -1,5 +1,6 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { MarketFilters } from './MarketFilters';
 import { MarketList } from './MarketList';
@@ -8,9 +9,13 @@ import { useMarketData } from './useMarketData';
 
 interface MarketSelectorProps {
   communityId: string;
+  hideHeader?: boolean;
 }
 
-export function MarketSelector({ communityId }: MarketSelectorProps) {
+export const MarketSelector = ({
+  communityId,
+  hideHeader = false,
+}: MarketSelectorProps) => {
   const {
     filters,
     setFilters,
@@ -20,18 +25,23 @@ export function MarketSelector({ communityId }: MarketSelectorProps) {
     savedMarketIds,
     onSubscribe,
     onUnsubscribe,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
   } = useMarketData(communityId);
 
   return (
     <section className="MarketSelector">
-      <div className="markets-header">
-        <CWText type="h3" fontWeight="bold" className="markets-title">
-          Find Markets
-        </CWText>
-        <CWText type="b1" className="markets-subtitle">
-          Discover and subscribe to prediction markets from multiple providers
-        </CWText>
-      </div>
+      {!hideHeader && (
+        <div className="markets-header">
+          <CWText type="h3" fontWeight="bold" className="markets-title">
+            Find Markets
+          </CWText>
+          <CWText type="b1" className="markets-subtitle">
+            Discover and subscribe to prediction markets from multiple providers
+          </CWText>
+        </div>
+      )}
 
       <MarketFilters
         filters={filters}
@@ -44,13 +54,32 @@ export function MarketSelector({ communityId }: MarketSelectorProps) {
           <CWCircleMultiplySpinner />
         </div>
       ) : (
-        <MarketList
-          markets={markets}
-          savedMarketIds={savedMarketIds}
-          onSubscribe={onSubscribe}
-          onUnsubscribe={onUnsubscribe}
-        />
+        <>
+          <MarketList
+            markets={markets}
+            savedMarketIds={savedMarketIds}
+            onSubscribe={onSubscribe}
+            onUnsubscribe={onUnsubscribe}
+          />
+          {isFetchingNextPage && (
+            <div className="markets-loading">
+              <CWCircleMultiplySpinner />
+            </div>
+          )}
+          {hasNextPage && !isFetchingNextPage && (
+            <div className="load-more-container">
+              <CWButton
+                label="See more"
+                buttonType="tertiary"
+                containerClassName="ml-auto"
+                onClick={() => {
+                  void fetchNextPage();
+                }}
+              />
+            </div>
+          )}
+        </>
       )}
     </section>
   );
-}
+};

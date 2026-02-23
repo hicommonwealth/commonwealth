@@ -1,10 +1,10 @@
 import { ContentType } from '@hicommonwealth/shared';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { listenForDOMNodeApperance } from 'helpers/dom';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useRef, useState } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import app from 'state';
 import {
   useDeleteCommentMutation,

@@ -5,9 +5,9 @@ import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 import { handleRedirectClicks } from 'helpers';
 import './index.scss';
 
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
+import { useFlag } from 'shared/hooks/useFlag';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { sidebarStore } from 'state/ui/sidebar';
@@ -58,7 +58,6 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
 
   const navigate = useCommonNavigate();
   const location = useLocation();
-  const xpEnabled = useFlag('xp');
   const marketsEnabled = useFlag('markets');
 
   const communityId = app.activeChainId() || '';
@@ -307,7 +306,7 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     displayData: null,
     hasDefaultToggle: false,
     isActive: !!matchesQuestsRoute,
-    isVisible: xpEnabled,
+    isVisible: true,
     isUpdated: true,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();

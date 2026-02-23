@@ -1,4 +1,7 @@
-import { preprocessQuillDeltaForRendering } from '@hicommonwealth/shared';
+import {
+  isValidImageUrl,
+  preprocessQuillDeltaForRendering,
+} from '@hicommonwealth/shared';
 import { loadScript } from 'helpers';
 import React, { ReactElement } from 'react';
 
@@ -186,8 +189,10 @@ export const renderQuillDelta = (
       })
     : consolidateOrderedLists(groups).map((group) => {
         const renderChild = (child, ii) => {
-          // handle images
           if (child.insert?.image) {
+            if (!isValidImageUrl(child.insert?.image)) {
+              return null;
+            }
             return <img key={ii} src={child.insert?.image} alt="image" />;
           }
 

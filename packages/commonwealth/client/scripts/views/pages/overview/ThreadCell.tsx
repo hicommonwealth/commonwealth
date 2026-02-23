@@ -1,4 +1,9 @@
-import { ActionGroups, GatedActionEnum, slugify } from '@hicommonwealth/shared';
+import {
+  ActionGroups,
+  GatedActionEnum,
+  isValidImageUrl,
+  slugify,
+} from '@hicommonwealth/shared';
 import { pluralize } from 'client/scripts/helpers';
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
@@ -72,7 +77,12 @@ const ThreadCell = ({
           undoUpvoteDisabled={false}
           tooltipText={permissions.tooltip}
         />
-        <img src={image[0] || threadPlaceholder} alt="Thread content" />
+        <img
+          src={
+            image[0] && isValidImageUrl(image[0]) ? image[0] : threadPlaceholder
+          }
+          alt="Thread content"
+        />
         <div className="thread-details">
           <div className="content-title">
             <CWText type="h5" fontWeight="semiBold" noWrap>

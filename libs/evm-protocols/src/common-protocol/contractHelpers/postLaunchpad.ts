@@ -6,10 +6,8 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
 
-function bigIntFromSci(str: string) {
-  if (!str.includes('e')) return BigInt(str);
-  const [base, exp] = str.split('e');
-  return BigInt(base) * 10n ** BigInt(exp);
+function bigIntFromSci(str: string): bigint {
+  return BigInt(Math.trunc(Number(str)));
 }
 
 export const approveTokenTransfer = async (
@@ -74,6 +72,7 @@ export const launchPostToken = async (
         connectorWeight,
         threadId,
         exchangeToken,
+        initPurchaseAmount,
         initPurchaseAmount,
       )
       .send({ from: walletAddress, value: 1e15 });
@@ -246,5 +245,6 @@ export const getPostPrice = async (
   isBuy: boolean,
 ) => {
   const price = await contract.methods.getPrice(tokenAddress, amountIn, isBuy);
-  return price.call();
+  const returnPrice = await price.call();
+  return returnPrice;
 };

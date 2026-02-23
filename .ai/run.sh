@@ -185,7 +185,37 @@ INSTRUCTIONS:
    - Use existing abstractions before creating new ones
    - Respect package boundaries
 
-2. Validate that your implementation is correct:
+2. ADD UNIT TESTS FOR NEW FUNCTIONALITY:
+   When adding new functions, helpers, hooks, or business logic, you MUST add unit tests.
+   - Use Vitest (import from 'vitest': describe, expect, test, vi)
+   - Place tests in appropriate location:
+     * packages/commonwealth/test/unit/ for frontend utilities/hooks
+     * libs/model/test/ for model/policy logic
+   - Follow existing test patterns in the codebase
+   - Test file naming: <filename>.spec.ts
+   - Test structure:
+     describe('FunctionName', () => {
+       test('should describe expected behavior', () => {
+         expect(result).to.equal(expected);
+       });
+     });
+   - Cover: happy path, edge cases, error conditions
+   - Run tests: pnpm -F commonwealth test-unit or pnpm -F model test-select <path>
+
+3. CAPTURE UI SCREENSHOTS FOR SIGNIFICANT UI CHANGES:
+   When the task involves significant UI changes (new pages, major layout changes, new components),
+   capture screenshots using Playwright MCP to document the changes:
+   - Start dev server if needed: pnpm start (wait for compilation)
+   - Use browser_navigate to go to http://localhost:8080/<relevant-path>
+   - Use browser_snapshot to see current state and get element refs
+   - Use browser_take_screenshot with descriptive filename (e.g., feature-page-initial.png)
+   - For user flows, capture before/after states of interactions
+   - IMPORTANT: Screenshots must NOT be committed to the repository
+   - After creating the PR, add screenshots as a PR comment (drag-drop/paste)
+   - GitHub will host the images and generate URLs (https://github.com/user-attachments/assets/...)
+   - Use these GitHub-hosted URLs in the PR description and progress.txt
+
+4. Validate that your implementation is correct:
    - Run: pnpm -r check-types (must pass)
    - Run: pnpm lint-branch-warnings (must pass)
    - Run: pnpm -F commonwealth test-unit (must pass for changed modules)
@@ -193,37 +223,60 @@ INSTRUCTIONS:
    - For API/database changes, run integration tests
    - Show the output of these commands
 
-3. Append progress notes to .ai/progress.txt with:
+5. Append progress notes to .ai/progress.txt with:
    - [YYYY-MM-DD] Feature: <brief description>
    - Completed GitHub issue #${ISSUE_NUM}
    - Key implementation decisions made
    - Files changed (main areas)
-   - Tests added/updated
+   - Tests added/updated (specify new test files created)
+   - Screenshots captured (if UI changes) - note: add GitHub URLs after uploading to PR
    - Any concerns for reviewers
    - Commit hash (after committing)
 
-4. Make a git commit with this format:
+6. Make a git commit with this format:
    <type>: <description>
 
    Completed GitHub issue #${ISSUE_NUM}
    - Summary of changes
    - Files/areas affected
    - Tests: <test coverage added>
+   - Screenshots: attached to PR (if applicable)
 
    🤖 Generated with Claude Code
    Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 
    Types: feat, fix, refactor, test, chore, docs
 
-5. After successful commit, update the GitHub issue:
+7. After successful commit, update the GitHub issue:
    - Add a comment with completion details and commit hash
    - Change label from 'ai-in-progress' to 'ai-completed'
+
+8. Create a Pull Request with the 'Closes #' convention:
+   - Push the branch: git push -u origin <branch-name>
+   - Create PR using: gh pr create --title '<type>: <description>' --body '...'
+   - PR body MUST include 'Closes #${ISSUE_NUM}' to auto-close the issue when merged
+   - Include a summary section, test plan, and screenshots section (if UI changes)
+   - For screenshots: After creating PR, add a comment with images attached, then edit PR description to include GitHub-hosted URLs
+   - Example PR body format:
+     ## Summary
+     - Brief description of changes
+
+     ## Test Plan
+     - [ ] Unit tests pass
+     - [ ] Manual verification steps
+
+     Closes #${ISSUE_NUM}
+
+     🤖 Generated with Claude Code
 
 CRITICAL RULES:
 - ONLY WORK ON THIS SINGLE ISSUE
 - Never commit if types/tests fail
 - Read files before editing them
 - Match existing code style and patterns
+- ADD UNIT TESTS when creating new functionality
+- CAPTURE SCREENSHOTS when making significant UI changes
+- NEVER COMMIT SCREENSHOTS TO THE REPO - upload to GitHub via PR comments instead
 "
 
 # Check if Claude succeeded
@@ -252,7 +305,9 @@ Ready for human review."
     echo "  1. Review changes: git diff HEAD~1"
     echo "  2. Test manually if needed: pnpm start"
     echo "  3. Push: git push -u origin ${BRANCH_NAME}"
-    echo "  4. Create PR: gh pr create --fill"
+    echo "  4. Create PR: gh pr create --title 'type: description' --body 'Closes #${ISSUE_NUM}'"
+    echo ""
+    echo -e "${YELLOW}Remember: Include 'Closes #${ISSUE_NUM}' in PR body to auto-close the issue${NC}"
 else
     echo ""
     echo -e "${RED}✗ AI workflow failed${NC}"

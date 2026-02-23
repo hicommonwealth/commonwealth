@@ -35,18 +35,41 @@ export function SearchThreads(): Query<typeof schemas.SearchThreads> {
         offset: limit * (cursor - 1),
       };
 
+      const orderClause =
+        order_by === 'created_at'
+          ? `${order_by} ${order_direction || 'DESC'}`
+          : `rank, created_at DESC`;
+
       const sql = `
 WITH output_with_topics AS (
-SELECT 
-  'thread' as type,
-  T.community_id,
-  T.topic_id,
+SELECT
   T.id,
-  T.title,
-  ${thread_title_only ? `''` : `T.body`} as body,
+  T.topic_id,
+  T.community_id,
   T.kind,
   T.created_at,
   T.address_id,
+  ts_rank_cd(T.search, tsquery) as rank
+FROM
+    "Threads" T
+    , websearch_to_tsquery('english', :search_term) as tsquery
+WHERE
+  T.deleted_at IS NULL
+  AND T.marked_as_spam_at IS NULL
+  ${replacements.community_id ? 'AND T.community_id = :community_id' : ''}
+  AND ${thread_title_only ? `T.title ILIKE '%' || :search_term || '%'` : `tsquery @@ T.search`}
+),
+${buildGatedOutput(actor)}
+SELECT
+  'thread' as type,
+  P.community_id,
+  P.topic_id,
+  P.id,
+  TH.title,
+  ${thread_title_only ? `''` : `TH.body`} as body,
+  P.kind,
+  P.created_at,
+  P.address_id,
   JSONB_BUILD_OBJECT(
     'id', A.id,
     'user_id', A.user_id,
@@ -57,27 +80,19 @@ SELECT
   U.tier as user_tier,
   U.profile->>'avatar_url' as avatar_url,
   U.profile->>'name' as profile_name,
-  ts_rank_cd(T.search, tsquery) as rank
-FROM 
-    "Threads" T
-    JOIN "Addresses" A ON T.address_id = A.id
-    JOIN "Users" U ON A.user_id = U.id
-    , websearch_to_tsquery('english', :search_term) as tsquery
-WHERE
-  T.deleted_at IS NULL
-  AND T.marked_as_spam_at IS NULL
-  ${replacements.community_id ? 'AND T.community_id = :community_id' : ''} 
-  AND (T.title ILIKE '%' || :search_term || '%' ${!thread_title_only ? 'OR tsquery @@ T.search' : ''})
-),
-${buildGatedOutput(actor)}  
-SELECT
-  T.*,
-  COUNT(*) OVER()::INTEGER AS total_count
-FROM
-  gated_output T
-ORDER BY
-  ${order_by === 'created_at' ? `T.${order_by} ${order_direction || 'DESC'}` : `rank, T.created_at DESC`}
-LIMIT :limit OFFSET :offset
+  P.rank${include_count ? `,\n  P.total_count` : ''}
+FROM (
+  SELECT
+    T.*${include_count ? `,\n    COUNT(*) OVER()::INTEGER AS total_count` : ''}
+  FROM
+    gated_output T
+  ORDER BY ${orderClause}
+  LIMIT :limit OFFSET :offset
+) P
+JOIN "Threads" TH ON P.id = TH.id
+JOIN "Addresses" A ON P.address_id = A.id
+JOIN "Users" U ON A.user_id = U.id
+ORDER BY ${orderClause}
 `;
 
       const results = await models.sequelize.query<

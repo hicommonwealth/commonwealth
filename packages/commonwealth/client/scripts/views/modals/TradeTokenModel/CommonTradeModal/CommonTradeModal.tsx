@@ -1,6 +1,6 @@
 import { SupportedCryptoCurrencies } from 'helpers/currency';
-import useBeforeUnload from 'hooks/useBeforeUnload';
 import React from 'react';
+import useBeforeUnload from 'shared/hooks/useBeforeUnload';
 import { CWText } from '../../../components/component_kit/cw_text';
 import {
   CWModal,

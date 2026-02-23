@@ -14,6 +14,7 @@ import * as launchpadToken from './launchpadToken';
 import * as loadTest from './load-test';
 import * as mcp from './mcp';
 import * as poll from './poll';
+import * as predictionMarket from './predictionMarket';
 import * as quest from './quest';
 import * as search from './search';
 import * as subscription from './subscription';
@@ -46,6 +47,7 @@ const api = {
   configuration: configuration.trpcRouter,
   mcp: mcp.trpcRouter,
   tokenAllocation: tokenAllocation.trpcRouter,
+  predictionMarket: predictionMarket.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {

@@ -1,6 +1,4 @@
-import { useFlag } from 'hooks/useFlag';
 import React, { ReactNode } from 'react';
-import MarkdownViewer from 'views/components/MarkdownViewer';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 
 type MarkdownViewerWithFallbackProps = {
@@ -13,7 +11,7 @@ type MarkdownViewerWithFallbackProps = {
 };
 
 /**
- * Temporary migration component that uses a feature toggle for viewing content.
+ * Rendering wrapper that keeps the Quill viewer as the single path.
  */
 export const MarkdownViewerWithFallback = (
   props: MarkdownViewerWithFallbackProps,
@@ -26,18 +24,6 @@ export const MarkdownViewerWithFallback = (
     maxChars,
     onImageClick,
   } = props;
-
-  const newEditor = useFlag('newEditor');
-  if (newEditor) {
-    return (
-      <MarkdownViewer
-        markdown={markdown}
-        cutoffLines={cutoffLines}
-        customShowMoreButton={customShowMoreButton}
-        className={className}
-      />
-    );
-  }
 
   return (
     <QuillRenderer

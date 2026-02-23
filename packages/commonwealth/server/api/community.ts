@@ -255,4 +255,8 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   getMarkets: trpc.query(Community.GetMarkets, trpc.Tag.Community),
+  discoverExternalMarkets: trpc.query(
+    Community.DiscoverExternalMarkets,
+    trpc.Tag.Community,
+  ),
 });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { MarketCard } from './MarketCard';
+import { MarketCard, MarketCardData, toMarketCardData } from './MarketCard';
 import './MarketList.scss';
 import { Market } from './types';
 
@@ -11,12 +11,12 @@ interface MarketListProps {
   onUnsubscribe: (market: Market) => void;
 }
 
-export function MarketList({
+export const MarketList = ({
   markets,
   savedMarketIds,
   onSubscribe,
   onUnsubscribe,
-}: MarketListProps) {
+}: MarketListProps) => {
   if (markets.length === 0) {
     return (
       <div className="markets-empty-state">
@@ -30,17 +30,28 @@ export function MarketList({
     );
   }
 
+  // Wrap handlers to convert MarketCardData back to Market
+  const handleSubscribe = (cardData: MarketCardData) => {
+    const market = markets.find((m) => m.slug === cardData.slug);
+    if (market) onSubscribe(market);
+  };
+
+  const handleUnsubscribe = (cardData: MarketCardData) => {
+    const market = markets.find((m) => m.slug === cardData.slug);
+    if (market) onUnsubscribe(market);
+  };
+
   return (
     <div className="market-list">
       {markets.map((market) => (
         <MarketCard
-          key={market.id}
-          market={market}
-          isSubscribed={savedMarketIds.has(market.id)}
-          onSubscribe={onSubscribe}
-          onUnsubscribe={onUnsubscribe}
+          key={market.slug}
+          market={toMarketCardData(market)}
+          isSubscribed={savedMarketIds.has(market.slug)}
+          onSubscribe={handleSubscribe}
+          onUnsubscribe={handleUnsubscribe}
         />
       ))}
     </div>
   );
-}
+};
