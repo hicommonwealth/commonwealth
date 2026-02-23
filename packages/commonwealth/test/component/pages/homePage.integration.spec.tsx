@@ -110,7 +110,7 @@ describe('HomePage integration', () => {
 
     renderWithProviders(<HomePage />);
 
-    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.getByTestId('home-page-layout')).toBeInTheDocument();
     expect(screen.getByTestId('home-idea-launchpad')).toBeInTheDocument();
     expect(screen.getAllByTestId('home-trending-token-list')).toHaveLength(3);
     expect(screen.getByText('Trending')).toBeInTheDocument();
