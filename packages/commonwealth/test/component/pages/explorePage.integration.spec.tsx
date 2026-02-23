@@ -22,6 +22,10 @@ vi.mock('hooks/useFlag', () => ({
   useFlag: useFlagMock,
 }));
 
+vi.mock('shared/hooks/useFlag', () => ({
+  useFlag: useFlagMock,
+}));
+
 vi.mock('navigation/helpers', () => ({
   useCommonNavigate: useCommonNavigateMock,
 }));

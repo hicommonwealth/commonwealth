@@ -51,10 +51,11 @@ if [ ! -s "$TMP_JSON" ]; then
   exit "${DEPCRUISE_EXIT:-1}"
 fi
 
-if node - "$TMP_JSON" "$TMP_CHANGED" <<'NODE'
+if node - "$TMP_JSON" "$TMP_CHANGED" "$BASE_BRANCH" "$ROOT_DIR" <<'NODE'
 const fs = require('node:fs');
+const { execFileSync } = require('node:child_process');
 
-const [jsonPath, changedPath] = process.argv.slice(2);
+const [jsonPath, changedPath, baseBranch, rootDir] = process.argv.slice(2);
 const report = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
 const changedFiles = new Set(
   fs
@@ -65,11 +66,45 @@ const changedFiles = new Set(
 );
 
 const circularEdges = [];
+const addedImportSpecifiersBySource = new Map();
+
+const getAddedImportSpecifiers = (source) => {
+  if (addedImportSpecifiersBySource.has(source)) {
+    return addedImportSpecifiersBySource.get(source);
+  }
+
+  let diff = '';
+  try {
+    diff = execFileSync(
+      'git',
+      ['-C', rootDir, 'diff', `origin/${baseBranch}...HEAD`, '-U0', '--', source],
+      { encoding: 'utf8' },
+    );
+  } catch {
+    const emptySet = new Set();
+    addedImportSpecifiersBySource.set(source, emptySet);
+    return emptySet;
+  }
+
+  const addedSpecifiers = new Set();
+  for (const line of diff.split('\n')) {
+    if (!line.startsWith('+') || line.startsWith('+++')) continue;
+    const match = line.match(/(?:from|import\(|require\()\s*['"]([^'"]+)['"]/);
+    if (!match?.[1]) continue;
+    addedSpecifiers.add(match[1]);
+  }
+
+  addedImportSpecifiersBySource.set(source, addedSpecifiers);
+  return addedSpecifiers;
+};
 
 for (const mod of report.modules || []) {
   if (!changedFiles.has(mod.source)) continue;
+  const addedSpecifiers = getAddedImportSpecifiers(mod.source);
+
   for (const dep of mod.dependencies || []) {
     if (!dep.circular) continue;
+    if (!dep.module || !addedSpecifiers.has(dep.module)) continue;
     circularEdges.push({
       source: mod.source,
       target: dep.resolved || dep.module || '<unknown>',

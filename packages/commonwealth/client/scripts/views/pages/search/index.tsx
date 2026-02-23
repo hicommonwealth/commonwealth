@@ -11,11 +11,11 @@ import './index.scss';
 
 import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import clsx from 'clsx';
-import { useFlag } from 'hooks/useFlag';
-import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useFlag } from 'shared/hooks/useFlag';
+import useWindowResize from 'shared/hooks/useWindowResize';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useFetchTokensQuery } from 'state/api/tokens';

@@ -2,14 +2,14 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'client/scripts/controllers/app/login';
 import Account from 'client/scripts/models/Account';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
-import useAppStatus from 'hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { useFlag } from 'hooks/useFlag';
 import { useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityStakeEvent,
 } from 'shared/analytics/types';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import { useFlag } from 'shared/hooks/useFlag';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
 import {

@@ -1,8 +1,8 @@
 import { findDenominationString } from 'helpers/findDenomination';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useFlag } from 'shared/hooks/useFlag';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';

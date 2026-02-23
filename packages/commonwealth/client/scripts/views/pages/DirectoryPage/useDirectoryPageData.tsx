@@ -1,7 +1,7 @@
 import { isCommandClick } from 'helpers';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useMemo } from 'react';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import { useFetchRelatedCommunitiesQuery } from 'state/api/communities';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { getNodeById } from 'state/api/nodes/utils';
