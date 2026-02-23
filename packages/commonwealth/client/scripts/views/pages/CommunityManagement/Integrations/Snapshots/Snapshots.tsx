@@ -1,6 +1,6 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import app from 'state';
 import {
   useGetCommunityByIdQuery,

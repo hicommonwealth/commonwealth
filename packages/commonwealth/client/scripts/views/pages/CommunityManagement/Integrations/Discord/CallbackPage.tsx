@@ -1,6 +1,6 @@
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
 import { useSetDiscordBotConfigMutation } from 'state/api/discord';
 import { LoadingIndicator } from '../../../../components/LoadingIndicator/LoadingIndicator';
 import { PageNotFound } from '../../../404';

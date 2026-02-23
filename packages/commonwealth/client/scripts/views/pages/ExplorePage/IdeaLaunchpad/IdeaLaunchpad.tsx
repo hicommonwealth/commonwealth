@@ -1,6 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import React, { useState } from 'react';
+import useDeferredConditionTriggerCallback from 'shared/hooks/useDeferredConditionTriggerCallback';
 import useUserStore from 'state/ui/user';
 import { AuthModal } from 'views/modals/AuthModal';
 import LaunchIdeaCard from '../../../components/LaunchIdeaCard';

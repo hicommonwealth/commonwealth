@@ -1,7 +1,7 @@
 import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { findDenominationString } from 'helpers/findDenomination';
-import { useFlag } from 'hooks/useFlag';
 import React, { useRef, useState } from 'react';
+import { useFlag } from 'shared/hooks/useFlag';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWText } from '../../components/component_kit/cw_text';
