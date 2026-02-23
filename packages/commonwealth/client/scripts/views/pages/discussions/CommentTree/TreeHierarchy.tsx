@@ -18,11 +18,11 @@ import React, {
   useState,
 } from 'react';
 import { Virtuoso } from 'react-virtuoso';
+import { trpc } from 'shared/api/trpcClient';
 import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
-import { trpc } from 'utils/trpcClient';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import { WithActiveStickyComment } from 'views/components/StickEditorContainer/context/WithActiveStickyComment';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
