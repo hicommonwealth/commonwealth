@@ -109,6 +109,7 @@ export const DeployDraftPredictionMarketModal = ({
       await deployMutation.mutateAsync({
         thread_id: thread.id,
         prediction_market_id: market.id,
+        market_id: payload.market_id,
         vault_address: payload.vault_address,
         governor_address: payload.governor_address,
         router_address: payload.router_address,

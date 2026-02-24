@@ -5,6 +5,7 @@
 import {
   BinaryVaultAbi,
   FutarchyRouterAbi,
+  UniswapV3StrategyAbi,
 } from '@commonxyz/common-protocol-abis';
 import { erc20Abi } from '@hicommonwealth/evm-protocols';
 import Web3 from 'web3';
@@ -16,6 +17,40 @@ export function marketIdToBytes32(marketId: string): `0x${string}` {
   const hex = marketId.startsWith('0x') ? marketId.slice(2) : marketId;
   const padded = hex.padStart(64, '0').slice(-64);
   return `0x${padded}` as `0x${string}`;
+}
+
+/**
+ * Fetch market_id from the vault's MarketCreated event logs (for markets deployed before we stored market_id).
+ * Returns the first marketId found for the given vault + pToken + fToken, or null.
+ */
+export async function fetchMarketIdFromChain(
+  vaultAddress: string,
+  pTokenAddress: string,
+  fTokenAddress: string,
+  chainRpc: string,
+): Promise<string | null> {
+  const web3 = new Web3(chainRpc);
+  const eventSig = (
+    web3 as unknown as { utils: { sha3: (s: string) => string } }
+  ).utils.sha3('MarketCreated(bytes32,address,address,address)');
+  if (!eventSig) return null;
+  const padAddr = (a: string) => {
+    const hex = a.toLowerCase().replace(/^0x/, '');
+    return '0x' + hex.padStart(64, '0').slice(-64);
+  };
+  const logs = await web3.eth.getPastLogs({
+    address: vaultAddress,
+    fromBlock: 0,
+    toBlock: 'latest',
+    topics: [eventSig, null, padAddr(pTokenAddress), padAddr(fTokenAddress)],
+  });
+  const first = logs[0];
+  const marketIdTopic =
+    first && typeof first === 'object' && Array.isArray(first.topics)
+      ? first.topics[1]
+      : null;
+  if (!marketIdTopic) return null;
+  return marketIdTopic as string;
 }
 
 /** Parse human-readable token amount to smallest units. */
@@ -63,8 +98,28 @@ async function approveToken(
   );
   if (currentAllowance < amount) {
     const tx = token.methods.approve(spender, amount);
-    await tx.send({ from: fromAddress });
+    const gas = await tx.estimateGas({ from: fromAddress });
+    await tx.send({
+      from: fromAddress,
+      gas: String(BigInt(gas.toString()) + 50000n),
+    });
   }
+}
+
+/** Send tx with estimated gas + buffer (matches deploy flow to avoid inflated provider estimates). */
+async function sendWithEstimatedGas(
+  tx: {
+    estimateGas: (opts: { from: string }) => Promise<unknown>;
+    send: (opts: {
+      from: string;
+      gas: string;
+    }) => Promise<{ transactionHash: string }>;
+  },
+  fromAddress: string,
+): Promise<{ transactionHash: string }> {
+  const gas = await tx.estimateGas({ from: fromAddress });
+  const gasLimit = BigInt(gas as unknown as string) + 100000n;
+  return tx.send({ from: fromAddress, gas: String(gasLimit) });
 }
 
 class BinaryVaultHelper extends ContractBase {
@@ -86,10 +141,11 @@ class BinaryVaultHelper extends ContractBase {
       amountWei,
       fromAddress,
     );
-    const receipt = await this.contract.methods
-      .mint(marketIdBytes, amountWei.toString(10))
-      .send({ from: fromAddress });
-    return { transactionHash: receipt.transactionHash as string };
+    const tx = this.contract.methods.mint(
+      marketIdBytes,
+      amountWei.toString(10),
+    );
+    return sendWithEstimatedGas(tx, fromAddress);
   }
 
   async merge(
@@ -114,10 +170,11 @@ class BinaryVaultHelper extends ContractBase {
       amountWei,
       fromAddress,
     );
-    const receipt = await this.contract.methods
-      .merge(marketIdBytes, amountWei.toString(10))
-      .send({ from: fromAddress });
-    return { transactionHash: receipt.transactionHash as string };
+    const tx = this.contract.methods.merge(
+      marketIdBytes,
+      amountWei.toString(10),
+    );
+    return sendWithEstimatedGas(tx, fromAddress);
   }
 
   async redeem(
@@ -134,10 +191,11 @@ class BinaryVaultHelper extends ContractBase {
       amountWei,
       fromAddress,
     );
-    const receipt = await this.contract.methods
-      .redeem(marketIdBytes, amountWei.toString(10))
-      .send({ from: fromAddress });
-    return { transactionHash: receipt.transactionHash as string };
+    const tx = this.contract.methods.redeem(
+      marketIdBytes,
+      amountWei.toString(10),
+    );
+    return sendWithEstimatedGas(tx, fromAddress);
   }
 }
 
@@ -146,6 +204,19 @@ class FutarchyRouterHelper extends ContractBase {
     super(routerAddress, FutarchyRouterAbi as unknown as AbiItem[], rpc);
   }
 
+  /** Get strategy address for a market (view call). */
+  async getStrategy(marketIdBytes: `0x${string}`): Promise<string> {
+    this.isInitialized();
+    const addr = (await this.contract.methods
+      .getStrategy(marketIdBytes)
+      .call()) as string;
+    return addr;
+  }
+
+  /**
+   * Execute swap via the strategy contract (matches app.js / FutarchyGovernor reference).
+   * Flow: getStrategy(marketId) → approve token to strategy → strategy.executeSwap(buyPass, amountIn, minOut).
+   */
   async swap(
     marketIdBytes: `0x${string}`,
     buyPass: boolean,
@@ -155,22 +226,34 @@ class FutarchyRouterHelper extends ContractBase {
     fromAddress: string,
   ): Promise<{ transactionHash: string }> {
     this.isInitialized();
+    const strategyAddress = await this.getStrategy(marketIdBytes);
     await approveToken(
       this.web3,
       tokenInAddress,
-      this.contractAddress,
+      strategyAddress,
       amountInWei,
       fromAddress,
     );
-    const receipt = await this.contract.methods
-      .swap(
-        marketIdBytes,
-        buyPass,
-        amountInWei.toString(10),
-        minAmountOutWei.toString(10),
-      )
-      .send({ from: fromAddress });
-    return { transactionHash: receipt.transactionHash as string };
+    const payload = {
+      marketIdBytes,
+      buyPass,
+      amountInWei: amountInWei.toString(10),
+      minAmountOutWei: minAmountOutWei.toString(10),
+      tokenInAddress,
+      strategyAddress,
+      fromAddress,
+    };
+    console.log('[Strategy.executeSwap] payload:', payload);
+    const strategyContract = new this.web3.eth.Contract(
+      UniswapV3StrategyAbi as unknown as AbiItem[],
+      strategyAddress,
+    );
+    const tx = strategyContract.methods.executeSwap(
+      buyPass,
+      amountInWei.toString(10),
+      minAmountOutWei.toString(10),
+    );
+    return sendWithEstimatedGas(tx, fromAddress);
   }
 }
 
@@ -192,7 +275,9 @@ export async function mintTokens(
 }
 
 /**
- * Execute swap: approve tokenIn to router, then router.swap(marketId, buyPass, amountIn, minAmountOut).
+ * Execute swap: get strategy from router, approve tokenIn to strategy,
+ * then strategy.executeSwap(buyPass, amountIn, minOut).
+ * Matches app.js / FutarchyGovernor reference (vote via strategy, not router.swap).
  */
 export async function swapTokens(
   params: TradeParams & {

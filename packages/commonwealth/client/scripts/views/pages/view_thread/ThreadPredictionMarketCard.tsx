@@ -69,8 +69,8 @@ export const ThreadPredictionMarketCard = ({
   const canCompleteDraft = isDraft && isAuthor;
   const canTrade =
     (market.status === 'active' || market.status === 'resolved') &&
-    market.vault_address &&
-    market.router_address;
+    !!market.vault_address &&
+    !!market.router_address;
 
   return (
     <>

@@ -1,3 +1,4 @@
+import { ArrowsDownUp } from '@phosphor-icons/react';
 import {
   notifyError,
   notifySuccess,
@@ -5,6 +6,7 @@ import {
 import MagicWebWalletController from 'client/scripts/controllers/app/webWallets/MagicWebWallet';
 import {
   applySlippage,
+  fetchMarketIdFromChain,
   mergeTokens,
   mintTokens,
   parseTokenAmount,
@@ -16,8 +18,11 @@ import useGetCommunityByIdQuery from 'client/scripts/state/api/communities/getCo
 import { fetchNodes } from 'client/scripts/state/api/nodes';
 import { useGetPredictionMarketPositionsQuery } from 'client/scripts/state/api/predictionMarket';
 import useUserStore from 'client/scripts/state/ui/user';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { CWDivider } from '../../components/component_kit/cw_divider';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
+import CWBanner from '../../components/component_kit/new_designs/CWBanner';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
@@ -32,6 +37,16 @@ import './PredictionMarketTradeModal.scss';
 
 const COLLATERAL_DECIMALS = 18;
 const DEFAULT_SLIPPAGE_BPS = 100; // 1%
+const PROTOCOL_FEE_BPS = 10; // 0.1%
+
+/** Format wei (bigint) to readable string with 2 decimals. */
+function formatTokenDisplay(wei: bigint, decimals = 18): string {
+  if (wei === 0n) return '0.00';
+  const divisor = 10n ** BigInt(decimals);
+  const whole = wei / divisor;
+  const frac = ((wei % divisor) * 100n) / divisor;
+  return `${whole}.${frac.toString().padStart(2, '0').slice(0, 2)}`;
+}
 
 type Market = {
   id: number;
@@ -91,10 +106,15 @@ export const PredictionMarketTradeModal = ({
   const [swapAmount, setSwapAmount] = useState('');
   const [swapBuyPass, setSwapBuyPass] = useState(true);
   const [slippageBps, setSlippageBps] = useState(DEFAULT_SLIPPAGE_BPS);
+  const [slippagePreset, setSlippagePreset] = useState<
+    'auto' | '0.5%' | '1.0%' | 'custom'
+  >('auto');
   const [mergeAmount, setMergeAmount] = useState('');
   const [redeemAmount, setRedeemAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fetchedMarketId, setFetchedMarketId] = useState<string | null>(null);
+  const [isFetchingMarketId, setIsFetchingMarketId] = useState(false);
 
   const { data: community } = useGetCommunityByIdQuery({
     id: threadCommunityId,
@@ -129,6 +149,43 @@ export const PredictionMarketTradeModal = ({
   const minBalanceForMerge =
     pTokenBalance < fTokenBalance ? pTokenBalance : fTokenBalance;
 
+  const effectiveMarketId = market.market_id ?? fetchedMarketId;
+  const effectiveMarket = { ...market, market_id: effectiveMarketId };
+  const hasAddresses = !!(
+    effectiveMarket.vault_address &&
+    effectiveMarket.router_address &&
+    effectiveMarket.market_id &&
+    effectiveMarket.p_token_address &&
+    effectiveMarket.f_token_address
+  );
+
+  useEffect(() => {
+    if (
+      !market.market_id &&
+      market.vault_address &&
+      market.p_token_address &&
+      market.f_token_address &&
+      chainRpc
+    ) {
+      setIsFetchingMarketId(true);
+      fetchMarketIdFromChain(
+        market.vault_address,
+        market.p_token_address,
+        market.f_token_address,
+        chainRpc,
+      )
+        .then((id) => id && setFetchedMarketId(id))
+        .catch(() => {})
+        .finally(() => setIsFetchingMarketId(false));
+    }
+  }, [
+    market.market_id,
+    market.vault_address,
+    market.p_token_address,
+    market.f_token_address,
+    chainRpc,
+  ]);
+
   const isResolved = market.status === 'resolved';
   const isActive = market.status === 'active';
   const swapDisabled = isResolved;
@@ -161,7 +218,7 @@ export const PredictionMarketTradeModal = ({
     try {
       const provider = await getProvider();
       await mintTokens({
-        ...getTradeParams(market, chainRpc, activeAddress, provider),
+        ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
         collateral_amount_wei: amountWei,
       });
       notifySuccess('Mint successful.');
@@ -189,7 +246,7 @@ export const PredictionMarketTradeModal = ({
     try {
       const provider = await getProvider();
       await swapTokens({
-        ...getTradeParams(market, chainRpc, activeAddress, provider),
+        ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
         buy_pass: swapBuyPass,
         amount_in_wei: amountInWei,
         min_amount_out_wei: minAmountOutWei,
@@ -220,7 +277,7 @@ export const PredictionMarketTradeModal = ({
     try {
       const provider = await getProvider();
       await mergeTokens({
-        ...getTradeParams(market, chainRpc, activeAddress, provider),
+        ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
         amount_wei: amountWei,
       });
       notifySuccess('Merge successful.');
@@ -252,7 +309,7 @@ export const PredictionMarketTradeModal = ({
     try {
       const provider = await getProvider();
       await redeemTokens({
-        ...getTradeParams(market, chainRpc, activeAddress, provider),
+        ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
         amount_wei: amountWei,
         winner: winner as 1 | 2,
       });
@@ -269,135 +326,311 @@ export const PredictionMarketTradeModal = ({
     }
   };
 
-  const hasAddresses =
-    market.vault_address &&
-    market.router_address &&
-    market.market_id &&
-    market.p_token_address &&
-    market.f_token_address;
-
   const renderTabContent = () => {
     if (activeTab === 'mint') {
       const amountWei = parseTokenAmount(mintAmount, COLLATERAL_DECIMALS);
       const costDisplay = amountWei > 0n ? mintAmount || '0' : '0';
+      const protocolFeeWei = (amountWei * BigInt(PROTOCOL_FEE_BPS)) / 10000n;
+      const protocolFeeDisplay =
+        protocolFeeWei > 0n ? (Number(protocolFeeWei) / 1e18).toFixed(3) : '0';
       return (
         <div className="PredictionMarketTradeModal-tab-content">
-          <CWText type="b2" className="label">
-            Collateral amount
-          </CWText>
-          <CWTextInput
-            value={mintAmount}
-            onInput={(e) => setMintAmount((e.target as HTMLInputElement).value)}
-            placeholder="0"
-            type="text"
-            containerClassName="amount-input"
-          />
-          <CWText type="caption" className="help">
-            You will receive equal amounts of PASS and FAIL tokens.
-          </CWText>
-          <CWText type="b2" className="summary">
-            Cost: {costDisplay} (collateral)
-          </CWText>
-          <CWButton
-            label="Deposit and Mint"
-            buttonType="primary"
-            buttonHeight="sm"
-            disabled={
-              !mintAmount || amountWei <= 0n || isLoading || !activeAddress
-            }
-            onClick={() => void handleMint()}
-          />
+          <div className="input-label-row">
+            <CWText type="b2" className="label">
+              Collateral Amount
+            </CWText>
+            <CWText type="caption" className="available">
+              Available: — ETH
+            </CWText>
+          </div>
+          <div className="amount-input-with-actions">
+            <CWTextInput
+              value={mintAmount}
+              onInput={(e) =>
+                setMintAmount((e.target as HTMLInputElement).value)
+              }
+              placeholder="0"
+              type="text"
+              fullWidth
+              containerClassName="amount-input-wrap"
+            />
+            <CWButton
+              label="MAX"
+              buttonType="secondary"
+              buttonHeight="sm"
+              buttonWidth="narrow"
+              onClick={() => {
+                // TODO: set to available collateral balance when we fetch it
+              }}
+            />
+            <CWText type="b2" className="unit">
+              ETH
+            </CWText>
+          </div>
+          <div className="info-row">
+            <CWIcon
+              iconName="infoEmpty"
+              iconSize="small"
+              className="info-icon"
+            />
+            <CWText type="caption" className="help">
+              You will receive equal amounts of&nbsp;<strong>PASS</strong>
+              &nbsp;and&nbsp;
+              <strong>FAIL</strong>&nbsp;tokens.
+            </CWText>
+          </div>
+          <CWDivider />
+          <div className="cost-details">
+            <div className="cost-row">
+              <CWText type="caption">Cost</CWText>
+              <CWText type="caption" fontWeight="medium">
+                {costDisplay} ETH
+              </CWText>
+            </div>
+            <div className="cost-row">
+              <CWText type="caption">Protocol Fee (0.1%)</CWText>
+              <CWText type="caption" fontWeight="medium">
+                {protocolFeeDisplay} ETH
+              </CWText>
+            </div>
+          </div>
         </div>
       );
     }
     if (activeTab === 'swap') {
       const amountInWei = parseTokenAmount(swapAmount, COLLATERAL_DECIMALS);
       const minOutWei = applySlippage(amountInWei, slippageBps);
+      const sellToken = swapBuyPass ? 'FAIL' : 'PASS';
+      const buyToken = swapBuyPass ? 'PASS' : 'FAIL';
+      const sellBalance = swapBuyPass ? fTokenBalance : pTokenBalance;
+      const buyBalance = swapBuyPass ? pTokenBalance : fTokenBalance;
+
+      const slippageOptions: Array<{
+        label: string;
+        preset: 'auto' | '0.5%' | '1.0%';
+        bps: number;
+      }> = [
+        { label: 'Auto', preset: 'auto', bps: DEFAULT_SLIPPAGE_BPS },
+        { label: '0.5%', preset: '0.5%', bps: 50 },
+        { label: '1.0%', preset: '1.0%', bps: 100 },
+      ];
+
       return (
         <div className="PredictionMarketTradeModal-tab-content">
-          <div className="toggle-row">
-            <CWButton
-              label="PASS"
-              buttonType={swapBuyPass ? 'primary' : 'secondary'}
-              buttonHeight="sm"
-              onClick={() => setSwapBuyPass(true)}
-            />
-            <CWButton
-              label="FAIL"
-              buttonType={!swapBuyPass ? 'primary' : 'secondary'}
-              buttonHeight="sm"
-              onClick={() => setSwapBuyPass(false)}
-            />
+          {/* Token panels */}
+          <div className="swap-panels">
+            <div className="token-panel">
+              <div className="panel-header">
+                <CWText type="caption" className="panel-side-label">
+                  You Sell
+                </CWText>
+                <CWText type="caption" className="panel-balance">
+                  Balance: {formatTokenDisplay(sellBalance)}
+                </CWText>
+              </div>
+              <div className="panel-body">
+                <div className={`token-badge ${sellToken.toLowerCase()}`}>
+                  <span className="token-dot" />
+                  <CWText type="b1" fontWeight="bold">
+                    {sellToken}
+                  </CWText>
+                </div>
+                <div className="panel-amount">
+                  <input
+                    className="swap-amount-input"
+                    type="text"
+                    value={swapAmount}
+                    onChange={(e) => setSwapAmount(e.target.value)}
+                    placeholder="0"
+                  />
+                  <button
+                    className="max-link"
+                    onClick={() =>
+                      setSwapAmount(formatTokenDisplay(sellBalance))
+                    }
+                  >
+                    MAX
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="swap-direction-toggle"
+              onClick={() => setSwapBuyPass((prev) => !prev)}
+            >
+              <ArrowsDownUp size={16} weight="bold" />
+            </div>
+
+            <div className="token-panel">
+              <div className="panel-header">
+                <CWText type="caption" className="panel-side-label">
+                  You Buy
+                </CWText>
+                <CWText type="caption" className="panel-balance">
+                  Balance: {formatTokenDisplay(buyBalance)}
+                </CWText>
+              </div>
+              <div className="panel-body">
+                <div className={`token-badge ${buyToken.toLowerCase()}`}>
+                  <span className="token-dot" />
+                  <CWText type="b1" fontWeight="bold">
+                    {buyToken}
+                  </CWText>
+                </div>
+                <div className="panel-amount">
+                  <CWText type="h4" fontWeight="bold" className="estimated-out">
+                    {minOutWei > 0n ? formatTokenDisplay(minOutWei) : '—'}
+                  </CWText>
+                  {minOutWei > 0n && (
+                    <CWText type="caption" className="min-out-hint">
+                      ~ {formatTokenDisplay(minOutWei)}
+                    </CWText>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-          <CWText type="b2" className="label">
-            {swapBuyPass ? 'Sell FAIL, buy PASS' : 'Sell PASS, buy FAIL'} —
-            Amount in
-          </CWText>
-          <CWTextInput
-            value={swapAmount}
-            onInput={(e) => setSwapAmount((e.target as HTMLInputElement).value)}
-            placeholder="0"
-            type="text"
-            containerClassName="amount-input"
-          />
-          <CWText type="b2" className="label">
-            Slippage (%)
-          </CWText>
-          <CWTextInput
-            value={String(slippageBps / 100)}
-            onInput={(e) => {
-              const v = parseFloat((e.target as HTMLInputElement).value);
-              if (!Number.isNaN(v)) setSlippageBps(Math.round(v * 100));
-            }}
-            placeholder="1"
-            type="text"
-            containerClassName="amount-input"
-          />
-          <CWText type="caption" className="summary">
-            Min. output (with slippage): {minOutWei.toString()}
-          </CWText>
-          <CWButton
-            label="Swap"
-            buttonType="primary"
-            buttonHeight="sm"
-            disabled={
-              !swapAmount || amountInWei <= 0n || isLoading || !activeAddress
-            }
-            onClick={() => void handleSwap()}
-          />
+
+          {/* Slippage */}
+          <div className="slippage-row">
+            <div className="slippage-label-group">
+              <CWText type="b2">Max Slippage</CWText>
+              <CWIcon
+                iconName="infoEmpty"
+                iconSize="small"
+                className="slippage-info-icon"
+              />
+            </div>
+            <div className="slippage-presets">
+              {slippageOptions.map(({ label, preset, bps }) => (
+                <button
+                  key={preset}
+                  className={`slippage-btn${slippagePreset === preset ? ' active' : ''}`}
+                  onClick={() => {
+                    setSlippagePreset(preset);
+                    setSlippageBps(bps);
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+              <input
+                className={`slippage-custom-input${slippagePreset === 'custom' ? ' active' : ''}`}
+                type="text"
+                placeholder="0.1"
+                value={
+                  slippagePreset === 'custom' ? String(slippageBps / 100) : ''
+                }
+                onChange={(e) => {
+                  const v = parseFloat(e.target.value);
+                  setSlippagePreset('custom');
+                  if (!Number.isNaN(v)) setSlippageBps(Math.round(v * 100));
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Summary */}
+          <div className="swap-summary">
+            <div className="summary-row">
+              <CWText type="caption">Exchange Rate</CWText>
+              <CWText type="caption">
+                1 {sellToken} = — {buyToken}
+              </CWText>
+            </div>
+            <div className="summary-row">
+              <CWText type="caption">Network Fee</CWText>
+              <CWText type="caption" className="network-fee">
+                —
+              </CWText>
+            </div>
+            <div className="summary-row">
+              <CWText type="caption">Min. Received</CWText>
+              <CWText type="caption" fontWeight="medium">
+                {minOutWei > 0n
+                  ? `${formatTokenDisplay(minOutWei)} ${buyToken}`
+                  : '—'}
+              </CWText>
+            </div>
+          </div>
+          <CWDivider />
         </div>
       );
     }
     if (activeTab === 'merge') {
       const amountWei = parseTokenAmount(mergeAmount, COLLATERAL_DECIMALS);
       const validMerge = amountWei > 0n && amountWei <= minBalanceForMerge;
+      const limitedByPass = pTokenBalance <= fTokenBalance;
+      const mergeDisplay = validMerge ? mergeAmount || '0' : '0';
       return (
         <div className="PredictionMarketTradeModal-tab-content">
-          <CWText type="b2" className="label">
-            Amount to merge (max: {minBalanceForMerge.toString()} wei)
-          </CWText>
-          <CWTextInput
-            value={mergeAmount}
-            onInput={(e) =>
-              setMergeAmount((e.target as HTMLInputElement).value)
+          <div className="input-label-row">
+            <CWText type="b2" className="label">
+              Amount to merge
+            </CWText>
+            <CWText type="caption" className="available">
+              Available: {formatTokenDisplay(minBalanceForMerge)} (Limited by{' '}
+              {limitedByPass ? 'PASS' : 'FAIL'})
+            </CWText>
+          </div>
+          <div className="amount-input-with-actions">
+            <CWTextInput
+              value={mergeAmount}
+              onInput={(e) =>
+                setMergeAmount((e.target as HTMLInputElement).value)
+              }
+              placeholder="0"
+              type="text"
+              fullWidth
+              containerClassName="amount-input-wrap"
+            />
+            <CWButton
+              label="MAX"
+              buttonType="secondary"
+              buttonHeight="sm"
+              buttonWidth="narrow"
+              onClick={() =>
+                setMergeAmount(formatTokenDisplay(minBalanceForMerge))
+              }
+            />
+          </div>
+          <CWBanner
+            type="info"
+            body={
+              <>
+                Merge equal amounts of&nbsp;<strong>PASS</strong>&nbsp;and&nbsp;
+                <strong>FAIL</strong>&nbsp;to get collateral back. Both tokens
+                will be burned in the process.
+              </>
             }
-            placeholder="0"
-            type="text"
-            containerClassName="amount-input"
           />
-          <CWText type="caption" className="help">
-            Merge equal amounts of PASS and FAIL to get collateral back.
-          </CWText>
-          <CWText type="b2" className="summary">
-            Collateral returned: {validMerge ? mergeAmount || '0' : '0'}
-          </CWText>
-          <CWButton
-            label="Merge"
-            buttonType="primary"
-            buttonHeight="sm"
-            disabled={!validMerge || isLoading || !activeAddress}
-            onClick={() => void handleMerge()}
-          />
+          <div className="cost-details merge-summary">
+            <div className="cost-row">
+              <CWText type="caption">Tokens to Burn</CWText>
+              <CWText type="caption" fontWeight="medium">
+                {mergeDisplay} PASS + {mergeDisplay} FAIL
+              </CWText>
+            </div>
+            <div className="cost-row">
+              <CWText type="caption">Exchange Rate</CWText>
+              <CWText type="caption" fontWeight="medium">
+                1:1 Collateral
+              </CWText>
+            </div>
+            <div className="cost-row">
+              <CWText type="caption" fontWeight="medium">
+                Collateral to be returned
+              </CWText>
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="collateral-return"
+              >
+                {mergeDisplay} ETH
+              </CWText>
+            </div>
+          </div>
         </div>
       );
     }
@@ -421,13 +654,6 @@ export const PredictionMarketTradeModal = ({
         <CWText type="b2" className="summary">
           Collateral returned: {validRedeem ? redeemAmount || '0' : '0'}
         </CWText>
-        <CWButton
-          label="Redeem"
-          buttonType="primary"
-          buttonHeight="sm"
-          disabled={!validRedeem || isLoading || !activeAddress}
-          onClick={() => void handleRedeem()}
-        />
       </div>
     );
   };
@@ -437,30 +663,84 @@ export const PredictionMarketTradeModal = ({
       <div className="PredictionMarketTradeModal">
         <CWModalHeader label="Trade" onModalClose={onClose} />
         <CWModalBody>
-          <CWText type="b2">
-            Market not fully deployed (missing addresses).
-          </CWText>
+          {isFetchingMarketId ? (
+            <div className="loading-row">
+              <CWCircleMultiplySpinner />
+            </div>
+          ) : (
+            <>
+              <CWText type="b2">
+                Market not fully deployed (missing addresses).
+              </CWText>
+              <CWText type="caption" className="help">
+                {market.status === 'draft'
+                  ? 'Complete deployment first using the "Complete deployment" button.'
+                  : 'Vault, router, market ID, or token addresses are missing. ' +
+                    'If this market was deployed earlier, it may need to be re-deployed.'}
+              </CWText>
+            </>
+          )}
         </CWModalBody>
       </div>
     );
   }
 
+  const primaryButtonLabel =
+    activeTab === 'mint'
+      ? 'Deposit and Mint'
+      : activeTab === 'swap'
+        ? 'Swap'
+        : activeTab === 'merge'
+          ? 'Merge'
+          : 'Redeem';
+  const onPrimaryAction = () => {
+    if (activeTab === 'mint') void handleMint();
+    else if (activeTab === 'swap') void handleSwap();
+    else if (activeTab === 'merge') void handleMerge();
+    else void handleRedeem();
+  };
+  const primaryDisabled =
+    activeTab === 'mint'
+      ? !mintAmount || parseTokenAmount(mintAmount, COLLATERAL_DECIMALS) <= 0n
+      : activeTab === 'swap'
+        ? !swapAmount || parseTokenAmount(swapAmount, COLLATERAL_DECIMALS) <= 0n
+        : activeTab === 'merge'
+          ? !mergeAmount ||
+            parseTokenAmount(mergeAmount, COLLATERAL_DECIMALS) <= 0n ||
+            parseTokenAmount(mergeAmount, COLLATERAL_DECIMALS) >
+              minBalanceForMerge
+          : !redeemAmount ||
+            parseTokenAmount(redeemAmount, COLLATERAL_DECIMALS) <= 0n ||
+            parseTokenAmount(redeemAmount, COLLATERAL_DECIMALS) >
+              (winner === 1 ? pTokenBalance : fTokenBalance);
+
   return (
     <div className="PredictionMarketTradeModal">
-      <CWModalHeader label="Prediction market — Trade" onModalClose={onClose} />
+      <CWModalHeader
+        label="Prediction market — Trade"
+        subheader={market.prompt ?? ''}
+        onModalClose={onClose}
+      />
+      <CWDivider />
       <CWModalBody>
-        {market.prompt && (
-          <CWText type="b2" className="prediction-prompt">
-            {market.prompt}
-          </CWText>
-        )}
-        <div className="balances-row">
-          <CWText type="caption">
-            PASS balance: {pTokenBalance.toString()}
-          </CWText>
-          <CWText type="caption">
-            FAIL balance: {fTokenBalance.toString()}
-          </CWText>
+        <div className="balances-section">
+          <div className="balance-block">
+            <CWText type="caption" className="balance-label">
+              PASS BALANCE
+            </CWText>
+            <CWText type="b1" fontWeight="bold">
+              {formatTokenDisplay(pTokenBalance)} PASS
+            </CWText>
+          </div>
+          <CWDivider isVertical />
+          <div className="balance-block right">
+            <CWText type="caption" className="balance-label">
+              FAIL BALANCE
+            </CWText>
+            <CWText type="b1" fontWeight="bold">
+              {formatTokenDisplay(fTokenBalance)} FAIL
+            </CWText>
+          </div>
         </div>
         <CWTabsRow boxed className="tabs-row">
           <CWTab
@@ -486,25 +766,38 @@ export const PredictionMarketTradeModal = ({
             isDisabled={redeemDisabled}
           />
         </CWTabsRow>
+        {errorMessage && (
+          <div className="alert-error">
+            <CWIcon
+              iconName="warning"
+              iconSize="small"
+              className="alert-icon"
+            />
+            <CWText type="b2">{errorMessage}</CWText>
+          </div>
+        )}
         {isLoading && (
           <div className="loading-row">
             <CWCircleMultiplySpinner />
             <CWText type="b2">Processing…</CWText>
           </div>
         )}
-        {errorMessage && (
-          <CWText type="b2" className="error-message">
-            {errorMessage}
-          </CWText>
-        )}
-        {renderTabContent()}
+        {!isLoading && renderTabContent()}
+        <CWDivider />
       </CWModalBody>
-      <CWModalFooter>
+      <CWModalFooter className="footer-actions">
         <CWButton
-          label="Close"
+          label="Cancel"
           buttonType="secondary"
           buttonHeight="sm"
           onClick={onClose}
+        />
+        <CWButton
+          label={primaryButtonLabel}
+          buttonType="primary"
+          buttonHeight="sm"
+          disabled={primaryDisabled || isLoading || !activeAddress}
+          onClick={onPrimaryAction}
         />
       </CWModalFooter>
     </div>

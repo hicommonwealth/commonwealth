@@ -3,24 +3,177 @@
 @use '../../../styles/mixins/colors.module';
 
 .PredictionMarketTradeModal {
-  .prediction-prompt {
-    margin-bottom: 12px;
+  .CWModalBody {
+    overflow: scroll !important;
   }
 
-  .balances-row {
+  .balances-section {
     display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 24px;
+    margin: 16px 0;
+    border: 1px solid colors.$neutral-100;
+    padding: 16px;
+    border-radius: border_radius.$border-radius-corners;
+
+    .balance-block {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .balance-label {
+        color: colors.$neutral-600;
+        margin: 0;
+      }
+
+      &.right {
+        align-items: flex-end;
+      }
+    }
+
+    .Divider {
+      height: 56px;
+    }
   }
 
   .tabs-row {
     margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    padding: 4px;
+    border-radius: 6px;
+
+    .Tab {
+      display: flex !important;
+      justify-content: center;
+      align-items: center;
+
+      .Text {
+        text-align: center !important;
+        display: flex !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        justify-content: center !important;
+      }
+    }
+  }
+
+  .alert-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    border: 1px solid colors.$rorange-500;
+    background-color: colors.$rorange-50;
+
+    .alert-icon {
+      flex-shrink: 0;
+      color: colors.$rorange-500;
+    }
+
+    .alert-icon + * {
+      color: colors.$rorange-700;
+    }
+  }
+
+  .loading-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
   }
 
   .PredictionMarketTradeModal-tab-content {
     display: flex;
     flex-direction: column;
     gap: 12px;
+
+    .input-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .label {
+        margin: 0;
+      }
+
+      .available {
+        color: colors.$neutral-600;
+        margin: 0;
+      }
+    }
+
+    .amount-input-with-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid colors.$neutral-200;
+      border-radius: 6px;
+      padding: 4px;
+
+      .amount-input-wrap {
+        flex: 1;
+        min-width: 0;
+        border: none !important;
+        * {
+          border: none !important;
+        }
+      }
+
+      .unit {
+        margin: 0;
+        color: colors.$neutral-600;
+        min-width: 32px;
+      }
+
+      .Button {
+        padding: 4px 8px !important;
+        height: auto !important;
+        .Text {
+          font-weight: 600 !important;
+          font-size: 10px !important;
+          line-height: 12px !important;
+        }
+      }
+    }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 12px;
+
+      .info-icon {
+        color: colors.$neutral-600;
+        flex-shrink: 0;
+      }
+
+      .help {
+        color: colors.$neutral-600;
+        margin: 0;
+      }
+    }
+
+    .cost-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+      background: colors.$neutral-75;
+      border-radius: 10px;
+
+      .cost-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .collateral-return {
+        color: colors.$rorange-500;
+      }
+    }
 
     .label {
       margin: 0;
@@ -44,15 +197,222 @@
     }
   }
 
-  .loading-row {
+  // ── Swap tab ──────────────────────────────────────────────────────────────
+
+  .swap-panels {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
+    flex-direction: column;
+
+    .token-panel {
+      background: colors.$neutral-75;
+      padding: 14px;
+      border-radius: 12px;
+
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+
+        .panel-side-label,
+        .panel-balance {
+          color: colors.$neutral-500;
+          margin: 0;
+        }
+      }
+
+      .panel-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+
+        .token-badge {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: colors.$neutral-150;
+          border-radius: 20px;
+          padding: 6px 10px 6px 6px;
+          flex-shrink: 0;
+
+          .token-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            flex-shrink: 0;
+          }
+
+          &.pass .token-dot {
+            background-color: colors.$green-500;
+          }
+
+          &.fail .token-dot {
+            background-color: colors.$rorange-500;
+          }
+        }
+
+        .panel-amount {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+
+          .swap-amount-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 26px;
+            font-weight: 700;
+            color: inherit;
+            text-align: right;
+            width: 150px;
+            padding: 0;
+
+            &::placeholder {
+              color: colors.$neutral-400;
+            }
+          }
+
+          .max-link {
+            background: none;
+            border: none;
+            padding: 0;
+            margin-top: 2px;
+            color: colors.$rorange-500;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            line-height: 1;
+
+            &:hover {
+              color: colors.$rorange-600;
+            }
+          }
+
+          .estimated-out {
+            color: colors.$primary-500;
+            margin: 0;
+          }
+
+          .min-out-hint {
+            color: colors.$neutral-500;
+            margin: 0;
+          }
+        }
+      }
+    }
+
+    .swap-direction-toggle {
+      align-self: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: colors.$rorange-500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      // (34px button - 12px visible gap) / 2 = 11px overlap into each panel
+      margin: -11px 0;
+      z-index: 2;
+      position: relative;
+      color: white;
+      flex-shrink: 0;
+      transition: background 0.15s;
+
+      &:hover {
+        background: colors.$rorange-600;
+      }
+    }
   }
 
-  .error-message {
-    color: colors.$rorange-500;
-    margin-bottom: 12px;
+  .slippage-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    .slippage-label-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .slippage-info-icon {
+        color: colors.$neutral-500;
+      }
+    }
+
+    .slippage-presets {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+
+      .slippage-btn {
+        background: colors.$neutral-75;
+        border: 1px solid colors.$neutral-200;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: inherit;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+
+        &.active {
+          background: colors.$rorange-500;
+          border-color: colors.$rorange-500;
+          color: white;
+        }
+
+        &:hover:not(.active) {
+          background: colors.$neutral-150;
+        }
+      }
+
+      .slippage-custom-input {
+        width: 46px;
+        background: colors.$neutral-75;
+        border: 1px solid colors.$neutral-200;
+        border-radius: 6px;
+        padding: 4px 6px;
+        font-size: 12px;
+        text-align: center;
+        color: inherit;
+        outline: none;
+        transition: border-color 0.15s;
+
+        &.active,
+        &:focus {
+          border-color: colors.$rorange-500;
+        }
+      }
+    }
+  }
+
+  .swap-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background: colors.$neutral-75;
+    border-radius: 10px;
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .network-fee {
+      color: colors.$rorange-500;
+    }
+  }
+
+  .footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
   }
 }
