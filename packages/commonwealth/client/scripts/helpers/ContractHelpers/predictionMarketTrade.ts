@@ -53,6 +53,37 @@ export async function fetchMarketIdFromChain(
   return marketIdTopic as string;
 }
 
+/**
+ * Fetch PASS and FAIL token balances for a user from chain (fallback when API has no position).
+ * Returns balances in wei (bigint).
+ */
+export async function getPredictionMarketBalancesFromChain(
+  chainRpc: string,
+  userAddress: string,
+  pTokenAddress: string,
+  fTokenAddress: string,
+): Promise<{ pTokenBalanceWei: bigint; fTokenBalanceWei: bigint }> {
+  const web3 = new Web3(chainRpc);
+  const balanceOfAbi: AbiItem = {
+    name: 'balanceOf',
+    type: 'function',
+    inputs: [{ name: 'account', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
+  };
+  const [pRaw, fRaw] = await Promise.all([
+    new web3.eth.Contract([balanceOfAbi], pTokenAddress).methods
+      .balanceOf(userAddress)
+      .call(),
+    new web3.eth.Contract([balanceOfAbi], fTokenAddress).methods
+      .balanceOf(userAddress)
+      .call(),
+  ]);
+  return {
+    pTokenBalanceWei: BigInt(String(pRaw ?? 0)),
+    fTokenBalanceWei: BigInt(String(fRaw ?? 0)),
+  };
+}
+
 /** Parse human-readable token amount to smallest units. */
 export function parseTokenAmount(value: string, decimals: number): bigint {
   if (!value || value.trim() === '') return 0n;

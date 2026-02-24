@@ -7,6 +7,7 @@ import MagicWebWalletController from 'client/scripts/controllers/app/webWallets/
 import {
   applySlippage,
   fetchMarketIdFromChain,
+  getPredictionMarketBalancesFromChain,
   mergeTokens,
   mintTokens,
   parseTokenAmount,
@@ -116,6 +117,10 @@ export const PredictionMarketTradeModal = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fetchedMarketId, setFetchedMarketId] = useState<string | null>(null);
   const [isFetchingMarketId, setIsFetchingMarketId] = useState(false);
+  const [onChainBalances, setOnChainBalances] = useState<{
+    p: bigint;
+    f: bigint;
+  } | null>(null);
 
   const { data: community } = useGetCommunityByIdQuery({
     id: threadCommunityId,
@@ -141,12 +146,12 @@ export const PredictionMarketTradeModal = ({
     ? BigInt(
         (userPosition as { p_token_balance: string }).p_token_balance ?? '0',
       )
-    : 0n;
+    : (onChainBalances?.p ?? 0n);
   const fTokenBalance = userPosition
     ? BigInt(
         (userPosition as { f_token_balance: string }).f_token_balance ?? '0',
       )
-    : 0n;
+    : (onChainBalances?.f ?? 0n);
   const minBalanceForMerge =
     pTokenBalance < fTokenBalance ? pTokenBalance : fTokenBalance;
 
@@ -201,6 +206,45 @@ export const PredictionMarketTradeModal = ({
     market.p_token_address,
     market.f_token_address,
     chainRpc,
+  ]);
+
+  // When API has no position for this user, fetch PASS/FAIL balances from chain so we still show them
+  useEffect(() => {
+    if (userPosition) {
+      setOnChainBalances(null);
+      return;
+    }
+    if (
+      !chainRpc ||
+      !activeAddress ||
+      !market.p_token_address ||
+      !market.f_token_address
+    ) {
+      return;
+    }
+    let cancelled = false;
+    getPredictionMarketBalancesFromChain(
+      chainRpc,
+      activeAddress,
+      market.p_token_address,
+      market.f_token_address,
+    )
+      .then(({ pTokenBalanceWei, fTokenBalanceWei }) => {
+        if (!cancelled)
+          setOnChainBalances({ p: pTokenBalanceWei, f: fTokenBalanceWei });
+      })
+      .catch(() => {
+        if (!cancelled) setOnChainBalances(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    chainRpc,
+    activeAddress,
+    market.p_token_address,
+    market.f_token_address,
+    userPosition,
   ]);
 
   const isResolved = market.status === 'resolved';
@@ -876,7 +920,6 @@ export const PredictionMarketTradeModal = ({
         {isLoading && (
           <div className="loading-row">
             <CWCircleMultiplySpinner />
-            <CWText type="b2">Processing…</CWText>
           </div>
         )}
         {!isLoading && renderTabContent()}
