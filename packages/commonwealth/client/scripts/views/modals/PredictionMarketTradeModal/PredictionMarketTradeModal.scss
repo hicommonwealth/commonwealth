@@ -48,7 +48,18 @@
 
   .balances-section {
     display: flex;
+    flex-wrap: wrap;
     gap: 12px;
+
+    .balance-address-row {
+      width: 100%;
+      margin-bottom: 4px;
+    }
+
+    .balance-address-label {
+      color: colors.$neutral-500;
+      font-size: 12px;
+    }
 
     .balance-card {
       flex: 1;
@@ -460,6 +471,12 @@
       .slippage-info-icon {
         color: colors.$neutral-500;
       }
+    }
+
+    .slippage-hint {
+      width: 100%;
+      margin-top: 4px;
+      color: colors.$neutral-500;
     }
 
     .slippage-presets {

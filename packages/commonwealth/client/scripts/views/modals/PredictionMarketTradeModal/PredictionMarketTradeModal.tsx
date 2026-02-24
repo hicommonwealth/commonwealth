@@ -112,7 +112,7 @@ export const PredictionMarketTradeModal = ({
   const [swapBuyPass, setSwapBuyPass] = useState(true);
   const [slippageBps, setSlippageBps] = useState(DEFAULT_SLIPPAGE_BPS);
   const [slippagePreset, setSlippagePreset] = useState<
-    'auto' | '0.5%' | '1.0%' | 'custom'
+    'auto' | '0.5%' | '1.0%' | '2.0%' | '5.0%' | 'no-min' | 'custom'
   >('auto');
   const [mergeAmount, setMergeAmount] = useState('');
   const [redeemAmount, setRedeemAmount] = useState('');
@@ -377,12 +377,24 @@ export const PredictionMarketTradeModal = ({
   };
 
   const handleSwap = async () => {
-    const amountInWei = parseTokenAmount(swapAmount, COLLATERAL_DECIMALS);
+    const swapDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
+    const amountInWei = parseTokenAmount(swapAmount, swapDecimals);
     if (amountInWei <= 0n) {
       setErrorMessage('Enter a valid amount.');
       return;
     }
-    const minAmountOutWei = applySlippage(amountInWei, slippageBps);
+    const sellBalance = swapBuyPass ? fTokenBalance : pTokenBalance;
+    if (amountInWei > sellBalance) {
+      const tokenName = swapBuyPass ? 'FAIL' : 'PASS';
+      setErrorMessage(
+        `Insufficient ${tokenName} tokens. You have ${formatTokenDisplay(sellBalance, swapDecimals)} ${tokenName}.`,
+      );
+      return;
+    }
+    const minAmountOutWei =
+      slippagePreset === 'no-min'
+        ? 0n
+        : applySlippage(amountInWei, slippageBps);
     setErrorMessage(null);
     setIsLoading(true);
     try {
@@ -395,6 +407,16 @@ export const PredictionMarketTradeModal = ({
       });
       notifySuccess('Swap successful.');
       await refetchPositions();
+      if (!userPosition) {
+        getPredictionMarketBalancesFromChain(
+          chainRpc,
+          activeAddress,
+          effectiveMarket.p_token_address ?? '',
+          effectiveMarket.f_token_address ?? '',
+        ).then(({ pTokenBalanceWei, fTokenBalanceWei }) =>
+          setOnChainBalances({ p: pTokenBalanceWei, f: fTokenBalanceWei }),
+        );
+      }
       onSuccess?.();
       onClose();
     } catch (err) {
@@ -530,8 +552,12 @@ export const PredictionMarketTradeModal = ({
       );
     }
     if (activeTab === 'swap') {
-      const amountInWei = parseTokenAmount(swapAmount, COLLATERAL_DECIMALS);
-      const minOutWei = applySlippage(amountInWei, slippageBps);
+      const swapDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
+      const amountInWei = parseTokenAmount(swapAmount, swapDecimals);
+      const minOutWei =
+        slippagePreset === 'no-min'
+          ? 0n
+          : applySlippage(amountInWei, slippageBps);
       const sellToken = swapBuyPass ? 'FAIL' : 'PASS';
       const buyToken = swapBuyPass ? 'PASS' : 'FAIL';
       const sellBalance = swapBuyPass ? fTokenBalance : pTokenBalance;
@@ -539,16 +565,39 @@ export const PredictionMarketTradeModal = ({
 
       const slippageOptions: Array<{
         label: string;
-        preset: 'auto' | '0.5%' | '1.0%';
+        preset: 'auto' | '0.5%' | '1.0%' | '2.0%' | '5.0%' | 'no-min';
         bps: number;
       }> = [
         { label: 'Auto', preset: 'auto', bps: DEFAULT_SLIPPAGE_BPS },
         { label: '0.5%', preset: '0.5%', bps: 50 },
         { label: '1.0%', preset: '1.0%', bps: 100 },
+        { label: '2.0%', preset: '2.0%', bps: 200 },
+        { label: '5.0%', preset: '5.0%', bps: 500 },
+        { label: 'No min', preset: 'no-min', bps: 0 },
       ];
+
+      const sellBalanceZero = sellBalance === 0n;
 
       return (
         <div className="PredictionMarketTradeModal-tab-content">
+          <CWBanner
+            type="info"
+            body={
+              sellBalanceZero ? (
+                <>
+                  You&apos;re selling <strong>{sellToken}</strong> but your
+                  balance is 0. Use the <strong>Mint</strong> tab first (you get
+                  equal PASS and FAIL), then return here to swap.
+                </>
+              ) : (
+                <>
+                  Mint in the&nbsp;<strong>Mint</strong>&nbsp;tab to get PASS
+                  and&nbsp;FAIL, then swap between them here.
+                </>
+              )
+            }
+            className="swap-hint-banner"
+          />
           {/* Token panels */}
           <div className="swap-panels">
             <div className="token-panel">
@@ -557,7 +606,7 @@ export const PredictionMarketTradeModal = ({
                   You Sell
                 </CWText>
                 <CWText type="caption" className="panel-balance">
-                  Balance: {formatTokenDisplay(sellBalance)}
+                  Balance: {formatTokenDisplay(sellBalance, swapDecimals)}
                 </CWText>
               </div>
               <div className="panel-body">
@@ -578,7 +627,9 @@ export const PredictionMarketTradeModal = ({
                   <button
                     className="max-link"
                     onClick={() =>
-                      setSwapAmount(formatTokenDisplay(sellBalance))
+                      setSwapAmount(
+                        formatTokenDisplay(sellBalance, swapDecimals),
+                      )
                     }
                   >
                     MAX
@@ -600,7 +651,7 @@ export const PredictionMarketTradeModal = ({
                   You Buy
                 </CWText>
                 <CWText type="caption" className="panel-balance">
-                  Balance: {formatTokenDisplay(buyBalance)}
+                  Balance: {formatTokenDisplay(buyBalance, swapDecimals)}
                 </CWText>
               </div>
               <div className="panel-body">
@@ -612,11 +663,15 @@ export const PredictionMarketTradeModal = ({
                 </div>
                 <div className="panel-amount">
                   <CWText type="h4" fontWeight="bold" className="estimated-out">
-                    {minOutWei > 0n ? formatTokenDisplay(minOutWei) : '—'}
+                    {slippagePreset === 'no-min'
+                      ? 'Any'
+                      : minOutWei > 0n
+                        ? formatTokenDisplay(minOutWei, swapDecimals)
+                        : '—'}
                   </CWText>
-                  {minOutWei > 0n && (
+                  {slippagePreset !== 'no-min' && minOutWei > 0n && (
                     <CWText type="caption" className="min-out-hint">
-                      ~ {formatTokenDisplay(minOutWei)}
+                      ~ {formatTokenDisplay(minOutWei, swapDecimals)}
                     </CWText>
                   )}
                 </div>
@@ -661,39 +716,10 @@ export const PredictionMarketTradeModal = ({
                 }}
               />
             </div>
-          </div>
-
-          {/* Summary */}
-          <div className="swap-summary">
-            <div className="summary-row">
-              <CWText type="caption">Available ETH</CWText>
-              <CWText type="caption">{availableEthDisplay}</CWText>
-            </div>
-            <div className="summary-row">
-              <CWText type="caption">Exchange Rate</CWText>
-              <CWText type="caption">
-                1 {sellToken} = — {buyToken}
-              </CWText>
-            </div>
-            <div className="summary-row">
-              <CWText type="caption">Network Fee</CWText>
-              <CWText type="caption" className="network-fee">
-                —
-              </CWText>
-            </div>
-            <CWDivider className="summary-divider" />
-            <div className="summary-row">
-              <CWText type="caption">Min. Received</CWText>
-              <CWText
-                type="caption"
-                fontWeight="medium"
-                className="summary-value-highlight"
-              >
-                {minOutWei > 0n
-                  ? `${formatTokenDisplay(minOutWei)} ${buyToken}`
-                  : '—'}
-              </CWText>
-            </div>
+            <CWText type="caption" className="slippage-hint">
+              If you get &quot;Slippage exceeded&quot;, try 2% or 5%, or use
+              &quot;No min&quot; to accept any amount (swap always succeeds).
+            </CWText>
           </div>
         </div>
       );
@@ -890,7 +916,19 @@ export const PredictionMarketTradeModal = ({
           parseTokenAmount(mintAmount, mintDecimals) >
             collateralInfo.balanceWei)
       : activeTab === 'swap'
-        ? !swapAmount || parseTokenAmount(swapAmount, COLLATERAL_DECIMALS) <= 0n
+        ? (() => {
+            const swapDecimals =
+              collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
+            const amountWei = parseTokenAmount(swapAmount, swapDecimals);
+            const sellBalance = swapBuyPass ? fTokenBalance : pTokenBalance;
+            const hasBalanceData =
+              userPosition != null || onChainBalances != null;
+            return (
+              !swapAmount ||
+              amountWei <= 0n ||
+              (hasBalanceData && sellBalance > 0n && amountWei > sellBalance)
+            );
+          })()
         : activeTab === 'merge'
           ? !mergeAmount ||
             parseTokenAmount(mergeAmount, COLLATERAL_DECIMALS) <= 0n ||
@@ -949,6 +987,15 @@ export const PredictionMarketTradeModal = ({
               Collateral: {market.collateral_address}
             </CWText>
           )}
+          {activeAddress && (
+            <div className="balance-address-row" title={activeAddress}>
+              <CWText type="caption" className="balance-address-label">
+                Balances for: {activeAddress.slice(0, 6)}…
+                {activeAddress.slice(-4)}
+                {userPosition != null ? ' (from API)' : ' (from chain)'}
+              </CWText>
+            </div>
+          )}
         </div>
         <div className="balances-section">
           <div className="balance-card pass">
@@ -960,7 +1007,7 @@ export const PredictionMarketTradeModal = ({
             </div>
             <div className="balance-card-value">
               <CWText type="b1" fontWeight="bold">
-                {formatTokenDisplay(pTokenBalance)}
+                {formatTokenDisplay(pTokenBalance, mintDecimals)}
               </CWText>
               <CWText type="b2" fontWeight="regular">
                 &nbsp;PASS
@@ -976,7 +1023,7 @@ export const PredictionMarketTradeModal = ({
             </div>
             <div className="balance-card-value">
               <CWText type="b1" fontWeight="bold">
-                {formatTokenDisplay(fTokenBalance)}
+                {formatTokenDisplay(fTokenBalance, mintDecimals)}
               </CWText>
               <CWText type="b2" fontWeight="regular">
                 &nbsp;FAIL
