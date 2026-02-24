@@ -187,9 +187,7 @@ export const PredictionMarketTradeModal = ({
   ]);
 
   const isResolved = market.status === 'resolved';
-  const isActive = market.status === 'active';
   const swapDisabled = isResolved;
-  const redeemDisabled = isActive;
   const winner = market.winner ?? 0;
 
   const getProvider = useCallback(async () => {
@@ -367,19 +365,15 @@ export const PredictionMarketTradeModal = ({
               ETH
             </CWText>
           </div>
-          <div className="info-row">
-            <CWIcon
-              iconName="infoEmpty"
-              iconSize="small"
-              className="info-icon"
-            />
-            <CWText type="caption" className="help">
-              You will receive equal amounts of&nbsp;<strong>PASS</strong>
-              &nbsp;and&nbsp;
-              <strong>FAIL</strong>&nbsp;tokens.
-            </CWText>
-          </div>
-          <CWDivider />
+          <CWBanner
+            type="info"
+            body={
+              <div>
+                You will receive equal amounts of <strong>PASS</strong> and{' '}
+                <strong>FAIL</strong> tokens.
+              </div>
+            }
+          />
           <div className="cost-details">
             <div className="cost-row">
               <CWText type="caption">Cost</CWText>
@@ -391,6 +385,21 @@ export const PredictionMarketTradeModal = ({
               <CWText type="caption">Protocol Fee (0.1%)</CWText>
               <CWText type="caption" fontWeight="medium">
                 {protocolFeeDisplay} ETH
+              </CWText>
+            </div>
+            <CWDivider className="summary-divider" />
+            <div className="cost-row">
+              <CWText type="caption" fontWeight="medium">
+                Total
+              </CWText>
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="summary-value-highlight"
+              >
+                {amountWei > 0n
+                  ? `${(Number(amountWei) / 1e18 + Number(protocolFeeWei) / 1e18).toFixed(4)} ETH`
+                  : '0 ETH'}
               </CWText>
             </div>
           </div>
@@ -545,16 +554,20 @@ export const PredictionMarketTradeModal = ({
                 —
               </CWText>
             </div>
+            <CWDivider className="summary-divider" />
             <div className="summary-row">
               <CWText type="caption">Min. Received</CWText>
-              <CWText type="caption" fontWeight="medium">
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="summary-value-highlight"
+              >
                 {minOutWei > 0n
                   ? `${formatTokenDisplay(minOutWei)} ${buyToken}`
                   : '—'}
               </CWText>
             </div>
           </div>
-          <CWDivider />
         </div>
       );
     }
@@ -598,11 +611,11 @@ export const PredictionMarketTradeModal = ({
           <CWBanner
             type="info"
             body={
-              <>
+              <div>
                 Merge equal amounts of&nbsp;<strong>PASS</strong>&nbsp;and&nbsp;
                 <strong>FAIL</strong>&nbsp;to get collateral back. Both tokens
                 will be burned in the process.
-              </>
+              </div>
             }
           />
           <div className="cost-details merge-summary">
@@ -618,6 +631,7 @@ export const PredictionMarketTradeModal = ({
                 1:1 Collateral
               </CWText>
             </div>
+            <CWDivider className="summary-divider" />
             <div className="cost-row">
               <CWText type="caption" fontWeight="medium">
                 Collateral to be returned
@@ -635,25 +649,51 @@ export const PredictionMarketTradeModal = ({
       );
     }
     // redeem
+    const canRedeem = winner === 1 || winner === 2;
     const amountWei = parseTokenAmount(redeemAmount, COLLATERAL_DECIMALS);
     const maxRedeem = winner === 1 ? pTokenBalance : fTokenBalance;
-    const validRedeem = amountWei > 0n && amountWei <= maxRedeem;
+    const validRedeem = canRedeem && amountWei > 0n && amountWei <= maxRedeem;
+    const redeemDisplay = validRedeem ? redeemAmount || '0' : '0';
     return (
       <div className="PredictionMarketTradeModal-tab-content">
-        <CWText type="b2" className="label">
-          Winning token amount ({winner === 1 ? 'PASS' : 'FAIL'}) — max:{' '}
-          {maxRedeem.toString()}
-        </CWText>
-        <CWTextInput
-          value={redeemAmount}
-          onInput={(e) => setRedeemAmount((e.target as HTMLInputElement).value)}
-          placeholder="0"
-          type="text"
-          containerClassName="amount-input"
-        />
-        <CWText type="b2" className="summary">
-          Collateral returned: {validRedeem ? redeemAmount || '0' : '0'}
-        </CWText>
+        {!canRedeem && (
+          <CWBanner
+            type="info"
+            body="Redeem is available only after the market is resolved. Then exchange winning tokens for collateral."
+          />
+        )}
+        {canRedeem && (
+          <>
+            <CWText type="b2" className="label">
+              Winning token amount ({winner === 1 ? 'PASS' : 'FAIL'}) — max:{' '}
+              {maxRedeem.toString()}
+            </CWText>
+            <CWTextInput
+              value={redeemAmount}
+              onInput={(e) =>
+                setRedeemAmount((e.target as HTMLInputElement).value)
+              }
+              placeholder="0"
+              type="text"
+              containerClassName="amount-input"
+            />
+            <div className="cost-details">
+              <CWDivider className="summary-divider" />
+              <div className="cost-row">
+                <CWText type="caption" fontWeight="medium">
+                  Collateral to be returned
+                </CWText>
+                <CWText
+                  type="caption"
+                  fontWeight="medium"
+                  className="summary-value-highlight"
+                >
+                  {redeemDisplay} ETH
+                </CWText>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     );
   };
@@ -709,7 +749,8 @@ export const PredictionMarketTradeModal = ({
             parseTokenAmount(mergeAmount, COLLATERAL_DECIMALS) <= 0n ||
             parseTokenAmount(mergeAmount, COLLATERAL_DECIMALS) >
               minBalanceForMerge
-          : !redeemAmount ||
+          : (winner !== 1 && winner !== 2) ||
+            !redeemAmount ||
             parseTokenAmount(redeemAmount, COLLATERAL_DECIMALS) <= 0n ||
             parseTokenAmount(redeemAmount, COLLATERAL_DECIMALS) >
               (winner === 1 ? pTokenBalance : fTokenBalance);
@@ -724,25 +765,40 @@ export const PredictionMarketTradeModal = ({
       <CWDivider />
       <CWModalBody>
         <div className="balances-section">
-          <div className="balance-block">
-            <CWText type="caption" className="balance-label">
-              PASS BALANCE
-            </CWText>
-            <CWText type="b1" fontWeight="bold">
-              {formatTokenDisplay(pTokenBalance)} PASS
-            </CWText>
+          <div className="balance-card pass">
+            <div className="balance-card-header">
+              <span className="balance-dot" />
+              <CWText type="caption" className="balance-label">
+                PASS BALANCE
+              </CWText>
+            </div>
+            <div className="balance-card-value">
+              <CWText type="b1" fontWeight="bold">
+                {formatTokenDisplay(pTokenBalance)}
+              </CWText>
+              <CWText type="b2" fontWeight="regular">
+                &nbsp;PASS
+              </CWText>
+            </div>
           </div>
-          <CWDivider isVertical />
-          <div className="balance-block right">
-            <CWText type="caption" className="balance-label">
-              FAIL BALANCE
-            </CWText>
-            <CWText type="b1" fontWeight="bold">
-              {formatTokenDisplay(fTokenBalance)} FAIL
-            </CWText>
+          <div className="balance-card fail">
+            <div className="balance-card-header">
+              <span className="balance-dot" />
+              <CWText type="caption" className="balance-label">
+                FAIL BALANCE
+              </CWText>
+            </div>
+            <div className="balance-card-value">
+              <CWText type="b1" fontWeight="bold">
+                {formatTokenDisplay(fTokenBalance)}
+              </CWText>
+              <CWText type="b2" fontWeight="regular">
+                &nbsp;FAIL
+              </CWText>
+            </div>
           </div>
         </div>
-        <CWTabsRow boxed className="tabs-row">
+        <CWTabsRow className="tabs-row">
           <CWTab
             label="Mint"
             isSelected={activeTab === 'mint'}
@@ -763,7 +819,6 @@ export const PredictionMarketTradeModal = ({
             label="Redeem"
             isSelected={activeTab === 'redeem'}
             onClick={() => setActiveTab('redeem')}
-            isDisabled={redeemDisabled}
           />
         </CWTabsRow>
         {errorMessage && (
@@ -783,8 +838,8 @@ export const PredictionMarketTradeModal = ({
           </div>
         )}
         {!isLoading && renderTabContent()}
-        <CWDivider />
       </CWModalBody>
+      <CWDivider />
       <CWModalFooter className="footer-actions">
         <CWButton
           label="Cancel"

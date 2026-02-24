@@ -3,57 +3,145 @@
 @use '../../../styles/mixins/colors.module';
 
 .PredictionMarketTradeModal {
+  .CWModalHeader {
+    .Frame .title-text,
+    .Frame .title-text.Text {
+      font-size: 24px;
+      line-height: 32px;
+    }
+
+    .Subtitle,
+    .Subtitle.Text {
+      font-size: 14px;
+      line-height: 20px;
+    }
+  }
+
   .CWModalBody {
     overflow: scroll !important;
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
 
   .balances-section {
     display: flex;
-    gap: 24px;
-    margin: 16px 0;
-    border: 1px solid colors.$neutral-100;
-    padding: 16px;
-    border-radius: border_radius.$border-radius-corners;
+    gap: 12px;
 
-    .balance-block {
+    .balance-card {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 8px;
+      padding: 14px 16px;
+      background: colors.$neutral-75;
+      border-radius: 12px;
+      border: 1px solid colors.$neutral-150;
+
+      .balance-card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .balance-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+      }
+
+      &.pass .balance-dot {
+        background-color: colors.$green-500;
+      }
+
+      &.fail .balance-dot {
+        background-color: colors.$rorange-500;
+      }
 
       .balance-label {
         color: colors.$neutral-600;
         margin: 0;
       }
 
-      &.right {
-        align-items: flex-end;
-      }
-    }
+      .balance-card-value {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
 
-    .Divider {
-      height: 56px;
+        .b1 {
+          font-size: 24px !important;
+        }
+
+        .b2 {
+          font-size: 16px !important;
+        }
+
+        .Text {
+          margin: 0;
+        }
+      }
     }
   }
 
   .tabs-row {
     margin-bottom: 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    padding: 4px;
-    border-radius: 6px;
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid colors.$neutral-200;
+    padding: 0;
+    background: transparent;
 
     .Tab {
+      flex: 1;
       display: flex !important;
       justify-content: center;
       align-items: center;
+      padding: 12px 16px;
+      border: none;
+      border-bottom: 3px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      cursor: pointer;
+      transition:
+        color 0.15s,
+        background 0.15s,
+        border-color 0.15s;
 
+      .label,
       .Text {
+        color: colors.$neutral-500;
         text-align: center !important;
         display: flex !important;
         width: 100% !important;
         max-width: 100% !important;
         justify-content: center !important;
+        -webkit-text-stroke: 0;
+      }
+
+      &:hover:not(.isDisabled) {
+        .label,
+        .Text {
+          color: colors.$neutral-700;
+        }
+      }
+
+      &.isSelected {
+        background: colors.$neutral-75;
+        border-bottom-color: colors.$primary-500;
+
+        .label,
+        .Text {
+          color: colors.$neutral-800;
+          font-weight: 600;
+          -webkit-text-stroke: 0;
+        }
+      }
+
+      &.isDisabled {
+        .label,
+        .Text {
+          color: colors.$neutral-400;
+        }
       }
     }
   }
@@ -160,8 +248,9 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      padding: 12px;
+      padding: 12px 16px;
       background: colors.$neutral-75;
+      border: 1px solid colors.$neutral-150;
       border-radius: 10px;
 
       .cost-row {
@@ -170,8 +259,15 @@
         align-items: center;
       }
 
-      .collateral-return {
-        color: colors.$rorange-500;
+      .collateral-return,
+      .summary-value-highlight {
+        font-size: 16px;
+        font-weight: 700;
+        color: colors.$primary-500;
+      }
+
+      .summary-divider {
+        background-color: colors.$primary-500;
       }
     }
 
@@ -277,7 +373,7 @@
             border: none;
             padding: 0;
             margin-top: 2px;
-            color: colors.$rorange-500;
+            color: colors.$primary-500;
             font-size: 11px;
             font-weight: 700;
             letter-spacing: 0.04em;
@@ -285,7 +381,7 @@
             line-height: 1;
 
             &:hover {
-              color: colors.$rorange-600;
+              color: colors.$primary-600;
             }
           }
 
@@ -307,7 +403,7 @@
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      background: colors.$rorange-500;
+      background: colors.$primary-500;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -321,7 +417,7 @@
       transition: background 0.15s;
 
       &:hover {
-        background: colors.$rorange-600;
+        background: colors.$primary-600;
       }
     }
   }
@@ -361,8 +457,8 @@
           border-color 0.15s;
 
         &.active {
-          background: colors.$rorange-500;
-          border-color: colors.$rorange-500;
+          background: colors.$primary-500;
+          border-color: colors.$primary-500;
           color: white;
         }
 
@@ -385,7 +481,7 @@
 
         &.active,
         &:focus {
-          border-color: colors.$rorange-500;
+          border-color: colors.$primary-500;
         }
       }
     }
@@ -395,8 +491,9 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 12px;
+    padding: 12px 16px;
     background: colors.$neutral-75;
+    border: 1px solid colors.$neutral-150;
     border-radius: 10px;
 
     .summary-row {
@@ -406,7 +503,17 @@
     }
 
     .network-fee {
-      color: colors.$rorange-500;
+      color: colors.$primary-500;
+    }
+
+    .summary-value-highlight {
+      font-size: 16px;
+      font-weight: 700;
+      color: colors.$primary-500;
+    }
+
+    .summary-divider {
+      background-color: colors.$primary-500;
     }
   }
 
