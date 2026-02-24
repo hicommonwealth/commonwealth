@@ -10,7 +10,9 @@ interface GetContentByUrlProps {
 export const getContentByUrl = async ({
   contentUrl,
 }: GetContentByUrlProps): Promise<string> => {
-  const response = await axios.get(contentUrl || '');
+  const response = await axios.get(contentUrl || '', {
+    withCredentials: true,
+  });
   return response?.data || '';
 };
 
