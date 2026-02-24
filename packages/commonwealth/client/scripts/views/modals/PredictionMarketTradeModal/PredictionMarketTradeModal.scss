@@ -29,6 +29,98 @@
     flex-direction: column;
     gap: 4px;
 
+    .collateral-row-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+      text-align: left;
+      color: inherit;
+
+      &:focus-visible {
+        outline: 2px solid colors.$primary-500;
+        outline-offset: 2px;
+      }
+    }
+
+    .collateral-row-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .collateral-chevron {
+      flex-shrink: 0;
+      color: colors.$neutral-500;
+    }
+
+    .collateral-row-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid colors.$neutral-150;
+    }
+
+    .copyable-address-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .copyable-address {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border: 1px solid colors.$neutral-200;
+      border-radius: 6px;
+      background: colors.$neutral-75;
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+      max-width: 100%;
+      min-width: 0;
+
+      .address-text {
+        font-size: 11px;
+        word-break: break-all;
+        opacity: 0.9;
+      }
+
+      .copy-icon {
+        flex-shrink: 0;
+        color: colors.$neutral-500;
+      }
+
+      &:hover {
+        background: colors.$neutral-150;
+        .copy-icon {
+          color: colors.$primary-500;
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid colors.$primary-500;
+        outline-offset: 2px;
+      }
+    }
+
+    .source-hint {
+      color: colors.$neutral-500;
+      font-size: 11px;
+    }
+
     .collateral-label {
       color: colors.$neutral-500;
 
@@ -76,12 +168,56 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        flex-wrap: wrap;
 
         .balance-dot {
           width: 8px;
           height: 8px;
           border-radius: 50%;
           flex-shrink: 0;
+        }
+
+        .balance-address-copy {
+          display: inline-flex;
+          align-items: center;
+          gap: 2px;
+          margin-left: auto;
+          padding: 2px 5px;
+          border: 1px solid colors.$neutral-300;
+          border-radius: 4px;
+          background: colors.$neutral-100;
+
+          .balance-address {
+            color: colors.$neutral-600;
+            font-size: 10px;
+            line-height: 1.2;
+            margin: 0;
+          }
+
+          .balance-copy-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: colors.$neutral-500;
+
+            .copy-icon {
+              display: block;
+            }
+
+            &:hover {
+              color: colors.$primary-500;
+            }
+
+            &:focus-visible {
+              outline: 2px solid colors.$primary-500;
+              outline-offset: 1px;
+              border-radius: 3px;
+            }
+          }
         }
       }
 

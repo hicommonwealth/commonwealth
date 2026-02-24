@@ -1,9 +1,10 @@
-import { ArrowsDownUp } from '@phosphor-icons/react';
+import { ArrowsDownUp, CaretDown, CaretUp } from '@phosphor-icons/react';
 import {
   notifyError,
   notifySuccess,
 } from 'client/scripts/controllers/app/notifications';
 import MagicWebWalletController from 'client/scripts/controllers/app/webWallets/MagicWebWallet';
+import { formatAddressShort } from 'client/scripts/helpers';
 import {
   applySlippage,
   fetchMarketIdFromChain,
@@ -22,6 +23,7 @@ import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communitySta
 import { fetchNodes } from 'client/scripts/state/api/nodes';
 import { useGetPredictionMarketPositionsQuery } from 'client/scripts/state/api/predictionMarket';
 import useUserStore from 'client/scripts/state/ui/user';
+import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import React, { useCallback, useEffect, useState } from 'react';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -68,6 +70,8 @@ type Market = {
   total_collateral?: string;
   /** ISO date string when the market ends (dissolves). */
   end_time?: string | null;
+  strategy_address?: string | null;
+  governor_address?: string | null;
   [key: string]: unknown;
 };
 
@@ -136,6 +140,7 @@ export const PredictionMarketTradeModal = ({
     symbol: string;
     decimals: number;
   } | null>(null);
+  const [detailsCollapsed, setDetailsCollapsed] = useState(true);
 
   const { data: community } = useGetCommunityByIdQuery({
     id: threadCommunityId,
@@ -975,59 +980,187 @@ export const PredictionMarketTradeModal = ({
       <CWDivider />
       <CWModalBody>
         <div className="collateral-row">
-          <CWText type="caption" className="collateral-label">
-            Collateral:&nbsp;
-            <strong>{collateralInfo ? collateralInfo.symbol : 'ETH'}</strong>
-            &nbsp;—&nbsp;Your balance:&nbsp;
-            {collateralInfo
-              ? formatTokenDisplay(
-                  collateralInfo.balanceWei,
-                  collateralInfo.decimals,
-                )
-              : availableEthDisplay}
-            &nbsp;
-            {collateralInfo ? collateralInfo.symbol : 'ETH'}
-          </CWText>
-          {(vaultBalanceOnChain ?? market.total_collateral != null) && (
-            <CWText type="caption" className="collateral-label total-minted">
-              Total minted:&nbsp;
-              {vaultBalanceOnChain != null
-                ? `${formatTokenDisplay(
-                    vaultBalanceOnChain.balanceWei,
-                    vaultBalanceOnChain.decimals,
-                  )} ${vaultBalanceOnChain.symbol}`
-                : `${formatTokenDisplay(
-                    BigInt(market.total_collateral ?? '0'),
-                    collateralInfo?.decimals ?? 18,
-                  )} ${collateralInfo ? collateralInfo.symbol : 'ETH'}`}
-            </CWText>
-          )}
-          {market.end_time && (
-            <CWText type="caption" className="collateral-label market-ends">
-              Market ends:&nbsp;
-              {new Date(market.end_time).toLocaleString(undefined, {
-                dateStyle: 'medium',
-                timeStyle: 'short',
-              })}
-            </CWText>
-          )}
-          {effectiveMarket.vault_address && market.collateral_address && (
-            <CWText
-              type="caption"
-              className="collateral-label verify-addresses"
-            >
-              Vault: {effectiveMarket.vault_address}
-              {' | '}
-              Collateral: {market.collateral_address}
-            </CWText>
-          )}
-          {activeAddress && (
-            <div className="balance-address-row" title={activeAddress}>
-              <CWText type="caption" className="balance-address-label">
-                Balances for: {activeAddress.slice(0, 6)}…
-                {activeAddress.slice(-4)}
-                {userPosition != null ? ' (from API)' : ' (from chain)'}
-              </CWText>
+          <button
+            type="button"
+            className="collateral-row-header"
+            onClick={() => setDetailsCollapsed((c) => !c)}
+            aria-expanded={!detailsCollapsed}
+          >
+            <div className="collateral-row-summary">
+              {(vaultBalanceOnChain ?? market.total_collateral != null) && (
+                <CWText
+                  type="caption"
+                  className="collateral-label total-minted"
+                >
+                  Total minted:&nbsp;
+                  {vaultBalanceOnChain != null
+                    ? `${formatTokenDisplay(
+                        vaultBalanceOnChain.balanceWei,
+                        vaultBalanceOnChain.decimals,
+                      )} ${vaultBalanceOnChain.symbol}`
+                    : `${formatTokenDisplay(
+                        BigInt(market.total_collateral ?? '0'),
+                        collateralInfo?.decimals ?? 18,
+                      )} ${collateralInfo ? collateralInfo.symbol : 'ETH'}`}
+                </CWText>
+              )}
+              {market.end_time && (
+                <CWText type="caption" className="collateral-label market-ends">
+                  Market ends:&nbsp;
+                  {new Date(market.end_time).toLocaleString(undefined, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                  })}
+                </CWText>
+              )}
+            </div>
+            {detailsCollapsed ? (
+              <CaretDown
+                size={16}
+                weight="bold"
+                className="collateral-chevron"
+              />
+            ) : (
+              <CaretUp size={16} weight="bold" className="collateral-chevron" />
+            )}
+          </button>
+          {!detailsCollapsed && (
+            <div className="collateral-row-details">
+              {effectiveMarket.vault_address && market.collateral_address && (
+                <div className="copyable-address-row">
+                  <CWText type="caption" className="collateral-label">
+                    Vault
+                  </CWText>
+                  <button
+                    type="button"
+                    className="copyable-address"
+                    onClick={() =>
+                      saveToClipboard(
+                        effectiveMarket.vault_address ?? '',
+                        true,
+                      ).catch(() => notifyError('Failed to copy'))
+                    }
+                    title="Copy vault address"
+                  >
+                    <span className="address-text">
+                      {effectiveMarket.vault_address}
+                    </span>
+                    <CWIcon
+                      iconName="copy"
+                      iconSize="small"
+                      className="copy-icon"
+                    />
+                  </button>
+                </div>
+              )}
+              {market.collateral_address && (
+                <div className="copyable-address-row">
+                  <CWText type="caption" className="collateral-label">
+                    Collateral
+                  </CWText>
+                  <button
+                    type="button"
+                    className="copyable-address"
+                    onClick={() =>
+                      saveToClipboard(
+                        market.collateral_address ?? '',
+                        true,
+                      ).catch(() => notifyError('Failed to copy'))
+                    }
+                    title="Copy collateral address"
+                  >
+                    <span className="address-text">
+                      {market.collateral_address}
+                    </span>
+                    <CWIcon
+                      iconName="copy"
+                      iconSize="small"
+                      className="copy-icon"
+                    />
+                  </button>
+                </div>
+              )}
+              {effectiveMarket.router_address && (
+                <div className="copyable-address-row">
+                  <CWText type="caption" className="collateral-label">
+                    Router
+                  </CWText>
+                  <button
+                    type="button"
+                    className="copyable-address"
+                    onClick={() =>
+                      saveToClipboard(
+                        effectiveMarket.router_address ?? '',
+                        true,
+                      ).catch(() => notifyError('Failed to copy'))
+                    }
+                    title="Copy router address"
+                  >
+                    <span className="address-text">
+                      {effectiveMarket.router_address}
+                    </span>
+                    <CWIcon
+                      iconName="copy"
+                      iconSize="small"
+                      className="copy-icon"
+                    />
+                  </button>
+                </div>
+              )}
+              {market.strategy_address && (
+                <div className="copyable-address-row">
+                  <CWText type="caption" className="collateral-label">
+                    Strategy
+                  </CWText>
+                  <button
+                    type="button"
+                    className="copyable-address"
+                    onClick={() =>
+                      saveToClipboard(
+                        market.strategy_address ?? '',
+                        true,
+                      ).catch(() => notifyError('Failed to copy'))
+                    }
+                    title="Copy strategy address"
+                  >
+                    <span className="address-text">
+                      {market.strategy_address}
+                    </span>
+                    <CWIcon
+                      iconName="copy"
+                      iconSize="small"
+                      className="copy-icon"
+                    />
+                  </button>
+                </div>
+              )}
+              {market.governor_address && (
+                <div className="copyable-address-row">
+                  <CWText type="caption" className="collateral-label">
+                    Governor
+                  </CWText>
+                  <button
+                    type="button"
+                    className="copyable-address"
+                    onClick={() =>
+                      saveToClipboard(
+                        market.governor_address ?? '',
+                        true,
+                      ).catch(() => notifyError('Failed to copy'))
+                    }
+                    title="Copy governor address"
+                  >
+                    <span className="address-text">
+                      {market.governor_address}
+                    </span>
+                    <CWIcon
+                      iconName="copy"
+                      iconSize="small"
+                      className="copy-icon"
+                    />
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1038,6 +1171,31 @@ export const PredictionMarketTradeModal = ({
               <CWText type="caption" className="balance-label">
                 PASS BALANCE
               </CWText>
+              {effectiveMarket.p_token_address && (
+                <div className="balance-address-copy">
+                  <CWText type="caption" className="balance-address">
+                    {formatAddressShort(effectiveMarket.p_token_address, 6, 4)}
+                  </CWText>
+                  <button
+                    type="button"
+                    className="balance-copy-btn"
+                    onClick={() =>
+                      saveToClipboard(
+                        effectiveMarket.p_token_address ?? '',
+                        true,
+                      ).catch(() => notifyError('Failed to copy'))
+                    }
+                    title="Copy PASS token address"
+                    aria-label="Copy PASS token address"
+                  >
+                    <CWIcon
+                      iconName="copy"
+                      iconSize="xs"
+                      className="copy-icon"
+                    />
+                  </button>
+                </div>
+              )}
             </div>
             <div className="balance-card-value">
               <CWText type="b1" fontWeight="bold">
@@ -1054,6 +1212,31 @@ export const PredictionMarketTradeModal = ({
               <CWText type="caption" className="balance-label">
                 FAIL BALANCE
               </CWText>
+              {effectiveMarket.f_token_address && (
+                <div className="balance-address-copy">
+                  <CWText type="caption" className="balance-address">
+                    {formatAddressShort(effectiveMarket.f_token_address, 6, 4)}
+                  </CWText>
+                  <button
+                    type="button"
+                    className="balance-copy-btn"
+                    onClick={() =>
+                      saveToClipboard(
+                        effectiveMarket.f_token_address ?? '',
+                        true,
+                      ).catch(() => notifyError('Failed to copy'))
+                    }
+                    title="Copy FAIL token address"
+                    aria-label="Copy FAIL token address"
+                  >
+                    <CWIcon
+                      iconName="copy"
+                      iconSize="xs"
+                      className="copy-icon"
+                    />
+                  </button>
+                </div>
+              )}
             </div>
             <div className="balance-card-value">
               <CWText type="b1" fontWeight="bold">
