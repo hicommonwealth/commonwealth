@@ -15,6 +15,7 @@ import {
   type TradeParams,
 } from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
 import useGetCommunityByIdQuery from 'client/scripts/state/api/communities/getCommuityById';
+import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import { fetchNodes } from 'client/scripts/state/api/nodes';
 import { useGetPredictionMarketPositionsQuery } from 'client/scripts/state/api/predictionMarket';
 import useUserStore from 'client/scripts/state/ui/user';
@@ -149,6 +150,22 @@ export const PredictionMarketTradeModal = ({
   const minBalanceForMerge =
     pTokenBalance < fTokenBalance ? pTokenBalance : fTokenBalance;
 
+  const {
+    data: ethBalance = '',
+    isLoading: isEthBalanceLoading,
+    refetch: refetchEthBalance,
+  } = useGetUserEthBalanceQuery({
+    chainRpc,
+    walletAddress: activeAddress,
+    ethChainId,
+    apiEnabled: !!chainRpc && !!activeAddress && ethChainId > 0,
+  });
+  const availableEthDisplay = isEthBalanceLoading
+    ? '—'
+    : ethBalance === '0.'
+      ? '0'
+      : ethBalance;
+
   const effectiveMarketId = market.market_id ?? fetchedMarketId;
   const effectiveMarket = { ...market, market_id: effectiveMarketId };
   const hasAddresses = !!(
@@ -221,6 +238,7 @@ export const PredictionMarketTradeModal = ({
       });
       notifySuccess('Mint successful.');
       await refetchPositions();
+      await refetchEthBalance();
       onSuccess?.();
       onClose();
     } catch (err) {
@@ -280,6 +298,7 @@ export const PredictionMarketTradeModal = ({
       });
       notifySuccess('Merge successful.');
       await refetchPositions();
+      await refetchEthBalance();
       onSuccess?.();
       onClose();
     } catch (err) {
@@ -313,6 +332,7 @@ export const PredictionMarketTradeModal = ({
       });
       notifySuccess('Redeem successful.');
       await refetchPositions();
+      await refetchEthBalance();
       onSuccess?.();
       onClose();
     } catch (err) {
@@ -338,7 +358,7 @@ export const PredictionMarketTradeModal = ({
               Collateral Amount
             </CWText>
             <CWText type="caption" className="available">
-              Available: — ETH
+              Available: {availableEthDisplay} ETH
             </CWText>
           </div>
           <div className="amount-input-with-actions">
@@ -358,8 +378,12 @@ export const PredictionMarketTradeModal = ({
               buttonHeight="sm"
               buttonWidth="narrow"
               onClick={() => {
-                // TODO: set to available collateral balance when we fetch it
+                if (ethBalance && ethBalance !== '0' && ethBalance !== '0.')
+                  setMintAmount(ethBalance);
               }}
+              disabled={
+                !ethBalance || ethBalance === '0' || ethBalance === '0.'
+              }
             />
             <CWText type="b2" className="unit">
               ETH
@@ -543,6 +567,10 @@ export const PredictionMarketTradeModal = ({
           {/* Summary */}
           <div className="swap-summary">
             <div className="summary-row">
+              <CWText type="caption">Available ETH</CWText>
+              <CWText type="caption">{availableEthDisplay}</CWText>
+            </div>
+            <div className="summary-row">
               <CWText type="caption">Exchange Rate</CWText>
               <CWText type="caption">
                 1 {sellToken} = — {buyToken}
@@ -620,6 +648,12 @@ export const PredictionMarketTradeModal = ({
           />
           <div className="cost-details merge-summary">
             <div className="cost-row">
+              <CWText type="caption">Available ETH</CWText>
+              <CWText type="caption" fontWeight="medium">
+                {availableEthDisplay}
+              </CWText>
+            </div>
+            <div className="cost-row">
               <CWText type="caption">Tokens to Burn</CWText>
               <CWText type="caption" fontWeight="medium">
                 {mergeDisplay} PASS + {mergeDisplay} FAIL
@@ -678,6 +712,14 @@ export const PredictionMarketTradeModal = ({
               containerClassName="amount-input"
             />
             <div className="cost-details">
+              <div className="cost-row">
+                <CWText type="caption" fontWeight="medium">
+                  Available ETH
+                </CWText>
+                <CWText type="caption" fontWeight="medium">
+                  {availableEthDisplay}
+                </CWText>
+              </div>
               <CWDivider className="summary-divider" />
               <div className="cost-row">
                 <CWText type="caption" fontWeight="medium">
