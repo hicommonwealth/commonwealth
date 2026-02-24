@@ -429,10 +429,16 @@ export const PredictionMarketTradeModal = ({
   };
 
   const handleMerge = async () => {
-    const amountWei = parseTokenAmount(mergeAmount, COLLATERAL_DECIMALS);
-    if (amountWei <= 0n || amountWei > minBalanceForMerge) {
+    const mergeDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
+    const amountWei = parseTokenAmount(mergeAmount, mergeDecimals);
+    if (amountWei <= 0n) {
+      setErrorMessage('Enter a valid amount.');
+      return;
+    }
+    if (amountWei > minBalanceForMerge) {
+      const maxDisplay = formatTokenDisplay(minBalanceForMerge, mergeDecimals);
       setErrorMessage(
-        `Enter a valid amount (max ${minBalanceForMerge.toString()} wei or use balance).`,
+        `Insufficient balance. You can merge at most ${maxDisplay} (limited by your PASS/FAIL balance).`,
       );
       return;
     }
@@ -447,6 +453,23 @@ export const PredictionMarketTradeModal = ({
       notifySuccess('Merge successful.');
       await refetchPositions();
       await refetchEthBalance();
+      if (market.collateral_address) {
+        getCollateralBalanceAndSymbol(
+          chainRpc,
+          activeAddress,
+          market.collateral_address,
+        ).then((info) => setCollateralInfo(info));
+      }
+      if (!userPosition) {
+        getPredictionMarketBalancesFromChain(
+          chainRpc,
+          activeAddress,
+          effectiveMarket.p_token_address ?? '',
+          effectiveMarket.f_token_address ?? '',
+        ).then(({ pTokenBalanceWei, fTokenBalanceWei }) =>
+          setOnChainBalances({ p: pTokenBalanceWei, f: fTokenBalanceWei }),
+        );
+      }
       onSuccess?.();
       onClose();
     } catch (err) {
@@ -532,9 +555,6 @@ export const PredictionMarketTradeModal = ({
               }}
               disabled={mintMaxDisabled}
             />
-            <CWText type="b2" className="unit">
-              {mintUnit}
-            </CWText>
           </div>
           <CWBanner
             type="info"
@@ -725,10 +745,12 @@ export const PredictionMarketTradeModal = ({
       );
     }
     if (activeTab === 'merge') {
-      const amountWei = parseTokenAmount(mergeAmount, COLLATERAL_DECIMALS);
+      const mergeDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
+      const amountWei = parseTokenAmount(mergeAmount, mergeDecimals);
       const validMerge = amountWei > 0n && amountWei <= minBalanceForMerge;
       const limitedByPass = pTokenBalance <= fTokenBalance;
       const mergeDisplay = validMerge ? mergeAmount || '0' : '0';
+      const mergeCollateralSymbol = collateralInfo?.symbol ?? 'ETH';
       return (
         <div className="PredictionMarketTradeModal-tab-content">
           <div className="input-label-row">
@@ -736,8 +758,8 @@ export const PredictionMarketTradeModal = ({
               Amount to merge
             </CWText>
             <CWText type="caption" className="available">
-              Available: {formatTokenDisplay(minBalanceForMerge)} (Limited
-              by&nbsp;
+              Available: {formatTokenDisplay(minBalanceForMerge, mergeDecimals)}{' '}
+              (Limited by&nbsp;
               {limitedByPass ? 'PASS' : 'FAIL'})
             </CWText>
           </div>
@@ -758,7 +780,9 @@ export const PredictionMarketTradeModal = ({
               buttonHeight="sm"
               buttonWidth="narrow"
               onClick={() =>
-                setMergeAmount(formatTokenDisplay(minBalanceForMerge))
+                setMergeAmount(
+                  formatTokenDisplay(minBalanceForMerge, mergeDecimals),
+                )
               }
             />
           </div>
@@ -773,12 +797,6 @@ export const PredictionMarketTradeModal = ({
             }
           />
           <div className="cost-details merge-summary">
-            <div className="cost-row">
-              <CWText type="caption">Available ETH</CWText>
-              <CWText type="caption" fontWeight="medium">
-                {availableEthDisplay}
-              </CWText>
-            </div>
             <div className="cost-row">
               <CWText type="caption">Tokens to Burn</CWText>
               <CWText type="caption" fontWeight="medium">
@@ -801,7 +819,7 @@ export const PredictionMarketTradeModal = ({
                 fontWeight="medium"
                 className="collateral-return"
               >
-                {mergeDisplay} ETH
+                {mergeDisplay} {mergeCollateralSymbol}
               </CWText>
             </div>
           </div>
@@ -931,9 +949,14 @@ export const PredictionMarketTradeModal = ({
           })()
         : activeTab === 'merge'
           ? !mergeAmount ||
-            parseTokenAmount(mergeAmount, COLLATERAL_DECIMALS) <= 0n ||
-            parseTokenAmount(mergeAmount, COLLATERAL_DECIMALS) >
-              minBalanceForMerge
+            parseTokenAmount(
+              mergeAmount,
+              collateralInfo?.decimals ?? COLLATERAL_DECIMALS,
+            ) <= 0n ||
+            parseTokenAmount(
+              mergeAmount,
+              collateralInfo?.decimals ?? COLLATERAL_DECIMALS,
+            ) > minBalanceForMerge
           : (winner !== 1 && winner !== 2) ||
             !redeemAmount ||
             parseTokenAmount(redeemAmount, COLLATERAL_DECIMALS) <= 0n ||
