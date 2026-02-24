@@ -62,6 +62,7 @@ describe('Prediction Market Redeem', () => {
       payload: {
         thread_id,
         prediction_market_id: marketId,
+        market_id: onChainMarketId,
         vault_address: '0x0000000000000000000000000000000000000001',
         governor_address: '0x0000000000000000000000000000000000000002',
         router_address: '0x0000000000000000000000000000000000000003',
