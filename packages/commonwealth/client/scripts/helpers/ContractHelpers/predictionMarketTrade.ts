@@ -84,6 +84,84 @@ export async function getPredictionMarketBalancesFromChain(
   };
 }
 
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+/**
+ * Fetch collateral ERC20 balance and symbol for the Mint tab.
+ * The vault pulls this token; user must hold it (e.g. WETH), not just native ETH.
+ */
+export async function getCollateralBalanceAndSymbol(
+  chainRpc: string,
+  userAddress: string,
+  collateralAddress: string,
+): Promise<{ balanceWei: bigint; symbol: string; decimals: number }> {
+  if (
+    !collateralAddress ||
+    collateralAddress.toLowerCase() === ZERO_ADDRESS.toLowerCase()
+  ) {
+    return { balanceWei: 0n, symbol: 'ETH', decimals: 18 };
+  }
+  const web3 = new Web3(chainRpc);
+  const erc20AbiSlice: AbiItem[] = [
+    {
+      name: 'balanceOf',
+      type: 'function',
+      inputs: [{ name: 'account', type: 'address' }],
+      outputs: [{ name: '', type: 'uint256' }],
+    },
+    {
+      name: 'decimals',
+      type: 'function',
+      inputs: [],
+      outputs: [{ name: '', type: 'uint8' }],
+    },
+    {
+      name: 'symbol',
+      type: 'function',
+      inputs: [],
+      outputs: [{ name: '', type: 'string' }],
+    },
+  ];
+  const contract = new web3.eth.Contract(erc20AbiSlice, collateralAddress);
+  const [balance, decimals, symbol] = await Promise.all([
+    contract.methods.balanceOf(userAddress).call(),
+    contract.methods.decimals().call(),
+    contract.methods
+      .symbol()
+      .call()
+      .catch(() => ''),
+  ]);
+  const decimalsNum = Number(decimals ?? 18);
+  return {
+    balanceWei: BigInt(String(balance ?? 0)),
+    symbol: (symbol as string) || 'Token',
+    decimals: decimalsNum,
+  };
+}
+
+/**
+ * Fetch the vault's balance of the collateral token (on-chain). Use this to verify
+ * the market actually holds collateral even if the app DB total_collateral is stale.
+ */
+export async function getVaultCollateralBalance(
+  chainRpc: string,
+  vaultAddress: string,
+  collateralAddress: string,
+): Promise<{ balanceWei: bigint; symbol: string; decimals: number }> {
+  if (
+    !vaultAddress ||
+    !collateralAddress ||
+    collateralAddress.toLowerCase() === ZERO_ADDRESS.toLowerCase()
+  ) {
+    return { balanceWei: 0n, symbol: 'ETH', decimals: 18 };
+  }
+  return getCollateralBalanceAndSymbol(
+    chainRpc,
+    vaultAddress,
+    collateralAddress,
+  );
+}
+
 /** Parse human-readable token amount to smallest units. */
 export function parseTokenAmount(value: string, decimals: number): bigint {
   if (!value || value.trim() === '') return 0n;

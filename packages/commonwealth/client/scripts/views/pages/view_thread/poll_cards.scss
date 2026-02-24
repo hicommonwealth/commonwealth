@@ -15,6 +15,12 @@
     margin: 0;
   }
 
+  .collateral-balance-row,
+  .total-minted-row {
+    margin: 0;
+    color: var(--text-secondary, #666);
+  }
+
   .PredictionMarketCard-actions {
     display: flex;
     gap: 8px;

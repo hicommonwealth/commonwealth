@@ -7,7 +7,9 @@ import MagicWebWalletController from 'client/scripts/controllers/app/webWallets/
 import {
   applySlippage,
   fetchMarketIdFromChain,
+  getCollateralBalanceAndSymbol,
   getPredictionMarketBalancesFromChain,
+  getVaultCollateralBalance,
   mergeTokens,
   mintTokens,
   parseTokenAmount,
@@ -39,7 +41,6 @@ import './PredictionMarketTradeModal.scss';
 
 const COLLATERAL_DECIMALS = 18;
 const DEFAULT_SLIPPAGE_BPS = 100; // 1%
-const PROTOCOL_FEE_BPS = 10; // 0.1%
 
 /** Format wei (bigint) to readable string with 2 decimals. */
 function formatTokenDisplay(wei: bigint, decimals = 18): string {
@@ -63,6 +64,8 @@ type Market = {
   status: string;
   winner?: number | null;
   prompt?: string;
+  /** Total collateral minted in market (wei string from DB). */
+  total_collateral?: string;
   [key: string]: unknown;
 };
 
@@ -120,6 +123,16 @@ export const PredictionMarketTradeModal = ({
   const [onChainBalances, setOnChainBalances] = useState<{
     p: bigint;
     f: bigint;
+  } | null>(null);
+  const [collateralInfo, setCollateralInfo] = useState<{
+    balanceWei: bigint;
+    symbol: string;
+    decimals: number;
+  } | null>(null);
+  const [vaultBalanceOnChain, setVaultBalanceOnChain] = useState<{
+    balanceWei: bigint;
+    symbol: string;
+    decimals: number;
   } | null>(null);
 
   const { data: community } = useGetCommunityByIdQuery({
@@ -247,6 +260,56 @@ export const PredictionMarketTradeModal = ({
     userPosition,
   ]);
 
+  // Fetch collateral token balance when market uses an ERC20 (e.g. WETH). Vault pulls this token, not native ETH.
+  useEffect(() => {
+    const addr = market.collateral_address;
+    const isZero =
+      !addr ||
+      addr.toLowerCase() === '0x0000000000000000000000000000000000000000';
+    if (isZero || !chainRpc || !activeAddress) {
+      setCollateralInfo(null);
+      return;
+    }
+    let cancelled = false;
+    getCollateralBalanceAndSymbol(chainRpc, activeAddress, addr)
+      .then((info) => {
+        if (!cancelled) setCollateralInfo(info);
+      })
+      .catch(() => {
+        if (!cancelled) setCollateralInfo(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [chainRpc, activeAddress, market.collateral_address]);
+
+  // Fetch vault's collateral balance on-chain so user can verify even if app DB is stale
+  useEffect(() => {
+    const vaultAddr = effectiveMarket.vault_address;
+    const collateralAddr = market.collateral_address;
+    const zeroAddr = '0x0000000000000000000000000000000000000000';
+    if (
+      !chainRpc ||
+      !vaultAddr ||
+      !collateralAddr ||
+      collateralAddr.toLowerCase() === zeroAddr
+    ) {
+      setVaultBalanceOnChain(null);
+      return;
+    }
+    let cancelled = false;
+    getVaultCollateralBalance(chainRpc, vaultAddr, collateralAddr)
+      .then((info) => {
+        if (!cancelled) setVaultBalanceOnChain(info);
+      })
+      .catch(() => {
+        if (!cancelled) setVaultBalanceOnChain(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [chainRpc, effectiveMarket.vault_address, market.collateral_address]);
+
   const isResolved = market.status === 'resolved';
   const swapDisabled = isResolved;
   const winner = market.winner ?? 0;
@@ -266,10 +329,22 @@ export const PredictionMarketTradeModal = ({
     return (controller as { provider?: unknown }).provider;
   }, [activeAddress, ethChainId]);
 
+  const mintDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
+
   const handleMint = async () => {
-    const amountWei = parseTokenAmount(mintAmount, COLLATERAL_DECIMALS);
+    const amountWei = parseTokenAmount(mintAmount, mintDecimals);
     if (amountWei <= 0n) {
       setErrorMessage('Enter a valid amount.');
+      return;
+    }
+    if (collateralInfo && amountWei > collateralInfo.balanceWei) {
+      const have = formatTokenDisplay(
+        collateralInfo.balanceWei,
+        collateralInfo.decimals,
+      );
+      setErrorMessage(
+        `Insufficient ${collateralInfo.symbol}. You have ${have} ${collateralInfo.symbol}.`,
+      );
       return;
     }
     setErrorMessage(null);
@@ -283,6 +358,13 @@ export const PredictionMarketTradeModal = ({
       notifySuccess('Mint successful.');
       await refetchPositions();
       await refetchEthBalance();
+      if (market.collateral_address) {
+        getCollateralBalanceAndSymbol(
+          chainRpc,
+          activeAddress,
+          market.collateral_address,
+        ).then((info) => setCollateralInfo(info));
+      }
       onSuccess?.();
       onClose();
     } catch (err) {
@@ -390,11 +472,13 @@ export const PredictionMarketTradeModal = ({
 
   const renderTabContent = () => {
     if (activeTab === 'mint') {
-      const amountWei = parseTokenAmount(mintAmount, COLLATERAL_DECIMALS);
-      const costDisplay = amountWei > 0n ? mintAmount || '0' : '0';
-      const protocolFeeWei = (amountWei * BigInt(PROTOCOL_FEE_BPS)) / 10000n;
-      const protocolFeeDisplay =
-        protocolFeeWei > 0n ? (Number(protocolFeeWei) / 1e18).toFixed(3) : '0';
+      const availableMintDisplay = collateralInfo
+        ? formatTokenDisplay(collateralInfo.balanceWei, collateralInfo.decimals)
+        : availableEthDisplay;
+      const mintUnit = collateralInfo ? collateralInfo.symbol : 'ETH';
+      const mintMaxDisabled = collateralInfo
+        ? collateralInfo.balanceWei === 0n
+        : !ethBalance || ethBalance === '0' || ethBalance === '0.';
       return (
         <div className="PredictionMarketTradeModal-tab-content">
           <div className="input-label-row">
@@ -402,7 +486,7 @@ export const PredictionMarketTradeModal = ({
               Collateral Amount
             </CWText>
             <CWText type="caption" className="available">
-              Available: {availableEthDisplay} ETH
+              Available: {availableMintDisplay} {mintUnit}
             </CWText>
           </div>
           <div className="amount-input-with-actions">
@@ -422,55 +506,26 @@ export const PredictionMarketTradeModal = ({
               buttonHeight="sm"
               buttonWidth="narrow"
               onClick={() => {
-                if (ethBalance && ethBalance !== '0' && ethBalance !== '0.')
-                  setMintAmount(ethBalance);
+                if (!mintMaxDisabled) setMintAmount(availableMintDisplay);
               }}
-              disabled={
-                !ethBalance || ethBalance === '0' || ethBalance === '0.'
-              }
+              disabled={mintMaxDisabled}
             />
             <CWText type="b2" className="unit">
-              ETH
+              {mintUnit}
             </CWText>
           </div>
           <CWBanner
             type="info"
             body={
               <div>
-                You will receive equal amounts of <strong>PASS</strong> and{' '}
-                <strong>FAIL</strong> tokens.
+                You will receive equal amounts of <strong>PASS</strong>{' '}
+                and&nbsp;
+                <strong>FAIL</strong> tokens. You must hold&nbsp;
+                <strong>{mintUnit}</strong> to mint
+                {mintUnit !== 'ETH' ? ' (e.g. wrap ETH first)' : ''}.
               </div>
             }
           />
-          <div className="cost-details">
-            <div className="cost-row">
-              <CWText type="caption">Cost</CWText>
-              <CWText type="caption" fontWeight="medium">
-                {costDisplay} ETH
-              </CWText>
-            </div>
-            <div className="cost-row">
-              <CWText type="caption">Protocol Fee (0.1%)</CWText>
-              <CWText type="caption" fontWeight="medium">
-                {protocolFeeDisplay} ETH
-              </CWText>
-            </div>
-            <CWDivider className="summary-divider" />
-            <div className="cost-row">
-              <CWText type="caption" fontWeight="medium">
-                Total
-              </CWText>
-              <CWText
-                type="caption"
-                fontWeight="medium"
-                className="summary-value-highlight"
-              >
-                {amountWei > 0n
-                  ? `${(Number(amountWei) / 1e18 + Number(protocolFeeWei) / 1e18).toFixed(4)} ETH`
-                  : '0 ETH'}
-              </CWText>
-            </div>
-          </div>
         </div>
       );
     }
@@ -655,7 +710,8 @@ export const PredictionMarketTradeModal = ({
               Amount to merge
             </CWText>
             <CWText type="caption" className="available">
-              Available: {formatTokenDisplay(minBalanceForMerge)} (Limited by{' '}
+              Available: {formatTokenDisplay(minBalanceForMerge)} (Limited
+              by&nbsp;
               {limitedByPass ? 'PASS' : 'FAIL'})
             </CWText>
           </div>
@@ -743,7 +799,8 @@ export const PredictionMarketTradeModal = ({
         {canRedeem && (
           <>
             <CWText type="b2" className="label">
-              Winning token amount ({winner === 1 ? 'PASS' : 'FAIL'}) — max:{' '}
+              Winning token amount ({winner === 1 ? 'PASS' : 'FAIL'}) —
+              max:&nbsp;
               {maxRedeem.toString()}
             </CWText>
             <CWTextInput
@@ -827,7 +884,11 @@ export const PredictionMarketTradeModal = ({
   };
   const primaryDisabled =
     activeTab === 'mint'
-      ? !mintAmount || parseTokenAmount(mintAmount, COLLATERAL_DECIMALS) <= 0n
+      ? !mintAmount ||
+        parseTokenAmount(mintAmount, mintDecimals) <= 0n ||
+        (!!collateralInfo &&
+          parseTokenAmount(mintAmount, mintDecimals) >
+            collateralInfo.balanceWei)
       : activeTab === 'swap'
         ? !swapAmount || parseTokenAmount(swapAmount, COLLATERAL_DECIMALS) <= 0n
         : activeTab === 'merge'
@@ -850,6 +911,45 @@ export const PredictionMarketTradeModal = ({
       />
       <CWDivider />
       <CWModalBody>
+        <div className="collateral-row">
+          <CWText type="caption" className="collateral-label">
+            Collateral:&nbsp;
+            <strong>{collateralInfo ? collateralInfo.symbol : 'ETH'}</strong>
+            &nbsp;—&nbsp;Your balance:&nbsp;
+            {collateralInfo
+              ? formatTokenDisplay(
+                  collateralInfo.balanceWei,
+                  collateralInfo.decimals,
+                )
+              : availableEthDisplay}
+            &nbsp;
+            {collateralInfo ? collateralInfo.symbol : 'ETH'}
+          </CWText>
+          {(vaultBalanceOnChain ?? market.total_collateral != null) && (
+            <CWText type="caption" className="collateral-label total-minted">
+              Total minted:&nbsp;
+              {vaultBalanceOnChain != null
+                ? `${formatTokenDisplay(
+                    vaultBalanceOnChain.balanceWei,
+                    vaultBalanceOnChain.decimals,
+                  )} ${vaultBalanceOnChain.symbol}`
+                : `${formatTokenDisplay(
+                    BigInt(market.total_collateral ?? '0'),
+                    collateralInfo?.decimals ?? 18,
+                  )} ${collateralInfo ? collateralInfo.symbol : 'ETH'}`}
+            </CWText>
+          )}
+          {effectiveMarket.vault_address && market.collateral_address && (
+            <CWText
+              type="caption"
+              className="collateral-label verify-addresses"
+            >
+              Vault: {effectiveMarket.vault_address}
+              {' | '}
+              Collateral: {market.collateral_address}
+            </CWText>
+          )}
+        </div>
         <div className="balances-section">
           <div className="balance-card pass">
             <div className="balance-card-header">
