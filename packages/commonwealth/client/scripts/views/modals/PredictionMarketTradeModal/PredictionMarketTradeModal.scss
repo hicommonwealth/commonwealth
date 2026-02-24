@@ -33,7 +33,8 @@
       color: colors.$neutral-500;
 
       &.total-minted,
-      &.vault-on-chain {
+      &.vault-on-chain,
+      &.market-ends {
         margin-top: 2px;
       }
 

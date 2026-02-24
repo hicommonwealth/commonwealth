@@ -66,6 +66,8 @@ type Market = {
   prompt?: string;
   /** Total collateral minted in market (wei string from DB). */
   total_collateral?: string;
+  /** ISO date string when the market ends (dissolves). */
+  end_time?: string | null;
   [key: string]: unknown;
 };
 
@@ -998,6 +1000,15 @@ export const PredictionMarketTradeModal = ({
                     BigInt(market.total_collateral ?? '0'),
                     collateralInfo?.decimals ?? 18,
                   )} ${collateralInfo ? collateralInfo.symbol : 'ETH'}`}
+            </CWText>
+          )}
+          {market.end_time && (
+            <CWText type="caption" className="collateral-label market-ends">
+              Market ends:&nbsp;
+              {new Date(market.end_time).toLocaleString(undefined, {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+              })}
             </CWText>
           )}
           {effectiveMarket.vault_address && market.collateral_address && (
