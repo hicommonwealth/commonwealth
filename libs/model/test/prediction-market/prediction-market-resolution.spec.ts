@@ -77,6 +77,7 @@ describe('Prediction Market Resolution', () => {
       payload: {
         thread_id: tId,
         prediction_market_id: market!.id!,
+        market_id: onChainMarketId,
         vault_address: '0x0000000000000000000000000000000000000001',
         governor_address: '0x0000000000000000000000000000000000000002',
         router_address: '0x0000000000000000000000000000000000000003',
@@ -271,6 +272,7 @@ describe('Prediction Market Resolution', () => {
       const marketBefore = await models.PredictionMarket.findOne({
         where: { market_id: onChainMarketId },
       });
+      expect(marketBefore).not.toBeNull();
       const resolvedAtBefore = marketBefore!.resolved_at;
 
       await projection.body.PredictionMarketProposalResolved({
@@ -365,6 +367,7 @@ describe('Prediction Market Resolution', () => {
         payload: {
           thread_id: newThread!.id!,
           prediction_market_id: market!.id!,
+          market_id: onChainMarketId,
           vault_address: '0x0000000000000000000000000000000000000001',
           governor_address: '0x0000000000000000000000000000000000000002',
           router_address: '0x0000000000000000000000000000000000000003',
