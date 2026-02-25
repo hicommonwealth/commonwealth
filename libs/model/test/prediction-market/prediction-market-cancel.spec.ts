@@ -125,6 +125,8 @@ describe('Prediction Market Cancel', () => {
       payload: {
         thread_id: newThread!.id!,
         prediction_market_id: market!.id!,
+        market_id:
+          '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
         vault_address: '0x0000000000000000000000000000000000000001',
         governor_address: '0x0000000000000000000000000000000000000002',
         router_address: '0x0000000000000000000000000000000000000003',
