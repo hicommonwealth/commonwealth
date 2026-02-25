@@ -57,6 +57,42 @@
     scrollbar-width: none;
   }
 
+  // Carousel styles for auto-rotating horizontal scroll
+  .carousel-container {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    margin: 16px 0;
+  }
+
+  .carousel-track {
+    display: flex;
+    gap: 16px;
+    padding: 8px;
+    width: fit-content;
+  }
+
+  .carousel {
+    animation: scroll 300s linear infinite;
+    width: fit-content;
+  }
+
+  // Pause animation on hover
+  .carousel.paused {
+    animation-play-state: paused !important;
+  }
+
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      // Move exactly one-third of the total width for seamless loop
+      // Since we duplicate tokens 3 times, moving 33.333% creates seamless effect
+      transform: translateX(calc(-33.333% - 8px));
+    }
+  }
+
   .empty-placeholder {
     display: flex;
     justify-content: center;

@@ -1,11 +1,11 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import moment from 'moment/moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation, useSearchParams } from 'react-router-dom';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchTopicsQuery } from 'state/api/topics';

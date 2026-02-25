@@ -1,9 +1,9 @@
 import { notifyError } from 'controllers/app/notifications';
-import useBrowserWindow from 'hooks/useBrowserWindow';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { isEqual } from 'lodash';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
 import useGenerateImageMutation from 'state/api/general/generateImage';
 import useUploadFileMutation from 'state/api/general/uploadFile';
 import { ImageProcessed, UploadControlProps } from './types';

@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-import useBrowserWindow from 'hooks/useBrowserWindow';
-import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
 import { matchRoutes, useLocation, useSearchParams } from 'react-router-dom';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
+import useWindowResize from 'shared/hooks/useWindowResize';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';

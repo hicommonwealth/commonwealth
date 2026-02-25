@@ -18,10 +18,7 @@ import useGetThreadToken from 'client/scripts/state/api/tokens/getThreadToken';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -34,6 +31,9 @@ import React, {
 } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import app from 'state';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useFetchProfilesByAddressesQuery from 'state/api/profiles/fetchProfilesByAddress';
@@ -95,6 +95,7 @@ import { LinkedUrlCard } from './LinkedUrlCard';
 import { ThreadPollCard } from './ThreadPollCard';
 import { ThreadPollEditorCard } from './ThreadPollEditorCard';
 import { ThreadPredictionMarketCard } from './ThreadPredictionMarketCard';
+import { ThreadPredictionMarketEditorCard } from './ThreadPredictionMarketEditorCard';
 import { EditBody } from './edit_body';
 import './index.scss';
 import { LinkedProposalsCard } from './linked_proposals_card';
@@ -137,7 +138,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [imageActionModalOpen, setImageActionModalOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   useInitChainIfNeeded(app);
@@ -699,7 +700,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         ]
       : []),
     ...(pollsData?.length > 0 ||
-    (isAuthor && (!app.chain?.meta?.admin_only_polling || isAdmin))
+    (isAuthor && (!app.chain?.meta?.admin_only_polling || isAdmin)) ||
+    (isAuthor && futarchyEnabled)
       ? [
           {
             label: 'Polls',
@@ -732,6 +734,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       threadAlreadyHasPolling={!pollsData?.length}
                     />
                   )}
+                {isAuthor && futarchyEnabled && thread && (
+                  <ThreadPredictionMarketEditorCard thread={thread} />
+                )}
               </div>
             ),
           },

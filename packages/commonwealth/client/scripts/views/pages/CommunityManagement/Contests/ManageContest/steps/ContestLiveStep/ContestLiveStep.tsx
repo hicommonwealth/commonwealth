@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-import { useAnimation } from 'hooks/useAnimation';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
+import { useAnimation } from 'shared/hooks/useAnimation';
+import { useFlag } from 'shared/hooks/useFlag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';

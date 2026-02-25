@@ -30,11 +30,11 @@ import {
   doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { isEqual } from 'lodash';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import {
   useCreateQuestMutation,
   useDeleteQuestMutation,

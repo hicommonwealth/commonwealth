@@ -9,6 +9,7 @@ const {
   useFetchTopicsQueryMock,
   useGetCommunityByIdQueryMock,
   useManageCommunityStakeModalStoreMock,
+  useTokenTradeWidgetMock,
   useUserStoreMock,
 } = vi.hoisted(() => ({
   useGetCommunityByIdQueryMock: vi.fn(),
@@ -16,6 +17,7 @@ const {
   useCreateThreadMutationMock: vi.fn(),
   useManageCommunityStakeModalStoreMock: vi.fn(),
   useUserStoreMock: vi.fn(),
+  useTokenTradeWidgetMock: vi.fn(),
   appMock: {
     activeChainId: vi.fn(() => 'cmntest'),
     chain: {
@@ -51,6 +53,13 @@ vi.mock('client/scripts/state/ui/user', () => ({
 vi.mock('state/ui/modals', () => ({
   useManageCommunityStakeModalStore: useManageCommunityStakeModalStoreMock,
 }));
+
+vi.mock(
+  'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget',
+  () => ({
+    useTokenTradeWidget: useTokenTradeWidgetMock,
+  }),
+);
 
 vi.mock('state/api/feeds/fetchUserActivity', () => ({
   useFetchGlobalActivityQuery: vi.fn(),
@@ -175,6 +184,13 @@ describe('CommunityHomePage integration', () => {
     useCreateThreadMutationMock.mockReset();
     useManageCommunityStakeModalStoreMock.mockReset();
     useUserStoreMock.mockReset();
+    useTokenTradeWidgetMock.mockReset();
+
+    useTokenTradeWidgetMock.mockReturnValue({
+      communityToken: undefined,
+      isLoadingToken: false,
+      isPinnedToken: false,
+    });
 
     appMock.activeChainId.mockReturnValue('cmntest');
     appMock.chain.meta = {
