@@ -22,7 +22,6 @@ export type DeployPredictionMarketPayload = {
   p_token_address: `0x${string}`;
   f_token_address: `0x${string}`;
   proposal_id: `0x${string}`;
-  market_id: `0x${string}`;
   start_time: Date;
   end_time: Date;
 };
@@ -109,15 +108,6 @@ class PredictionMarket extends ContractBase {
   ): Promise<{
     logs?: Array<{ address?: string; data?: string; topics?: string[] }>;
   }> {
-    console.log('comes here => ', {
-      proposalId,
-      marketId,
-      collateralAddress,
-      durationSeconds,
-      resolutionThreshold,
-      initialLiquidityWei,
-      fromAddress,
-    });
     this.isInitialized();
 
     // Approve governor to spend collateral before propose (required when initialLiquidity > 0).
@@ -276,7 +266,6 @@ class PredictionMarket extends ContractBase {
     const router_address = await this.getRouter();
 
     return {
-      market_id: marketId,
       governor_address: this.contractAddress as `0x${string}`,
       vault_address,
       router_address,

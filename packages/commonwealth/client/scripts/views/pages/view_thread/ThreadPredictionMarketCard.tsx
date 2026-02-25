@@ -220,7 +220,7 @@ export const ThreadPredictionMarketCard = ({
                 <CWButton
                   buttonHeight="sm"
                   buttonType="secondary"
-                  label="Trade"
+                  label={market.status === 'resolved' ? 'Redeem' : 'Trade'}
                   className="trade-button"
                   onClick={(e) => {
                     e.preventDefault();
