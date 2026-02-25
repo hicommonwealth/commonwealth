@@ -84,8 +84,8 @@ describe('Prediction Market Lifecycle', () => {
       strategy_address: '0x0000000000000000000000000000000000000004',
       p_token_address: '0x0000000000000000000000000000000000000005',
       f_token_address: '0x0000000000000000000000000000000000000006',
-      proposal_id: `0x${'a'.repeat(64)}`,
-      market_id: `0x${'b'.repeat(64)}`,
+      proposal_id: `0x${'a'.repeat(64)}` as `0x${string}`,
+      market_id: `0x${'b'.repeat(64)}` as `0x${string}`,
       start_time: new Date(),
       end_time: new Date(Date.now() + 86400 * 7 * 1000),
     };
