@@ -94,7 +94,6 @@ import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { LinkedUrlCard } from './LinkedUrlCard';
 import { ThreadPollCard } from './ThreadPollCard';
 import { ThreadPollEditorCard } from './ThreadPollEditorCard';
-import { ThreadPredictionMarketCard } from './ThreadPredictionMarketCard';
 import { ThreadPredictionMarketEditorCard } from './ThreadPredictionMarketEditorCard';
 import { EditBody } from './edit_body';
 import './index.scss';
@@ -737,18 +736,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 {isAuthor && futarchyEnabled && thread && (
                   <ThreadPredictionMarketEditorCard thread={thread} />
                 )}
-              </div>
-            ),
-          },
-        ]
-      : []),
-    ...(futarchyEnabled && thread
-      ? [
-          {
-            label: 'Prediction Market',
-            item: (
-              <div className="cards-column">
-                <ThreadPredictionMarketCard thread={thread} />
               </div>
             ),
           },
