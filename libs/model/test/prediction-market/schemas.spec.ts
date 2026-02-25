@@ -78,7 +78,6 @@ const baseDeployCommand = {
   p_token_address: '0x5555555555555555555555555555555555555555',
   f_token_address: '0x6666666666666666666666666666666666666666',
   proposal_id: `0x${'a'.repeat(64)}`,
-  market_id: `0x${'b'.repeat(64)}`,
   start_time: new Date(),
   end_time: new Date(Date.now() + 1000 * 60 * 60),
 };
