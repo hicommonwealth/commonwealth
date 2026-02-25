@@ -20,6 +20,8 @@ export type DeployPredictionMarketPayload = {
   strategy_address: `0x${string}`;
   p_token_address: `0x${string}`;
   f_token_address: `0x${string}`;
+  proposal_id: `0x${string}`;
+  market_id: `0x${string}`;
   start_time: Date;
   end_time: Date;
 };
@@ -179,9 +181,10 @@ class PredictionMarket extends ContractBase {
    */
   async deploy(params: DeployParams): Promise<DeployPredictionMarketPayload> {
     this.isInitialized();
-    const proposalId = randomBytes32();
-    const marketId = randomBytes32();
-    const durationSeconds = BigInt(params.duration_days * 86400);
+    const proposal_id = randomBytes32();
+    const market_id = randomBytes32();
+    // const durationSeconds = BigInt(params.duration_days * 86400); // use this after testing
+    const durationSeconds = BigInt(1200); // TODO: 20 minutes for testing, remove afterwards
     // Contract expects resolution threshold in 1e18 scale
     const resolutionThresholdWei = BigInt(
       Math.round(params.resolution_threshold * 1e18),
@@ -204,8 +207,8 @@ class PredictionMarket extends ContractBase {
     }
 
     const rawReceipt = await this.propose(
-      proposalId,
-      marketId,
+      proposal_id,
+      market_id,
       params.collateral_address,
       durationSeconds,
       resolutionThresholdWei,
@@ -279,9 +282,82 @@ class PredictionMarket extends ContractBase {
       strategy_address,
       p_token_address,
       f_token_address,
+      proposal_id,
+      market_id,
       start_time: new Date(Number(startTime) * 1000),
       end_time: new Date(Number(endTime) * 1000),
     };
+  }
+
+  /**
+   * Get current TWAP probability for a proposal (1e18 scale, e.g. 0.55e18 = 55% PASS).
+   */
+  async getCurrentProbability(
+    proposalId: `0x${string}`,
+    twapWindowSeconds: number,
+  ): Promise<bigint> {
+    this.isInitialized();
+    const result = (await this.contract.methods
+      .getCurrentProbability(proposalId, twapWindowSeconds)
+      .call()) as unknown;
+    return BigInt(String(result));
+  }
+
+  /**
+   * Resolve a proposal on-chain via TWAP. Returns the winner (1=PASS, 2=FAIL).
+   */
+  async resolve(
+    proposalId: `0x${string}`,
+    twapWindowSeconds: number,
+    fromAddress: string,
+  ): Promise<{ winner: number }> {
+    this.isInitialized();
+    const tx = this.contract.methods.resolve(proposalId, twapWindowSeconds);
+    let rawReceipt: {
+      logs?: Array<{ address?: string; data?: string; topics?: string[] }>;
+    };
+    try {
+      const gas = await tx.estimateGas({ from: fromAddress });
+      rawReceipt = await tx.send({
+        from: fromAddress,
+        gas: String(BigInt(gas.toString()) + 50000n),
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/user rejected|denied|reject/i.test(msg)) {
+        throw new Error('Transaction was rejected by the user.');
+      }
+      if (/insufficient funds|not enough balance/i.test(msg)) {
+        throw new Error('Insufficient funds for gas.');
+      }
+      throw err;
+    }
+
+    const logs: Array<{ address: string; data: string; topics: string[] }> = (
+      rawReceipt.logs ?? []
+    ).map((log: { address?: string; data?: string; topics?: string[] }) => ({
+      address: log.address ?? '',
+      data: log.data ?? '0x',
+      topics: Array.isArray(log.topics) ? log.topics : [],
+    }));
+
+    for (const log of logs) {
+      try {
+        const decoded = decodeEventLog({
+          abi: FutarchyGovernorAbi,
+          data: log.data as `0x${string}`,
+          topics: log.topics as [`0x${string}`, ...`0x${string}`[]],
+          strict: false,
+        });
+        if (decoded.eventName === 'ProposalResolved') {
+          const args = decoded.args as unknown as { winner?: number | bigint };
+          return { winner: Number(args.winner ?? 0) };
+        }
+      } catch {
+        // not ProposalResolved
+      }
+    }
+    throw new Error('ProposalResolved event not found in transaction receipt');
   }
 }
 

@@ -1,0 +1,270 @@
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+
+.PredictionMarketResolveModal {
+  display: flex;
+  flex-direction: column;
+  max-height: 84vh;
+  overflow: hidden;
+
+  .CWModalBody {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .countdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+
+    .countdown-label {
+      margin: 0;
+    }
+
+    .countdown-tag {
+      background-color: colors.$neutral-700 !important;
+
+      .Text,
+      .Icon {
+        color: colors.$white !important;
+      }
+    }
+  }
+
+  .countdown-boxes {
+    display: flex;
+    gap: 12px;
+  }
+
+  .countdown-box {
+    flex: 1;
+    background-color: colors.$neutral-100;
+    border-radius: border_radius.$border-radius-corners;
+    padding: 16px;
+    text-align: center;
+    min-width: 0;
+    border: 1px solid colors.$neutral-200;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    .countdown-value {
+      display: block;
+      margin: 0 0 4px 0;
+      color: colors.$neutral-800;
+      line-height: 24px !important;
+    }
+
+    .countdown-unit {
+      color: colors.$neutral-500;
+      margin: 0;
+    }
+  }
+
+  .twap-section {
+    background-color: colors.$neutral-50;
+    border-radius: border_radius.$border-radius-corners;
+    padding: 16px;
+    border: 1px solid colors.$neutral-150;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .twap-label {
+    display: block;
+    color: colors.$neutral-800 !important;
+  }
+
+  .twap-skeleton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    background-color: colors.$neutral-50;
+    border-radius: border_radius.$border-radius-corners;
+  }
+
+  .twap-error {
+    color: colors.$rorange-500;
+    margin-top: 4px;
+  }
+
+  .twap-error-banner,
+  .resolve-modal-error-banner {
+    padding: 10px 12px !important;
+
+    .body {
+      font-size: 12px !important;
+    }
+  }
+
+  .probability-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+
+    .probability-value {
+      margin: 0;
+    }
+
+    .probability-change {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+
+      .probability-change-icon {
+        flex-shrink: 0;
+      }
+
+      &.positive {
+        color: colors.$green-500;
+
+        .probability-change-icon {
+          color: colors.$green-500;
+          fill: colors.$green-500;
+        }
+      }
+
+      &.negative {
+        color: colors.$rorange-500;
+
+        .probability-change-icon {
+          color: colors.$rorange-500;
+          fill: colors.$rorange-500;
+        }
+      }
+    }
+  }
+
+  .resolution-threshold-row {
+    margin-top: 4px;
+
+    .threshold-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .threshold-label {
+      display: block;
+      color: colors.$neutral-800;
+    }
+
+    .threshold-bar-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .threshold-bar {
+      flex: 1;
+      display: flex;
+      height: 8px;
+      border-radius: border_radius.$border-radius-corners;
+      overflow: hidden;
+    }
+
+    .threshold-bar-fill {
+      background-color: colors.$primary-500;
+      min-width: 0;
+    }
+
+    .threshold-bar-empty {
+      background-color: colors.$neutral-200;
+      min-width: 0;
+    }
+
+    .threshold-value {
+      flex-shrink: 0;
+      color: colors.$neutral-600 !important;
+      font-weight: 600;
+    }
+  }
+
+  .twap-window-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .twap-window-label {
+      margin: 0;
+      color: colors.$neutral-600 !important;
+      font-size: 12px !important;
+    }
+
+    .SelectList {
+      width: 100%;
+    }
+  }
+
+  .predicted-outcome-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-radius: border_radius.$border-radius-corners;
+    background-color: colors.$neutral-50;
+    border: 1px solid colors.$neutral-200;
+
+    .predicted-outcome-label,
+    .predicted-outcome-value {
+      margin: 0;
+    }
+
+    &.outcome-pass {
+      .predicted-outcome-icon {
+        color: colors.$green-600 !important;
+        fill: colors.$green-600 !important;
+      }
+
+      .predicted-outcome-label,
+      .predicted-outcome-value {
+        color: colors.$green-600;
+      }
+    }
+
+    &.outcome-fail {
+      .predicted-outcome-icon {
+        color: colors.$rorange-600 !important;
+        fill: colors.$rorange-600 !important;
+      }
+
+      .predicted-outcome-label,
+      .predicted-outcome-value {
+        color: colors.$rorange-600;
+      }
+    }
+
+    .predicted-outcome-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 2px;
+    }
+
+    .predicted-outcome-label {
+      margin: 0;
+      opacity: 0.9;
+    }
+  }
+
+  .help-text {
+    color: colors.$neutral-600;
+    margin-top: 4px;
+    margin-bottom: 8px;
+  }
+
+  .error-message {
+    color: colors.$rorange-500;
+    margin-top: 8px;
+  }
+}

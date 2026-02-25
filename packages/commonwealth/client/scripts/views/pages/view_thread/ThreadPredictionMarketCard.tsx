@@ -6,6 +6,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { DeployDraftPredictionMarketModal } from '../../modals/PredictionMarket/DeployDraftPredictionMarketModal';
+import { PredictionMarketResolveModal } from '../../modals/PredictionMarket/PredictionMarketResolveModal';
 import './poll_cards.scss';
 
 type PredictionMarketResult = {
@@ -16,6 +17,9 @@ type PredictionMarketResult = {
   duration?: number;
   resolution_threshold?: number;
   collateral_address?: string;
+  proposal_id?: string | null;
+  governor_address?: string | null;
+  end_time?: Date | string | null;
   created_at?: string;
   [key: string]: unknown;
 };
@@ -24,6 +28,7 @@ type ThreadPredictionMarketCardProps = {
   thread: Thread;
   market: PredictionMarketResult;
   isAuthor?: boolean;
+  canResolveMarket?: boolean;
 };
 
 const statusTagType = (
@@ -54,10 +59,15 @@ export const ThreadPredictionMarketCard = ({
   thread,
   market,
   isAuthor = false,
+  canResolveMarket = false,
 }: ThreadPredictionMarketCardProps) => {
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
+  const [isResolveModalOpen, setIsResolveModalOpen] = useState(false);
   const isDraft = market.status === 'draft';
+  const isActive = market.status === 'active';
   const canCompleteDraft = isDraft && isAuthor;
+  const endTime = market.end_time ? new Date(market.end_time) : new Date(0);
+  const canShowResolve = isActive && canResolveMarket;
 
   return (
     <>
@@ -85,6 +95,18 @@ export const ThreadPredictionMarketCard = ({
                 }}
               />
             )}
+            {canShowResolve && (
+              <CWButton
+                buttonHeight="sm"
+                buttonType="primary"
+                label="Resolve market"
+                className="resolve-market-button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsResolveModalOpen(true);
+                }}
+              />
+            )}
           </div>
         }
       />
@@ -100,6 +122,19 @@ export const ThreadPredictionMarketCard = ({
         }
         onClose={() => setIsDeployModalOpen(false)}
         open={isDeployModalOpen}
+      />
+      <CWModal
+        size="medium"
+        content={
+          <PredictionMarketResolveModal
+            thread={thread}
+            market={market}
+            onClose={() => setIsResolveModalOpen(false)}
+            onSuccess={() => setIsResolveModalOpen(false)}
+          />
+        }
+        onClose={() => setIsResolveModalOpen(false)}
+        open={isResolveModalOpen}
       />
     </>
   );

@@ -733,8 +733,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       threadAlreadyHasPolling={!pollsData?.length}
                     />
                   )}
-                {isAuthor && futarchyEnabled && thread && (
-                  <ThreadPredictionMarketEditorCard thread={thread} />
+                {(isAuthor || isAdmin) && futarchyEnabled && thread && (
+                  <ThreadPredictionMarketEditorCard
+                    thread={thread}
+                    isAuthor={isAuthor}
+                    isAdmin={isAdmin}
+                  />
                 )}
               </div>
             ),
