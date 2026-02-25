@@ -183,8 +183,7 @@ class PredictionMarket extends ContractBase {
     this.isInitialized();
     const proposal_id = randomBytes32();
     const market_id = randomBytes32();
-    // const durationSeconds = BigInt(params.duration_days * 86400); // use this after testing
-    const durationSeconds = BigInt(1200); // TODO: 20 minutes for testing, remove afterwards
+    const durationSeconds = BigInt(params.duration_days * 86400);
     // Contract expects resolution threshold in 1e18 scale
     const resolutionThresholdWei = BigInt(
       Math.round(params.resolution_threshold * 1e18),
