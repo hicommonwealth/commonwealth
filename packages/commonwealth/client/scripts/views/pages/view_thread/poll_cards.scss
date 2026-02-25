@@ -15,8 +15,22 @@
     margin: 0;
   }
 
+  .collateral-balance-row,
+  .total-minted-row {
+    margin: 0;
+    color: var(--text-secondary, #666);
+  }
+
+  .PredictionMarketCard-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
   .complete-deployment-button,
-  .resolve-market-button {
+  .resolve-market-button
+  .trade-button {
     margin-top: 4px;
     align-self: flex-start;
   }

@@ -179,16 +179,16 @@ export const PredictionMarketEditorModal = ({
       await deployMutation.mutateAsync({
         thread_id: thread.id,
         prediction_market_id: predictionMarketId,
-        vault_address: payload.vault_address,
-        governor_address: payload.governor_address,
-        router_address: payload.router_address,
-        strategy_address: payload.strategy_address,
-        p_token_address: payload.p_token_address,
-        f_token_address: payload.f_token_address,
         proposal_id: payload.proposal_id,
         market_id: payload.market_id,
-        start_time: payload.start_time,
-        end_time: payload.end_time,
+        vault_address: payload.vault_address as string,
+        governor_address: payload.governor_address as string,
+        router_address: payload.router_address as string,
+        strategy_address: payload.strategy_address as string,
+        p_token_address: payload.p_token_address as string,
+        f_token_address: payload.f_token_address as string,
+        start_time: payload.start_time as unknown,
+        end_time: payload.end_time as unknown,
       });
 
       notifySuccess('Prediction market created and deployed.');

@@ -70,6 +70,7 @@ const baseCreateCommand = {
 const baseDeployCommand = {
   thread_id: 1,
   prediction_market_id: 1,
+  market_id: `0x${'b'.repeat(64)}`,
   vault_address: '0x1111111111111111111111111111111111111111',
   governor_address: '0x2222222222222222222222222222222222222222',
   router_address: '0x3333333333333333333333333333333333333333',

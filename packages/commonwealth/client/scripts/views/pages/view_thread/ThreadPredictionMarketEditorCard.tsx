@@ -30,6 +30,7 @@ export const ThreadPredictionMarketEditorCard = ({
 
   const results = (marketsData as { results?: unknown[] } | undefined)?.results;
   const markets = Array.isArray(results) ? results : [];
+  console.log('markets => ', markets);
   const hasPredictionMarket = markets.length > 0;
 
   if (!isFutarchyEnabled || !thread?.id) return null;
