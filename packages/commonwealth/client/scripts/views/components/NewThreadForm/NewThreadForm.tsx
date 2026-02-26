@@ -13,7 +13,6 @@ import {
 } from 'client/scripts/helpers/snapshot_utils';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
-import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   getEthChainIdOrBech32Prefix,
@@ -38,11 +37,7 @@ import { useLocation } from 'react-router-dom';
 import useAppStatus from 'shared/hooks/useAppStatus';
 import { useFlag } from 'shared/hooks/useFlag';
 import app from 'state';
-import { useAiCompletion } from 'state/api/ai';
-import {
-  generateThreadPrompt,
-  generateThreadTitlePrompt,
-} from 'state/api/ai/prompts';
+import { AICompletionType, useAiCompletion } from 'state/api/ai';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
@@ -264,14 +259,6 @@ export const NewThreadForm = forwardRef<
     } = useNewThreadForm(selectedCommunityId, topicsForSelector, {
       contentDelta,
       setContentDelta,
-    });
-
-    const { data: recentThreads } = useGetThreadsQuery({
-      cursor: 1,
-      limit: 2,
-      community_id: selectedCommunityId,
-      enabled: !!selectedCommunityId && !!threadTopic?.id,
-      topic_id: threadTopic?.id,
     });
 
     const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
@@ -629,76 +616,46 @@ export const NewThreadForm = forwardRef<
       setThreadContentDelta(createDeltaFromText(''));
       bodyAccumulatedRef.current = '';
 
-      const recentThreadsContext = recentThreads?.pages[0]?.results
-        .map((thread) => {
-          return (
-            `Title: ${thread.title}\nBody: ${thread.body}\n` +
-            `Topic: ${thread.topic?.name || 'N/A'}\nCommunity: ${thread.community_id || 'N/A'}`
-          );
-        })
-        .join('\n\n');
+      const effectiveCommunityId = communityId || selectedCommunityId;
 
       try {
-        const { systemPrompt: bodySystemPrompt, userPrompt: bodyUserPrompt } =
-          generateThreadPrompt(
-            recentThreadsContext || 'Suggest a new discussion topic.',
-          );
-
-        await generateCompletion(bodyUserPrompt, {
-          model: DEFAULT_COMPLETION_MODEL,
-          stream: true,
-          systemPrompt: bodySystemPrompt,
-          includeContextualMentions: true,
-          communityId: communityId || selectedCommunityId,
-          onError: (error) => {
-            console.error('Error generating AI thread body:', error);
-            notifyError('Failed to generate AI thread content');
-            setIsGenerating(false);
+        await generateCompletion(
+          {
+            communityId: effectiveCommunityId,
+            completionType: AICompletionType.Thread,
+            topicId: threadTopic?.id,
+            model: DEFAULT_COMPLETION_MODEL,
+            stream: true,
           },
-          onChunk: (chunk) => {
-            bodyAccumulatedRef.current += chunk;
-            setThreadContentDelta(
-              createDeltaFromText(bodyAccumulatedRef.current.trimStart()),
-            );
-          },
-          onComplete: (generatedBody) => {
-            const {
-              systemPrompt: titleSystemPrompt,
-              userPrompt: titleUserPrompt,
-            } = generateThreadTitlePrompt(generatedBody.trim() || 'New Thread');
-
-            void (async () => {
-              try {
-                await generateCompletion(titleUserPrompt, {
-                  model: DEFAULT_COMPLETION_MODEL,
-                  stream: false,
-                  systemPrompt: titleSystemPrompt,
-                  includeContextualMentions: true,
-                  communityId: communityId || selectedCommunityId,
-                  onComplete(fullTitle) {
-                    setThreadTitle(fullTitle.trim());
-                    setIsGenerating(false);
-                  },
-                  onError: (titleError) => {
-                    console.error(
-                      'Error generating AI thread title:',
-                      titleError,
-                    );
-                    notifyError('Failed to generate AI thread title');
-                    setIsGenerating(false);
-                  },
-                });
-              } catch (error) {
-                console.error(
-                  'Error awaiting title generation in AI thread:',
-                  error,
-                );
-                notifyError('Failed to initiate AI thread title generation');
-                setIsGenerating(false);
+          {
+            onError: (error) => {
+              console.error('Error generating AI thread body:', error);
+              notifyError('Failed to generate AI thread content');
+              setIsGenerating(false);
+            },
+            onChunk: (chunk) => {
+              bodyAccumulatedRef.current += chunk;
+              setThreadContentDelta(
+                createDeltaFromText(bodyAccumulatedRef.current.trimStart()),
+              );
+            },
+            onComplete: (generatedBody) => {
+              // Derive a title from the first meaningful line of the generated body
+              const trimmedBody = generatedBody.trim();
+              if (trimmedBody) {
+                const firstLine = trimmedBody
+                  .split('\n')
+                  .find((line) => line.replace(/[#*>\-\s]/g, '').length > 0);
+                const title = (firstLine || 'New Thread')
+                  .replace(/^[#*>\-\s]+/, '')
+                  .trim()
+                  .slice(0, 100);
+                setThreadTitle(title);
               }
-            })();
+              setIsGenerating(false);
+            },
           },
-        });
+        );
       } catch (error) {
         console.error('Error in AI thread generation process:', error);
         notifyError('Failed to generate AI thread content or title');
