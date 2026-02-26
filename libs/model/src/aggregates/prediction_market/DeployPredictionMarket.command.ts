@@ -20,6 +20,7 @@ export function DeployPredictionMarket(): Command<
       const { thread } = mustBeAuthorizedThread(actor, context);
       const {
         prediction_market_id,
+        market_id,
         vault_address,
         governor_address,
         router_address,
@@ -47,6 +48,7 @@ export function DeployPredictionMarket(): Command<
       return await models.sequelize.transaction(async (transaction) => {
         await market.update(
           {
+            market_id,
             vault_address,
             governor_address,
             router_address,

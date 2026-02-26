@@ -14,6 +14,7 @@ import type { AbiItem } from 'web3-utils';
 import ContractBase from './ContractBase';
 
 export type DeployPredictionMarketPayload = {
+  market_id: `0x${string}`;
   vault_address: `0x${string}`;
   governor_address: `0x${string}`;
   router_address: `0x${string}`;
@@ -273,6 +274,7 @@ class PredictionMarket extends ContractBase {
     const router_address = await this.getRouter();
 
     return {
+      market_id: marketId,
       governor_address: this.contractAddress as `0x${string}`,
       vault_address,
       router_address,

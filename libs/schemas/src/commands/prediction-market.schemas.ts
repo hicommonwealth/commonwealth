@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ThreadContext } from '../context';
-import { EVM_ADDRESS, PG_INT } from '../utils';
+import { EVM_ADDRESS, EVM_BYTES, PG_INT } from '../utils';
 
 export const CreatePredictionMarket = {
   input: z.object({
@@ -18,6 +18,7 @@ export const DeployPredictionMarket = {
   input: z.object({
     thread_id: PG_INT,
     prediction_market_id: PG_INT,
+    market_id: EVM_BYTES,
     vault_address: EVM_ADDRESS,
     governor_address: EVM_ADDRESS,
     router_address: EVM_ADDRESS,
