@@ -18,6 +18,7 @@ const CONTEXT_CONFIG = {
 
 export interface AICompletionEntityIds {
   parentCommentId?: number;
+  threadId?: number;
   topicId?: number;
 }
 
@@ -131,6 +132,36 @@ export async function buildContextFromEntityIds(
           CONTEXT_CONFIG.MAX_CONTEXT_LENGTH,
         ),
         topicName: comment.Thread.topic?.name || 'General',
+      };
+    }
+  }
+
+  // Fetch thread directly if threadId is provided and we didn't already get it from a parent comment
+  if (entityIds.threadId && !context.thread) {
+    const thread = await models.Thread.findOne({
+      where: {
+        id: entityIds.threadId,
+        community_id: communityId,
+      },
+      attributes: ['id', 'community_id', 'title', 'body'],
+      include: [
+        {
+          model: models.Topic,
+          as: 'topic',
+          attributes: ['name'],
+        },
+      ],
+    });
+
+    if (thread) {
+      context.thread = {
+        id: thread.id!,
+        title: thread.title,
+        body: truncateText(
+          thread.body || '',
+          CONTEXT_CONFIG.MAX_CONTEXT_LENGTH,
+        ),
+        topicName: thread.topic?.name || 'General',
       };
     }
   }

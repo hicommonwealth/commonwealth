@@ -659,6 +659,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     try {
       contextData = await buildContextFromEntityIds(communityId, {
         parentCommentId,
+        threadId: effectiveThreadId,
         topicId,
       });
     } catch (contextError) {
