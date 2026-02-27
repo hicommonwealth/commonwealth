@@ -10,20 +10,6 @@ import {
 } from './ranking';
 
 export const trpcRouter = trpc.router({
-  createAICompletionComment: trpc.command(
-    Comment.CreateAICompletionComment,
-    trpc.Tag.Comment,
-    [
-      trpc.trackAnalytics([
-        MixpanelCommunityInteractionEvent.CREATE_COMMENT,
-        (output) => ({ community: output.community_id, is_ai_generated: true }),
-      ]),
-    ],
-  ),
-  createAICompletionToken: trpc.command(
-    Comment.CreateAICompletionToken,
-    trpc.Tag.Comment,
-  ),
   createComment: trpc.command(Comment.CreateComment, trpc.Tag.Comment, [
     // trpc.fireAndForget(async (input, _, ctx) => {
     //   await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);

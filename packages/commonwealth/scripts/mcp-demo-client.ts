@@ -4,6 +4,7 @@ import { config } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import {
   buildMCPClientOptions,
+  filterServersWithWhitelist,
   withMCPAuthUsername,
   type CommonMCPServerWithHeaders,
 } from '@hicommonwealth/model/services';
@@ -102,7 +103,7 @@ async function startChatBot() {
     '\n👋 Ask me anything about Common communities, threads, or users!',
   );
 
-  const allServers = await getAllServers();
+  const allServers = filterServersWithWhitelist(await getAllServers());
   console.log(`\nAvailable servers:`);
   allServers.forEach((server) => {
     console.log(
