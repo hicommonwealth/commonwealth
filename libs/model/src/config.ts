@@ -98,7 +98,6 @@ const {
   KLAVIS_API_KEY,
   REORG_SAFETY_DISABLED,
   SEND_EMAILS,
-  MCP_BOT_EMAIL,
   IGNORE_CONTENT_CREATION_LIMIT,
   AI_BOT_USER_ADDRESS,
   MAGNA_API_KEY,
@@ -324,7 +323,6 @@ export const config = configure(
     MCP: {
       MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
       MCP_KEY_BYPASS: MCP_KEY_BYPASS,
-      BOT_EMAIL: MCP_BOT_EMAIL || 'mcp@common.xyz',
     },
     XP: {
       REFERRER_FEE_RATIO: parseFloat(
@@ -720,7 +718,6 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && data),
           'MCP_KEY_BYPASS cannot be set in production',
         ),
-      BOT_EMAIL: z.string(),
     }),
     XP: z.object({
       REFERRER_FEE_RATIO: z.number(),
