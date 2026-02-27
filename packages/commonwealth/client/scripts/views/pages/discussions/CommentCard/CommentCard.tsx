@@ -389,10 +389,6 @@ export const CommentCard = ({
     };
 
     void generateAIReply();
-
-    return () => {
-      cancelCompletionRef.current();
-    };
   }, [
     isStreamingAIReply,
     streamingModelId,
@@ -401,6 +397,17 @@ export const CommentCard = ({
     comment.community_id,
     webSearchEnabled,
   ]);
+
+  // Cancel AI streaming only on real component unmount (e.g., navigating away)
+  // This is separate from the streaming effect so that dependency changes
+  // (like zustand store hydration) don't abort the in-flight request.
+  useEffect(() => {
+    return () => {
+      cancelCompletionRef.current();
+      streamingStateRef.current = { inProgress: false, commentId: null };
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const displayText = isStreamingAIReply ? streamingText : comment.body;
 
