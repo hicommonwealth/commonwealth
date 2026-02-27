@@ -293,8 +293,7 @@ export const ThreadPredictionMarketCard = ({
   const canCancel =
     isAuthor &&
     market &&
-    (market.status === PredictionMarketStatus.Draft ||
-      market.status === PredictionMarketStatus.Active);
+    market.status === PredictionMarketStatus.Draft;
 
   const canResolve =
     isAuthor &&

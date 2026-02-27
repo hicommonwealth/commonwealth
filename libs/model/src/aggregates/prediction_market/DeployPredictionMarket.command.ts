@@ -29,6 +29,7 @@ export function DeployPredictionMarket(): Command<
         f_token_address,
         start_time,
         end_time,
+        initial_liquidity,
       } = payload;
 
       const market =
@@ -57,6 +58,7 @@ export function DeployPredictionMarket(): Command<
             f_token_address,
             start_time,
             end_time,
+            ...(initial_liquidity !== undefined && { initial_liquidity }),
             status: schemas.PredictionMarketStatus.Active,
           },
           { transaction },

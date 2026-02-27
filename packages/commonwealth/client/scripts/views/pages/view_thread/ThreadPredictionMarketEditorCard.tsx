@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { PredictionMarketStatus } from '@hicommonwealth/schemas';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import type Thread from 'client/scripts/models/Thread';
 import { useGetPredictionMarketsQuery } from 'state/api/predictionMarket';
@@ -26,34 +27,31 @@ export const ThreadPredictionMarketEditorCard = ({
 
   const results = (marketsData as { results?: unknown[] } | undefined)?.results;
   const markets = Array.isArray(results) ? results : [];
-  console.log('markets => ', markets);
-  const hasPredictionMarket = markets.length > 0;
+  const activeMarket = markets.find(
+    (m) =>
+      (m as { status?: string }).status !== PredictionMarketStatus.Cancelled,
+  );
 
   if (!isFutarchyEnabled || !thread?.id) return null;
 
-  if (hasPredictionMarket) {
+  if (activeMarket) {
     return (
-      <>
-        {markets.map((market) => (
-          <ThreadPredictionMarketCard
-            key={(market as { id: number }).id}
-            thread={thread}
-            market={
-              market as {
-                id: number;
-                thread_id: number;
-                prompt: string;
-                status: string;
-                duration?: number;
-                resolution_threshold?: number;
-                collateral_address?: string;
-                [key: string]: unknown;
-              }
-            }
-            isAuthor={true}
-          />
-        ))}
-      </>
+      <ThreadPredictionMarketCard
+        thread={thread}
+        market={
+          activeMarket as {
+            id: number;
+            thread_id: number;
+            prompt: string;
+            status: string;
+            duration?: number;
+            resolution_threshold?: number;
+            collateral_address?: string;
+            [key: string]: unknown;
+          }
+        }
+        isAuthor={true}
+      />
     );
   }
 
