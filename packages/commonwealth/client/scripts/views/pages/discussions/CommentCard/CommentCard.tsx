@@ -151,7 +151,7 @@ export const CommentCard = ({
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
   const [streamingText, setStreamingText] = useState('');
-  const { generateCompletion, cancel: cancelCompletion } = useAiCompletion();
+  const { generateCompletion } = useAiCompletion();
   const utils = trpc.useUtils();
 
   // Fetch community details
@@ -174,11 +174,6 @@ export const CommentCard = ({
   useEffect(() => {
     generateCompletionRef.current = generateCompletion;
   }, [generateCompletion]);
-
-  const cancelCompletionRef = useRef(cancelCompletion);
-  useEffect(() => {
-    cancelCompletionRef.current = cancelCompletion;
-  }, [cancelCompletion]);
 
   // Use ref for utils to avoid effect re-runs
   const utilsRef = useRef(utils);
@@ -278,7 +273,11 @@ export const CommentCard = ({
   useEffect(() => {
     if (!isStreamingAIReply || !streamingModelId) return;
 
-    // Prevent duplicate requests (e.g., from React StrictMode in development)
+    // Prevent duplicate requests (e.g., from React StrictMode in development).
+    // NOTE: There is intentionally no separate cleanup effect — a cleanup that
+    // resets inProgress would defeat this guard during StrictMode's
+    // mount → unmount → remount cycle. The guard stays true through re-runs,
+    // and onComplete/onError/catch already reset it when the request finishes.
     if (
       streamingStateRef.current.inProgress &&
       streamingStateRef.current.commentId === comment.id
@@ -397,17 +396,6 @@ export const CommentCard = ({
     comment.community_id,
     webSearchEnabled,
   ]);
-
-  // Cancel AI streaming only on real component unmount (e.g., navigating away)
-  // This is separate from the streaming effect so that dependency changes
-  // (like zustand store hydration) don't abort the in-flight request.
-  useEffect(() => {
-    return () => {
-      cancelCompletionRef.current();
-      streamingStateRef.current = { inProgress: false, commentId: null };
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const displayText = isStreamingAIReply ? streamingText : comment.body;
 
