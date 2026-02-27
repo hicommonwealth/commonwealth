@@ -109,12 +109,16 @@ export const CreateComment = ({
 
     try {
       const communityId = app.activeChainId() || '';
+      const bodyText = serializeDelta(contentDelta);
+      if (!bodyText.trim()) {
+        throw new Error('Comment body cannot be empty');
+      }
       const input = await buildCreateCommentInput({
         communityId,
         address: user.activeAccount!.address,
         threadId: rootThread.id,
         threadMsgId: rootThread.canvasMsgId ?? null,
-        unescapedText: serializeDelta(contentDelta),
+        unescapedText: bodyText,
         parentCommentId: parentCommentId ?? null,
         parentCommentMsgId: parentCommentMsgId ?? null,
         existingNumberOfComments: rootThread.numberOfComments || 0,

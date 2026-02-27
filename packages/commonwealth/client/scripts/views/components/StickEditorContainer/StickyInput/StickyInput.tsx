@@ -71,6 +71,7 @@ const StickyInput = (props: StickyInputProps) => {
     thread: originalThread,
     canComment,
     handleIsReplying,
+    disabled: isSubmitDisabledByParent,
   } = props;
   const { isWindowExtraSmall: isMobile } = useBrowserWindow({});
   const { menuVisible } = useSidebarStore();
@@ -323,6 +324,7 @@ const StickyInput = (props: StickyInputProps) => {
       !event.shiftKey &&
       !isExpanded &&
       contentDelta?.ops?.length > 0 &&
+      !isSubmitDisabledByParent &&
       (!isTurnstileEnabled || turnstileToken) &&
       !justClosedMentionDropdown
     ) {
@@ -509,6 +511,7 @@ const StickyInput = (props: StickyInputProps) => {
               disabled={
                 !canComment ||
                 !contentDelta?.ops?.length ||
+                isSubmitDisabledByParent ||
                 isGenerating ||
                 (isTurnstileEnabled && !turnstileToken)
               }
