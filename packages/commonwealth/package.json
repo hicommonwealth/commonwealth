@@ -214,7 +214,7 @@
     "jsdom-global": "^3.0.2",
     "jsonwebtoken": "^9.0.0",
     "lexical": "^0.17.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "long": "^5.2.3",
     "lottie-react": "^2.4.1",
     "magic-sdk": "^28.17.0",
