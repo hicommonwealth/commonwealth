@@ -191,9 +191,11 @@ export const TreeHierarchy = ({
   );
 
   useEffect(() => {
-    const unregister = registerAIStreamingCallback((commentId) => {
-      void handleGenerateAIReply(commentId);
-    });
+    const unregister = registerAIStreamingCallback(
+      (commentId, useDefaultModelOnly) => {
+        void handleGenerateAIReply(commentId, useDefaultModelOnly);
+      },
+    );
 
     return () => {
       unregister();
