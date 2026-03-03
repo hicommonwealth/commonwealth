@@ -279,14 +279,24 @@ const StickyInput = (props: StickyInputProps) => {
       }
 
       // Automatically trigger AI reply if MCP mentions are detected, regardless of AI toggle state
-      if (effectiveAiCommentsToggleEnabled || hasMCPMentions) {
+      const shouldTriggerAI =
+        effectiveAiCommentsToggleEnabled || hasMCPMentions;
+      // Use DEFAULT_MODEL when MCP mentions are present and no model is explicitly selected,
+      // or when MCP triggered the AI but the toggle is off.
+      const useDefaultModelOnly =
+        hasMCPMentions &&
+        (!effectiveAiCommentsToggleEnabled || selectedModels.length === 0);
+
+      if (shouldTriggerAI) {
         handleAiReply(commentId);
       }
 
       try {
         await listenForComment(
           commentId,
-          !!(effectiveAiCommentsToggleEnabled || hasMCPMentions),
+          shouldTriggerAI,
+          undefined,
+          useDefaultModelOnly,
         );
       } catch (error) {
         console.warn('StickyInput - Failed to jump to comment:', error);
@@ -311,6 +321,7 @@ const StickyInput = (props: StickyInputProps) => {
     resetTurnstile,
     extractMentionsFromDelta,
     contentDelta,
+    selectedModels,
   ]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

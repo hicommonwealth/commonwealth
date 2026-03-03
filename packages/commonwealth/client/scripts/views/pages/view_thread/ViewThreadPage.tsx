@@ -1,6 +1,8 @@
 import { GetThreadToken } from '@hicommonwealth/schemas';
 import {
   ContentType,
+  DEFAULT_COMPLETION_MODEL,
+  DEFAULT_COMPLETION_MODEL_LABEL,
   GatedActionEnum,
   getThreadUrl,
   MIN_CHARS_TO_SHOW_MORE,
@@ -289,11 +291,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const handleGenerateAIComment = useCallback(
     async (mainThreadId: number): Promise<void> => {
-      if (
-        !effectiveAiCommentsToggleEnabled ||
-        !user.activeAccount ||
-        selectedModels.length === 0
-      ) {
+      if (!effectiveAiCommentsToggleEnabled || !user.activeAccount) {
         return;
       }
 
@@ -304,7 +302,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         return;
       }
 
-      const newInstances: StreamingReplyInstance[] = selectedModels.map(
+      const modelsToUse =
+        selectedModels.length > 0
+          ? selectedModels
+          : [
+              {
+                value: DEFAULT_COMPLETION_MODEL,
+                label: DEFAULT_COMPLETION_MODEL_LABEL,
+              },
+            ];
+
+      const newInstances: StreamingReplyInstance[] = modelsToUse.map(
         (model) => ({
           targetCommentId: mainThreadId,
           modelId: model.value,

@@ -1375,25 +1375,6 @@ export const NewThreadForm = forwardRef<
                     />
 
                     {isAIEnabled && (
-                      <div className="ai-toggle-wrapper">
-                        <CWToggle
-                          className="ai-toggle"
-                          icon="binoculars"
-                          iconColor="#757575"
-                          checked={effectiveWebSearchEnabled}
-                          onChange={() =>
-                            effectiveSetWebSearchEnabled(
-                              !effectiveWebSearchEnabled,
-                            )
-                          }
-                        />
-                        <CWText type="caption" className="toggle-label">
-                          Web search
-                        </CWText>
-                      </div>
-                    )}
-
-                    {isAIEnabled && (
                       <CWThreadAction
                         action="ai-reply"
                         label="Draft thread with AI"
@@ -1419,6 +1400,25 @@ export const NewThreadForm = forwardRef<
                         />
                         <CWText type="caption" className="toggle-label">
                           AI initial comment
+                        </CWText>
+                      </div>
+                    )}
+
+                    {isAIEnabled && aiCommentsToggleEnabled && (
+                      <div className="ai-toggle-wrapper">
+                        <CWToggle
+                          className="ai-toggle"
+                          icon="binoculars"
+                          iconColor="#757575"
+                          checked={effectiveWebSearchEnabled}
+                          onChange={() =>
+                            effectiveSetWebSearchEnabled(
+                              !effectiveWebSearchEnabled,
+                            )
+                          }
+                        />
+                        <CWText type="caption" className="toggle-label">
+                          Web search
                         </CWText>
                       </div>
                     )}
