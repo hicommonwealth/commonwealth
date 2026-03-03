@@ -72,15 +72,13 @@ export async function createAIComment(
       }
     }
 
-    // Create comment as bot user
+    // Create comment as bot user (system actor bypasses turnstile/tiered middleware)
     const result = await command(Comment.CreateComment(), {
-      actor: {
-        user: {
-          id: botUser.id!,
-          email: botUser.email!,
-        },
+      actor: systemActor({
+        id: botUser.id!,
+        email: botUser.email || 'ai-bot@common.xyz',
         address: botAddress.address,
-      },
+      }),
       payload: {
         thread_id: threadId,
         parent_id: parentCommentId ?? undefined,
