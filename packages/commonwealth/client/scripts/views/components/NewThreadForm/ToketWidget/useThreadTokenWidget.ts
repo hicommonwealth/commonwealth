@@ -2,7 +2,7 @@ import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { Community } from '@hicommonwealth/schemas';
 import TokenLaunchpad from 'helpers/ContractHelpers/tokenLaunchpad';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import {
   useBuyThreadTokenMutation,
@@ -83,46 +83,6 @@ export const useThreadTokenWidget = ({
   const [walletEthBalance, setWalletEthBalance] = useState<string>('0.0');
   const [isLoadingWalletEthBalance, setIsLoadingWalletEthBalance] =
     useState<boolean>(false);
-
-  useEffect(() => {
-    const fetchWalletBalance = async () => {
-      if (
-        !tokenizedThreadsEnabled ||
-        !selectedAddress ||
-        !chainRpc ||
-        !isPrimaryTokenEth
-      ) {
-        return;
-      }
-
-      if (typeof window === 'undefined' || !window.ethereum) {
-        return;
-      }
-
-      try {
-        setIsLoadingWalletEthBalance(true);
-        const weiHex: string = await window.ethereum.request({
-          method: 'eth_getBalance',
-          params: [selectedAddress, 'latest'],
-        });
-
-        const weiBigInt = BigInt(weiHex);
-        const balanceEth = Number(weiBigInt) / 1e18;
-
-        setWalletEthBalance(balanceEth.toString());
-      } catch (error) {
-        console.error(
-          'Error fetching wallet ETH balance from MetaMask:',
-          error,
-        );
-        setWalletEthBalance('0.0');
-      } finally {
-        setIsLoadingWalletEthBalance(false);
-      }
-    };
-
-    void fetchWalletBalance();
-  }, [tokenizedThreadsEnabled, selectedAddress, chainRpc, isPrimaryTokenEth]);
 
   const {
     data: userPrimaryTokenBalance = '0.0',
