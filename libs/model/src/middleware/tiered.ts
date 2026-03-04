@@ -15,6 +15,7 @@ import { Op } from 'sequelize';
 import { ZodType } from 'zod';
 import { config } from '../config';
 import { models } from '../database';
+import { isBotUser } from '../utils/botUser';
 import { setUserTier } from '../utils/tiers';
 
 type Counters = 'creates' | 'upvotes' | 'ai-images' | 'ai-text';
@@ -54,8 +55,9 @@ export function tiered({
   minTier?: UserTierMap;
 }) {
   return async function ({ actor }: Context<ZodType, ZodType>) {
-    // System actors bypass all tier checks
+    // System actors and bot users bypass all tier checks
     if (actor.is_system_actor) return;
+    if (actor.user.id && (await isBotUser(actor.user.id))) return;
 
     if (!actor.user.id) throw new InvalidActor(actor, 'Must be a user');
 
