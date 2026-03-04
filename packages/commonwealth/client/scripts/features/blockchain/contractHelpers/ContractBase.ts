@@ -6,18 +6,27 @@ import { distributeSkale } from 'utils/skaleUtils';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 
+type ContractMethodExecutor = {
+  call: (...args: unknown[]) => Promise<never>;
+  send: (...args: unknown[]) => Promise<never>;
+};
+
+type DynamicContract = {
+  methods: Record<string, (...args: unknown[]) => ContractMethodExecutor>;
+};
+
 abstract class ContractBase {
-  protected contract: any;
+  protected contract: DynamicContract;
   public contractAddress: string;
-  protected wallet: IWebWallet<any>;
+  protected wallet: IWebWallet<{ address: string } | string>;
   protected web3: Web3;
   protected initialized: boolean;
   protected walletEnabled: boolean;
   protected rpc: string;
   protected chainId: string;
-  private abi: any;
+  private abi: readonly unknown[];
 
-  constructor(contractAddress: string, abi: any, rpc: string) {
+  constructor(contractAddress: string, abi: readonly unknown[], rpc: string) {
     this.contractAddress = contractAddress;
     this.abi = abi;
     this.rpc = rpc;
@@ -26,8 +35,7 @@ abstract class ContractBase {
   async initialize(
     withWallet: boolean = false,
     chainId?: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    providerInstance?: any,
+    providerInstance?: unknown,
   ): Promise<void> {
     if (!this.initialized || withWallet || providerInstance) {
       try {
@@ -62,7 +70,7 @@ abstract class ContractBase {
         this.contract = new this.web3.eth.Contract(
           this.abi as AbiItem[],
           this.contractAddress,
-        );
+        ) as unknown as DynamicContract;
         this.initialized = true;
       } catch (error) {
         throw new Error('Failed to initialize contract: ' + error);
@@ -82,7 +90,7 @@ abstract class ContractBase {
     this.contract = new this.web3.eth.Contract(
       this.abi as AbiItem[],
       this.contractAddress,
-    );
+    ) as unknown as DynamicContract;
   }
 
   async estimateGas(): Promise<bigint | null> {

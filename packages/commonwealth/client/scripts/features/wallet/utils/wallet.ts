@@ -1,7 +1,9 @@
 import { WalletId } from '@hicommonwealth/shared';
 import IWebWallet from 'models/IWebWallet';
 
-const getAddressFromWallet = (wallet: IWebWallet<any>) => {
+const getAddressFromWallet = (
+  wallet: IWebWallet<{ address: string } | string>,
+) => {
   const selectedAddress = (() => {
     if (wallet.chain === 'ethereum' || wallet.chain === 'solana') {
       return wallet.accounts[0];

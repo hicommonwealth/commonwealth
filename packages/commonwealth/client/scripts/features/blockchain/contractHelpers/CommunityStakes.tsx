@@ -1,5 +1,5 @@
 import { CommunityStakeAbi } from '@commonxyz/common-protocol-abis';
-import Web3 from 'web3';
+import Web3, { TransactionReceipt } from 'web3';
 import { toBigInt } from 'web3-utils';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
@@ -127,7 +127,7 @@ class CommunityStakes extends ContractBase {
     id: number,
     amount: number,
     walletAddress: string,
-  ): Promise<any> {
+  ): Promise<TransactionReceipt> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true);
     }
@@ -154,7 +154,7 @@ class CommunityStakes extends ContractBase {
     const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
     try {
-      txReceipt = await this.contract.methods
+      txReceipt = (await this.contract.methods
         .buyStake(namespaceAddress, id, amount)
         .send({
           value: totalPrice,
@@ -162,7 +162,7 @@ class CommunityStakes extends ContractBase {
           type: '0x2',
           maxFeePerGas: maxFeePerGasEst?.toString(),
           maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
-        });
+        })) as unknown as TransactionReceipt;
       try {
         // @ts-expect-error StrictNullChecks
         await this.web3.currentProvider.request({
@@ -196,7 +196,7 @@ class CommunityStakes extends ContractBase {
     id: number,
     amount: number,
     walletAddress: string,
-  ): Promise<any> {
+  ): Promise<TransactionReceipt> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true);
     }
@@ -205,14 +205,14 @@ class CommunityStakes extends ContractBase {
     const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
     try {
-      txReceipt = await this.contract.methods
+      txReceipt = (await this.contract.methods
         .sellStake(namespaceAddress, id.toString(), amount.toString())
         .send({
           from: walletAddress,
           type: '0x2',
           maxFeePerGas: maxFeePerGasEst?.toString(),
           maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
-        });
+        })) as unknown as TransactionReceipt;
     } catch {
       throw new Error('Transaction failed');
     }

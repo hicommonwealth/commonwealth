@@ -53,7 +53,7 @@ export const useGetAllCosmosProposals = ({
       needToInitAPI &&
       !startedApiRef.current
     ) {
-      initApi();
+      void initApi();
     }
   }, [needToInitAPI, app.chain]);
 

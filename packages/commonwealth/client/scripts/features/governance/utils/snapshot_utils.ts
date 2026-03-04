@@ -6,6 +6,21 @@ import {
 } from 'state/api/snapshots';
 import { getSnapshotVotesQuery } from 'state/api/snapshots/getVotes';
 
+type SnapshotStrategyParams = Record<string, unknown>;
+type SnapshotPayload = Record<string, unknown>;
+type SnapshotClient = {
+  vote: (
+    provider: unknown,
+    address: string,
+    payload: SnapshotPayload,
+  ) => Promise<unknown>;
+  proposal: (
+    provider: unknown,
+    address: string,
+    payload: SnapshotPayload,
+  ) => Promise<unknown>;
+};
+
 export interface SnapshotSpace {
   id: string;
   name: string;
@@ -30,8 +45,7 @@ export interface SnapshotSpace {
   strategies: Array<{
     name: string;
     network?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    params: any;
+    params: SnapshotStrategyParams;
   }>;
   members: string[];
 }
@@ -54,8 +68,7 @@ export interface SnapshotProposal {
   strategies?: Array<{
     name: string;
     network?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    params: any;
+    params: SnapshotStrategyParams;
   }>;
 }
 
@@ -91,13 +104,16 @@ class SnapshotLazyLoader {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function castVote(address: string, payload: any, spaceId: string) {
+export async function castVote(
+  address: string,
+  payload: SnapshotPayload,
+  spaceId: string,
+) {
   const { Web3Provider } = await import('@ethersproject/providers');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const web3 = new Web3Provider((window as any).ethereum);
-  const client = await SnapshotLazyLoader.getClient();
-  await client.vote(web3 as any, address, payload);
+  const client = (await SnapshotLazyLoader.getClient()) as SnapshotClient;
+  await client.vote(web3, address, payload);
   await queryClient.invalidateQueries({
     queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', spaceId],
   });
@@ -105,17 +121,15 @@ export async function castVote(address: string, payload: any, spaceId: string) {
 
 export async function createProposal(
   address: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload: any,
+  payload: SnapshotPayload,
   spaceId: string,
 ) {
   const { Web3Provider } = await import('@ethersproject/providers');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const web3 = new Web3Provider((window as any).ethereum);
-  const client = await SnapshotLazyLoader.getClient();
+  const client = (await SnapshotLazyLoader.getClient()) as SnapshotClient;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const res = await client.proposal(web3 as any, address, payload);
+  const res = await client.proposal(web3, address, payload);
 
   await queryClient.invalidateQueries({
     queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', spaceId],

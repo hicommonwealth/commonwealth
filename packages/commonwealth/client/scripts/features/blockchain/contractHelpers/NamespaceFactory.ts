@@ -8,11 +8,23 @@ import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
 import ContractBase from './ContractBase';
 
+type ReservationHookContract = {
+  methods: {
+    validateReservationStatus: (
+      account: string,
+      name: string,
+      extraData: string,
+    ) => {
+      call: () => Promise<boolean>;
+    };
+  };
+};
+
 /**
  * Abstract contract helpers for the Namespace Factory contract
  */
 class NamespaceFactory extends ContractBase {
-  public reservationHook: any;
+  public reservationHook?: ReservationHookContract;
 
   /*
    * Initializes a namespace instance at factory address
@@ -36,7 +48,7 @@ class NamespaceFactory extends ContractBase {
       this.reservationHook = new this.web3.eth.Contract(
         INamespaceResHookAbi,
         addr,
-      );
+      ) as unknown as ReservationHookContract;
     }
   }
 
@@ -91,7 +103,7 @@ class NamespaceFactory extends ContractBase {
     walletAddress: string,
     feeManager: string,
     chainId: string,
-  ): Promise<any> {
+  ): Promise<TransactionReceipt> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
@@ -178,7 +190,7 @@ class NamespaceFactory extends ContractBase {
     stakesId: number,
     walletAddress: string,
     chainId: string,
-  ): Promise<any> {
+  ): Promise<TransactionReceipt> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }

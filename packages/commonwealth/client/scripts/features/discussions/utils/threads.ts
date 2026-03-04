@@ -4,8 +4,9 @@ import { Link, LinkSource } from 'models/Thread';
 // eslint-disable-next-line max-len
 
 export function detectURL(str: string) {
-  if (str.slice(0, 4) !== 'http') str = `http://${str}`; // no https required because this is only used for regex match
-  return !!str.match(re_weburl);
+  // No https required because this is only used for regex matching.
+  const normalized = str.slice(0, 4) !== 'http' ? `http://${str}` : str;
+  return !!normalized.match(re_weburl);
 }
 
 export const filterLinks = (links: Link[] = [], source: LinkSource) => {

@@ -21,6 +21,6 @@ export const useInitChainIfNeeded = (app: IApp) => {
       }
     };
 
-    chainInit();
+    void chainInit();
   }, [app?.isAdapterReady]);
 };
