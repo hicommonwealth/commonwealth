@@ -35,7 +35,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 2.9 Write unit tests for extracted shared utils (260304) PR TBD — extended EPIC-2 contract coverage for post-move `shared/utils/*` modules and legacy-path compatibility assertions, including long-tail util contract checks
 - [x] 2.10 Write component tests for extracted shared hooks (260304) PR TBD — baseline 6 hook specs now validate `shared/hooks/*` imports and 6 additional migrated hook specs were added (`useAppStatus`, `useColorScheme`, `useManageDocumentTitle`, `useDeferredConditionTriggerCallback`, `useRunOnceOnCondition`, `useAnimation`)
 - [x] 2.11 Create feature directory stubs + migrate feature-specific helpers (260304) PR TBD — moved feature-owned helper modules into `features/*/utils` and `features/blockchain/contractHelpers` with legacy `helpers/*` re-export stubs preserved for rollout safety
-- [ ] 2.12 Migrate feature-specific hooks to feature dirs
+- [x] 2.12 Migrate feature-specific hooks to feature dirs (260304) PR TBD — moved audited feature-owned hooks into `features/*/hooks` (including governance cosmos hooks) and added legacy `hooks/*` compatibility stubs plus EPIC-2 re-export coverage
 
 EPIC-2 audit note (2026-02-19): milestone `#136` has Epic-1 and test-hardening merged (`#13405` via PR `#13406`), while Epic-2 structural moves/import rewires remain open.
 

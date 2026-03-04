@@ -170,6 +170,55 @@ const contracts: ModuleContract[] = [
     requiredExports: ['getUniqueUserAddresses'],
   },
   {
+    legacySpecifier: '../../../client/scripts/hooks/useCommunityCardPrice.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/communities/hooks/useCommunityCardPrice.ts',
+    ],
+    requiredExports: ['useCommunityCardPrice'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useTopicGating.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/communities/hooks/useTopicGating.ts',
+    ],
+    requiredExports: ['default'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useJoinCommunityBanner.tsx',
+    futureSpecifiers: [
+      '../../../client/scripts/features/communities/hooks/useJoinCommunityBanner.tsx',
+    ],
+    requiredExports: ['default'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useMentionExtractor.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/discussions/hooks/useMentionExtractor.ts',
+    ],
+    requiredExports: ['useMentionExtractor'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useShowImage.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/discussions/hooks/useShowImage.ts',
+    ],
+    requiredExports: ['useShowImage'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useNetworkSwitching.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/wallet/hooks/useNetworkSwitching.ts',
+    ],
+    requiredExports: ['useNetworkSwitching'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useInitChainIfNeeded.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/governance/hooks/useInitChainIfNeeded.ts',
+    ],
+    requiredExports: ['useInitChainIfNeeded'],
+  },
+  {
     legacySpecifier: '../../../client/scripts/hooks/useDraft.tsx',
     futureSpecifiers: [
       '../../../client/scripts/shared/hooks/useDraft.tsx',
