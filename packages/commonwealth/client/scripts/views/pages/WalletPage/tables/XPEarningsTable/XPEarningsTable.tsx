@@ -1,8 +1,8 @@
 import { QuestEvents, XpLogView } from '@hicommonwealth/schemas';
 import { splitCamelOrPascalCase } from 'client/scripts/helpers/string';
-import { APIOrderDirection } from 'helpers/constants';
 import moment from 'moment';
 import React from 'react';
+import { APIOrderDirection } from 'shared/utils/constants';
 import { useGetXPs } from 'state/api/user';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import {

@@ -1,7 +1,7 @@
 import { TopicWeightedVoting, VoteView } from '@hicommonwealth/schemas';
-import { APIOrderDirection } from 'helpers/constants';
 import React, { Dispatch, SetStateAction, useMemo } from 'react';
 import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
+import { APIOrderDirection } from 'shared/utils/constants';
 import app from 'state';
 import { saveToClipboard } from 'utils/clipboard';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';

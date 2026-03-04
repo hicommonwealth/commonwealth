@@ -1,7 +1,6 @@
 import { isValidImageUrl, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import DOMPurify from 'dompurify';
 import { loadScript } from 'helpers';
-import { twitterLinkRegex } from 'helpers/constants';
 import _ from 'lodash';
 import { marked } from 'marked';
 import markedFootnote from 'marked-footnote';
@@ -15,6 +14,7 @@ import React, {
   useState,
 } from 'react';
 import removeMd from 'remove-markdown';
+import { twitterLinkRegex } from 'shared/utils/constants';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
 import { renderTruncatedHighlights } from './highlighter';

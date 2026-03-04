@@ -1,8 +1,8 @@
 import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import { useGetMembersQuery } from 'client/scripts/state/api/communities';
-import { APIOrderDirection } from 'helpers/constants';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { APIOrderDirection } from 'shared/utils/constants';
 import app from 'state';
 import { useInviteLinkModal } from 'state/ui/modals';
 import { useDebounce } from 'usehooks-ts';

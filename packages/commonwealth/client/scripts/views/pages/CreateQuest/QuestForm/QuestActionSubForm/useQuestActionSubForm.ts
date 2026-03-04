@@ -2,10 +2,10 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { numberNonDecimalGTZeroValidationSchema } from 'helpers/formValidations/common';
 import { splitCamelOrPascalCase } from 'helpers/string';
 import { useEffect } from 'react';
 import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
+import { numberNonDecimalGTZeroValidationSchema } from 'shared/utils/formValidations/common';
 import { useCWRepetitionCycleRadioButton } from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { ValidationFnProps } from 'views/components/component_kit/CWRepetitionCycleRadioButton/types';
 import { doesConfigAllowContentIdField } from '../helpers';

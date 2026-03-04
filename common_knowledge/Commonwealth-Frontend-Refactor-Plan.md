@@ -30,7 +30,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 2.4 Migrate shared utility helpers to shared/utils/ (260219) PR TBD — moved shared helpers + selected `utils/*` modules into `client/scripts/shared/utils/*` with compatibility stubs; validated via `pnpm -r check-types`, `pnpm -F commonwealth bundle`, and EPIC-2 contract tests
 - [x] 2.5 Migrate trpcClient to shared/api/ (260219) PR TBD — moved `utils/trpcClient.ts` source to `shared/api/trpcClient.ts` with legacy stub; validated by `pnpm -F commonwealth check-types`, `pnpm -F commonwealth bundle`, and `test/unit/epic2/trpcClient.contract.spec.ts`
 - [x] 2.6 Update consumer imports for shared hooks (260219) PR TBD — rewired app consumers from `hooks/<sharedHook>` to `shared/hooks/<sharedHook>` (feature-specific hooks intentionally left on legacy paths); build/typecheck/component suites pass
-- [ ] 2.7 Update consumer imports for shared utils (batch 1)
+- [x] 2.7 Update consumer imports for shared utils (batch 1) (260304) PR TBD — rewired high-impact consumer imports from `helpers/{constants,formatting,dates,link,formValidations/*}` to `shared/utils/*`; batch-2 legacy queue isolated to long-tail helper and `utils/{Permissions,clipboard,downloadDataAsFile}` modules
 - [ ] 2.8 Update consumer imports for shared utils (batch 2)
 - [~] 2.9 Write unit tests for extracted shared utils (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline contract suite added under `test/unit/epic2`; extend post-move assertions as modules relocate
 - [~] 2.10 Write component tests for extracted shared hooks (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline hook tests added for 6 high-signal hooks; extend as additional hooks move

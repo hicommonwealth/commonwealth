@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useUserStore } from 'state/ui/user/user';
 import { saveToClipboard } from 'utils/clipboard';
 
-import { APIOrderDirection } from 'helpers/constants';
+import { APIOrderDirection } from 'shared/utils/constants';
 import { Avatar } from '../../../Avatar';
 import { CWIcon } from '../../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../component_kit/cw_text';
