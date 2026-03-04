@@ -33,7 +33,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 2.7 Update consumer imports for shared utils (batch 1) (260304) PR TBD — rewired high-impact consumer imports from `helpers/{constants,formatting,dates,link,formValidations/*}` to `shared/utils/*`; batch-2 legacy queue isolated to long-tail helper and `utils/{Permissions,clipboard,downloadDataAsFile}` modules
 - [x] 2.8 Update consumer imports for shared utils (batch 2) (260304) PR TBD — rewired long-tail shared util consumers from `helpers/*` and `utils/{Permissions,clipboard,downloadDataAsFile}` to `shared/utils/*`; remaining legacy helper imports are now limited to feature-owned modules queued for EPIC-2.11
 - [x] 2.9 Write unit tests for extracted shared utils (260304) PR TBD — extended EPIC-2 contract coverage for post-move `shared/utils/*` modules and legacy-path compatibility assertions, including long-tail util contract checks
-- [~] 2.10 Write component tests for extracted shared hooks (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline hook tests added for 6 high-signal hooks; extend as additional hooks move
+- [x] 2.10 Write component tests for extracted shared hooks (260304) PR TBD — baseline 6 hook specs now validate `shared/hooks/*` imports and 6 additional migrated hook specs were added (`useAppStatus`, `useColorScheme`, `useManageDocumentTitle`, `useDeferredConditionTriggerCallback`, `useRunOnceOnCondition`, `useAnimation`)
 - [ ] 2.11 Create feature directory stubs + migrate feature-specific helpers
 - [ ] 2.12 Migrate feature-specific hooks to feature dirs
 

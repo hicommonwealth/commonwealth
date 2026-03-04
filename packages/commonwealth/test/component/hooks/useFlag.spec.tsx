@@ -9,7 +9,7 @@ vi.mock('@openfeature/react-sdk', () => ({
   useBooleanFlagValue: useBooleanFlagValueMock,
 }));
 
-import { useFlag } from '../../../client/scripts/hooks/useFlag';
+import { useFlag } from '../../../client/scripts/shared/hooks/useFlag';
 
 describe('useFlag', () => {
   beforeEach(() => {

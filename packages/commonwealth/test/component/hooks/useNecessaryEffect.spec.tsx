@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import useNecessaryEffect from '../../../client/scripts/hooks/useNecessaryEffect';
+import useNecessaryEffect from '../../../client/scripts/shared/hooks/useNecessaryEffect';
 
 describe('useNecessaryEffect', () => {
   beforeEach(() => {
