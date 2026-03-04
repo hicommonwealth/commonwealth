@@ -1,0 +1,32 @@
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
+
+.ThreadPredictionMarketTag {
+  display: inline-block;
+
+  .Tag.passed,
+  .Tag.failed {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    line-height: 24px;
+  }
+}
+
+.prediction-market-popover {
+  .popover-title {
+    color: colors.$neutral-900;
+    font-weight: 700;
+  }
+}
+
+.ThreadPredictionMarketTag-popover-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .probability-bar {
+    white-space: nowrap;
+  }
+}

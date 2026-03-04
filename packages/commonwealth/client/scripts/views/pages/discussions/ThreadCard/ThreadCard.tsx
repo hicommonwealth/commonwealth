@@ -16,6 +16,7 @@ import useGetThreadToken from 'state/api/tokens/getThreadToken';
 import useUserStore from 'state/ui/user';
 import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
+import { ThreadPredictionMarketTagContainer } from 'views/components/ThreadPredictionMarketTag';
 import { ThreadTokenDrawer } from 'views/components/ThreadTokenDrawer';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -255,6 +256,8 @@ export const ThreadCard = ({
             </div>
             <div className="content-top-tags">
               {thread.hasPoll && <CWTag label="Poll" type="poll" />}
+
+              <ThreadPredictionMarketTagContainer thread={thread} />
 
               {linkedSnapshots.length > 0 && (
                 <CWTag

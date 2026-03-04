@@ -9,6 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
+import { ThreadPredictionMarketTagContainer } from 'views/components/ThreadPredictionMarketTag';
 import { isHot } from 'views/pages/discussions/helpers';
 import { z } from 'zod';
 import Account from '../../../../models/Account';
@@ -237,6 +238,7 @@ export const CWContentPage = ({
             <ThreadContestTagContainer
               associatedContests={thread?.associatedContests}
             />
+            {thread && <ThreadPredictionMarketTagContainer thread={thread} />}
             {truncate(title)}
           </h1>
         ) : (
