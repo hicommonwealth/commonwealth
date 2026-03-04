@@ -61,3 +61,30 @@ export const GetPredictionMarketPositions = {
   }),
   output: z.array(PredictionMarketPositionView),
 };
+
+const PredictionMarketDiscoverSort = z.enum(['volume', 'recency']);
+const PredictionMarketStatusFilter = z.enum([
+  'draft',
+  'active',
+  'resolved',
+  'cancelled',
+]);
+
+export const DiscoverPredictionMarkets = {
+  input: PaginationParamsSchema.extend({
+    community_id: z.string().optional(),
+    statuses: z
+      .array(PredictionMarketStatusFilter)
+      .optional()
+      .default([]),
+    sort: PredictionMarketDiscoverSort.optional().default('recency'),
+    search: z.string().optional(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(
+      PredictionMarketView.extend({
+        community_id: z.string(),
+      }),
+    ),
+  }),
+};

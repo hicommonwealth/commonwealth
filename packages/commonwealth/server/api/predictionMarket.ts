@@ -22,6 +22,10 @@ export const trpcRouter = trpc.router({
     PredictionMarket.GetPredictionMarkets,
     trpc.Tag.PredictionMarket,
   ),
+  discoverPredictionMarkets: trpc.query(
+    PredictionMarket.DiscoverPredictionMarkets,
+    trpc.Tag.PredictionMarket,
+  ),
   getPredictionMarketTrades: trpc.query(
     PredictionMarket.GetPredictionMarketTrades,
     trpc.Tag.PredictionMarket,

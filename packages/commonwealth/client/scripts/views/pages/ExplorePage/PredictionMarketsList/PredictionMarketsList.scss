@@ -1,0 +1,99 @@
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+
+.PredictionMarketsList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 0;
+  margin-bottom: 16px;
+  width: 100%;
+
+  // Override global .filters from QuestList that collapse with height: 0
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    height: auto;
+    margin-top: 0;
+    min-height: fit-content;
+  }
+
+  .markets-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 48px;
+  }
+
+  .empty-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    text-align: center;
+    gap: 8px;
+
+    .empty-description {
+      color: colors.$neutral-500;
+    }
+  }
+
+  .markets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .load-more-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 24px 0;
+  }
+}
+
+.ExplorePredictionMarketCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid colors.$neutral-200;
+  background: colors.$neutral-50;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  min-height: 100px;
+
+  &:hover {
+    border-color: colors.$primary-200;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .prediction-prompt {
+    font-weight: 500;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+  }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+
+    .pass-tag {
+      font-weight: 600;
+    }
+  }
+
+  .time-left,
+  .volume {
+    color: colors.$neutral-500;
+  }
+}
