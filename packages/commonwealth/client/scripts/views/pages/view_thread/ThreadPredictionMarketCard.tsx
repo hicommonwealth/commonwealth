@@ -173,7 +173,11 @@ export const ThreadPredictionMarketCard = ({
             )}
             {market.total_collateral != null && (
               <CWText type="caption" className="total-minted-row">
-                Total minted: {formatCollateralBalance(BigInt(market.total_collateral), collateralDisplay?.decimals ?? 18)}{' '}
+                Total minted:{' '}
+                {formatCollateralBalance(
+                  BigInt(market.total_collateral),
+                  collateralDisplay?.decimals ?? 18,
+                )}{' '}
                 {collateralDisplay?.symbol ?? 'ETH'}
               </CWText>
             )}

@@ -14,6 +14,7 @@ export enum AICompletionType {
   Thread = 'thread',
   Comment = 'comment',
   Poll = 'poll',
+  PredictionMarket = 'prediction_market',
 }
 
 // Delimiters sent by backend in streaming responses
