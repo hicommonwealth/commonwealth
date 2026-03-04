@@ -5,7 +5,7 @@ import warpcastImg from 'assets/img/share/warpcast.png';
 import twitterImg from 'assets/img/share/x.png';
 import React, { useCallback, useMemo } from 'react';
 import useAppStatus from 'shared/hooks/useAppStatus';
-import { saveToClipboard } from 'utils/clipboard';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { ShareOption } from './ShareOption';
 

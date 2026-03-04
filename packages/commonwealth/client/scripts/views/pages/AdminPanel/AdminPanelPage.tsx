@@ -1,6 +1,6 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect } from 'react';
-import Permissions from 'utils/Permissions';
+import Permissions from 'shared/utils/Permissions';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import RerankThreads from 'views/pages/AdminPanel/RerankThreads';
 import UpdateCommunityIdTask from 'views/pages/AdminPanel/UpdateCommunityIdTask';

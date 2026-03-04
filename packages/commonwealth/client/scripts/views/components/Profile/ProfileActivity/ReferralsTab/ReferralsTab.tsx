@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { saveToClipboard } from 'shared/utils/clipboard';
 import { useUserStore } from 'state/ui/user/user';
-import { saveToClipboard } from 'utils/clipboard';
 
 import { APIOrderDirection } from 'shared/utils/constants';
 import { Avatar } from '../../../Avatar';

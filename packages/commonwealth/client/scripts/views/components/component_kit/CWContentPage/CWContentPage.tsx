@@ -1,11 +1,11 @@
 import { GetThreadToken } from '@hicommonwealth/schemas';
-import { truncate } from 'helpers/truncate';
 import useTopicGating from 'hooks/useTopicGating';
 import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import React, { ReactNode, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
+import { truncate } from 'shared/utils/truncate';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';

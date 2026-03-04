@@ -48,12 +48,12 @@ import type { DeltaStatic } from 'quill';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
 import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
 import useManageDocumentTitle from 'shared/hooks/useManageDocumentTitle';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useCreateThreadMutation, {
   buildCreateThreadInput,
 } from 'state/api/threads/createThread';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
-import { saveToClipboard } from 'utils/clipboard';
 import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 // eslint-disable-next-line max-len

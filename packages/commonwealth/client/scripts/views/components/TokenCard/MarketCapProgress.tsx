@@ -1,10 +1,10 @@
 import clsx from 'clsx';
+import numeral from 'numeral';
+import React from 'react';
 import {
   currencyNameToSymbolMap,
   SupportedFiatCurrencies,
-} from 'helpers/currency';
-import numeral from 'numeral';
-import React from 'react';
+} from 'shared/utils/currency';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import './MarketCapProgress.scss';

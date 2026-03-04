@@ -1,6 +1,6 @@
 import React from 'react';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import useUserStore from 'state/ui/user';
-import { saveToClipboard } from 'utils/clipboard';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverTriggerProps } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';

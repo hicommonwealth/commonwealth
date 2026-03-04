@@ -12,6 +12,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
+import Permissions from 'shared/utils/Permissions';
 import app from 'state';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { useGetQuestByIdQuery } from 'state/api/quest';
@@ -21,7 +22,6 @@ import {
 } from 'state/api/quests';
 import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
