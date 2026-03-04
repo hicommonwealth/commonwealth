@@ -1,36 +1,46 @@
 import { WalletId } from '@hicommonwealth/shared';
 import IWebWallet from 'models/IWebWallet';
 
+const getAccountAddress = (
+  account: { address: string } | string | undefined,
+) => {
+  if (typeof account === 'string') {
+    return account;
+  }
+  return account?.address;
+};
+
 const getAddressFromWallet = (
   wallet: IWebWallet<{ address: string } | string>,
 ) => {
+  const firstAccount = wallet.accounts[0];
   const selectedAddress = (() => {
     if (wallet.chain === 'ethereum' || wallet.chain === 'solana') {
-      return wallet.accounts[0];
+      return getAccountAddress(firstAccount);
     }
 
     if (wallet.defaultNetwork === 'terra') {
       if (wallet.name === WalletId.TerraWalletConnect) {
-        return wallet.accounts[0]?.address;
+        return getAccountAddress(firstAccount);
       } else {
-        return wallet.accounts[0];
+        return getAccountAddress(firstAccount);
       }
     }
 
     if (wallet.chain === 'cosmos') {
       if (wallet.defaultNetwork === 'injective') {
-        return wallet.accounts[0];
+        return getAccountAddress(firstAccount);
       }
 
-      return wallet.accounts[0]?.address;
+      return getAccountAddress(firstAccount);
     }
 
     if (wallet.chain === 'substrate') {
-      return wallet.accounts[0]?.address;
+      return getAccountAddress(firstAccount);
     }
 
     if (wallet.chain === 'sui') {
-      return wallet.accounts[0];
+      return getAccountAddress(firstAccount);
     }
   })();
 

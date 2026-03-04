@@ -23,7 +23,7 @@ type ReservationHookContract = {
 /**
  * Abstract contract helpers for the Namespace Factory contract
  */
-class NamespaceFactory extends ContractBase {
+class NamespaceFactory extends ContractBase<typeof NamespaceFactoryAbi> {
   public reservationHook?: ReservationHookContract;
 
   /*
@@ -84,7 +84,7 @@ class NamespaceFactory extends ContractBase {
     }
     if (this.reservationHook) {
       return await this.reservationHook.methods
-        .validateReservationStatus(this.wallet.accounts[0], name, '')
+        .validateReservationStatus(this.getPrimaryAccountAddress(), name, '')
         .call();
     }
     return true;
@@ -124,7 +124,7 @@ class NamespaceFactory extends ContractBase {
           maxFeePerGas: maxFeePerGasEst?.toString(),
           maxPriorityFeePerGas:
             this.chainId && parseInt(this.chainId) === ValidChains.SKALE_TEST
-              ? BigInt(0.00012 * 1e9)
+              ? BigInt(0.00012 * 1e9).toString()
               : this.web3.utils.toWei('0.001', 'gwei'),
         });
     } catch (error) {
@@ -212,7 +212,7 @@ class NamespaceFactory extends ContractBase {
           maxFeePerGas: maxFeePerGasEst?.toString(),
           maxPriorityFeePerGas:
             this.chainId && parseInt(this.chainId) === ValidChains.SKALE_TEST
-              ? BigInt(0.00012 * 1e9)
+              ? BigInt(0.00012 * 1e9).toString()
               : this.web3.utils.toWei('0.001', 'gwei'),
         });
     } catch {
@@ -274,7 +274,7 @@ class NamespaceFactory extends ContractBase {
             maxFeePerGas: maxFeePerGasEst?.toString(),
             maxPriorityFeePerGas:
               this.chainId && parseInt(this.chainId) === ValidChains.SKALE_TEST
-                ? BigInt(0.00012 * 1e9)
+                ? BigInt(0.00012 * 1e9).toString()
                 : this.web3.utils.toWei('0.001', 'gwei'),
           });
       }

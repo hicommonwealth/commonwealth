@@ -58,7 +58,7 @@ export interface ProposalInfo {
   hook: string;
 }
 
-class VoteGovernance extends ContractBase {
+class VoteGovernance extends ContractBase<typeof VoteGovernanceAbi> {
   veTokenAddress: string;
 
   constructor(governanceAddress: string, veTokenAddress: string, rpc: string) {

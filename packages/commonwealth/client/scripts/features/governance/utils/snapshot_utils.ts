@@ -6,19 +6,23 @@ import {
 } from 'state/api/snapshots';
 import { getSnapshotVotesQuery } from 'state/api/snapshots/getVotes';
 
-type SnapshotStrategyParams = Record<string, unknown>;
+type SnapshotStrategyParams = unknown;
 type SnapshotPayload = Record<string, unknown>;
+type SnapshotProposalResponse = {
+  id: string;
+  title?: string;
+};
 type SnapshotClient = {
   vote: (
     provider: unknown,
     address: string,
     payload: SnapshotPayload,
-  ) => Promise<unknown>;
+  ) => Promise<void>;
   proposal: (
     provider: unknown,
     address: string,
     payload: SnapshotPayload,
-  ) => Promise<unknown>;
+  ) => Promise<SnapshotProposalResponse>;
 };
 
 export interface SnapshotSpace {
@@ -123,7 +127,7 @@ export async function createProposal(
   address: string,
   payload: SnapshotPayload,
   spaceId: string,
-) {
+): Promise<SnapshotProposalResponse> {
   const { Web3Provider } = await import('@ethersproject/providers');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const web3 = new Web3Provider((window as any).ethereum);

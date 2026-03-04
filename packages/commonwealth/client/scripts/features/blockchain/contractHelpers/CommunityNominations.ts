@@ -58,7 +58,7 @@ class communityNominations extends ContractBase {
         .nominateNominator(namespace, verfiedAddress)
         .send({
           value: this.web3.utils.toWei(NOMINATION_FEE, 'ether'),
-          from: this.wallet.accounts[0],
+          from: this.getPrimaryAccountAddress(),
           type: '0x2',
           maxFeePerGas: maxFeePerGasEst?.toString(),
           maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),

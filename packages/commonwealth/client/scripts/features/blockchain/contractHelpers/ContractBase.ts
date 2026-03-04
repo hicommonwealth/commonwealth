@@ -3,30 +3,26 @@ import { ChainBase } from '@hicommonwealth/shared';
 import WebWalletController from 'controllers/app/web_wallets';
 import IWebWallet from 'models/IWebWallet';
 import { distributeSkale } from 'utils/skaleUtils';
-import Web3 from 'web3';
+import Web3, { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
 
-type ContractMethodExecutor = {
-  call: (...args: unknown[]) => Promise<never>;
-  send: (...args: unknown[]) => Promise<never>;
-};
+type WalletAccount = { address: string } | string;
+type GenericContractAbi = ConstructorParameters<typeof Contract>[0];
 
-type DynamicContract = {
-  methods: Record<string, (...args: unknown[]) => ContractMethodExecutor>;
-};
-
-abstract class ContractBase {
-  protected contract: DynamicContract;
+abstract class ContractBase<
+  TAbi extends GenericContractAbi = GenericContractAbi,
+> {
+  protected contract: Contract<TAbi>;
   public contractAddress: string;
-  protected wallet: IWebWallet<{ address: string } | string>;
+  protected wallet: IWebWallet<WalletAccount>;
   protected web3: Web3;
   protected initialized: boolean;
   protected walletEnabled: boolean;
   protected rpc: string;
   protected chainId: string;
-  private abi: readonly unknown[];
+  private abi: TAbi;
 
-  constructor(contractAddress: string, abi: readonly unknown[], rpc: string) {
+  constructor(contractAddress: string, abi: TAbi, rpc: string) {
     this.contractAddress = contractAddress;
     this.abi = abi;
     this.rpc = rpc;
@@ -40,7 +36,7 @@ abstract class ContractBase {
     if (!this.initialized || withWallet || providerInstance) {
       try {
         this.chainId = chainId || '1';
-        let provider = this.rpc;
+        let provider: unknown = this.rpc;
 
         if (providerInstance) {
           provider = providerInstance;
@@ -59,18 +55,18 @@ abstract class ContractBase {
           provider = this.wallet.api.givenProvider;
           this.walletEnabled = true;
 
-          await distributeSkale(this.wallet.accounts[0], chainId);
+          await distributeSkale(this.getPrimaryAccountAddress(), chainId);
         }
 
         this.web3 =
           withWallet && this.wallet?.name === 'walletconnect'
             ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (this.wallet as any)._web3
-            : new Web3(provider);
+            : new Web3(provider as ConstructorParameters<typeof Web3>[0]);
         this.contract = new this.web3.eth.Contract(
           this.abi as AbiItem[],
           this.contractAddress,
-        ) as unknown as DynamicContract;
+        ) as unknown as Contract<TAbi>;
         this.initialized = true;
       } catch (error) {
         throw new Error('Failed to initialize contract: ' + error);
@@ -90,7 +86,15 @@ abstract class ContractBase {
     this.contract = new this.web3.eth.Contract(
       this.abi as AbiItem[],
       this.contractAddress,
-    ) as unknown as DynamicContract;
+    ) as unknown as Contract<TAbi>;
+  }
+
+  protected getPrimaryAccountAddress(): string {
+    const account = this.wallet?.accounts?.[0];
+    if (typeof account === 'string') {
+      return account;
+    }
+    return account?.address ?? '';
   }
 
   async estimateGas(): Promise<bigint | null> {

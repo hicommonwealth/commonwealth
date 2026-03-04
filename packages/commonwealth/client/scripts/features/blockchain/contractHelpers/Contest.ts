@@ -240,7 +240,9 @@ class Contest extends ContractBase {
     }
 
     this.reInitContract();
-    const tokenAddress = await this.contract.methods.contestToken().call();
+    const tokenAddressCall = await this.contract.methods.contestToken().call();
+    const tokenAddress =
+      typeof tokenAddressCall === 'string' ? tokenAddressCall : ZERO_ADDRESS;
 
     let txReceipt;
 
@@ -251,8 +253,8 @@ class Contest extends ContractBase {
         txReceipt = await this.contract.methods.deposit(weiAmount).send({
           value: weiAmount,
           from: walletAddress,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
+          maxPriorityFeePerGas: undefined,
+          maxFeePerGas: undefined,
         });
       } catch {
         throw new Error('ETH transfer failed');
@@ -269,8 +271,8 @@ class Contest extends ContractBase {
       });
       txReceipt = await this.contract.methods.deposit(weiAmount).send({
         from: walletAddress,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
+        maxPriorityFeePerGas: undefined,
+        maxFeePerGas: undefined,
       });
     }
     return txReceipt;
