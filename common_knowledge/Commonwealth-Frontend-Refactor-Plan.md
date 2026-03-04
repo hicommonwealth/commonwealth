@@ -34,7 +34,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 2.8 Update consumer imports for shared utils (batch 2) (260304) PR TBD — rewired long-tail shared util consumers from `helpers/*` and `utils/{Permissions,clipboard,downloadDataAsFile}` to `shared/utils/*`; remaining legacy helper imports are now limited to feature-owned modules queued for EPIC-2.11
 - [x] 2.9 Write unit tests for extracted shared utils (260304) PR TBD — extended EPIC-2 contract coverage for post-move `shared/utils/*` modules and legacy-path compatibility assertions, including long-tail util contract checks
 - [x] 2.10 Write component tests for extracted shared hooks (260304) PR TBD — baseline 6 hook specs now validate `shared/hooks/*` imports and 6 additional migrated hook specs were added (`useAppStatus`, `useColorScheme`, `useManageDocumentTitle`, `useDeferredConditionTriggerCallback`, `useRunOnceOnCondition`, `useAnimation`)
-- [ ] 2.11 Create feature directory stubs + migrate feature-specific helpers
+- [x] 2.11 Create feature directory stubs + migrate feature-specific helpers (260304) PR TBD — moved feature-owned helper modules into `features/*/utils` and `features/blockchain/contractHelpers` with legacy `helpers/*` re-export stubs preserved for rollout safety
 - [ ] 2.12 Migrate feature-specific hooks to feature dirs
 
 EPIC-2 audit note (2026-02-19): milestone `#136` has Epic-1 and test-hardening merged (`#13405` via PR `#13406`), while Epic-2 structural moves/import rewires remain open.

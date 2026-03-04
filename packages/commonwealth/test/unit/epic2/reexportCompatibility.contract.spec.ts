@@ -116,6 +116,60 @@ const contracts: ModuleContract[] = [
     requiredExports: ['downloadDataAsFile'],
   },
   {
+    legacySpecifier: '../../../client/scripts/helpers/quest.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/quests/utils/quest.ts',
+    ],
+    requiredExports: ['calculateQuestTimelineLabel', 'resetXPCacheForUser'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/snapshot_utils.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/governance/utils/snapshot_utils.ts',
+    ],
+    requiredExports: ['createProposal', 'getScore', 'loadMultipleSpacesData'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/launchpad.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/tokens/utils/launchpad.ts',
+    ],
+    requiredExports: ['calculateTokenPricing'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/findDenomination.tsx',
+    futureSpecifiers: [
+      '../../../client/scripts/features/tokens/utils/findDenomination.tsx',
+    ],
+    requiredExports: ['findDenominationIcon', 'findDenominationString'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/feed.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/explore/utils/feed.ts',
+    ],
+    requiredExports: ['extractImages'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/wallet.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/wallet/utils/wallet.ts',
+    ],
+    requiredExports: ['getAddressFromWallet'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/threads.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/discussions/utils/threads.ts',
+    ],
+    requiredExports: ['detectURL', 'filterLinks', 'getAddedAndDeleted'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/user.ts',
+    futureSpecifiers: ['../../../client/scripts/features/auth/utils/user.ts'],
+    requiredExports: ['getUniqueUserAddresses'],
+  },
+  {
     legacySpecifier: '../../../client/scripts/hooks/useDraft.tsx',
     futureSpecifiers: [
       '../../../client/scripts/shared/hooks/useDraft.tsx',
