@@ -40,7 +40,9 @@ interface ThreadPredictionMarketTagProps {
   market: ThreadPredictionMarketTagMarket;
 }
 
-const ThreadPredictionMarketTag = ({ market }: ThreadPredictionMarketTagProps) => {
+const ThreadPredictionMarketTag = ({
+  market,
+}: ThreadPredictionMarketTagProps) => {
   const popoverProps = usePopover();
   const passPct = Math.round((market.current_probability ?? 0.5) * 100);
   const failPct = 100 - passPct;
@@ -62,9 +64,18 @@ const ThreadPredictionMarketTag = ({ market }: ThreadPredictionMarketTagProps) =
         title={market.prompt || 'Prediction market'}
         body={
           <div className="ThreadPredictionMarketTag-popover-body">
-            <CWText type="caption" className="probability-bar">
-              PASS {passPct}% ████████░░░░░ FAIL {failPct}%
-            </CWText>
+            <div className="ThreadPredictionMarketTag-probability-bar">
+              <CWText type="caption">PASS {passPct}%</CWText>
+              <progress
+                className="ThreadPredictionMarketTag-progress"
+                max={100}
+                value={passPct}
+                aria-valuenow={passPct}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              />
+              <CWText type="caption">FAIL {failPct}%</CWText>
+            </div>
             <CWText type="caption">{timeRemaining(market.end_time)}</CWText>
             <CWText type="caption">
               {formatVolume(market.total_collateral ?? '0')} USDC locked
