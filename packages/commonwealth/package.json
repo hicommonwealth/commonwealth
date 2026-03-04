@@ -188,7 +188,7 @@
     "csv-parser": "^3.2.0",
     "csv-writer": "^1.6.0",
     "discord.js": "^14.16.2",
-    "dompurify": "^2.5.8",
+    "dompurify": "^3.3.1",
     "dotenv": "^16.0.3",
     "emoji-regex": "^10.6.0",
     "esm-loader-css": "^1.0.6",
