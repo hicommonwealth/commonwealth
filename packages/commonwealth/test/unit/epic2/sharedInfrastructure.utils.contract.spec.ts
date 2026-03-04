@@ -1,35 +1,83 @@
 import moment from 'moment';
-import { describe, expect, test, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 
 vi.mock('@hicommonwealth/shared', () => ({
   COMMUNITY_NAME_ERROR: 'Invalid community name',
   COMMUNITY_NAME_REGEX: /^[a-zA-Z0-9 _-]+$/,
 }));
 
+import { isS3URL } from '../../../client/scripts/shared/utils/awsHelpers';
 import {
   APIOrderBy,
   APIOrderDirection,
   BASE_CHAIN_ID,
   DEFAULT_CHAIN,
   twitterLinkRegex,
-} from '../../../client/scripts/helpers/constants';
-import { getRelativeTimestamp } from '../../../client/scripts/helpers/dates';
+} from '../../../client/scripts/shared/utils/constants';
+import {
+  getAmountWithCurrencySymbol,
+  SupportedFiatCurrencies,
+} from '../../../client/scripts/shared/utils/currency';
+import { getRelativeTimestamp } from '../../../client/scripts/shared/utils/dates';
 import {
   formatDisplayNumber,
   formatMarketCap,
-} from '../../../client/scripts/helpers/formatting';
+} from '../../../client/scripts/shared/utils/formatting';
 import {
   linkValidationSchema,
   numberValidationSchema,
-} from '../../../client/scripts/helpers/formValidations/common';
-import { VALIDATION_MESSAGES } from '../../../client/scripts/helpers/formValidations/messages';
+} from '../../../client/scripts/shared/utils/formValidations/common';
+import { VALIDATION_MESSAGES } from '../../../client/scripts/shared/utils/formValidations/messages';
 import {
   categorizeSocialLinks,
   getLinkType,
   isLinkValid,
-} from '../../../client/scripts/helpers/link';
+} from '../../../client/scripts/shared/utils/link';
+import {
+  getLocalStorageItem,
+  LocalStorageKeys,
+  REFCODE_EXPIRATION_MS,
+  setLocalStorageItem,
+} from '../../../client/scripts/shared/utils/localStorage';
+import { roundDecimalsOrReturnWhole } from '../../../client/scripts/shared/utils/number';
+import {
+  isRateLimitError,
+  RATE_LIMIT_MESSAGE,
+} from '../../../client/scripts/shared/utils/rateLimit';
+import { splitCamelOrPascalCase } from '../../../client/scripts/shared/utils/string';
+import { disabledStakeButtonTooltipText } from '../../../client/scripts/shared/utils/tooltipTexts';
+import {
+  isNonEmptyString,
+  isNotUndefined,
+} from '../../../client/scripts/shared/utils/typeGuards';
+
+const createLocalStorageMock = (): Storage => {
+  const store = new Map<string, string>();
+  return {
+    get length() {
+      return store.size;
+    },
+    clear: () => store.clear(),
+    getItem: (key: string) => store.get(key) ?? null,
+    key: (index: number) => Array.from(store.keys())[index] ?? null,
+    removeItem: (key: string) => {
+      store.delete(key);
+    },
+    setItem: (key: string, value: string) => {
+      store.set(key, value);
+    },
+  } as Storage;
+};
 
 describe('shared infrastructure utility contracts', () => {
+  beforeAll(() => {
+    vi.stubGlobal('localStorage', createLocalStorageMock());
+  });
+
+  afterAll(() => {
+    vi.unstubAllGlobals();
+  });
+
   test('constants expose stable baseline values', () => {
     expect(APIOrderDirection.Asc).toBe('ASC');
     expect(APIOrderBy.LastActive).toBe('last_active');
@@ -94,5 +142,56 @@ describe('shared infrastructure utility contracts', () => {
       'Must be greater than 5',
     );
     expect(VALIDATION_MESSAGES.GITHUB_FORMAT).toBe('Invalid GitHub URL');
+  });
+
+  test('long-tail shared utils keep deterministic string and number contracts', () => {
+    expect(splitCamelOrPascalCase('CommunityJoined')).toBe('Community Joined');
+    expect(roundDecimalsOrReturnWhole(9.1234, 2)).toBe(9.12);
+    expect(roundDecimalsOrReturnWhole(9.000001, 2)).toBe(9);
+    expect(isNonEmptyString('Commonwealth')).toBe(true);
+    expect(isNotUndefined(undefined)).toBe(false);
+  });
+
+  test('currency and tooltip helpers preserve output format', () => {
+    expect(getAmountWithCurrencySymbol(42, SupportedFiatCurrencies.USD)).toBe(
+      '$ 42 ',
+    );
+    expect(
+      disabledStakeButtonTooltipText({
+        isLoggedIn: false,
+      }),
+    ).toBe('Login to buy stakes');
+  });
+
+  test('rate-limit and aws helper contracts stay stable', () => {
+    expect(RATE_LIMIT_MESSAGE).toContain('rate limited');
+    expect(isRateLimitError({ status: 429 })).toBe(true);
+    expect(
+      isRateLimitError({
+        message: 'Too many requests, please retry later',
+      }),
+    ).toBe(true);
+    expect(isS3URL('https://s3.amazonaws.com/common.xyz/file.png')).toBe(true);
+    expect(isS3URL('https://example.com/file.png')).toBe(false);
+  });
+
+  test('localStorage helpers keep refcode persistence semantics', () => {
+    localStorage.clear();
+    expect(REFCODE_EXPIRATION_MS).toBeGreaterThan(0);
+
+    setLocalStorageItem(
+      LocalStorageKeys.ReferralCode,
+      'ref-123',
+      REFCODE_EXPIRATION_MS,
+    );
+    expect(getLocalStorageItem(LocalStorageKeys.ReferralCode)).toBe('ref-123');
+
+    // Referral code is immutable once set.
+    setLocalStorageItem(
+      LocalStorageKeys.ReferralCode,
+      'ref-456',
+      REFCODE_EXPIRATION_MS,
+    );
+    expect(getLocalStorageItem(LocalStorageKeys.ReferralCode)).toBe('ref-123');
   });
 });

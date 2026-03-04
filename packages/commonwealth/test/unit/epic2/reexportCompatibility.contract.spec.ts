@@ -28,6 +28,94 @@ const contracts: ModuleContract[] = [
     requiredExports: ['isLinkValid', 'getLinkType', 'categorizeSocialLinks'],
   },
   {
+    legacySpecifier: '../../../client/scripts/helpers/currency.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/currency.ts'],
+    requiredExports: [
+      'SupportedFiatCurrencies',
+      'SupportedCryptoCurrencies',
+      'getAmountWithCurrencySymbol',
+    ],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/typeGuards.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/typeGuards.ts'],
+    requiredExports: ['isUndefined', 'isNotUndefined', 'isNonEmptyString'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/rateLimit.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/rateLimit.ts'],
+    requiredExports: ['RATE_LIMIT_MESSAGE', 'isRateLimitError'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/localStorage.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/localStorage.ts'],
+    requiredExports: [
+      'LocalStorageKeys',
+      'getLocalStorageItem',
+      'setLocalStorageItem',
+    ],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/string.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/string.ts'],
+    requiredExports: ['splitCamelOrPascalCase'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/number.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/number.ts'],
+    requiredExports: [
+      'calculateRemainingPercentageChangeFractional',
+      'roundDecimalsOrReturnWhole',
+    ],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/tooltipTexts.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/tooltipTexts.ts'],
+    requiredExports: ['disabledStakeButtonTooltipText'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/truncate.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/truncate.ts'],
+    requiredExports: ['truncate'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/browser.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/browser.ts'],
+    requiredExports: ['getBrowserInfo', 'getBrowserType'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/awsHelpers.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/awsHelpers.ts'],
+    requiredExports: ['isS3URL'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/dom.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/dom.ts'],
+    requiredExports: ['listenForDOMNodeApperance'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/image.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/image.ts'],
+    requiredExports: ['generateBlobImageFromAlphabet'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/utils/Permissions.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/Permissions.ts'],
+    requiredExports: ['default'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/utils/clipboard.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/clipboard.ts'],
+    requiredExports: ['saveToClipboard'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/utils/downloadDataAsFile.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/shared/utils/downloadDataAsFile.ts',
+    ],
+    requiredExports: ['downloadDataAsFile'],
+  },
+  {
     legacySpecifier: '../../../client/scripts/hooks/useDraft.tsx',
     futureSpecifiers: [
       '../../../client/scripts/shared/hooks/useDraft.tsx',
