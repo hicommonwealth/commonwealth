@@ -80,10 +80,6 @@ export const useThreadTokenWidget = ({
     !primaryTokenAddress ||
     primaryTokenAddress === '0x0000000000000000000000000000000000000000';
 
-  const [walletEthBalance, setWalletEthBalance] = useState<string>('0.0');
-  const [isLoadingWalletEthBalance, setIsLoadingWalletEthBalance] =
-    useState<boolean>(false);
-
   const {
     data: userPrimaryTokenBalance = '0.0',
     isLoading: isLoadingPrimaryTokenBalance,
@@ -98,11 +94,9 @@ export const useThreadTokenWidget = ({
       !isPrimaryTokenEth,
   });
 
-  const userBalance = isPrimaryTokenEth
-    ? walletEthBalance
-    : userPrimaryTokenBalance;
+  const userBalance = userPrimaryTokenBalance;
   const isLoadingBalance = isPrimaryTokenEth
-    ? isLoadingWalletEthBalance
+    ? false
     : isLoadingPrimaryTokenBalance;
 
   const { data: userTokenBalance = '0.0', isLoading: isLoadingTokenBalance } =

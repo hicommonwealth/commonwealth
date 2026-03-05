@@ -110,8 +110,8 @@ export const factoryContracts: FactoryContractsType = {
     LPBondingCurve: '0x4bF195932E20Dc8459419Bc93a84B713bED20f38',
     TokenCommunityManager: '0x84A0CFb53a77202777fdbc845e7A5bb214311e88',
     ReferralFeeManager: '0x9d3BE262bed6F3A0AAb4E97c0232071EF730632f',
-    TokenLaunchpad: '0x1ace5ED3bB32e9F11c6b647Be7656fF778B28774',
-    TokenBondingCurve: '0x8C0E90C61146490DD94D71d508E193842f4eD542',
+    TokenLaunchpad: '0xACD353A1Bf569662E2e0e5Dd127FeCbee505986c',
+    TokenBondingCurve: '0xC815d94E05dCAa6D84a740291A03A1e73BF48C1f',
     chainId: 8453,
   },
   [ValidChains.Linea]: {
