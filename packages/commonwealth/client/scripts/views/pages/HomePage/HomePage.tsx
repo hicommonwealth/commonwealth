@@ -9,6 +9,7 @@ import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal';
 import IdeaLaunchpad from '../ExplorePage/IdeaLaunchpad';
 import { TrendingCommunitiesPreview } from '../user_dashboard/TrendingCommunitiesPreview/TrendingCommunitiesPreview';
 import ActiveContestList from './ActiveContestList/ActiveContestList';
+import ActivePredictionMarketList from './ActivePredictionMarketList/ActivePredictionMarketList';
 import './HomePage.scss';
 import TrendingThreadList from './TrendingThreadList/TrendingThreadList';
 import TrendingTokensList from './TrendingTokenList/TrendingTokenList';
@@ -46,6 +47,7 @@ const HomePage = () => {
         />
         <TrendingCommunitiesPreview />
         <ActiveContestList />
+        <ActivePredictionMarketList />
         <XpQuestList />
         <TrendingThreadList query={useFetchGlobalActivityQuery} />
         <CWModal

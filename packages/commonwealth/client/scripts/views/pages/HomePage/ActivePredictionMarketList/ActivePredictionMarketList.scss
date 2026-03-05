@@ -1,0 +1,171 @@
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/elevation';
+
+.ActivePredictionMarketList {
+  margin: 16px 0;
+
+  .heading-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .see-all-link {
+      cursor: pointer;
+      color: colors.$primary-500;
+      text-decoration: none;
+
+      &:focus,
+      &:active,
+      &:hover,
+      &:visited {
+        outline: none;
+        text-decoration: none;
+      }
+    }
+
+    .link-right {
+      display: flex;
+      gap: 4px;
+    }
+  }
+
+  .content {
+    display: flex;
+    gap: 15px;
+    justify-content: start;
+    margin: 10px 0;
+    overflow-x: auto;
+
+    .PredictionMarketCardCompact {
+      flex: 0 0 330px;
+      width: 330px;
+      display: flex;
+      flex-direction: column;
+      border-radius: border_radius.$border-radius-tags;
+      background: colors.$white;
+      box-shadow: elevation.$elevation-2;
+      overflow: hidden;
+      transition: box-shadow 0.2s ease;
+
+      &:hover {
+        box-shadow: elevation.$elevation-3;
+      }
+
+      .card-link {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        text-decoration: none;
+        color: inherit;
+        min-height: 220px;
+      }
+
+      .badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: border_radius.$border-radius-rounded-corners;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      .badge-active {
+        background: colors.$primary-500;
+        color: colors.$white;
+      }
+
+      .badge-time {
+        background: colors.$neutral-800;
+        color: colors.$white;
+
+        .CWIcon {
+          opacity: 0.9;
+        }
+      }
+
+      .prompt {
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.35;
+        color: colors.$neutral-900;
+        font-size: 15px;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: auto;
+      }
+
+      .metric-box {
+        background: colors.$neutral-100;
+        border-radius: border_radius.$border-radius-corners-wider;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .metric-label {
+        margin: 0;
+        color: colors.$neutral-500;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .metric-value {
+        margin: 0;
+        color: colors.$neutral-900;
+        font-size: 18px;
+
+        &.yes-price {
+          color: colors.$primary-500;
+        }
+      }
+
+      .view-thread-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 12px 16px;
+        background: colors.$primary-500;
+        color: colors.$white;
+        border-radius: border_radius.$border-radius-corners-wider;
+        margin-top: 4px;
+        transition:
+          filter 0.15s ease,
+          opacity 0.15s ease;
+
+        .card-link:hover & {
+          filter: brightness(0.94);
+        }
+
+        .card-link:active & {
+          opacity: 0.95;
+        }
+      }
+    }
+  }
+}
