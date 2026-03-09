@@ -4,6 +4,7 @@ import {
   isValidImageUrl,
 } from '@hicommonwealth/shared';
 import { useShowImage } from 'client/scripts/hooks/useShowImage';
+import { ThreadPredictionMarketTagContainer } from 'client/scripts/views/components/ThreadPredictionMarketTag';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -16,7 +17,6 @@ import useGetThreadToken from 'state/api/tokens/getThreadToken';
 import useUserStore from 'state/ui/user';
 import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
-import { ThreadPredictionMarketTagContainer } from 'views/components/ThreadPredictionMarketTag';
 import { ThreadTokenDrawer } from 'views/components/ThreadTokenDrawer';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
 import { CWDivider } from 'views/components/component_kit/cw_divider';

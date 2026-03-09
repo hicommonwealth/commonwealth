@@ -1,11 +1,11 @@
 import moment from 'moment';
 import React from 'react';
 
-import { CWText } from 'views/components/component_kit/cw_text';
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import CWPopover, {
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+} from 'client/scripts/views/components/component_kit/new_designs/CWPopover';
+import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
 
 import './ThreadPredictionMarketTag.scss';
 
