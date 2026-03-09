@@ -1,2 +1,2 @@
-export { default } from './PredictionMarketsList';
 export { ExplorePredictionMarketCard } from './ExplorePredictionMarketCard';
+export { default } from './PredictionMarketsList';
