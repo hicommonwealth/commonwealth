@@ -30,7 +30,10 @@ export function CreatePredictionMarket(): Command<
 
       // Check if a prediction market already exists for this thread
       const existingMarket = await models.PredictionMarket.findOne({
-        where: { thread_id: thread.id, status: schemas.PredictionMarketStatus.Active },
+        where: {
+          thread_id: thread.id,
+          status: schemas.PredictionMarketStatus.Active,
+        },
       });
       if (existingMarket) {
         throw new InvalidState(
