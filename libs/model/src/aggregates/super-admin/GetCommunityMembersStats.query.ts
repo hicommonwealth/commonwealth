@@ -53,7 +53,7 @@ export function GetCommunityMembersStats(): Query<
           type: QueryTypes.SELECT,
         },
       );
-      return { members };
+      return members;
     },
   };
 }
