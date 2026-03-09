@@ -3,8 +3,8 @@ import React from 'react';
 import type Thread from 'client/scripts/models/Thread';
 import { useGetPredictionMarketsQuery } from 'state/api/predictionMarket';
 
-import ThreadPredictionMarketTag from './ThreadPredictionMarketTag';
 import type { ThreadPredictionMarketTagMarket } from './ThreadPredictionMarketTag';
+import ThreadPredictionMarketTag from './ThreadPredictionMarketTag';
 
 interface ThreadPredictionMarketTagContainerProps {
   thread: Thread;
@@ -24,7 +24,9 @@ const ThreadPredictionMarketTagContainer = ({
   const hasPredictionMarket = markets.length > 0;
 
   // Only show tag for active or resolved markets (not draft/cancelled) in feed
-  const displayMarket = markets[0] as ThreadPredictionMarketTagMarket | undefined;
+  const displayMarket = markets[0] as
+    | ThreadPredictionMarketTagMarket
+    | undefined;
   const showTag =
     hasPredictionMarket &&
     displayMarket &&
