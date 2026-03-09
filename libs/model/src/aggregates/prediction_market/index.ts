@@ -2,6 +2,7 @@ export * from './CancelPredictionMarket.command';
 export * from './CreatePredictionMarket.command';
 export * from './DeployPredictionMarket.command';
 export * from './DiscoverPredictionMarkets.query';
+export * from './GetActivePredictionMarkets.query';
 export * from './GetPredictionMarketPositions.query';
 export * from './GetPredictionMarkets.query';
 export * from './GetPredictionMarketTrades.query';

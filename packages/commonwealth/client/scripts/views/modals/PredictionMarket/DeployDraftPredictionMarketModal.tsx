@@ -116,6 +116,7 @@ export const DeployDraftPredictionMarketModal = ({
         strategy_address: payload.strategy_address,
         p_token_address: payload.p_token_address,
         f_token_address: payload.f_token_address,
+        proposal_id: payload.proposal_id,
         start_time: payload.start_time,
         end_time: payload.end_time,
       });
