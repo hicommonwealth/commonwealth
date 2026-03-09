@@ -39,7 +39,7 @@ function formatCollateralBalance(wei: bigint, decimals: number): string {
   return `${whole}.${frac.toString().padStart(2, '0').slice(0, 2)}`;
 }
 
-type PredictionMarketResult = {
+export type PredictionMarketResult = {
   id: number;
   thread_id: number;
   prompt: string;
@@ -290,10 +290,7 @@ export const ThreadPredictionMarketCard = ({
   const isAuthor = isAuthorProp ?? isThreadAuthor;
 
   const isDraft = market?.status === PredictionMarketStatus.Draft;
-  const isActive = market?.status === PredictionMarketStatus.Active;
   const canCompleteDraft = isDraft && isAuthor;
-  const endTime = market?.end_time ? new Date(market?.end_time) : new Date(0);
-  const canShowResolve = isActive && canResolveMarket;
 
   const canTrade =
     (market?.status === 'active' || market?.status === 'resolved') &&
@@ -403,7 +400,7 @@ export const ThreadPredictionMarketCard = ({
                         },
                       ]
                     : []),
-                  ...(canResolve
+                  ...(canResolve && canResolveMarket
                     ? [
                         {
                           label: 'Resolve market',
