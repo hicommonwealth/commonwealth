@@ -73,6 +73,13 @@ vi.mock('views/pages/HomePage/ActiveContestList/ActiveContestList', () => ({
   default: () => <div data-testid="home-active-contests" />,
 }));
 
+vi.mock(
+  'views/pages/HomePage/ActivePredictionMarketList/ActivePredictionMarketList',
+  () => ({
+    default: () => <div data-testid="home-active-prediction-markets" />,
+  }),
+);
+
 vi.mock('views/pages/HomePage/TrendingThreadList/TrendingThreadList', () => ({
   default: () => <div data-testid="home-trending-threads" />,
 }));

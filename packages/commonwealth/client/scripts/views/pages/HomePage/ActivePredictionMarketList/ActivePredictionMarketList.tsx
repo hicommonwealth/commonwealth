@@ -1,14 +1,14 @@
 import { getThreadUrl } from '@hicommonwealth/shared';
+import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { Skeleton } from 'client/scripts/views/components/Skeleton';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useFlag } from 'shared/hooks/useFlag';
 import { useGetActivePredictionMarketsQuery } from 'state/api/predictionMarket';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { Skeleton } from 'views/components/Skeleton';
 
 import './ActivePredictionMarketList.scss';
 
