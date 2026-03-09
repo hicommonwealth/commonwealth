@@ -21,6 +21,7 @@ import ExploreContestList from './ExploreContestList';
 import './ExplorePage.scss';
 import IdeaLaunchpad from './IdeaLaunchpad';
 import MarketsList from './MarketsList';
+import PredictionMarketsList from './PredictionMarketsList';
 import QuestList from './QuestList';
 import { ThreadFeed } from './ThreadFeed/ThreadFeed';
 import TokensList from './TokensList';
@@ -28,6 +29,7 @@ import TokensList from './TokensList';
 const ExplorePage = () => {
   const containerRef = useRef();
   const marketsEnabled = useFlag('markets');
+  const predictionMarketsEnabled = useFlag('futarchy');
   const navigate = useCommonNavigate();
   const [searchParams] = useSearchParams();
   const [searchText, setSearchText] = useState<string>('');
@@ -42,6 +44,9 @@ const ExplorePage = () => {
     { value: 'quests', label: 'Quests' },
     { value: 'tokens', label: 'Tokens' },
     ...(marketsEnabled ? [{ value: 'markets', label: 'Markets' }] : []),
+    ...(predictionMarketsEnabled
+      ? [{ value: 'prediction-markets', label: 'Prediction Markets' }]
+      : []),
   ];
 
   // Add state for tracking active tab
@@ -146,6 +151,13 @@ const ExplorePage = () => {
         )}
         {marketsEnabled && activeTab === 'markets' && (
           <MarketsList
+            hideHeader
+            searchText={searchText}
+            onClearSearch={() => setSearchText('')}
+          />
+        )}
+        {predictionMarketsEnabled && activeTab === 'prediction-markets' && (
+          <PredictionMarketsList
             hideHeader
             searchText={searchText}
             onClearSearch={() => setSearchText('')}

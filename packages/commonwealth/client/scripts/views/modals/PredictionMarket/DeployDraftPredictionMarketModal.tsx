@@ -28,6 +28,7 @@ type DraftMarket = {
   duration?: number;
   resolution_threshold?: number;
   collateral_address?: string;
+  initial_liquidity?: string | null;
   [key: string]: unknown;
 };
 
@@ -75,7 +76,9 @@ export const DeployDraftPredictionMarketModal = ({
     typeof market.resolution_threshold === 'number'
       ? market.resolution_threshold
       : 0.55;
-  const collateralAddress = (market.collateral_address ?? '') as `0x${string}`;
+  const collateralAddress = (market.collateral_address ?? '').trim();
+  const isValidCollateral =
+    collateralAddress.startsWith('0x') && collateralAddress.length === 42;
 
   const handleDeploy = async () => {
     if (!thread?.id || !activeAddress) {
@@ -90,9 +93,21 @@ export const DeployDraftPredictionMarketModal = ({
       notifyError('On-chain deployment is not configured.');
       return;
     }
+    if (!isValidCollateral) {
+      setErrorMessage(
+        'Invalid collateral address. The draft market must have a valid ERC20 collateral address.',
+      );
+      notifyError('Invalid collateral address.');
+      return;
+    }
 
     setErrorMessage(null);
     setPhase('deploying');
+
+    const initialLiquidity =
+      (market.initial_liquidity ?? '').toString().trim() || '0';
+
+    console.log('market => ', market);
 
     try {
       const payload = await deployPredictionMarketOnChain({
@@ -100,10 +115,10 @@ export const DeployDraftPredictionMarketModal = ({
         chain_rpc: chainRpc,
         user_address: activeAddress,
         prompt: market.prompt,
-        collateral_address: collateralAddress,
+        collateral_address: collateralAddress as `0x${string}`,
         duration_days: durationDays,
         resolution_threshold: resolutionThreshold,
-        initial_liquidity: '0',
+        initial_liquidity: initialLiquidity,
       });
 
       await deployMutation.mutateAsync({
@@ -116,8 +131,10 @@ export const DeployDraftPredictionMarketModal = ({
         strategy_address: payload.strategy_address,
         p_token_address: payload.p_token_address,
         f_token_address: payload.f_token_address,
+        proposal_id: payload.proposal_id,
         start_time: payload.start_time,
         end_time: payload.end_time,
+        initial_liquidity: initialLiquidity,
       });
 
       notifySuccess('Prediction market deployed.');
@@ -195,7 +212,7 @@ export const DeployDraftPredictionMarketModal = ({
           label="Deploy on-chain"
           buttonType="primary"
           buttonHeight="sm"
-          disabled={!deployConfigured || !activeAddress}
+          disabled={!deployConfigured || !activeAddress || !isValidCollateral}
           onClick={() => void handleDeploy()}
         />
       </CWModalFooter>

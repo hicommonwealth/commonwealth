@@ -20,6 +20,7 @@ export enum AICompletionType {
   Thread = 'thread',
   Comment = 'comment',
   Poll = 'poll',
+  PredictionMarket = 'prediction_market',
 }
 
 export const generateThreadPrompt = (context: string): StructuredPrompt => {
@@ -132,6 +133,30 @@ Guidelines:
   { "question": "string", "options": ["string", "string", ...] }
 
 IMPORTANT: Return only the JSON object without any introduction, explanation, or meta-text.
+  `;
+  const userPrompt = `THREAD CONTENT:\n${context}`;
+  return { systemPrompt, userPrompt };
+};
+
+export const generatePredictionMarketPrompt = (
+  context: string,
+): StructuredPrompt => {
+  const systemPrompt = `
+You are an AI assistant that helps create clear, resolvable prediction market questions for the Common platform.
+Common hosts communities with prediction markets (binary PASS/FAIL outcomes) used for governance and futarchy.
+
+Based on the thread content provided in the USER PROMPT, generate a single prediction market prompt: a short,
+unambiguous question that can be resolved as PASS or FAIL.
+
+Guidelines:
+- The prompt should be one concise question (e.g. "Will X happen by date Y?", "Does proposal Z pass?").
+- It must be objectively resolvable (no subjective or opinion-based wording).
+- Prefer yes/no or clearly verifiable outcomes.
+- Keep it under 200 characters when possible.
+- Do not include "Will" at the start if the question is already clearly binary (optional).
+- Return only the prompt text—no quotes, no explanation, no preamble.
+
+IMPORTANT: Return only the prediction market prompt text without any introduction, explanation, or meta-text.
   `;
   const userPrompt = `THREAD CONTENT:\n${context}`;
   return { systemPrompt, userPrompt };

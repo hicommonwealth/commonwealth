@@ -110,6 +110,7 @@ async function validateRequest(
     AICompletionType.Thread,
     AICompletionType.Comment,
     AICompletionType.Poll,
+    AICompletionType.PredictionMarket,
   ];
   if (!completionType || !validCompletionTypes.includes(completionType)) {
     res.status(400).json({

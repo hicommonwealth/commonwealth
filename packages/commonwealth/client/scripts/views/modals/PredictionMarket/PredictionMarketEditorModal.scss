@@ -12,6 +12,37 @@
     margin-bottom: 16px;
   }
 
+  .prompt-input-with-ai {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px;
+
+    .CWTextArea {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .prompt-ai-button {
+      flex: 0 0 auto;
+      margin-left: auto;
+    }
+
+    .prompt-ai-button--compact {
+      padding: 4px 10px;
+      min-height: 28px;
+
+      .button-text {
+        font-size: 12px;
+      }
+    }
+
+    .prompt-ai-spinner {
+      flex: 0 0 auto;
+      align-self: center;
+    }
+  }
+
   .duration-threshold-row {
     display: flex;
     flex-direction: column;

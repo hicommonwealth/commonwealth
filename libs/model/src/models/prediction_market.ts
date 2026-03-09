@@ -45,6 +45,10 @@ export const PredictionMarket = (
         allowNull: false,
         defaultValue: 0,
       },
+      initial_liquidity: {
+        type: Sequelize.DECIMAL(78, 0),
+        allowNull: true,
+      },
       current_probability: { type: Sequelize.FLOAT, allowNull: true },
     },
     {
