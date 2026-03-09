@@ -6,8 +6,8 @@ import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
 import {
   UPGRADE_MIN_USDC_BALANCE,
-  UpgradeTierPolicy,
-} from '../../src/aggregates/user/UpgradeTier.policy';
+  UpgradeTierProjection,
+} from '../../src/aggregates/user/UpgradeTier.projection';
 import { models } from '../../src/database';
 import { USDC_BASE_MAINNET_ADDRESS } from '../../src/services/openai/parseBotCommand';
 import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
@@ -147,7 +147,7 @@ describe('Upgrade Tiers lifecycle', () => {
         ) as EventPair<'NominatorNominated'>,
       ]);
 
-      await drainOutbox(['NominatorNominated'], UpgradeTierPolicy);
+      await drainOutbox(['NominatorNominated'], UpgradeTierProjection);
 
       const userAfter = await models.User.findByPk(user.id);
       expect(userAfter!.tier).toBe(UserTierMap.ChainVerified);
@@ -179,7 +179,7 @@ describe('Upgrade Tiers lifecycle', () => {
         },
       ]);
 
-      await drainOutbox(['ContestContentAdded'], UpgradeTierPolicy);
+      await drainOutbox(['ContestContentAdded'], UpgradeTierProjection);
 
       const userAfter = await models.User.findByPk(user.id);
       expect(
@@ -204,7 +204,7 @@ describe('Upgrade Tiers lifecycle', () => {
         },
       ]);
 
-      await drainOutbox(['ContestContentUpvoted'], UpgradeTierPolicy);
+      await drainOutbox(['ContestContentUpvoted'], UpgradeTierProjection);
 
       const userAfter2 = await models.User.findByPk(user.id);
       expect(

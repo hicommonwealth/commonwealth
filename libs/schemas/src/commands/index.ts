@@ -1,5 +1,4 @@
 export * from './address.schemas';
-export * from './ai-completion-comment.schemas';
 export * from './bot-contest.schemas';
 export * from './chainEvent.schemas';
 export * from './chainNode.schemas';
@@ -13,6 +12,7 @@ export * from './load-testing.schemas';
 export * from './magic.schemas';
 export * from './market.schemas';
 export * from './poll.schemas';
+export * from './prediction-market.schemas';
 export * from './quest.schemas';
 export * from './snapshot.schemas';
 export * from './subscription.schemas';

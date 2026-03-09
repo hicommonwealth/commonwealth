@@ -20,14 +20,13 @@ export const DISCORD_BOT_ADDRESS = '0xdiscordbot';
 
 export const MCP_MENTION_SYMBOL = '/' as const;
 
-export const MCP_BOT_NAME = 'MCP Bot';
-export const MCP_BOT_EMAIL = 'mcp@common.xyz';
-
 export const DEFAULT_NAME = 'Anonymous';
 
 export const MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER = 1_000;
 
 export const PRODUCTION_DOMAIN = 'common.xyz';
+
+export const MIN_SEARCH_LENGTH = 3;
 
 export const BLOG_SUBDOMAIN = `blog.${PRODUCTION_DOMAIN}`;
 

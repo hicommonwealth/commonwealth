@@ -7,6 +7,7 @@ import {
   SearchUserProfilesView,
   ThreadView,
 } from '@hicommonwealth/schemas';
+import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
 import { SearchScope } from '../models/SearchQuery';
@@ -46,7 +47,8 @@ const useSearchResults = (
     orderBy: APIOrderBy.Rank,
     orderDirection: APIOrderDirection.Desc,
   };
-  const queryEnabled = debouncedSearchTerm.length > 0 && !!communityId;
+  const queryEnabled =
+    debouncedSearchTerm.length >= MIN_SEARCH_LENGTH && !!communityId;
 
   const { data: threadsData } = useSearchThreadsQuery({
     ...{
@@ -90,7 +92,7 @@ const useSearchResults = (
     enabled:
       queryEnabled &&
       filters.includes('members') &&
-      debouncedSearchTerm?.length >= 3,
+      debouncedSearchTerm?.length >= MIN_SEARCH_LENGTH,
   });
 
   const searchResults = useMemo(() => {

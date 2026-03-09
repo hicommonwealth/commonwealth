@@ -54,7 +54,6 @@ export const verifySessionSignature = async (
 
     const messageBytes = new TextEncoder().encode(suiAuthData.message);
 
-    // The signature from the client is hex-encoded
     const isValid = await verifyPersonalMessageSignature(
       messageBytes,
       suiAuthData.signature,

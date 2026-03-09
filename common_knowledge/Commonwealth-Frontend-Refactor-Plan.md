@@ -24,18 +24,20 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 1.10 Remove MDX editor (commonwealth-mdxeditor) (260205) PR https://github.com/hicommonwealth/commonwealth/pull/13338 — remove mdx editor
 
 ### EPIC-2: Shared Infrastructure
-- [ ] 2.1 Set up component test infrastructure
-- [ ] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases
-- [ ] 2.3 Migrate shared reusable hooks to shared/hooks/
-- [ ] 2.4 Migrate shared utility helpers to shared/utils/
-- [ ] 2.5 Migrate trpcClient to shared/api/
-- [ ] 2.6 Update consumer imports for shared hooks
+- [x] 2.1 Set up component test infrastructure (260219) PR TBD — added `renderWithProviders` contract coverage for route overrides, provider overrides, and query client isolation
+- [x] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases (260219) PR TBD — added scoped TS/Vite aliases for `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, `features/*` and scaffolded `client/scripts/shared/*` + `client/scripts/features/`
+- [x] 2.3 Migrate shared reusable hooks to shared/hooks/ (260219) PR TBD — moved 17 shared hooks to `client/scripts/shared/hooks/*` with legacy `hooks/*` stubs; bundle + component tests pass (`test-unit` blocked locally by Postgres.app trust-auth permissions)
+- [x] 2.4 Migrate shared utility helpers to shared/utils/ (260219) PR TBD — moved shared helpers + selected `utils/*` modules into `client/scripts/shared/utils/*` with compatibility stubs; validated via `pnpm -r check-types`, `pnpm -F commonwealth bundle`, and EPIC-2 contract tests
+- [x] 2.5 Migrate trpcClient to shared/api/ (260219) PR TBD — moved `utils/trpcClient.ts` source to `shared/api/trpcClient.ts` with legacy stub; validated by `pnpm -F commonwealth check-types`, `pnpm -F commonwealth bundle`, and `test/unit/epic2/trpcClient.contract.spec.ts`
+- [x] 2.6 Update consumer imports for shared hooks (260219) PR TBD — rewired app consumers from `hooks/<sharedHook>` to `shared/hooks/<sharedHook>` (feature-specific hooks intentionally left on legacy paths); build/typecheck/component suites pass
 - [ ] 2.7 Update consumer imports for shared utils (batch 1)
 - [ ] 2.8 Update consumer imports for shared utils (batch 2)
-- [ ] 2.9 Write unit tests for extracted shared utils
-- [ ] 2.10 Write component tests for extracted shared hooks
+- [~] 2.9 Write unit tests for extracted shared utils (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline contract suite added under `test/unit/epic2`; extend post-move assertions as modules relocate
+- [~] 2.10 Write component tests for extracted shared hooks (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline hook tests added for 6 high-signal hooks; extend as additional hooks move
 - [ ] 2.11 Create feature directory stubs + migrate feature-specific helpers
 - [ ] 2.12 Migrate feature-specific hooks to feature dirs
+
+EPIC-2 audit note (2026-02-19): milestone `#136` has Epic-1 and test-hardening merged (`#13405` via PR `#13406`), while Epic-2 structural moves/import rewires remain open.
 
 ### EPIC-3: Normalize Components
 - [ ] 3.1 Decouple useCommunityContests
@@ -65,6 +67,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [ ] 4.15 Migrate Explore + Dashboard + HomePage + remaining
 - [ ] 4.16 Update ALL route definitions + verify
 - [ ] 4.17 Write smoke component tests for each migrated feature
+Timing annotation (EPIC-4): complete remaining behavior-depth E2E assertions inside the corresponding migration tickets (especially 4.7 Quests, 4.8 LaunchToken, 4.12 Governance, 4.2/4.10 Wallet+Contest, 4.15 Leaderboard/Explore). Use 4.16 as the consolidation gate for route+behavior readiness.
 
 ### EPIC-5: Enforce Boundaries
 - [ ] 5.1 Install eslint-plugin-boundaries + configure zones
@@ -84,10 +87,11 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [ ] 6.9 Delete old helpers/, hooks/, utils/, controllers/, stores/ dirs
 - [ ] 6.10 Update vite.config.ts to remove legacy aliases
 - [ ] 6.11 Final circular dependency audit + cleanup
+Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocking CI guard during 6.1-6.10. Promote to full `pnpm depcruise:circular` blocking only at 6.11 once pre-existing legacy cycles are burned down.
 
 ## 1. Hooks/Utils Extraction Spec
 
-### Shared Hooks --> `client/scripts/shared/hooks/`
+### Shared Hooks --> `client/scripts/shared/hooks/` (physical destination; import namespaces defined in Import Update Strategy)
 
 | Hook | Source | Consumers | Move-Together |
 |------|--------|-----------|---------------|
@@ -103,6 +107,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 | `useBeforeUnload` | `hooks/useBeforeUnload.ts` | form components | -- |
 | `useForceRerender` | `hooks/useForceRerender.ts` | 6 files (post-consolidation) | -- |
 | `useDraft` | `hooks/useDraft.tsx` | thread forms, comments | -- |
+| `useDeviceProfile` | `hooks/useDeviceProfile.ts` | device-specific UX conditions | -- |
 | `useInitApp` | `hooks/useInitApp.ts` | App.tsx | -- |
 | `useManageDocumentTitle` | `hooks/useManageDocumentTitle.ts` | Layout | -- |
 | `useDeferredConditionTriggerCallback` | `hooks/useDeferredConditionTriggerCallback.ts` | various | -- |
@@ -121,8 +126,6 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 | `useNetworkSwitching` | `features/wallet/hooks/` |
 | `useInitChainIfNeeded` | `features/governance/hooks/` |
 | `useJoinCommunityBanner` | `features/communities/hooks/` |
-| `useReactNativeWebView` | `features/mobile/hooks/` |
-| `useMobileRPCSender/Receiver` | `features/mobile/hooks/` |
 | `useGetAllCosmosProposals` | `features/governance/hooks/cosmos/` |
 | `useShowImage` | `features/discussions/hooks/` |
 
@@ -138,6 +141,8 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 
 ### Shared Utils --> `client/scripts/shared/utils/`
 
+Note: `packages/commonwealth/shared/*` already exists and is used today (`shared/utils`, `shared/analytics`, `shared/adapters`, etc.). Epic-2 extracted helper modules should use scoped imports (`shared/utils/<module>`, `shared/hooks/<module>`, `shared/api/<module>`) backed by explicit alias mapping, not a blanket `shared/* -> client/scripts/shared/*` remap.
+
 | File | Source | Consumers | Notes |
 |------|--------|-----------|-------|
 | `general.ts` (split from `helpers/index.tsx`) | `helpers/index.tsx` | **56 files** | Re-export stub mandatory |
@@ -150,9 +155,9 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 | `link.ts` | `helpers/link.ts` | 4 files | URL validation + social links |
 | `formValidations/` | `helpers/formValidations/` | ~10 files | Move as directory |
 | `feature-flags.ts` | `helpers/feature-flags.ts` | 2 files | Move with useFlag |
-| `clipboard.ts` | `utils/clipboard.ts` | 12 files | Consolidate with helpers/clipboard.ts |
-| `downloadDataAsFile.ts`, `imageCompression.ts` | `utils/` | ~3 each | Straightforward |
-| `permissions.ts` | `utils/Permissions.ts` | ~5 files | Straightforward |
+| `clipboard.ts` | `utils/clipboard.ts` | 12 files | Straightforward |
+| `downloadDataAsFile.ts`, `ImageCompression.ts` | `utils/` | ~3 each | Straightforward |
+| `Permissions.ts` | `utils/Permissions.ts` | ~5 files | Straightforward |
 | `tooltipTexts.ts` | `helpers/tooltipTexts.ts` | ~8 files | Pure strings |
 | `awsHelpers.ts` | `helpers/awsHelpers.ts` | ~3 files | External services |
 
@@ -183,8 +188,12 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 
 ### Import Update Strategy
 
-1. Add tsconfig paths `"shared/*"` and `"features/*"` BEFORE any moves
-2. Add vite resolve aliases for `shared` and `features`
+1. Add scoped tsconfig paths BEFORE any moves:
+   - `shared/hooks/*` -> `client/scripts/shared/hooks/*`
+   - `shared/utils/*` -> `client/scripts/shared/utils/*`
+   - `shared/api/*` -> `client/scripts/shared/api/*`
+   - `features/*` -> `client/scripts/features/*`
+2. Add matching Vite aliases for scoped namespaces above; do **not** blanket-remap `shared/*` because `packages/commonwealth/shared/*` is already live
 3. Use `git mv` for all moves (preserves blame)
 4. Create deprecated re-export stubs for files with 10+ consumers
 5. Update consumers in batches; delete stubs when grep confirms zero direct imports
@@ -193,89 +202,92 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 
 ## 2. Test Strategy
 
-### Current State
-- **89 total test files**: 12 unit, 20 integration, 48 E2E, 9 devnet
-- **ZERO component tests** for React components
-- **Stack**: Vitest 1.6.1 + Playwright 1.44.0
-- **Missing**: @testing-library/react, no custom render helpers
+### Current State (Repo Audit: 2026-02-19, post-merge of PR #13406)
+- **115 total spec test files**: 19 unit, 20 integration, 54 E2E, 9 devnet, 2 visual, 11 component
+- **Smoke coverage**: 3 files / 5 tagged `@smoke` tests
+- **E2E quality caveat**: 12 of 49 `e2eRegular` files are still crash-only, but refactor-critical routes now have behavior/security assertions under `@refactor`
+- **Component test layer exists**: Vitest+jsdom harness with shared provider render utility and hook/page coverage
+- **Stack (lockfile-resolved)**: Vitest 1.6.1 + Playwright 1.44.0
+- **Testing-library infra is present**: `@testing-library/react` `^16.3.2`, `@testing-library/jest-dom` `^6.9.1`, `@testing-library/user-event` `^14.6.1`
 
-### New Infrastructure to Add
+### Infrastructure Already Merged (PR #13406, merged 2026-02-18)
 
-**Dependencies** (devDependencies):
+**Dependencies** (devDependencies in `packages/commonwealth/package.json`):
 - `@testing-library/react`
 - `@testing-library/jest-dom`
 - `@testing-library/user-event`
 
-**New Config** (`vitest.component.config.ts`):
+**Component Test Config** (`packages/commonwealth/vitest.component.config.ts`):
 - Environment: `jsdom`
-- Setup: `test/component/setup.ts` (mocks trpcClient, useFlag, analytics)
-- Include: `test/component/**/*.spec.{ts,tsx}`
+- Setup: `packages/commonwealth/test/component/setup.ts`
+- Include: `test/component/**/*.{spec,test}.{ts,tsx}`
 
-**New Test Helper** (`test/component/helpers/renderWithProviders.tsx`):
-- Wraps in QueryClientProvider, MemoryRouter, app context providers
-- Accepts `initialRoute`, `queryClient`, `providerOverrides`
+**Component Render Helper** (`packages/commonwealth/test/component/renderWithProviders.tsx`):
+- Wraps providers and router context for stable component-level integration tests
+- Supports route and provider overrides used by page contract suites
 
-**New Scripts**:
+**Implemented Scripts**:
 ```
-"test-component": "vitest --config ./vitest.component.config.ts run test/component"
-"test-component:watch": "vitest --config ./vitest.component.config.ts test/component"
+"test-component": "NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true vitest --config ./vitest.component.config.ts run test/component"
+"test-component:watch": "NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true vitest --config ./vitest.component.config.ts test/component"
 ```
 
-### Tests to Write During Refactor
+### Coverage Added (merged in PR #13406)
 
-**Shared Utils (unit tests, ~40 tests, ~600 LOC)**:
-- `formatting.spec.ts` -- formatDisplayNumber edge cases
-- `dates.spec.ts` -- date formatting
-- `currency.spec.ts` -- currency formatting
-- `link.spec.ts` -- URL validation, social link categorization
-- `clipboard.spec.ts` -- saveToClipboard mock
-- `truncate.spec.ts` -- truncation
-- `formValidations.spec.ts` -- Zod schemas
-- `general.spec.ts` -- pluralize, formatAddressShort, tokensToWei
+**EPIC-2 safety-net tests:**
+- Shared infrastructure unit contracts: `packages/commonwealth/test/unit/epic2/sharedInfrastructure.utils.contract.spec.ts`
+- `trpcClient` contract coverage: `packages/commonwealth/test/unit/epic2/trpcClient.contract.spec.ts`
+- Old/new import compatibility checks: `packages/commonwealth/test/unit/epic2/reexportCompatibility.contract.spec.ts`
+- Shared hook component tests:
+  - `packages/commonwealth/test/component/hooks/useFlag.spec.tsx`
+  - `packages/commonwealth/test/component/hooks/useDraft.spec.tsx`
+  - `packages/commonwealth/test/component/hooks/useBeforeUnload.spec.tsx`
+  - `packages/commonwealth/test/component/hooks/useWindowResize.spec.tsx`
+  - `packages/commonwealth/test/component/hooks/useNecessaryEffect.spec.tsx`
+  - `packages/commonwealth/test/component/hooks/useForceRerender.spec.tsx`
 
-**Shared Hooks (component tests, ~16 tests, ~400 LOC)**:
-- `useFlag.spec.ts` -- returns boolean, respects provider
-- `useDraft.spec.tsx` -- save/restore/clear/size-limit
-- `useForceRerender.spec.ts` -- counter increments
-- `useBeforeUnload.spec.ts` -- event listener lifecycle
-- `useWindowResize.spec.ts` -- resize callback
-- `useNecessaryEffect.spec.ts` -- effect with deps + cleanup
+**EPIC-3 contract coverage:**
+- View-thread and discussions extraction contracts:
+  - `packages/commonwealth/test/unit/epic3/viewThreadPage.contracts.spec.ts`
+  - `packages/commonwealth/test/unit/epic3/discussionsPage.contracts.spec.ts`
+- Page-level component integration contracts:
+  - `packages/commonwealth/test/component/pages/explorePage.integration.spec.tsx`
+  - `packages/commonwealth/test/component/pages/homePage.integration.spec.tsx`
+  - `packages/commonwealth/test/component/pages/governancePage.integration.spec.tsx`
+  - `packages/commonwealth/test/component/pages/communityHomePage.integration.spec.tsx`
 
-**Feature Smoke Tests (component tests, ~14 tests, ~900 LOC)**:
-One smoke test per migrated feature page -- renders without crash with mock providers:
-- LeaderboardPage, WalletPage, AdminPanel, SignIn, DiscussionsPage, ViewThreadPage, GovernancePage, ContestPage, NotificationSettings, ExplorePage, QuestDetails, SearchPage, LaunchToken, CreateCommunity
+### E2E Coverage Status (post-PR #13406)
 
-### E2E Coverage Gaps to Address Post-Refactor
-
-| Feature | Missing E2E | Priority |
-|---------|------------|----------|
-| Quests (create/list/detail) | No E2E exists | P1 |
-| LaunchToken flow | No E2E exists | P1 |
-| OnBoarding flow | No E2E exists | P1 |
-| GovernancePage (new, behind flag) | No E2E exists | P1 |
-| Leaderboard page | No E2E exists | P2 |
-| WalletPage (full page) | Only transactions covered | P2 |
-| ExplorePage tabs/filtering | No E2E exists | P2 |
-| ContestPage (public view) | Only admin tested | P2 |
+| Feature | Current E2E State | Priority |
+|---------|-------------------|----------|
+| Quests (create/list/detail) | Covered in `refactor-feature-behavior.spec.ts` | P1 delivered |
+| LaunchToken flow | Covered in `refactor-feature-behavior.spec.ts` | P1 delivered |
+| GovernancePage (`/governance`) | Covered via route matrix + behavior guards | P1 delivered |
+| Leaderboard (`/leaderboard`) | Covered in refactor behavior suite | P1 delivered |
+| WalletPage (`/wallet`) | Covered for signed-out and signed-in behavior | P1 delivered |
+| ContestPage public (`/contest/:id`) | Covered for list + detail route resolution | P1 delivered |
+| ExplorePage tabs/filtering | Covered for quests tab controls (`filters`, `search`) | P2 partially delivered |
+| Discussions interactions | Still partial; legacy skipped interaction tests remain | P2 remaining |
 
 ### Verification Gates Per PR
 
-**Every PR must pass:**
-1. `pnpm -r check-types` -- zero errors
-2. `pnpm lint-branch-warnings` -- zero new warnings
-3. `pnpm -F commonwealth bundle` -- production build succeeds
-4. `pnpm -F commonwealth test-unit` -- all unit tests pass
-5. `pnpm -F commonwealth test-component` -- all component tests pass (after setup)
+**PR-required (fast lane):**
+1. `pnpm -r check-types` -- zero type errors
+2. `pnpm lint-diff` -- no new lint violations
+3. `pnpm -F commonwealth bundle` -- production bundle succeeds
+4. `pnpm -F commonwealth test-unit` -- unit suite passes
+5. `pnpm -F commonwealth test-e2e-smoke --forbid-only` -- smoke suite passes
+6. `pnpm -F commonwealth test-component -- --allowOnly=false` -- component suite passes
 
-**Additional gates by PR type:**
+**Additional gates by PR type (automation-first, changed-file aware):**
 
 | PR Type | Extra Gate |
 |---------|-----------|
-| Dead code deletion | `grep -r 'deleted-filename' client/` returns 0 |
-| File move | No files at old location; bundle size doesn't grow >1% |
-| Feature migration | Relevant E2E tests pass; smoke test exists |
-| Boundary rules | `pnpm lint-boundaries` passes |
-| Final cleanup | `npx madge --circular client/scripts/` reports no cycles |
+| Route migration (`navigation/*Routes*`, `Router.tsx`) | Run route-matrix E2E subset for touched routes |
+| Privileged/admin/community-manage changes | Run security route-access E2E subset |
+| Boundary config/import-layer changes | `pnpm -F commonwealth lint-boundaries` (new script in EPIC-5) |
+| Final cleanup (`views/` deletion, alias removal) | `pnpm -F commonwealth no-legacy-imports` + `pnpm -F commonwealth no-stub-imports` + `pnpm depcruise:circular:diff` |
+| Visual baseline update PR | Run `pnpm -F commonwealth test-visual:update` and require human approval |
 
 ### Regression Avoidance for File Moves
 
@@ -285,6 +297,83 @@ One smoke test per migrated feature page -- renders without crash with mock prov
 4. **`pnpm -F commonwealth bundle`** after every file-move PR
 5. **One feature per PR** -- never mix features, each PR independently revertable
 6. **tsconfig/vite aliases added before any moves** (standalone PR)
+
+### Automation-First Decision Log (locked 2026-02-16)
+
+1. **ComponentsShowcase mismatch (`/components`)**
+   Keep `/components` temporarily, mark as deprecated, and remove only after replacement visual targets are in place. This prevents noisy false failures in automated visual flows.
+
+2. **Visual baseline strategy**
+   Use **committed canonical baselines** for visual tests that are gating quality. Run compare mode (`test-visual`) in automated quality gates (nightly + release-candidate). Restrict baseline updates to dedicated PRs using `test-visual:update` with explicit human approval.
+   - Bootstrap note: if no committed baselines exist yet, CI may run update mode artifact generation once to seed the first baseline PR, then return to compare-mode gating.
+   - Timing annotation: remove the bootstrap fallback path in EPIC-6 Wave 6 once baselines are stable and consistently committed in normal PR and nightly runs.
+
+3. **Stateful/mature E2E policy**
+   Keep mature/stateful-heavy coverage out of normal PR fast lane. Run full suites nightly and as **release-candidate blocking gates**.
+
+4. **Boundary rollout mode**
+   Start with **block-new-violations now** (diff-based) while legacy violations remain warning/allowlist for one sprint. Then switch to full blocking once legacy debt is burned down.
+
+5. **Human-in-the-loop checkpoints (required)**
+   - Visual baseline changes: explicit reviewer approval before merge.
+   - Release candidate promotion: explicit human release sign-off after full suite passes.
+   - Temporary boundary allowlist changes: explicit reviewer approval with expiry date.
+
+### Automation Execution Policy
+
+For this refactor program, automation should create issues, draft PRs, and run preconfigured test suites. Humans approve only high-impact checkpoints (baseline updates, release promotion, and temporary policy exceptions).
+
+### 4. Phase 1 Test Backlog Status (EPIC-2..EPIC-6)
+
+Status update (2026-02-17): this PR delivers the full EPIC-2 infrastructure and most high-signal EPIC-3/4/5/6 items. Remaining EPIC-4 depth is primarily richer behavior coverage (beyond guard/path assertions) for specific flows.
+
+| Priority | Epic | Test Type | Scope | Risk Mitigated | Effort | Status |
+|----------|------|-----------|-------|----------------|--------|--------|
+| P0 | EPIC-2 | Unit | Shared util contract suite (`helpers/index`, `constants`, `formatting`, `dates`, `link`, `formValidations`) | Logical regressions during extraction/re-export | M | Done |
+| P0 | EPIC-2 | Component (Vitest + jsdom) | Shared hooks suite (`useFlag`, `useDraft`, `useBeforeUnload`, `useWindowResize`, `useNecessaryEffect`, `useForceRerender`) | Functional and side-effect regressions in hook migration | M | Done |
+| P0 | EPIC-2 | Unit/Integration | `trpcClient` contract tests (exports, header shape, query utils) before/after path move | API call and auth header regressions | S | Done |
+| P0 | EPIC-2 | Static/Unit | Re-export compatibility tests for old → new paths (high-consumer modules) | Import path breakages after moves | S | Done |
+| P0 | EPIC-3 | Component integration | `ViewThreadPage` split contract: loading, error, content, key CTA visibility | Functional/UI regressions from decomposition | M | Partial (contract unit coverage added) |
+| P0 | EPIC-3 | Component integration | `DiscussionsPage` split contract: filters, topic parsing, list rendering modes | Functional regressions in critical page behavior | M | Partial (contract unit coverage added) |
+| P1 | EPIC-3 | Component integration | `ExplorePage`, `GovernancePage`, `CommunityHomePage`, `HomePage` split smoke + key-state checks | UI regressions and state propagation issues | M | Done |
+| P0 | EPIC-4 | E2E | Route migration matrix for touched feature entry routes in common/custom/general routing modes | Functional regressions from route rewiring | M | Done |
+| P0 | EPIC-4 | E2E Security | Unauthorized-access checks for `/admin-panel` and community-manage routes | Security regressions on privileged surfaces | S | Done |
+| P1 | EPIC-4 | E2E behavior | Quests create/list/detail | Missing feature coverage | M | Partial (list/detail + create-route guard) |
+| P1 | EPIC-4 | E2E behavior | LaunchToken happy-path render + key form interactions | Missing feature coverage | M | Partial (render + metadata inputs) |
+| P1 | EPIC-4 | E2E behavior | Governance page flag ON/OFF behavior + proposal navigation | Feature-flag and routing regressions | M | Partial (route behavior guard) |
+| P1 | EPIC-4 | E2E behavior | Wallet full-page (`/wallet`) and public contest page (`/contest/:id`) | Missing high-risk route coverage | M | Partial (signed-in/out + route resolution) |
+| P1 | EPIC-5 | Static lint | Boundary rules + rule-test fixtures + CI enforcement (`lint-boundaries`) | Cross-feature coupling regressions | M | Done |
+| P0 | EPIC-6 | Static lint | No-legacy-import checks (`views`, old aliases) + no-stub-import checks | Cleanup regressions after deletions | S | Done |
+| P1 | EPIC-6 | Static analysis | Circular dependency gate via dependency-cruiser (`depcruise:circular`) | Runtime/logical regressions from cycles | S | Partial (`depcruise:circular:diff` blocking in CI) |
+| P1 | EPIC-6 | Visual | Deterministic key-page visual checks in compare mode | UI regressions during mass moves | M | Done |
+
+### 5. Implementation Plan (Ordered, Incremental, Refactor-Safe)
+
+1. **Wave 0: Baseline + Tooling Contracts**
+   Reconcile plan metrics with current repo state and lock ownership matrix for EPIC-2..EPIC-6 tests. Keep visual policy locked to compare mode for gates and update mode only in baseline-update PRs.
+2. **Wave 1: EPIC-2 Safety Net First**
+   Add component infra (`vitest.component.config.ts`, `test/component/setup.ts`, `renderWithProviders`) and scripts (`test-component`, `test-component:watch`). Implement shared util/hook tests, plus `trpcClient` contract and re-export compatibility tests.
+3. **Wave 2: EPIC-3 Pre-Split Guards**
+   Add page contract tests for `ViewThreadPage` and `DiscussionsPage` before decomposition. Add focused component integration tests for `Explore/Governance/Home` containers.
+4. **Wave 3: EPIC-4 Migration-by-Wave Policy**
+   For each migration PR, require touched-route smoke coverage, one behavior scenario, and one security assertion for privileged pages. Fill missing E2E in priority order: Quests → LaunchToken → Governance → Wallet/Contest public → Leaderboard/Explore filters.
+   Timing annotation: behavior-depth scenarios are implemented within each corresponding EPIC-4 migration ticket and validated again at 4.16 (not deferred to a post-EPIC cleanup).
+5. **Wave 4: EPIC-5 Boundaries**
+   Add `eslint-plugin-boundaries` and `lint-boundaries` script. Roll out as block-new-violations immediately (diff-based), legacy violations warning/allowlist for one sprint, then full blocking.
+6. **Wave 5: EPIC-6 Cleanup Guards**
+   Add no-legacy-import and no-stub-import checks plus `depcruise:circular`. Remove legacy aliases and `views/` only after route matrix, smoke, and key behavior coverage are green.
+7. **Wave 6: Hardening + Automation**
+   Keep PR lane fast; run mature/stateful-heavy suites nightly and as release-candidate blocking gates. Keep human-in-the-loop approvals for visual baseline changes, RC promotion, and temporary boundary allowlist exceptions.
+   EPIC-6 hardening closeout: remove visual bootstrap fallback after baseline stability is demonstrated, and keep compare mode as the only gating mode.
+
+Execution status in PR #13406:
+1. Wave 0 completed (baseline reconciled + ownership/gating policy recorded).
+2. Wave 1 completed (component harness, scripts, EPIC-2 contracts).
+3. Wave 2 mostly completed (EPIC-3 contract tests and key page integration tests).
+4. Wave 3 completed for route/security coverage; behavior depth is partially completed for selected features.
+5. Wave 4 completed (boundary fixtures + blocking diff gate in CI).
+6. Wave 5 completed with diff-blocking cleanup guards (`no-legacy-imports`, `no-stub-imports`, `depcruise:circular:diff`).
+7. Wave 6 completed (visual compare gate + baseline-update workflow + nightly/RC hardening workflow).
 
 ---
 
@@ -597,19 +686,21 @@ EPIC-1: Dead Code Deletion
 EPIC-2: Shared Infrastructure
 ├── 2.1: Set up component test infrastructure [blocked-by: EPIC-1]
 │   new: vitest.component.config.ts, test/component/setup.ts,
-│        test/component/helpers/renderWithProviders.tsx
+│        test/component/renderWithProviders.tsx
 │   deps: @testing-library/react, jest-dom, user-event
 │   ~250 LOC new
 │   reviewer: frontend
 │
 ├── 2.2: Create shared/ directory scaffolding + tsconfig/vite aliases [blocked-by: EPIC-1]
 │   new dirs: client/scripts/shared/{hooks,utils,api}, client/scripts/features/
-│   modify: tsconfig.json, client/vite.config.ts
-│   ~30 LOC modify
+│   modify: packages/commonwealth/tsconfig.json, packages/commonwealth/client/vite.config.ts
+│   NOTE: keep existing package-level `shared/*` imports intact; add scoped aliases
+│         (`shared/hooks/*`, `shared/utils/*`, `shared/api/*`, `features/*`) only
+│   ~40 LOC modify
 │   reviewer: full-stack
 │
 ├── 2.3: Migrate shared reusable hooks to shared/hooks/ [blocked-by: 2.2, 1.5]
-│   move: 16 hooks via git mv
+│   move: 17 hooks via git mv (including `useDeviceProfile`)
 │   create: shared/hooks/index.ts barrel, hooks/index.ts re-export stub
 │   ~500 LOC move, ~80 LOC new
 │   reviewer: frontend
@@ -642,23 +733,26 @@ EPIC-2: Shared Infrastructure
 │   reviewer: frontend
 │
 ├── 2.9: Write unit tests for extracted shared utils [blocked-by: 2.4] [PARALLEL w/ 2.6-2.8]
-│   new: 8 test files, ~600 LOC
+│   baseline merged: `test/unit/epic2/*.spec.ts` in PR #13406
+│   new in this wave: post-move assertions + alias-resolution coverage for extracted modules
 │   reviewer: frontend
 │
 ├── 2.10: Write component tests for extracted shared hooks [blocked-by: 2.1, 2.3] [PARALLEL]
-│   new: 6 test files, ~400 LOC
+│   baseline merged: 6 hook specs in `test/component/hooks/*` (PR #13406)
+│   new in this wave: extend suite as additional hooks are moved to shared/hooks
 │   reviewer: frontend
 │
 ├── 2.11: Create feature directory stubs + migrate feature-specific helpers [blocked-by: 2.2]
 │   new dirs: features/{quests,governance,tokens,explore,blockchain,wallet,
-│             discussions,auth,contests,notifications,communities,search,mobile}/
+│             discussions,auth,contests,notifications,communities,search}/
 │   move: 10 helper files/directories
 │   HIGH-IMPACT: quest.ts (23 consumers), snapshot_utils.ts (23), ContractHelpers/ (30)
 │   ~3000 LOC move
 │   reviewer: frontend
 │
 └── 2.12: Migrate feature-specific hooks to feature dirs [blocked-by: 2.2, 2.3]
-    move: 14 hooks to respective feature directories
+    move: 12 hooks to respective feature directories
+    NOTE: React Native hooks removed in EPIC-1.8 are intentionally excluded
     ~800 LOC move
     reviewer: frontend
 ```
@@ -848,7 +942,8 @@ EPIC-6: Kill views/ + Final Cleanup
 │   ~20 LOC modify
 │
 └── 6.11: Final circular dependency audit + cleanup [blocked-by: 6.10]
-    Run: madge --circular, bundle, check-types, test-component, test-unit
+    Run: pnpm depcruise:circular, bundle, check-types, test-component, test-unit
+    Transition note: switch from `pnpm depcruise:circular:diff` (guarding new cycles) to full `pnpm depcruise:circular` blocking at this step.
     ~200 LOC modify
 ```
 
@@ -902,12 +997,12 @@ client/scripts/                    159,062 LOC   1,986 files
 └── lib/                                24   0%      1 file
 ```
 
-**DevX problems today:**
+**DevX problems in the pre-hardening baseline:**
 - **"Where does this go?"** -- No clear answer. hooks/ vs helpers/ vs utils/ vs state/ vs controllers/ are all grab bags. New code goes wherever the dev guesses.
 - **views/ is 79% of the codebase** -- A search for anything returns views/ results. Feature boundaries don't exist.
 - **Cross-feature imports everywhere** -- DiscussionsPage imports from CommunityManagement/Contests/. NotificationSettings exports hooks consumed by Discussions. No enforcement.
 - **Duplicate patterns** -- helpers/clipboard.ts AND utils/clipboard.ts. useForceRerender AND useRerender. helpers/index.tsx is a 278-line junk drawer.
-- **Zero component tests** -- No safety net for refactoring. Only E2E tests catch regressions.
+- **Component tests were absent** -- before this hardening program, only E2E tests caught UI regressions.
 - **Finding a feature's code requires searching 4+ directories** -- Page in views/pages/, components in views/components/, hooks in hooks/, state in state/api/, helpers in helpers/.
 
 ---
@@ -1033,9 +1128,8 @@ client/scripts/                    ~152,000 LOC   ~1,850 files
 │   ├── markets/                       ~500
 │   │   └── pages/ (MarketsAppPage)
 │   │
-│   └── mobile/                      ~1,000
-│       ├── pages/ (MobileAppRedirect)
-│       └── hooks/ (useMobileRPCSender, etc.)
+│   └── mobile/                      removed in EPIC-1.8
+│       └── React Native bridge + MobileAppRedirect deleted (PR #13347)
 │
 ├── shared/                         ~28,000  18%    ~350 files  ← TRULY SHARED CODE
 │   ├── components/
@@ -1044,7 +1138,7 @@ client/scripts/                    ~152,000 LOC   ~1,850 files
 │   │   ├── SublayoutHeader/          1,959
 │   │   ├── MarkdownEditor/           1,958
 │   │   ├── Profile/                  2,070
-│   │   ├── Privy/                      807
+│   │   ├── Privy/                     removed in EPIC-1.7 (PR #13348)
 │   │   ├── menus/                      500
 │   │   └── (20+ small shared components)
 │   ├── hooks/                        1,200
@@ -1113,13 +1207,13 @@ client/scripts/                    ~152,000 LOC   ~1,850 files
 
 ### DevX Before vs After
 
-| DevX Dimension | Before (Today) | After (End State) |
+| DevX Dimension | Before (Pre-hardening baseline) | After (End State) |
 |----------------|-----------------|-------------------|
 | **"Where do I put new code?"** | Guess: hooks/ vs helpers/ vs utils/ vs controllers/ vs state/? | **Clear:** `features/<name>/` for feature code, `shared/` for reusable code |
 | **"Where is the Discussions feature?"** | Search 4+ directories: views/pages/discussions/, views/components/Comments/, hooks/useDraft.tsx, state/api/threads/, helpers/threads.ts | **One directory:** `features/discussions/` (pages, components, hooks, utils, modals) |
 | **"Can I import from another feature?"** | No rules. CommunityManagement/Contests/ is imported by 17 files across 7 features | **Lint enforced:** `features/*` cannot import from `features/<other>/*`. Must go through `shared/` |
 | **"What's the design system?"** | Buried at views/components/component_kit/ inside a 125k LOC views/ directory | **Top-level:** `shared/components/component_kit/` -- clearly separated |
-| **"How do I test this component?"** | You don't. Zero component tests. E2E only. | **Testing Library setup** with renderWithProviders, per-feature smoke tests, shared hook/util unit tests |
+| **"How do I test this component?"** | No component test harness; E2E-only fallback. | **Testing Library setup** with renderWithProviders, per-feature smoke tests, shared hook/util unit tests |
 | **"What can I safely delete?"** | No idea. Import graph is tangled. | **Boundary lint rules** prevent new tangles. Dead code shows up as lint violations. |
 | **"How big is each feature?"** | Unknown. Everything is in views/. | **Measurable:** `wc -l features/discussions/**` gives you the answer |
 | **File count in a directory** | views/ has **1,496 files** | Largest feature dir has ~200 files. shared/ has ~350. |
@@ -1162,12 +1256,11 @@ Per the meeting note "must remove workers / things that don't / shouldn't remain
 **Found in client:**
 - `client/public/firebase-messaging-sw.js` -- Firebase Cloud Messaging service worker for Knock push notifications. **Active/in-use.** Handles push event display and notification click routing. Should keep.
 - `client/public/manifest.json` -- PWA manifest ("Common App", standalone display). Review with product whether PWA support is still desired.
-- `hooks/mobile/useMobileRPCSender.ts` + `useMobileRPCEventReceiver.ts` -- React Native WebView bridge (postMessage). **Active for mobile app.** Moving to `features/mobile/hooks/` in EPIC-2.
-- `hooks/useReactNativeWebView.ts` -- RN WebView detection + `isMobileApp()`. Same as above.
+- React Native bridge hooks/pages were removed in EPIC-1.8 (`PR #13347`); no `hooks/mobile/*` bridge code remains in current repo state.
 
 **No traditional Web Workers or SharedWorkers found.** No `.worker.ts` files, no `new Worker()` calls.
 
-**Action:** No client-side workers need removal. The Firebase SW and mobile bridge are functional. The PWA manifest (`manifest.json`) may warrant a product review on whether to keep PWA support.
+**Action:** No additional client-side worker removals required. Keep Firebase SW as-is; review PWA manifest (`manifest.json`) with product if PWA support scope changes.
 
 ---
 
@@ -1725,15 +1818,22 @@ After each epic:
 1. `pnpm -r check-types` passes
 2. `pnpm -F commonwealth bundle` succeeds
 3. `pnpm -F commonwealth test-unit` passes
-4. `pnpm -F commonwealth test-component` passes (after EPIC-2)
-5. `pnpm lint-branch-warnings` clean
+4. `pnpm -F commonwealth test-e2e-smoke --forbid-only` passes
+5. `pnpm -F commonwealth test-component` passes (after EPIC-2)
+6. `pnpm lint-diff` clean
 
 Final verification (EPIC-6):
-- `npx madge --circular --extensions ts,tsx client/scripts/` -- no cycles
-- All E2E suites pass on staging
+- `pnpm depcruise:circular` (new script) -- no circular dependencies
+- `pnpm -F commonwealth test-e2e` passes
+- `pnpm -F commonwealth test-e2e-serial` passes
+- `pnpm -F commonwealth test-e2e-mature` passes
+- `pnpm -F commonwealth test-visual` passes in compare mode
 - No `views/` directory exists
 - No deprecated re-export stubs remain
+- No legacy aliases/imports remain (`views`, `helpers`, `hooks`, `controllers`, `models`)
+- Release-candidate promotion has explicit human sign-off
 
 ## Change Log
 
 - 260202: Updated by Codex; moved plan into Common Knowledge and added status section.
+- 260216: Updated by Codex with automation-first testing policy decisions (visual baseline gating, nightly+RC mature E2E, staged boundary enforcement, and human-in-the-loop approvals).

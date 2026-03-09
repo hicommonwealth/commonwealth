@@ -1,5 +1,5 @@
 import { getBrowserType } from 'helpers/browser';
-import useAppStatus from 'hooks/useAppStatus';
+import useAppStatus from 'shared/hooks/useAppStatus';
 
 const SAFARI_ENABLED = true;
 

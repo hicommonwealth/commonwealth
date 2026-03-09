@@ -1,9 +1,9 @@
 import { jumpHighlightElement } from 'helpers/html';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import Group from 'models/Group';
 import MinimumProfile from 'models/MinimumProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import app from 'state';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles/index';

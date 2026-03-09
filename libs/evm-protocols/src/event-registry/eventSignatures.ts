@@ -59,6 +59,20 @@ export const EvmEventSignatures = {
     JudgeNominated:
       '0xd3381a18ee091ebc453476f9f0f9167642972862d5946a730a557ef658113ac1',
   },
+  PredictionMarket: {
+    TokensMinted:
+      '0xef616469a0b35ce807813d17c53c505b9d4796a93287cd361318dbca99ac9250',
+    TokensMerged:
+      '0x5c89c1323725653974345a374ee77b42caf5137589586f5ecd2643b4f5595284',
+    SwapExecuted:
+      '0x6c3029970cad07cf2c4bef13d30bdb7b6b77093a579d543839b5386cb0184b03',
+    TokensRedeemed:
+      '0x9a3541a9607a3b384f06a6f84bfe21fa1717a369e4c28574c6e784d586789c74',
+    ProposalResolved:
+      '0xa57dd01540a3fffc26f05f994ad25d6f8af2e1c9343c994e5f61be3bd5b9bff3',
+    MarketResolved:
+      '0xf34984473148051bc1bdf1be6ecc462d7b228d591058a8a27977b84770b738b9',
+  },
   TokenCommunityManager: {
     CommunityNamespaceCreated:
       '0xa16d784cb6c784b621c7877ce80495765ed32ca0b3dba2ef467116a435f125fd',

@@ -1,6 +1,6 @@
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { LoadingIndicator } from '../../components/LoadingIndicator/LoadingIndicator';
 

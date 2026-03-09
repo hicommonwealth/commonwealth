@@ -16,6 +16,22 @@ function createScriptsResolver(folder: string): Alias {
   };
 }
 
+function createScopedScriptsResolver(
+  scopedNamespace: string,
+  scriptsRelativePath: string,
+): Alias {
+  const find = new RegExp(`^${scopedNamespace}/(.*)$`);
+  return {
+    find,
+    replacement: path.resolve(
+      projectRootDir,
+      'scripts',
+      scriptsRelativePath,
+      '$1',
+    ),
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const envPath = path.dirname(path.dirname(process.cwd())); // root project .env
@@ -52,6 +68,7 @@ export default defineConfig(({ mode }) => {
     ),
     'process.env.FLAG_BINANCE_WEB': JSON.stringify(env.FLAG_BINANCE_WEB),
     'process.env.FLAG_MARKETS': JSON.stringify(env.FLAG_MARKETS),
+    'process.env.FLAG_FUTARCHY': JSON.stringify(env.FLAG_FUTARCHY),
   };
 
   return {
@@ -188,6 +205,10 @@ export default defineConfig(({ mode }) => {
         createScriptsResolver('controllers'),
         createScriptsResolver('models'),
         createScriptsResolver('helpers'),
+        createScopedScriptsResolver('shared/hooks', 'shared/hooks'),
+        createScopedScriptsResolver('shared/utils', 'shared/utils'),
+        createScopedScriptsResolver('shared/api', 'shared/api'),
+        createScopedScriptsResolver('features', 'features'),
       ],
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },

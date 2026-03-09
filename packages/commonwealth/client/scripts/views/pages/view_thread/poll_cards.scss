@@ -4,3 +4,32 @@
   display: flex;
   padding: 16px;
 }
+
+.PredictionMarketCard {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .prediction-prompt {
+    margin: 0;
+  }
+
+  .collateral-balance-row,
+  .total-minted-row {
+    margin: 0;
+    color: var(--text-secondary, #666);
+  }
+
+  .PredictionMarketCard-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .complete-deployment-button,
+  .trade-button {
+    align-self: flex-start;
+  }
+}

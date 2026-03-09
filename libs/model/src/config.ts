@@ -98,7 +98,6 @@ const {
   KLAVIS_API_KEY,
   REORG_SAFETY_DISABLED,
   SEND_EMAILS,
-  MCP_BOT_EMAIL,
   IGNORE_CONTENT_CREATION_LIMIT,
   AI_BOT_USER_ADDRESS,
   MAGNA_API_KEY,
@@ -107,6 +106,7 @@ const {
   SLACK_WEBHOOK_URL_ALL_ENG,
   SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
   FLAG_MARKETS,
+  FLAG_FUTARCHY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -323,7 +323,6 @@ export const config = configure(
     MCP: {
       MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
       MCP_KEY_BYPASS: MCP_KEY_BYPASS,
-      BOT_EMAIL: MCP_BOT_EMAIL || 'mcp@common.xyz',
     },
     XP: {
       REFERRER_FEE_RATIO: parseFloat(
@@ -362,6 +361,7 @@ export const config = configure(
     },
     MARKETS: {
       ENABLED: FLAG_MARKETS === 'true',
+      FUTARCHY_ENABLED: FLAG_FUTARCHY === 'true',
     },
   },
   z.object({
@@ -718,7 +718,6 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && data),
           'MCP_KEY_BYPASS cannot be set in production',
         ),
-      BOT_EMAIL: z.string(),
     }),
     XP: z.object({
       REFERRER_FEE_RATIO: z.number(),
@@ -775,6 +774,7 @@ export const config = configure(
     }),
     MARKETS: z.object({
       ENABLED: z.boolean(),
+      FUTARCHY_ENABLED: z.boolean(),
     }),
   }),
 );

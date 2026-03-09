@@ -1,6 +1,6 @@
 import { generateBlobImageFromAlphabet } from 'helpers/image';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useMemo, useState } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import app from 'state';
 import { useGetPinnedTokenByCommunityId } from 'state/api/communities';
 import {

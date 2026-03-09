@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-import useBrowserWindow from 'hooks/useBrowserWindow';
-import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
 import { matchRoutes, useLocation, useSearchParams } from 'react-router-dom';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
+import useWindowResize from 'shared/hooks/useWindowResize';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
@@ -141,7 +141,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     (user.isWelcomeOnboardFlowComplete || !isWindowSmallInclusive) &&
     !(isWindowExtraSmall && isWelcomeOnboardModalOpen);
   return (
-    <div className="Sublayout">
+    <div className="Sublayout" data-testid="sublayout">
       {(!isWindowSmallInclusive || isWindowSmallToMedium) && (
         <CollapsableSidebarButton
           onMobile={isWindowExtraSmall}
@@ -162,7 +162,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
         onClose={() => setAuthModalType(undefined)}
         isOpen={!!authModalType}
       />
-      <div className="sidebar-and-body-container">
+      <div className="sidebar-and-body-container" data-testid="main-content">
         <Sidebar
           // @ts-expect-error StrictNullChecks
           isInsideCommunity={isInsideCommunity}
