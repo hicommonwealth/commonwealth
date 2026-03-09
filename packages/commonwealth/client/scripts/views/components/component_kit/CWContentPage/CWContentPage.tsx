@@ -1,4 +1,5 @@
 import { GetThreadToken } from '@hicommonwealth/schemas';
+import { ThreadPredictionMarketTagContainer } from 'client/scripts/views/components/ThreadPredictionMarketTag';
 import { truncate } from 'helpers/truncate';
 import useTopicGating from 'hooks/useTopicGating';
 import { IThreadCollaborator } from 'models/Thread';
@@ -237,6 +238,7 @@ export const CWContentPage = ({
             <ThreadContestTagContainer
               associatedContests={thread?.associatedContests}
             />
+            {thread && <ThreadPredictionMarketTagContainer thread={thread} />}
             {truncate(title)}
           </h1>
         ) : (
