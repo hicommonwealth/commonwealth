@@ -123,12 +123,15 @@ export const PredictionMarketEditorModal = ({
 
     try {
       setPhase('creating');
+      const initialLiquidity = (values.initialLiquidity ?? '').trim() || '0';
+
       await createMutation.mutateAsync({
         thread_id: thread.id,
         prompt: values.prompt.trim(),
         collateral_address: collateralAddress as `0x${string}`,
         duration: values.durationDays * 86400,
         resolution_threshold: values.resolutionThreshold / 100,
+        initial_liquidity: initialLiquidity,
       });
 
       if (!activeAddress) {
@@ -183,7 +186,7 @@ export const PredictionMarketEditorModal = ({
         collateral_address: collateralAddress as `0x${string}`,
         duration_days: values.durationDays,
         resolution_threshold: values.resolutionThreshold / 100,
-        initial_liquidity: (values.initialLiquidity ?? '').trim() || '0',
+        initial_liquidity: initialLiquidity,
       });
 
       await deployMutation.mutateAsync({
@@ -199,6 +202,7 @@ export const PredictionMarketEditorModal = ({
         f_token_address: payload.f_token_address as string,
         start_time: payload.start_time as unknown,
         end_time: payload.end_time as unknown,
+        initial_liquidity: initialLiquidity,
       });
 
       notifySuccess('Prediction market created and deployed.');

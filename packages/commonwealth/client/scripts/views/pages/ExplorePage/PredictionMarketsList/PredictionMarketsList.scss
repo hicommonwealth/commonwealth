@@ -63,7 +63,9 @@
   border-radius: 12px;
   border: 1px solid colors.$neutral-200;
   background: colors.$neutral-25;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
   min-height: 180px;
 
   &:hover {

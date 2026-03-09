@@ -1,11 +1,26 @@
+import { PredictionMarketStatus } from '@hicommonwealth/schemas';
 import { getCollateralBalanceAndSymbol } from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
 import type Thread from 'client/scripts/models/Thread';
 import useGetCommunityByIdQuery from 'client/scripts/state/api/communities/getCommuityById';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
-import useUserStore from 'client/scripts/state/ui/user';
+import {
+  useGetPredictionMarketPositionsQuery,
+  useGetPredictionMarketTradesQuery,
+} from 'client/scripts/state/api/predictionMarket';
+import { openConfirmation } from 'client/scripts/views/modals/confirmation_modal';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
+import {
+  useCancelPredictionMarketMutation,
+  useGetPredictionMarketsQuery,
+} from 'state/api/prediction-markets';
+import useUserStore from 'state/ui/user';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { CWDivider } from '../../components/component_kit/cw_divider';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
+import { PopoverMenu } from '../../components/component_kit/CWPopoverMenu';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
@@ -13,6 +28,8 @@ import { DeployDraftPredictionMarketModal } from '../../modals/PredictionMarket/
 import { PredictionMarketResolveModal } from '../../modals/PredictionMarket/PredictionMarketResolveModal';
 import { PredictionMarketTradeModal } from '../../modals/PredictionMarketTradeModal';
 import './poll_cards.scss';
+import { formatCollateral } from './predictionMarketUtils';
+import './ThreadPredictionMarketCard.scss';
 
 function formatCollateralBalance(wei: bigint, decimals: number): string {
   if (wei === 0n) return '0.00';
@@ -22,11 +39,13 @@ function formatCollateralBalance(wei: bigint, decimals: number): string {
   return `${whole}.${frac.toString().padStart(2, '0').slice(0, 2)}`;
 }
 
-type PredictionMarketResult = {
+export type PredictionMarketResult = {
   id: number;
   thread_id: number;
   prompt: string;
   status: string;
+  total_collateral?: string;
+  current_probability?: number;
   duration?: number;
   resolution_threshold?: number;
   collateral_address?: string;
@@ -41,60 +60,128 @@ type PredictionMarketResult = {
   eth_chain_id?: number;
   winner?: number | null;
   created_at?: string;
-  /** Total collateral minted in market (wei string from DB). */
-  total_collateral?: string;
   [key: string]: unknown;
 };
 
 type ThreadPredictionMarketCardProps = {
   thread: Thread;
-  market: PredictionMarketResult;
+  market?: PredictionMarketResult;
   isAuthor?: boolean;
   canResolveMarket?: boolean;
 };
 
-const statusTagType = (
-  status: string,
-): 'info' | 'active' | 'passed' | 'failed' | 'disabled' => {
+const getStatusLabel = (status: string) => {
   switch (status) {
-    case 'draft':
+    case PredictionMarketStatus.Draft:
+      return 'Draft';
+    case PredictionMarketStatus.Active:
+      return 'Active';
+    case PredictionMarketStatus.Resolved:
+      return 'Resolved';
+    case PredictionMarketStatus.Cancelled:
+      return 'Cancelled';
+    default:
+      return status;
+  }
+};
+
+const getStatusTagType = (
+  status: string,
+): 'info' | 'active' | 'passed' | 'disabled' => {
+  switch (status) {
+    case PredictionMarketStatus.Draft:
       return 'info';
-    case 'active':
+    case PredictionMarketStatus.Active:
       return 'active';
-    case 'resolved':
+    case PredictionMarketStatus.Resolved:
       return 'passed';
-    case 'cancelled':
+    case PredictionMarketStatus.Cancelled:
       return 'disabled';
     default:
       return 'info';
   }
 };
 
-const statusLabel: Record<string, string> = {
-  draft: 'Draft',
-  active: 'Active',
-  resolved: 'Resolved',
-  cancelled: 'Cancelled',
+const getTimeRemaining = (m: PredictionMarketResult) => {
+  if (!m?.end_time) return null;
+
+  const endTime = moment(m.end_time);
+  const now = moment();
+
+  if (endTime.isBefore(now)) {
+    return `Ended ${endTime.format('lll')}`;
+  }
+
+  const duration = moment.duration(endTime.diff(now));
+  const days = Math.floor(duration.asDays());
+  const hours = duration.hours();
+  const minutes = duration.minutes();
+  const seconds = duration.seconds();
+
+  if (days > 0) {
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  }
+  if (hours > 0) {
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+  return `${minutes}m ${seconds}s`;
 };
 
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000';
 
 export const ThreadPredictionMarketCard = ({
   thread,
-  market,
-  isAuthor = false,
-  canResolveMarket = false,
+  market: marketProp,
+  isAuthor: isAuthorProp,
+  canResolveMarket,
 }: ThreadPredictionMarketCardProps) => {
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [isResolveModalOpen, setIsResolveModalOpen] = useState(false);
   const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
+  const [timeDisplay, setTimeDisplay] = useState<string | null>(null);
+  const user = useUserStore();
+
+  const { data: marketsData, isLoading } = useGetPredictionMarketsQuery({
+    threadId: thread.id!,
+    apiCallEnabled: !marketProp,
+  });
+
+  const { mutateAsync: cancelMarket } = useCancelPredictionMarketMutation({
+    threadId: thread.id!,
+  });
+
+  const market =
+    marketProp ??
+    (marketsData?.results?.[0] as PredictionMarketResult | undefined);
+
+  const { data: positions = [] } = useGetPredictionMarketPositionsQuery({
+    prediction_market_id: market?.id ?? 0,
+  });
+  const userPosition = Array.isArray(positions)
+    ? positions.find(
+        (p: { user_address: string }) =>
+          p.user_address?.toLowerCase() ===
+          user.activeAccount?.address?.toLowerCase(),
+      )
+    : undefined;
+
+  const { data: tradesData } = useGetPredictionMarketTradesQuery({
+    prediction_market_id: market?.id ?? 0,
+  });
+  const trades =
+    (tradesData as { results?: { collateral_amount: string }[] })?.results ??
+    [];
+  const marketVolume = trades.reduce(
+    (sum, t) => sum + BigInt(t.collateral_amount || '0'),
+    0n,
+  );
+
   const [collateralDisplay, setCollateralDisplay] = useState<{
     symbol: string;
     balance: string;
     decimals: number;
   } | null>(null);
 
-  const user = useUserStore();
   const activeAddress = user.activeAccount?.address ?? '';
   const { data: community } = useGetCommunityByIdQuery({
     id: thread?.communityId ?? '',
@@ -109,8 +196,8 @@ export const ThreadPredictionMarketCard = ({
       ?.ChainNode?.eth_chain_id ?? 0;
 
   const isCollateralZero =
-    !market.collateral_address ||
-    market.collateral_address.toLowerCase() === ZERO_ADDR.toLowerCase();
+    !market?.collateral_address ||
+    market?.collateral_address.toLowerCase() === ZERO_ADDR.toLowerCase();
   const { data: ethBalance = '' } = useGetUserEthBalanceQuery({
     chainRpc,
     walletAddress: activeAddress,
@@ -120,7 +207,23 @@ export const ThreadPredictionMarketCard = ({
   });
 
   useEffect(() => {
-    const addr = market.collateral_address;
+    if (!market) return;
+    setTimeDisplay(getTimeRemaining(market));
+  }, [market]);
+
+  useEffect(() => {
+    if (!market?.end_time) return;
+    const endTime = moment(market.end_time);
+    if (endTime.isBefore(moment())) return;
+
+    const interval = setInterval(() => {
+      setTimeDisplay(getTimeRemaining(market));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [market?.end_time, market]);
+
+  useEffect(() => {
+    const addr = market?.collateral_address;
     const isZero = !addr || addr.toLowerCase() === ZERO_ADDR.toLowerCase();
     if (isZero) {
       const bal = ethBalance === '0.' ? '0' : ethBalance || '—';
@@ -147,91 +250,283 @@ export const ThreadPredictionMarketCard = ({
     return () => {
       cancelled = true;
     };
-  }, [chainRpc, activeAddress, market.collateral_address, ethBalance]);
+  }, [chainRpc, activeAddress, market?.collateral_address, ethBalance]);
 
-  const isDraft = market.status === 'draft';
-  const isActive = market.status === 'active';
+  const handleCancelMarket = () => {
+    if (!market) return;
+
+    openConfirmation({
+      title: 'Cancel Prediction Market',
+      description: 'Are you sure you want to cancel this prediction market?',
+      buttons: [
+        {
+          label: 'Cancel Market',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
+          onClick: async () => {
+            try {
+              await cancelMarket({
+                thread_id: thread.id!,
+                prediction_market_id: market.id,
+              });
+            } catch (err) {
+              console.error('Failed to cancel prediction market', err);
+            }
+          },
+        },
+        {
+          label: 'Dismiss',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+      ],
+    });
+  };
+
+  const isThreadAuthor =
+    user.activeAccount?.address === thread.author &&
+    user.activeAccount?.community?.id === thread.communityId;
+
+  const isAuthor = isAuthorProp ?? isThreadAuthor;
+
+  const isDraft = market?.status === PredictionMarketStatus.Draft;
   const canCompleteDraft = isDraft && isAuthor;
-  const endTime = market.end_time ? new Date(market.end_time) : new Date(0);
-  const canShowResolve = isActive && canResolveMarket;
+
   const canTrade =
-    (market.status === 'active' || market.status === 'resolved') &&
-    !!market.vault_address &&
-    !!market.router_address;
+    (market?.status === 'active' || market?.status === 'resolved') &&
+    !!market?.vault_address &&
+    !!market?.router_address;
+
+  const canCancel =
+    isAuthor && market && market.status === PredictionMarketStatus.Draft;
+
+  const canResolve =
+    isAuthor &&
+    market &&
+    market.status === PredictionMarketStatus.Active &&
+    !!market.vault_address;
+
+  const decimals = collateralDisplay?.decimals ?? 18;
+  const symbol = collateralDisplay?.symbol ?? 'ETH';
+  const pBalance = userPosition?.p_token_balance
+    ? formatCollateralBalance(
+        BigInt(String(userPosition.p_token_balance)),
+        decimals,
+      )
+    : '0.00';
+  const fBalance = userPosition?.f_token_balance
+    ? formatCollateralBalance(
+        BigInt(String(userPosition.f_token_balance)),
+        decimals,
+      )
+    : '0.00';
+
+  const passProbability = market?.current_probability ?? 0.5;
+  const failProbability = 1 - passProbability;
+
+  if (marketProp === undefined && isLoading) {
+    return (
+      <CWCard className="ThreadPredictionMarketCard skeleton">
+        <div className="prediction-market-header">
+          <div className="skeleton-badge" />
+          <div className="skeleton-prompt" />
+        </div>
+        <div className="metrics-cards">
+          <div className="skeleton-metric" />
+          <div className="skeleton-metric" />
+        </div>
+        <div className="probability-section">
+          <div className="skeleton-bar" />
+        </div>
+      </CWCard>
+    );
+  }
+
+  if (!market) {
+    return (
+      <CWCard className="ThreadPredictionMarketCard empty-state">
+        <CWText type="b2" className="empty-state-message">
+          No prediction market for this thread.
+        </CWText>
+      </CWCard>
+    );
+  }
 
   return (
     <>
-      <CWContentPageCard
-        header="Prediction market"
-        showCollapsedIcon
-        content={
-          <div className="PredictionMarketCard">
-            <CWText type="b2" className="prediction-prompt">
-              {market.prompt || 'No prompt'}
+      <CWCard className="ThreadPredictionMarketCard">
+        <div className="prediction-market-header">
+          <div className="market-prompt-row">
+            <CWText type="b2" className="market-prompt">
+              {market.prompt}
             </CWText>
-            <CWTag
-              label={statusLabel[market.status] ?? market.status}
-              type={statusTagType(market.status)}
-            />
-            {canTrade && collateralDisplay && (
-              <CWText type="caption" className="collateral-balance-row">
-                Collateral: <strong>{collateralDisplay.symbol}</strong>
-                {' — '}
-                Your balance: {collateralDisplay.balance}{' '}
-                {collateralDisplay.symbol}
-              </CWText>
-            )}
-            {canShowResolve && (
-              <CWButton
-                buttonHeight="sm"
-                buttonType="primary"
-                label="Resolve market"
-                className="resolve-market-button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsResolveModalOpen(true);
-                }}
+            {(canCancel || canResolve || canCompleteDraft) && (
+              <PopoverMenu
+                className="prediction-market-actions"
+                placement="bottom-end"
+                renderTrigger={(handleInteraction) => (
+                  <CWIconButton
+                    iconName="gear"
+                    iconSize="small"
+                    onClick={handleInteraction}
+                    iconButtonTheme="neutral"
+                    aria-label="Market actions"
+                  />
+                )}
+                menuItems={[
+                  ...(canCompleteDraft
+                    ? [
+                        {
+                          label: 'Complete deployment',
+                          iconLeft: 'trophy' as const,
+                          iconLeftWeight: 'bold' as const,
+                          onClick: (e?: React.MouseEvent<HTMLElement>) => {
+                            e?.stopPropagation();
+                            setIsDeployModalOpen(true);
+                          },
+                        },
+                      ]
+                    : []),
+                  ...(canCancel
+                    ? [
+                        {
+                          label: 'Cancel market',
+                          iconLeft: 'close' as const,
+                          iconLeftWeight: 'bold' as const,
+                          onClick: (e?: React.MouseEvent<HTMLElement>) => {
+                            e?.stopPropagation();
+                            handleCancelMarket();
+                          },
+                        },
+                      ]
+                    : []),
+                  ...(canResolve && canResolveMarket
+                    ? [
+                        {
+                          label: 'Resolve market',
+                          iconLeft: 'trophy' as const,
+                          iconLeftWeight: 'bold' as const,
+                          onClick: () => setIsResolveModalOpen(true),
+                        },
+                      ]
+                    : []),
+                ]}
               />
             )}
-            {market.total_collateral != null && (
-              <CWText type="caption" className="total-minted-row">
-                Total minted:{' '}
-                {formatCollateralBalance(
-                  BigInt(market.total_collateral),
-                  collateralDisplay?.decimals ?? 18,
-                )}{' '}
-                {collateralDisplay?.symbol ?? 'ETH'}
+          </div>
+          {timeDisplay && (
+            <div className="time-remaining">
+              <CWIcon iconName="timer" iconSize="small" />
+              <CWText type="caption" className="time-text">
+                {timeDisplay}
               </CWText>
-            )}
-            <div className="PredictionMarketCard-actions">
-              {canCompleteDraft && (
-                <CWButton
-                  buttonHeight="sm"
-                  buttonType="primary"
-                  label="Complete deployment"
-                  className="complete-deployment-button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsDeployModalOpen(true);
-                  }}
-                />
-              )}
-              {canTrade && (
-                <CWButton
-                  buttonHeight="sm"
-                  buttonType="secondary"
-                  label={market.status === 'resolved' ? 'Redeem' : 'Trade'}
-                  className="trade-button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsTradeModalOpen(true);
-                  }}
-                />
-              )}
+            </div>
+          )}
+          <CWTag
+            label={getStatusLabel(market.status)}
+            type={getStatusTagType(market.status)}
+            classNames="status-badge"
+          />
+        </div>
+        <CWDivider />
+
+        <div className="metrics-cards">
+          <div className="metric-card">
+            <div className="metric-row">
+              <CWText type="caption" className="metric-label">
+                TOTAL MINTED
+              </CWText>
+              <CWText type="b1" className="metric-value">
+                {formatCollateral(market.total_collateral ?? '0')}&nbsp;
+                <CWText type="b2">
+                  <span className="metric-symbol">{symbol}</span>
+                </CWText>
+              </CWText>
             </div>
           </div>
-        }
-      />
+          <div className="metric-card">
+            <div className="metric-row">
+              <CWText type="caption" className="metric-label">
+                MARKET VOL.
+              </CWText>
+              <CWText type="b1" className="metric-value">
+                {formatCollateral(marketVolume.toString())}&nbsp;
+                <CWText type="b2">
+                  <span className="metric-symbol">{symbol}</span>
+                </CWText>
+              </CWText>
+            </div>
+          </div>
+        </div>
+
+        <div className="collateral-section">
+          <div className="collateral-row">
+            <CWText type="caption" className="collateral-label">
+              Collateral
+            </CWText>
+            <CWText type="caption" className="collateral-value">
+              {symbol}
+            </CWText>
+          </div>
+          <div className="collateral-row">
+            <CWText type="caption" className="collateral-label">
+              Your balance
+            </CWText>
+            <CWText type="b2" className="collateral-value">
+              {collateralDisplay?.balance ?? '—'} {symbol}
+            </CWText>
+          </div>
+        </div>
+        <CWDivider />
+        <div className="probability-section">
+          <div className="probability-labels">
+            <div className="balance-label">
+              <CWText type="caption" className="pass-label">
+                PASS BALANCE
+              </CWText>
+              <CWText type="b2" className="pass-value">
+                {pBalance}&nbsp;
+              </CWText>
+            </div>
+            <div className="balance-label end">
+              <CWText type="caption" className="fail-label">
+                FAIL BALANCE
+              </CWText>
+              <CWText type="b2" className="fail-value">
+                {fBalance}&nbsp;
+              </CWText>
+            </div>
+          </div>
+          <div className="probability-bar">
+            <div
+              className="probability-pass"
+              style={{ width: `${passProbability * 100}%` }}
+            />
+            <div
+              className="probability-fail"
+              style={{ width: `${failProbability * 100}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="action-buttons">
+          {canTrade && (
+            <CWButton
+              buttonHeight="sm"
+              buttonType="secondary"
+              buttonWidth="full"
+              label={market.status === 'resolved' ? 'Redeem' : 'Trade'}
+              iconLeft="transfer"
+              className="trade-button"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsTradeModalOpen(true);
+              }}
+            />
+          )}
+        </div>
+      </CWCard>
+
       <CWModal
         size="medium"
         content={

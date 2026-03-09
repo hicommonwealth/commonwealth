@@ -4,13 +4,12 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 
-type DiscoverResult = z.infer<
-  typeof schemas.PredictionMarketView
-> & { total?: number; community_id?: string };
+type DiscoverResult = z.infer<typeof schemas.PredictionMarketView> & {
+  total?: number;
+  community_id?: string;
+};
 
-type DiscoverPayload = z.infer<
-  typeof schemas.DiscoverPredictionMarkets.input
->;
+type DiscoverPayload = z.infer<typeof schemas.DiscoverPredictionMarkets.input>;
 
 export function DiscoverPredictionMarkets(): Query<
   typeof schemas.DiscoverPredictionMarkets
@@ -20,19 +19,11 @@ export function DiscoverPredictionMarkets(): Query<
     auth: [],
     secure: false,
     body: async ({ payload }: { payload: DiscoverPayload }) => {
-      const {
-        community_id,
-        statuses,
-        sort,
-        search,
-        cursor,
-        limit,
-      } = payload;
+      const { community_id, statuses, sort, search, cursor, limit } = payload;
 
       const offset = limit! * (cursor! - 1);
 
-      const hasStatusFilter =
-        Array.isArray(statuses) && statuses.length > 0;
+      const hasStatusFilter = Array.isArray(statuses) && statuses.length > 0;
       const statusPlaceholders = hasStatusFilter
         ? statuses!.map((_, i) => `:status_${i}`).join(', ')
         : '';
@@ -45,9 +36,7 @@ export function DiscoverPredictionMarkets(): Query<
           ? `AND t.community_id = :community_id`
           : '';
       const searchFilter =
-        search && search.trim() !== ''
-          ? `AND pm.prompt ILIKE :search`
-          : '';
+        search && search.trim() !== '' ? `AND pm.prompt ILIKE :search` : '';
       const searchReplacement =
         search && search.trim() !== ''
           ? `%${search.trim().replace(/%/g, '\\%')}%`
@@ -62,13 +51,10 @@ export function DiscoverPredictionMarkets(): Query<
         limit,
         offset,
         ...(hasStatusFilter &&
-          statuses!.reduce<Record<string, unknown>>(
-            (acc, s, i) => {
-              acc[`status_${i}`] = s;
-              return acc;
-            },
-            {},
-          )),
+          statuses!.reduce<Record<string, unknown>>((acc, s, i) => {
+            acc[`status_${i}`] = s;
+            return acc;
+          }, {})),
         ...(community_id && community_id.trim() !== '' ? { community_id } : {}),
         ...(searchReplacement != null ? { search: searchReplacement } : {}),
       };
@@ -92,15 +78,15 @@ export function DiscoverPredictionMarkets(): Query<
       const total = +(results.at(0)?.total ?? 0);
       const resultsWithoutTotal = results
         .map(({ total: _t, ...r }) => r)
-        .filter((r): r is DiscoverResult & { community_id: string } =>
-          typeof r.community_id === 'string',
+        .filter(
+          (r): r is DiscoverResult & { community_id: string } =>
+            typeof r.community_id === 'string',
         );
 
-      return schemas.buildPaginatedResponse(
-        resultsWithoutTotal,
-        total,
-        { limit, offset },
-      );
+      return schemas.buildPaginatedResponse(resultsWithoutTotal, total, {
+        limit,
+        offset,
+      });
     },
   };
 }

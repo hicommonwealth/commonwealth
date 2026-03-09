@@ -1,3 +1,4 @@
+import { PredictionMarketStatus } from '@hicommonwealth/schemas';
 import { DEFAULT_COMPLETION_MODEL } from '@hicommonwealth/shared';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { useFlag } from 'client/scripts/hooks/useFlag';
@@ -10,7 +11,10 @@ import { CWContentPageCard } from '../../components/component_kit/CWContentPageC
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { PredictionMarketEditorModal } from '../../modals/PredictionMarket/PredictionMarketEditorModal';
-import { ThreadPredictionMarketCard } from './ThreadPredictionMarketCard';
+import {
+  type PredictionMarketResult,
+  ThreadPredictionMarketCard,
+} from './ThreadPredictionMarketCard';
 import './poll_cards.scss';
 
 type ThreadPredictionMarketEditorCardProps = {
@@ -37,8 +41,10 @@ export const ThreadPredictionMarketEditorCard = ({
 
   const results = (marketsData as { results?: unknown[] } | undefined)?.results;
   const markets = Array.isArray(results) ? results : [];
-  console.log('markets => ', markets);
-  const hasPredictionMarket = markets.length > 0;
+  const activeMarket = markets.find(
+    (m) =>
+      (m as { status?: string }).status !== PredictionMarketStatus.Cancelled,
+  );
 
   const handleGeneratePrompt = () => {
     const communityId = thread?.communityId;
@@ -86,28 +92,14 @@ export const ThreadPredictionMarketEditorCard = ({
 
   const canResolveMarket = isAuthor || isAdmin;
 
-  if (hasPredictionMarket) {
+  if (activeMarket) {
     return (
       <>
         {markets.map((market) => (
           <ThreadPredictionMarketCard
-            key={(market as { id: number }).id}
+            key={(market as PredictionMarketResult).id}
             thread={thread}
-            market={
-              market as {
-                id: number;
-                thread_id: number;
-                prompt: string;
-                status: string;
-                duration?: number;
-                resolution_threshold?: number;
-                collateral_address?: string;
-                proposal_id?: string | null;
-                governor_address?: string | null;
-                end_time?: Date | string | null;
-                [key: string]: unknown;
-              }
-            }
+            market={market as PredictionMarketResult}
             isAuthor={isAuthor}
             canResolveMarket={canResolveMarket}
           />
@@ -116,11 +108,11 @@ export const ThreadPredictionMarketEditorCard = ({
     );
   }
 
-  if (!hasPredictionMarket && !isAuthor) {
+  if (!activeMarket && !isAuthor) {
     return null;
   }
 
-  if (!hasPredictionMarket) {
+  if (!activeMarket) {
     return (
       <>
         <CWContentPageCard

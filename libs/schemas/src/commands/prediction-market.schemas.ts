@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ThreadContext } from '../context';
-import { EVM_ADDRESS, EVM_BYTES, PG_INT } from '../utils';
+import { EVM_ADDRESS, EVM_BYTES, PG_ETH, PG_INT } from '../utils';
 
 export const CreatePredictionMarket = {
   input: z.object({
@@ -9,6 +9,7 @@ export const CreatePredictionMarket = {
     collateral_address: EVM_ADDRESS,
     duration: PG_INT,
     resolution_threshold: z.number(),
+    initial_liquidity: PG_ETH.optional(),
   }),
   output: z.boolean(),
   context: ThreadContext,
@@ -28,6 +29,7 @@ export const DeployPredictionMarket = {
     proposal_id: EVM_BYTES,
     start_time: z.coerce.date(),
     end_time: z.coerce.date(),
+    initial_liquidity: PG_ETH.optional(),
   }),
   output: z.boolean(),
   context: ThreadContext,

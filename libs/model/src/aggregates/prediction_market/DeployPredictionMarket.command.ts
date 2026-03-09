@@ -30,6 +30,7 @@ export function DeployPredictionMarket(): Command<
         proposal_id,
         start_time,
         end_time,
+        initial_liquidity,
       } = payload;
 
       const market =
@@ -59,6 +60,7 @@ export function DeployPredictionMarket(): Command<
             proposal_id,
             start_time,
             end_time,
+            ...(initial_liquidity !== undefined && { initial_liquidity }),
             status: schemas.PredictionMarketStatus.Active,
           },
           { transaction },
