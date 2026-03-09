@@ -10,6 +10,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { DeployDraftPredictionMarketModal } from '../../modals/PredictionMarket/DeployDraftPredictionMarketModal';
+import { PredictionMarketResolveModal } from '../../modals/PredictionMarket/PredictionMarketResolveModal';
 import { PredictionMarketTradeModal } from '../../modals/PredictionMarketTradeModal';
 import './poll_cards.scss';
 
@@ -29,6 +30,9 @@ type PredictionMarketResult = {
   duration?: number;
   resolution_threshold?: number;
   collateral_address?: string;
+  proposal_id?: string | null;
+  governor_address?: string | null;
+  end_time?: Date | string | null;
   vault_address?: string | null;
   router_address?: string | null;
   market_id?: string | null;
@@ -46,6 +50,7 @@ type ThreadPredictionMarketCardProps = {
   thread: Thread;
   market: PredictionMarketResult;
   isAuthor?: boolean;
+  canResolveMarket?: boolean;
 };
 
 const statusTagType = (
@@ -78,8 +83,10 @@ export const ThreadPredictionMarketCard = ({
   thread,
   market,
   isAuthor = false,
+  canResolveMarket = false,
 }: ThreadPredictionMarketCardProps) => {
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
+  const [isResolveModalOpen, setIsResolveModalOpen] = useState(false);
   const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
   const [collateralDisplay, setCollateralDisplay] = useState<{
     symbol: string;
@@ -143,7 +150,10 @@ export const ThreadPredictionMarketCard = ({
   }, [chainRpc, activeAddress, market.collateral_address, ethBalance]);
 
   const isDraft = market.status === 'draft';
+  const isActive = market.status === 'active';
   const canCompleteDraft = isDraft && isAuthor;
+  const endTime = market.end_time ? new Date(market.end_time) : new Date(0);
+  const canShowResolve = isActive && canResolveMarket;
   const canTrade =
     (market.status === 'active' || market.status === 'resolved') &&
     !!market.vault_address &&
@@ -170,6 +180,18 @@ export const ThreadPredictionMarketCard = ({
                 Your balance: {collateralDisplay.balance}{' '}
                 {collateralDisplay.symbol}
               </CWText>
+            )}
+            {canShowResolve && (
+              <CWButton
+                buttonHeight="sm"
+                buttonType="primary"
+                label="Resolve market"
+                className="resolve-market-button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsResolveModalOpen(true);
+                }}
+              />
             )}
             {market.total_collateral != null && (
               <CWText type="caption" className="total-minted-row">
@@ -198,7 +220,7 @@ export const ThreadPredictionMarketCard = ({
                 <CWButton
                   buttonHeight="sm"
                   buttonType="secondary"
-                  label="Trade"
+                  label={market.status === 'resolved' ? 'Redeem' : 'Trade'}
                   className="trade-button"
                   onClick={(e) => {
                     e.preventDefault();
@@ -222,6 +244,19 @@ export const ThreadPredictionMarketCard = ({
         }
         onClose={() => setIsDeployModalOpen(false)}
         open={isDeployModalOpen}
+      />
+      <CWModal
+        size="medium"
+        content={
+          <PredictionMarketResolveModal
+            thread={thread}
+            market={market}
+            onClose={() => setIsResolveModalOpen(false)}
+            onSuccess={() => setIsResolveModalOpen(false)}
+          />
+        }
+        onClose={() => setIsResolveModalOpen(false)}
+        open={isResolveModalOpen}
       />
       <CWModal
         size="medium"

@@ -165,6 +165,15 @@ vi.mock('views/pages/HomePage/ActiveContestList/ActiveContestList', () => ({
 }));
 
 vi.mock(
+  'views/pages/HomePage/ActivePredictionMarketList/ActivePredictionMarketList',
+  () => ({
+    default: () => (
+      <div data-testid="community-home-active-prediction-markets" />
+    ),
+  }),
+);
+
+vi.mock(
   'views/pages/CommunityHome/CommunityTransactions/CommunityTransactions',
   () => ({
     default: () => <div data-testid="community-home-transactions" />,

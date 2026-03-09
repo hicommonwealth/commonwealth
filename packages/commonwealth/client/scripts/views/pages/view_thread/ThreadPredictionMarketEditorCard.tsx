@@ -15,15 +15,18 @@ import './poll_cards.scss';
 
 type ThreadPredictionMarketEditorCardProps = {
   thread: Thread;
+  isAuthor?: boolean;
+  isAdmin?: boolean;
 };
 
 export const ThreadPredictionMarketEditorCard = ({
   thread,
+  isAuthor = false,
+  isAdmin = false,
 }: ThreadPredictionMarketEditorCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [promptData, setPromptData] = useState('');
   const [isAIresponseCompleted, setIsAIresponseCompleted] = useState(true);
-
   const { generateCompletion } = useAiCompletion();
   const { isAIEnabled } = useAIFeatureEnabled();
   const isFutarchyEnabled = useFlag('futarchy');
@@ -34,6 +37,7 @@ export const ThreadPredictionMarketEditorCard = ({
 
   const results = (marketsData as { results?: unknown[] } | undefined)?.results;
   const markets = Array.isArray(results) ? results : [];
+  console.log('markets => ', markets);
   const hasPredictionMarket = markets.length > 0;
 
   const handleGeneratePrompt = () => {
@@ -80,6 +84,8 @@ export const ThreadPredictionMarketEditorCard = ({
 
   if (!isFutarchyEnabled || !thread?.id) return null;
 
+  const canResolveMarket = isAuthor || isAdmin;
+
   if (hasPredictionMarket) {
     return (
       <>
@@ -96,62 +102,76 @@ export const ThreadPredictionMarketEditorCard = ({
                 duration?: number;
                 resolution_threshold?: number;
                 collateral_address?: string;
+                proposal_id?: string | null;
+                governor_address?: string | null;
+                end_time?: Date | string | null;
                 [key: string]: unknown;
               }
             }
-            isAuthor={true}
+            isAuthor={isAuthor}
+            canResolveMarket={canResolveMarket}
           />
         ))}
       </>
     );
   }
 
-  return (
-    <>
-      <CWContentPageCard
-        header="Add a prediction market to this thread?"
-        showCollapsedIcon={true}
-        content={
-          <div className="PollEditorCard">
-            <CWButton
-              buttonHeight="sm"
-              className="create-poll-button"
-              label="Create prediction market"
-              onClick={(e) => {
-                e.preventDefault();
-                setIsModalOpen(true);
-                setIsAIresponseCompleted(true);
-                setPromptData('');
-              }}
-            />
-          </div>
-        }
-      />
-      <CWModal
-        size="medium"
-        content={
-          isModalOpen ? (
-            <PredictionMarketEditorModal
-              thread={thread}
-              onModalClose={() => {
-                setIsModalOpen(false);
-                setIsAIresponseCompleted(true);
-                setPromptData('');
-              }}
-              onSuccess={() => setIsModalOpen(false)}
-              promptData={promptData}
-              isAIresponseCompleted={isAIresponseCompleted}
-              onGeneratePrompt={isAIEnabled ? handleGeneratePrompt : undefined}
-            />
-          ) : null
-        }
-        onClose={() => {
-          setIsModalOpen(false);
-          setIsAIresponseCompleted(true);
-          setPromptData('');
-        }}
-        open={isModalOpen}
-      />
-    </>
-  );
+  if (!hasPredictionMarket && !isAuthor) {
+    return null;
+  }
+
+  if (!hasPredictionMarket) {
+    return (
+      <>
+        <CWContentPageCard
+          header="Add a prediction market to this thread?"
+          showCollapsedIcon={true}
+          content={
+            <div className="PollEditorCard">
+              <CWButton
+                buttonHeight="sm"
+                className="create-poll-button"
+                label="Create prediction market"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsModalOpen(true);
+                  setIsAIresponseCompleted(true);
+                  setPromptData('');
+                }}
+              />
+            </div>
+          }
+        />
+        <CWModal
+          size="medium"
+          content={
+            isModalOpen ? (
+              <PredictionMarketEditorModal
+                thread={thread}
+                onModalClose={() => {
+                  setIsModalOpen(false);
+                  setIsAIresponseCompleted(true);
+                  setPromptData('');
+                }}
+                onSuccess={() => setIsModalOpen(false)}
+                promptData={promptData}
+                isAIresponseCompleted={isAIresponseCompleted}
+                onGeneratePrompt={
+                  isAIEnabled ? handleGeneratePrompt : undefined
+                }
+              />
+            ) : null
+          }
+          onClose={() => {
+            setIsModalOpen(false);
+            setIsAIresponseCompleted(true);
+            setPromptData('');
+          }}
+          open={isModalOpen}
+        />
+      </>
+    );
+  }
+
+  return null;
 };
