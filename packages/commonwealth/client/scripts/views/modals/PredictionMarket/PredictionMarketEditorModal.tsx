@@ -37,6 +37,7 @@ import {
   THRESHOLD_MAX,
   THRESHOLD_MIN,
 } from './predictionMarketEditorValidation';
+import { SyncPromptData } from './SyncPromptData';
 
 // Base Sepolia placeholder addresses; replace with chain config when available
 const COLLATERAL_OPTIONS = [
@@ -57,6 +58,12 @@ type PredictionMarketEditorModalProps = {
   onModalClose: () => void;
   thread: Thread;
   onSuccess?: () => void;
+  /** AI-generated prompt text; synced into the form when present */
+  promptData?: string;
+  /** False while AI is streaming the prompt */
+  isAIresponseCompleted?: boolean;
+  /** Called when user clicks the AI generate button; only shown when AI is enabled */
+  onGeneratePrompt?: () => void;
 };
 
 const INITIAL_FORM_VALUES = {
@@ -72,6 +79,9 @@ export const PredictionMarketEditorModal = ({
   onModalClose,
   thread,
   onSuccess,
+  promptData = '',
+  isAIresponseCompleted = true,
+  onGeneratePrompt,
 }: PredictionMarketEditorModalProps) => {
   const modalContainerRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<Phase>('form');
@@ -182,6 +192,7 @@ export const PredictionMarketEditorModal = ({
       await deployMutation.mutateAsync({
         thread_id: thread.id,
         prediction_market_id: predictionMarketId,
+        proposal_id: payload.proposal_id,
         market_id: payload.market_id,
         vault_address: payload.vault_address as string,
         governor_address: payload.governor_address as string,
@@ -254,16 +265,36 @@ export const PredictionMarketEditorModal = ({
       >
         {({ watch, register }) => (
           <>
+            <SyncPromptData promptData={promptData} />
             <CWModalBody>
               <div className="prompt-row">
-                <CWTextArea
-                  name="prompt"
-                  hookToForm
-                  label="Prompt"
-                  placeholder="What outcome should this market resolve?"
-                  maxLength={PROMPT_MAX_LENGTH}
-                  charCount={PROMPT_MAX_LENGTH}
-                />
+                <div className="prompt-input-with-ai">
+                  <CWTextArea
+                    name="prompt"
+                    hookToForm
+                    label="Prompt"
+                    placeholder="What outcome should this market resolve?"
+                    maxLength={PROMPT_MAX_LENGTH}
+                    charCount={PROMPT_MAX_LENGTH}
+                  />
+                  {onGeneratePrompt && (
+                    <CWButton
+                      type="button"
+                      iconLeft="sparkle"
+                      label="Generate with AI"
+                      buttonType="secondary"
+                      buttonHeight="sm"
+                      disabled={!isAIresponseCompleted}
+                      onClick={onGeneratePrompt}
+                      className="prompt-ai-button prompt-ai-button--compact"
+                    />
+                  )}
+                  {!isAIresponseCompleted && (
+                    <span className="prompt-ai-spinner">
+                      <CWCircleMultiplySpinner center={false} />
+                    </span>
+                  )}
+                </div>
                 <CWText type="caption" className="help-text">
                   This question will determine PASS vs FAIL resolution.
                 </CWText>

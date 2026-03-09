@@ -25,6 +25,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { DeployDraftPredictionMarketModal } from '../../modals/PredictionMarket/DeployDraftPredictionMarketModal';
+import { PredictionMarketResolveModal } from '../../modals/PredictionMarket/PredictionMarketResolveModal';
 import { PredictionMarketTradeModal } from '../../modals/PredictionMarketTradeModal';
 import './poll_cards.scss';
 import { formatCollateral } from './predictionMarketUtils';
@@ -43,12 +44,14 @@ type PredictionMarketResult = {
   thread_id: number;
   prompt: string;
   status: string;
-  end_time?: string;
   total_collateral?: string;
   current_probability?: number;
   duration?: number;
   resolution_threshold?: number;
   collateral_address?: string;
+  proposal_id?: string | null;
+  governor_address?: string | null;
+  end_time?: Date | string | null;
   vault_address?: string | null;
   router_address?: string | null;
   market_id?: string | null;
@@ -64,6 +67,7 @@ type ThreadPredictionMarketCardProps = {
   thread: Thread;
   market?: PredictionMarketResult;
   isAuthor?: boolean;
+  canResolveMarket?: boolean;
 };
 
 const getStatusLabel = (status: string) => {
@@ -129,8 +133,10 @@ export const ThreadPredictionMarketCard = ({
   thread,
   market: marketProp,
   isAuthor: isAuthorProp,
+  canResolveMarket,
 }: ThreadPredictionMarketCardProps) => {
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
+  const [isResolveModalOpen, setIsResolveModalOpen] = useState(false);
   const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
   const [timeDisplay, setTimeDisplay] = useState<string | null>(null);
   const user = useUserStore();
@@ -284,16 +290,18 @@ export const ThreadPredictionMarketCard = ({
   const isAuthor = isAuthorProp ?? isThreadAuthor;
 
   const isDraft = market?.status === PredictionMarketStatus.Draft;
+  const isActive = market?.status === PredictionMarketStatus.Active;
   const canCompleteDraft = isDraft && isAuthor;
+  const endTime = market?.end_time ? new Date(market?.end_time) : new Date(0);
+  const canShowResolve = isActive && canResolveMarket;
+
   const canTrade =
     (market?.status === 'active' || market?.status === 'resolved') &&
     !!market?.vault_address &&
     !!market?.router_address;
 
   const canCancel =
-    isAuthor &&
-    market &&
-    market.status === PredictionMarketStatus.Draft;
+    isAuthor && market && market.status === PredictionMarketStatus.Draft;
 
   const canResolve =
     isAuthor &&
@@ -401,7 +409,7 @@ export const ThreadPredictionMarketCard = ({
                           label: 'Resolve market',
                           iconLeft: 'trophy' as const,
                           iconLeftWeight: 'bold' as const,
-                          onClick: () => {},
+                          onClick: () => setIsResolveModalOpen(true),
                         },
                       ]
                     : []),
@@ -510,7 +518,7 @@ export const ThreadPredictionMarketCard = ({
               buttonHeight="sm"
               buttonType="secondary"
               buttonWidth="full"
-              label="Trade"
+              label={market.status === 'resolved' ? 'Redeem' : 'Trade'}
               iconLeft="transfer"
               className="trade-button"
               onClick={(e) => {
@@ -534,6 +542,19 @@ export const ThreadPredictionMarketCard = ({
         }
         onClose={() => setIsDeployModalOpen(false)}
         open={isDeployModalOpen}
+      />
+      <CWModal
+        size="medium"
+        content={
+          <PredictionMarketResolveModal
+            thread={thread}
+            market={market}
+            onClose={() => setIsResolveModalOpen(false)}
+            onSuccess={() => setIsResolveModalOpen(false)}
+          />
+        }
+        onClose={() => setIsResolveModalOpen(false)}
+        open={isResolveModalOpen}
       />
       <CWModal
         size="medium"

@@ -1,157 +1,120 @@
 import {
+  CompletionModel,
   CompletionOptions,
   DEFAULT_COMPLETION_MODEL,
 } from '@hicommonwealth/shared';
-import { notifyInfo } from 'client/scripts/controllers/app/notifications';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { userStore } from 'state/ui/user';
-import { trpc } from 'utils/trpcClient';
-import { useMentionExtractor } from '../../../hooks/useMentionExtractor';
+
+/**
+ * Completion types that can be requested from the AI completion endpoint
+ * Note: ThreadTitle is not included as title generation requires client-side text input
+ */
+export enum AICompletionType {
+  Thread = 'thread',
+  Comment = 'comment',
+  Poll = 'poll',
+  PredictionMarket = 'prediction_market',
+}
+
+// Delimiters sent by backend in streaming responses
+const COMMENT_PAYLOAD_DELIMITER = '\n__COMMENT_PAYLOAD__\n';
+const STREAM_ERROR_PREFIX = '\n__STREAM_ERROR__\n';
+const COMMENT_ERROR_DELIMITER = '\n__COMMENT_ERROR__\n';
+
+const STREAM_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
 
 interface AiCompletionOptions extends Partial<CompletionOptions> {
   onChunk?: (chunk: string) => void;
-  onComplete?: (fullText: string) => void;
+  onComplete?: (
+    fullText: string,
+    commentPayload?: Record<string, unknown>,
+  ) => void | Promise<void>;
   onError?: (error: Error) => void;
-  includeContextualMentions?: boolean;
-  communityId?: string;
+  onCommentError?: (error: string) => void;
+  webSearchEnabled?: boolean;
+}
+
+/**
+ * Input for generating AI completions using entity IDs
+ * For Comment completions, either parentCommentId or threadId must be provided:
+ * - parentCommentId: AI replies to an existing comment
+ * - threadId: AI creates a root-level comment on the thread
+ */
+export interface AICompletionInput {
+  communityId: string;
+  completionType: AICompletionType;
+  parentCommentId?: number;
+  threadId?: number; // For root-level AI comments (no parent comment)
+  topicId?: number;
+  model?: CompletionModel;
+  temperature?: number;
+  maxTokens?: number;
+  stream?: boolean;
+  useOpenRouter?: boolean;
+  webSearchEnabled?: boolean;
 }
 
 interface CompletionError {
   error: string;
   status?: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 /**
  * Hook for streaming AI completions from the server
- * Supports both OpenAI and OpenRouter with contextual mention integration
+ * Uses entity IDs for secure server-side context building
+ *
+ * For Comment completions, the server automatically creates the AI comment
+ * after the completion finishes - no additional client action needed.
  */
 export const useAiCompletion = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [completion, setCompletion] = useState<string>('');
+  const activeControllerRef = useRef<AbortController | null>(null);
 
-  const { extractMentionsFromText, validateMentionLimits } =
-    useMentionExtractor();
-
-  const utils = trpc.useUtils();
-
-  const fetchContextForMentions = useCallback(
-    async (
-      userPrompt: string,
-      communityId?: string,
-    ): Promise<string | null> => {
-      try {
-        const mentions = extractMentionsFromText(userPrompt);
-
-        if (mentions.length === 0) {
-          return null;
-        }
-
-        const { validMentions, hasExceededLimit } =
-          validateMentionLimits(mentions);
-
-        if (hasExceededLimit) {
-          console.warn('Some mentions were ignored due to limits');
-          notifyInfo('Some mentions were ignored due to limits');
-        }
-
-        if (validMentions.length === 0) {
-          return null;
-        }
-
-        const mentionsForContext = validMentions.map((mention) => ({
-          id: mention.id,
-          type: mention.type,
-          name: mention.name,
-        }));
-
-        const contextData = await utils.search.aggregateContext.fetch({
-          mentions: JSON.stringify(mentionsForContext),
-          communityId,
-          contextDataDays: 30,
-        });
-
-        return contextData.formattedContext;
-      } catch (contextError) {
-        console.error('Error fetching context for mentions:', contextError);
-        return null;
-      }
-    },
-    [extractMentionsFromText, validateMentionLimits, utils],
-  );
+  const cancel = useCallback(() => {
+    activeControllerRef.current?.abort();
+    activeControllerRef.current = null;
+  }, []);
 
   const generateCompletion = useCallback(
-    async (userPrompt: string, options?: AiCompletionOptions) => {
-      const requestId = Math.random().toString(36).substr(2, 9);
-      console.log(`[${requestId}] Starting AI completion request`, {
-        promptLength: userPrompt.length,
-        model: options?.model,
-        stream: options?.stream !== false,
-      });
+    async (input: AICompletionInput, options?: AiCompletionOptions) => {
+      // Cancel any prior in-flight request
+      activeControllerRef.current?.abort();
+
+      const controller = new AbortController();
+      activeControllerRef.current = controller;
+
+      // 2-minute timeout
+      const timeoutId = setTimeout(() => controller.abort(), STREAM_TIMEOUT_MS);
 
       setIsLoading(true);
       setError(null);
       setCompletion('');
 
       let accumulatedText = '';
-      const streamMode = options?.stream !== false;
+      const streamMode = input.stream !== false;
 
       try {
-        let contextualData: string | null = null;
-        if (options?.includeContextualMentions !== false) {
-          contextualData = await fetchContextForMentions(
-            userPrompt,
-            options?.communityId,
-          );
-        }
-
-        let enhancedSystemPrompt = options?.systemPrompt;
-        if (contextualData) {
-          const contextSection = `
-
-CONTEXTUAL INFORMATION:
-The user has mentioned the following entities in their message.
-Use this context to provide more informed and relevant responses:
-
-${contextualData}
-
----
-
-`;
-          enhancedSystemPrompt = contextSection + (enhancedSystemPrompt || '');
-        }
-
-        const requestBody: Partial<CompletionOptions> & {
-          jwt?: string | null;
-          prompt: string;
-          communityId?: string;
-        } = {
-          prompt: userPrompt,
-          model: options?.model || DEFAULT_COMPLETION_MODEL,
-          maxTokens: options?.maxTokens,
+        const requestBody = {
+          communityId: input.communityId,
+          completionType: input.completionType,
+          parentCommentId: input.parentCommentId,
+          threadId: input.threadId,
+          topicId: input.topicId,
+          model: input.model || options?.model || DEFAULT_COMPLETION_MODEL,
+          temperature:
+            typeof input.temperature === 'number'
+              ? input.temperature
+              : options?.temperature,
+          maxTokens: input.maxTokens || options?.maxTokens,
           stream: streamMode,
-          useOpenRouter: options?.useOpenRouter,
+          useOpenRouter: input.useOpenRouter || options?.useOpenRouter,
+          webSearchEnabled: input.webSearchEnabled || options?.webSearchEnabled,
           jwt: userStore.getState().jwt,
-          ...(typeof options?.useWebSearch === 'boolean'
-            ? { useWebSearch: options.useWebSearch }
-            : {}),
-          ...(options?.communityId && { communityId: options.communityId }),
         };
-
-        if (typeof options?.temperature === 'number') {
-          requestBody.temperature = options.temperature;
-        }
-
-        if (enhancedSystemPrompt) {
-          requestBody.systemPrompt = enhancedSystemPrompt;
-        }
-
-        console.log(`[${requestId}] Sending request to /api/aicompletion`, {
-          bodySize: JSON.stringify(requestBody).length,
-          stream: streamMode,
-        });
 
         const response = await fetch('/api/aicompletion', {
           method: 'POST',
@@ -159,16 +122,10 @@ ${contextualData}
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(requestBody),
-        });
-
-        console.log(`[${requestId}] Received response`, {
-          status: response.status,
-          statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries()),
+          signal: controller.signal,
         });
 
         if (!response.ok) {
-          // Try to parse the error response
           let errorData: CompletionError;
           try {
             errorData = await response.json();
@@ -179,14 +136,10 @@ ${contextualData}
           }
 
           const errorMessage = errorData.error || `Error ${response.status}`;
-          console.error('API error:', errorData);
           throw new Error(errorMessage);
         }
 
-        // Handle streaming vs. non-streaming response
         if (streamMode) {
-          console.log(`[${requestId}] Starting streaming response processing`);
-
           if (!response.body) {
             throw new Error('ReadableStream not supported in this browser.');
           }
@@ -194,55 +147,106 @@ ${contextualData}
           const reader = response.body.getReader();
           const decoder = new TextDecoder();
 
-          let buffer = '';
-          let chunkCount = 0;
+          // Abort the reader when the signal fires
+          controller.signal.addEventListener('abort', () => {
+            reader.cancel().catch(() => {});
+          });
+
+          let fullStreamContent = '';
 
           while (true) {
             const { done, value } = await reader.read();
-            chunkCount++;
 
             if (done) {
-              console.log(`[${requestId}] Streaming completed`, {
-                totalChunks: chunkCount,
-                totalLength: accumulatedText.length,
-                bufferRemaining: buffer.length,
-              });
+              // Extract delimited sections from accumulated stream content
+              let displayText = fullStreamContent;
+              let commentPayload: Record<string, unknown> | undefined;
 
-              // Process any remaining text in the buffer
-              if (buffer.length > 0) {
-                accumulatedText += buffer;
-                setCompletion(accumulatedText);
+              // Check for stream error
+              if (fullStreamContent.includes(STREAM_ERROR_PREFIX)) {
+                const errIdx = fullStreamContent.indexOf(STREAM_ERROR_PREFIX);
+                displayText = fullStreamContent.substring(0, errIdx);
+                const errMsg = fullStreamContent
+                  .substring(errIdx + STREAM_ERROR_PREFIX.length)
+                  .trim();
+                throw new Error(errMsg || 'Streaming error');
               }
 
-              options?.onComplete?.(accumulatedText);
+              // Check for comment creation error
+              if (fullStreamContent.includes(COMMENT_ERROR_DELIMITER)) {
+                const errIdx = fullStreamContent.indexOf(
+                  COMMENT_ERROR_DELIMITER,
+                );
+                displayText = fullStreamContent.substring(0, errIdx);
+                const errPayload = fullStreamContent
+                  .substring(errIdx + COMMENT_ERROR_DELIMITER.length)
+                  .trim();
+                options?.onCommentError?.(
+                  errPayload || 'Failed to create comment',
+                );
+              }
+
+              // Check for comment payload
+              if (displayText.includes(COMMENT_PAYLOAD_DELIMITER)) {
+                const delimiterIndex = displayText.indexOf(
+                  COMMENT_PAYLOAD_DELIMITER,
+                );
+                const jsonPayload = displayText
+                  .substring(delimiterIndex + COMMENT_PAYLOAD_DELIMITER.length)
+                  .trim();
+                displayText = displayText.substring(0, delimiterIndex);
+
+                try {
+                  commentPayload = JSON.parse(jsonPayload);
+                } catch {
+                  // payload parse failure is non-fatal
+                }
+              }
+
+              accumulatedText = displayText;
+              setCompletion(displayText);
+
+              await options?.onComplete?.(displayText, commentPayload);
               break;
             }
 
-            // Decode the new chunk and add to buffer
             const chunk = decoder.decode(value, { stream: true });
+            fullStreamContent += chunk;
 
-            if (chunkCount % 10 === 0) {
-              console.log(`[${requestId}] Processing chunk ${chunkCount}`, {
-                chunkSize: chunk.length,
-                totalAccumulated: accumulatedText.length,
-              });
+            // Check for stream error mid-stream
+            if (fullStreamContent.includes(STREAM_ERROR_PREFIX)) {
+              const errIdx = fullStreamContent.indexOf(STREAM_ERROR_PREFIX);
+              const errMsg = fullStreamContent
+                .substring(errIdx + STREAM_ERROR_PREFIX.length)
+                .trim();
+              throw new Error(errMsg || 'Streaming error');
             }
 
-            // Check if the chunk contains an error message
-            if (chunk.startsWith('\nError:')) {
-              console.error(`[${requestId}] Error chunk received:`, chunk);
-              throw new Error(chunk.substring(8));
+            // Only update displayed text up to any delimiter if it appears mid-stream
+            let displayChunk = chunk;
+            if (fullStreamContent.includes(COMMENT_PAYLOAD_DELIMITER)) {
+              const delimiterIndex = fullStreamContent.indexOf(
+                COMMENT_PAYLOAD_DELIMITER,
+              );
+              const preDelimiterContent = fullStreamContent.substring(
+                0,
+                delimiterIndex,
+              );
+              const previousDisplayedLength = accumulatedText.length;
+              displayChunk = preDelimiterContent.substring(
+                previousDisplayedLength,
+              );
+              accumulatedText = preDelimiterContent;
+            } else {
+              accumulatedText = fullStreamContent;
             }
 
-            buffer += chunk;
-
-            // Process chunk - only send the current chunk to onChunk, not the accumulated text
-            accumulatedText += chunk;
             setCompletion(accumulatedText);
-            options?.onChunk?.(chunk);
+            if (displayChunk) {
+              options?.onChunk?.(displayChunk);
+            }
           }
         } else {
-          // Handle non-streaming response
           const data = await response.json();
 
           if (data.error) {
@@ -251,28 +255,40 @@ ${contextualData}
 
           accumulatedText = data.completion || '';
           setCompletion(accumulatedText);
+
           options?.onComplete?.(accumulatedText);
         }
       } catch (err) {
+        // Ignore AbortError — it means the request was intentionally cancelled
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          return accumulatedText;
+        }
+
         const tempError = err instanceof Error ? err : new Error(String(err));
-        console.error(`[${requestId}] AI completion error:`, {
-          error: tempError.message,
-          stack: tempError.stack,
-        });
+        console.error('AI completion error:', tempError.message);
         setError(tempError);
-        options?.onError?.(tempError);
+
+        try {
+          options?.onError?.(tempError);
+        } catch {
+          // swallow callback errors
+        }
       } finally {
-        console.log(`[${requestId}] AI completion request finished`);
+        clearTimeout(timeoutId);
+        if (activeControllerRef.current === controller) {
+          activeControllerRef.current = null;
+        }
         setIsLoading(false);
       }
 
       return accumulatedText;
     },
-    [fetchContextForMentions],
+    [],
   );
 
   return {
     generateCompletion,
+    cancel,
     completion,
     isLoading,
     error,

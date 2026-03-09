@@ -26,6 +26,7 @@ export const DeployPredictionMarket = {
     strategy_address: EVM_ADDRESS,
     p_token_address: EVM_ADDRESS,
     f_token_address: EVM_ADDRESS,
+    proposal_id: EVM_BYTES,
     start_time: z.coerce.date(),
     end_time: z.coerce.date(),
     initial_liquidity: PG_ETH.optional(),

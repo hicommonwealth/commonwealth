@@ -325,12 +325,13 @@ jobs:
           chmod -R 755 ./libs/model/coverage/lcov.info
           chmod -R 755 ./libs/sitemaps/coverage/lcov.info
 
-      - name: Coveralls parallel
-        uses: coverallsapp/github-action@v2
-        with:
-          flag-name: unit-test-coverage
-          parallel: true
-          files: libs/adapters/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info
+      # TODO: temporarily disabled - re-enable when Coveralls is fixed
+      # - name: Coveralls parallel
+      #   uses: coverallsapp/github-action@v2
+      #   with:
+      #     flag-name: unit-test-coverage
+      #     parallel: true
+      #     files: libs/adapters/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info
 
   commonwealth-component-tests:
     name: Commonwealth Component Tests
@@ -621,18 +622,19 @@ jobs:
             packages/commonwealth/test/visual/visual-report
           retention-days: 7
 
-  report-coverage:
-    name: Upload Test Coverage Report
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: [ commonwealth-unit-tests ]
-    if: always()
-    strategy:
-      matrix:
-        node: [ 22 ]
-
-    steps:
-      - name: Coveralls Finished
-        uses: coverallsapp/github-action@v2
-        with:
-          parallel-finished: true
+  # TODO: temporarily disabled - re-enable when Coveralls is fixed
+  # report-coverage:
+  #   name: Upload Test Coverage Report
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 5
+  #   needs: [ commonwealth-unit-tests ]
+  #   if: always()
+  #   strategy:
+  #     matrix:
+  #       node: [ 22 ]
+  #
+  #   steps:
+  #     - name: Coveralls Finished
+  #       uses: coverallsapp/github-action@v2
+  #       with:
+  #         parallel-finished: true

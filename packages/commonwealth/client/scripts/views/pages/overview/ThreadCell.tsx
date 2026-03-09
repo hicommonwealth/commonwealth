@@ -22,6 +22,7 @@ import threadPlaceholder from '../../../../assets/img/threadplaceholder.png';
 import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
 import { SharePopover } from '../../components/SharePopover';
 import { ThreadContestTagContainer } from '../../components/ThreadContestTag';
+import { ThreadPredictionMarketTagContainer } from '../../components/ThreadPredictionMarketTag';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { CWThreadAction } from '../../components/component_kit/new_designs/cw_thread_action';
@@ -89,6 +90,7 @@ const ThreadCell = ({
               <ThreadContestTagContainer
                 associatedContests={thread.associatedContests}
               />
+              <ThreadPredictionMarketTagContainer thread={thread} />
               {thread.title}
             </CWText>
             <NewThreadTag threadCreatedAt={moment(thread.createdAt)} />

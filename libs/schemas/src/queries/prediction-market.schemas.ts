@@ -62,3 +62,42 @@ export const GetPredictionMarketPositions = {
   }),
   output: z.array(PredictionMarketPositionView),
 };
+
+/** Row returned for discovery: market + community_id for thread link */
+export const ActivePredictionMarketRow = PredictionMarketView.extend({
+  community_id: z.string(),
+});
+
+export const GetActivePredictionMarkets = {
+  input: z.object({
+    community_id: z.string().optional(),
+    limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+  }),
+  output: z.object({
+    results: z.array(ActivePredictionMarketRow),
+  }),
+};
+
+const PredictionMarketDiscoverSort = z.enum(['volume', 'recency']);
+const PredictionMarketStatusFilter = z.enum([
+  'draft',
+  'active',
+  'resolved',
+  'cancelled',
+]);
+
+export const DiscoverPredictionMarkets = {
+  input: PaginationParamsSchema.extend({
+    community_id: z.string().optional(),
+    statuses: z.array(PredictionMarketStatusFilter).optional().default([]),
+    sort: PredictionMarketDiscoverSort.optional().default('recency'),
+    search: z.string().optional(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(
+      PredictionMarketView.extend({
+        community_id: z.string(),
+      }),
+    ),
+  }),
+};
