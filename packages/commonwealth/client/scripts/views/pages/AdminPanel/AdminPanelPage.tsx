@@ -1,4 +1,4 @@
-import { useFlag } from 'hooks/useFlag';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect } from 'react';
 import Permissions from 'utils/Permissions';
