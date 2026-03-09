@@ -2,10 +2,10 @@ import { getThreadUrl } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../../components/component_kit/cw_text';
+import { CWButton } from '../../../components/component_kit/new_designs/CWButton';
+import { CWTag } from '../../../components/component_kit/new_designs/CWTag';
 import './PredictionMarketsList.scss';
 
 function formatCollateralVolume(wei: string, decimals = 18): string {
@@ -25,7 +25,10 @@ function formatCollateralVolume(wei: string, decimals = 18): string {
   return whole.toString() + (frac > 0n ? `.${frac}` : '');
 }
 
-function formatTimeLeft(endTime: string | null | undefined, status: string): string {
+function formatTimeLeft(
+  endTime: string | null | undefined,
+  status: string,
+): string {
   if (status === 'resolved' || status === 'cancelled') return 'Ended';
   if (!endTime) return '—';
   const end = moment(endTime);

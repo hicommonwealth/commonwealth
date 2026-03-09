@@ -1,23 +1,21 @@
 import React from 'react';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
-import CWAccordion from 'views/components/CWAccordion';
+import CWAccordion from '../../../../components/CWAccordion';
+import { CWCheckbox } from '../../../../components/component_kit/cw_checkbox';
+import { CWText } from '../../../../components/component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
-} from 'views/components/component_kit/new_designs/CWDrawer';
-import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
-import type {
-  FiltersDrawerProps,
-  PredictionMarketStatusFilter,
-} from './types';
+} from '../../../../components/component_kit/new_designs/CWDrawer';
+import { CWRadioButton } from '../../../../components/component_kit/new_designs/cw_radio_button';
 import './FiltersDrawer.scss';
+import type { FiltersDrawerProps, PredictionMarketStatusFilter } from './types';
 
-const STATUS_OPTIONS: { value: PredictionMarketStatusFilter; label: string }[] = [
-  { value: 'active', label: 'Active' },
-  { value: 'draft', label: 'Draft' },
-  { value: 'resolved', label: 'Resolved' },
-  { value: 'cancelled', label: 'Cancelled' },
-];
+const STATUS_OPTIONS: { value: PredictionMarketStatusFilter; label: string }[] =
+  [
+    { value: 'active', label: 'Active' },
+    { value: 'draft', label: 'Draft' },
+    { value: 'resolved', label: 'Resolved' },
+    { value: 'cancelled', label: 'Cancelled' },
+  ];
 
 const SORT_OPTIONS = [
   { value: 'recency', label: 'Recency' },

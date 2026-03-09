@@ -5,10 +5,10 @@ import {
   type DiscoverPredictionMarketsFilters,
   type PredictionMarketStatusFilter,
 } from 'state/api/predictionMarket';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWText } from '../../../components/component_kit/cw_text';
+import { CWButton } from '../../../components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from '../../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWTag } from '../../../components/component_kit/new_designs/CWTag';
 import { ExplorePredictionMarketCard } from './ExplorePredictionMarketCard';
 import FiltersDrawer from './FiltersDrawer';
 import './PredictionMarketsList.scss';
@@ -167,7 +167,9 @@ const PredictionMarketsList = ({
             <ExplorePredictionMarketCard
               key={market.id}
               market={
-                market as Parameters<typeof ExplorePredictionMarketCard>[0]['market']
+                market as Parameters<
+                  typeof ExplorePredictionMarketCard
+                >[0]['market']
               }
               showVolume={false}
             />
@@ -180,7 +182,9 @@ const PredictionMarketsList = ({
               <ExplorePredictionMarketCard
                 key={market.id}
                 market={
-                  market as Parameters<typeof ExplorePredictionMarketCard>[0]['market']
+                  market as Parameters<
+                    typeof ExplorePredictionMarketCard
+                  >[0]['market']
                 }
                 showVolume={showVolume}
               />
