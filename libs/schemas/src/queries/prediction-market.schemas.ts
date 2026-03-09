@@ -61,3 +61,18 @@ export const GetPredictionMarketPositions = {
   }),
   output: z.array(PredictionMarketPositionView),
 };
+
+/** Row returned for discovery: market + community_id for thread link */
+export const ActivePredictionMarketRow = PredictionMarketView.extend({
+  community_id: z.string(),
+});
+
+export const GetActivePredictionMarkets = {
+  input: z.object({
+    community_id: z.string().optional(),
+    limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+  }),
+  output: z.object({
+    results: z.array(ActivePredictionMarketRow),
+  }),
+};

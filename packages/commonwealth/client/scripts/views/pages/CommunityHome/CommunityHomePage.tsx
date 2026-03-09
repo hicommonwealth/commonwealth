@@ -28,6 +28,7 @@ import {
 import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import ActiveContestList from '../HomePage/ActiveContestList/ActiveContestList';
+import ActivePredictionMarketList from '../HomePage/ActivePredictionMarketList/ActivePredictionMarketList';
 import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
 import XpQuestList from '../HomePage/XpQuestList/XpQuestList';
 import './CommunityHomePage.scss';
@@ -161,6 +162,10 @@ const CommunityHome = () => {
             communityIdFilter={chain}
           />
           <ActiveContestList isCommunityHomePage />
+          <ActivePredictionMarketList
+            isCommunityHomePage
+            communityIdFilter={chain}
+          />
           {communityToken && <CommunityTransactions />}
           <XpQuestList communityIdFilter={chain} />
           <CWModal
