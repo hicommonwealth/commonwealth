@@ -1,11 +1,13 @@
 import { getThreadUrl } from '@hicommonwealth/shared';
 import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useFlag } from 'shared/hooks/useFlag';
 import { useGetActivePredictionMarketsQuery } from 'state/api/predictionMarket';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { Skeleton } from 'views/components/Skeleton';
 
 import './ActivePredictionMarketList.scss';
@@ -66,6 +68,12 @@ const PredictionMarketCardCompact = ({
       ? formatTimeRemaining(endTime)
       : null;
   const totalMinted = formatTotalMinted(market.total_collateral);
+  const navigate = useCommonNavigate();
+
+  const handleViewThread = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate(threadUrl, {}, null);
+  };
 
   return (
     <div className="PredictionMarketCardCompact">
@@ -82,6 +90,12 @@ const PredictionMarketCardCompact = ({
         <CWText type="h4" fontWeight="semiBold" className="prompt">
           {market.prompt || 'Prediction market'}
         </CWText>
+        {totalMinted !== '0' && (
+          <div className="volume-row">
+            <CWIcon iconName="chartLineUp" iconSize="small" />
+            <CWText type="caption">{totalMinted} minted</CWText>
+          </div>
+        )}
         <div className="metrics">
           <div className="metric-box">
             <CWText type="caption" className="metric-label">
@@ -104,13 +118,17 @@ const PredictionMarketCardCompact = ({
             </CWText>
           </div>
         </div>
-        <span className="view-thread-btn">
-          <CWText type="b2" fontWeight="semiBold">
-            View Thread
-          </CWText>
-          <CWIcon iconName="chatDots" iconSize="small" />
-        </span>
       </Link>
+      <div className="card-cta">
+        <CWButton
+          buttonType="primary"
+          buttonWidth="full"
+          buttonHeight="sm"
+          label="View Thread"
+          iconRight="chatDots"
+          onClick={handleViewThread}
+        />
+      </div>
     </div>
   );
 };
