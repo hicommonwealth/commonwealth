@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { config, logger } from '@hicommonwealth/core';
 import { extractMCPMentions } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import {
@@ -6,8 +6,11 @@ import {
   filterServersWithWhitelist,
   withMCPAuthUsername,
 } from '@hicommonwealth/model/services';
+import { getBaseUrl } from '@hicommonwealth/shared';
 
 const log = logger(import.meta);
+
+const COMMON_MCP_HANDLE = 'common';
 
 /**
  * Gets all community-enabled MCP servers for a community
@@ -31,10 +34,22 @@ export async function getAllMCPServers(
     ],
   });
 
-  return mcpServers.map((server) => ({
-    ...withMCPAuthUsername(server),
-    headers: {},
-  }));
+  return mcpServers.map((server) => {
+    const serverData = withMCPAuthUsername(server);
+
+    // Fallback to the app's own MCP endpoint for the built-in common server
+    if (serverData.handle === COMMON_MCP_HANDLE && !serverData.server_url) {
+      serverData.server_url = `${getBaseUrl(config.APP_ENV)}/mcp`;
+      log.info(
+        `MCP server "${COMMON_MCP_HANDLE}" has no server_url, falling back to ${serverData.server_url}`,
+      );
+    }
+
+    return {
+      ...serverData,
+      headers: {},
+    };
+  });
 }
 
 /**

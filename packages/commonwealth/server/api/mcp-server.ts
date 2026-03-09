@@ -167,7 +167,14 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
       tools: tools.map((tool) => ({
         name: tool.name,
         description: tool.description,
-        inputSchema: z.toJSONSchema(tool.inputSchema),
+        inputSchema: z.toJSONSchema(tool.inputSchema, {
+          unrepresentable: 'any',
+          override: ({ zodSchema, jsonSchema }) => {
+            if (zodSchema instanceof z.ZodDate) {
+              jsonSchema.type = 'string';
+            }
+          },
+        }),
       })),
     };
   });
