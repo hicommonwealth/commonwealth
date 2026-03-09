@@ -39,6 +39,7 @@ import {
 import CWTab from '../../components/component_kit/new_designs/CWTabs/CWTab';
 import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
+import { CWTooltip } from '../../components/component_kit/new_designs/CWTooltip';
 import './PredictionMarketTradeModal.scss';
 
 const COLLATERAL_DECIMALS = 18;
@@ -69,7 +70,7 @@ type Market = {
   /** Total collateral minted in market (wei string from DB). */
   total_collateral?: string;
   /** ISO date string when the market ends (dissolves). */
-  end_time?: string | null;
+  end_time?: Date | string | null;
   strategy_address?: string | null;
   governor_address?: string | null;
   [key: string]: unknown;
@@ -112,7 +113,9 @@ export const PredictionMarketTradeModal = ({
 }: PredictionMarketTradeModalProps) => {
   const user = useUserStore();
   const activeAddress = user.activeAccount?.address ?? '';
-  const [activeTab, setActiveTab] = useState<TabId>('mint');
+  const [activeTab, setActiveTab] = useState<TabId>(() =>
+    market.status === 'resolved' ? 'redeem' : 'mint',
+  );
   const [mintAmount, setMintAmount] = useState('');
   const [swapAmount, setSwapAmount] = useState('');
   const [swapBuyPass, setSwapBuyPass] = useState(true);
@@ -493,7 +496,8 @@ export const PredictionMarketTradeModal = ({
       setErrorMessage('Market has no winner yet.');
       return;
     }
-    const amountWei = parseTokenAmount(redeemAmount, COLLATERAL_DECIMALS);
+    const redeemDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
+    const amountWei = parseTokenAmount(redeemAmount, redeemDecimals);
     const maxRedeem = winner === 1 ? pTokenBalance : fTokenBalance;
     if (amountWei <= 0n || amountWei > maxRedeem) {
       setErrorMessage(`Enter a valid amount (max ${maxRedeem.toString()}).`);
@@ -835,8 +839,11 @@ export const PredictionMarketTradeModal = ({
     }
     // redeem
     const canRedeem = winner === 1 || winner === 2;
-    const amountWei = parseTokenAmount(redeemAmount, COLLATERAL_DECIMALS);
+    const redeemDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
+    const redeemCollateralSymbol = collateralInfo?.symbol ?? 'ETH';
+    const amountWei = parseTokenAmount(redeemAmount, redeemDecimals);
     const maxRedeem = winner === 1 ? pTokenBalance : fTokenBalance;
+    const winningToken = winner === 1 ? 'PASS' : 'FAIL';
     const validRedeem = canRedeem && amountWei > 0n && amountWei <= maxRedeem;
     const redeemDisplay = validRedeem ? redeemAmount || '0' : '0';
     return (
@@ -849,30 +856,46 @@ export const PredictionMarketTradeModal = ({
         )}
         {canRedeem && (
           <>
-            <CWText type="b2" className="label">
-              Winning token amount ({winner === 1 ? 'PASS' : 'FAIL'}) —
-              max:&nbsp;
-              {maxRedeem.toString()}
-            </CWText>
-            <CWTextInput
-              value={redeemAmount}
-              onInput={(e) =>
-                setRedeemAmount((e.target as HTMLInputElement).value)
+            <div className="input-label-row">
+              <CWText type="b2" className="label">
+                Winning token amount ({winningToken})
+              </CWText>
+              <CWText type="caption" className="available">
+                Available: {formatTokenDisplay(maxRedeem, redeemDecimals)}{' '}
+                {winningToken}
+              </CWText>
+            </div>
+            <div className="amount-input-with-actions">
+              <CWTextInput
+                value={redeemAmount}
+                onInput={(e) =>
+                  setRedeemAmount((e.target as HTMLInputElement).value)
+                }
+                placeholder="0"
+                type="text"
+                fullWidth
+                containerClassName="amount-input-wrap"
+              />
+              <CWButton
+                label="MAX"
+                buttonType="secondary"
+                buttonHeight="sm"
+                buttonWidth="narrow"
+                onClick={() =>
+                  setRedeemAmount(formatTokenDisplay(maxRedeem, redeemDecimals))
+                }
+              />
+            </div>
+            <CWBanner
+              type="info"
+              body={
+                <div>
+                  Exchange winning <strong>{winningToken}</strong> tokens for
+                  collateral ({redeemCollateralSymbol}).
+                </div>
               }
-              placeholder="0"
-              type="text"
-              containerClassName="amount-input"
             />
             <div className="cost-details">
-              <div className="cost-row">
-                <CWText type="caption" fontWeight="medium">
-                  Available ETH
-                </CWText>
-                <CWText type="caption" fontWeight="medium">
-                  {availableEthDisplay}
-                </CWText>
-              </div>
-              <CWDivider className="summary-divider" />
               <div className="cost-row">
                 <CWText type="caption" fontWeight="medium">
                   Collateral to be returned
@@ -880,9 +903,9 @@ export const PredictionMarketTradeModal = ({
                 <CWText
                   type="caption"
                   fontWeight="medium"
-                  className="summary-value-highlight"
+                  className="collateral-return"
                 >
-                  {redeemDisplay} ETH
+                  {redeemDisplay} {redeemCollateralSymbol}
                 </CWText>
               </div>
             </div>
@@ -966,9 +989,14 @@ export const PredictionMarketTradeModal = ({
             ) > minBalanceForMerge
           : (winner !== 1 && winner !== 2) ||
             !redeemAmount ||
-            parseTokenAmount(redeemAmount, COLLATERAL_DECIMALS) <= 0n ||
-            parseTokenAmount(redeemAmount, COLLATERAL_DECIMALS) >
-              (winner === 1 ? pTokenBalance : fTokenBalance);
+            parseTokenAmount(
+              redeemAmount,
+              collateralInfo?.decimals ?? COLLATERAL_DECIMALS,
+            ) <= 0n ||
+            parseTokenAmount(
+              redeemAmount,
+              collateralInfo?.decimals ?? COLLATERAL_DECIMALS,
+            ) > (winner === 1 ? pTokenBalance : fTokenBalance);
 
   return (
     <div className="PredictionMarketTradeModal">
@@ -1008,8 +1036,12 @@ export const PredictionMarketTradeModal = ({
                 <CWText type="caption" className="collateral-label market-ends">
                   Market ends:&nbsp;
                   {new Date(market.end_time).toLocaleString(undefined, {
-                    dateStyle: 'medium',
-                    timeStyle: 'short',
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
                   })}
                 </CWText>
               )}
@@ -1249,22 +1281,85 @@ export const PredictionMarketTradeModal = ({
           </div>
         </div>
         <CWTabsRow className="tabs-row">
-          <CWTab
-            label="Mint"
-            isSelected={activeTab === 'mint'}
-            onClick={() => setActiveTab('mint')}
-          />
-          <CWTab
-            label="Swap"
-            isSelected={activeTab === 'swap'}
-            onClick={() => setActiveTab('swap')}
-            isDisabled={swapDisabled}
-          />
-          <CWTab
-            label="Merge"
-            isSelected={activeTab === 'merge'}
-            onClick={() => setActiveTab('merge')}
-          />
+          {isResolved ? (
+            <CWTooltip
+              placement="top"
+              content="This action is not available for resolved markets."
+              renderTrigger={(handleInteraction) => (
+                <div
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                  style={{ flex: 1 }}
+                >
+                  <CWTab
+                    label="Mint"
+                    isSelected={false}
+                    onClick={() => {}}
+                    isDisabled
+                  />
+                </div>
+              )}
+            />
+          ) : (
+            <CWTab
+              label="Mint"
+              isSelected={activeTab === 'mint'}
+              onClick={() => setActiveTab('mint')}
+            />
+          )}
+          {isResolved ? (
+            <CWTooltip
+              placement="top"
+              content="This action is not available for resolved markets."
+              renderTrigger={(handleInteraction) => (
+                <div
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                  style={{ flex: 1 }}
+                >
+                  <CWTab
+                    label="Swap"
+                    isSelected={false}
+                    onClick={() => {}}
+                    isDisabled
+                  />
+                </div>
+              )}
+            />
+          ) : (
+            <CWTab
+              label="Swap"
+              isSelected={activeTab === 'swap'}
+              onClick={() => setActiveTab('swap')}
+              isDisabled={swapDisabled}
+            />
+          )}
+          {isResolved ? (
+            <CWTooltip
+              placement="top"
+              content="This action is not available for resolved markets."
+              renderTrigger={(handleInteraction) => (
+                <div
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                  style={{ flex: 1 }}
+                >
+                  <CWTab
+                    label="Merge"
+                    isSelected={false}
+                    onClick={() => {}}
+                    isDisabled
+                  />
+                </div>
+              )}
+            />
+          ) : (
+            <CWTab
+              label="Merge"
+              isSelected={activeTab === 'merge'}
+              onClick={() => setActiveTab('merge')}
+            />
+          )}
           <CWTab
             label="Redeem"
             isSelected={activeTab === 'redeem'}

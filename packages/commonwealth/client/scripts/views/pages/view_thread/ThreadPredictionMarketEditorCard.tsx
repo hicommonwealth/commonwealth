@@ -12,10 +12,14 @@ import './poll_cards.scss';
 
 type ThreadPredictionMarketEditorCardProps = {
   thread: Thread;
+  isAuthor?: boolean;
+  isAdmin?: boolean;
 };
 
 export const ThreadPredictionMarketEditorCard = ({
   thread,
+  isAuthor = false,
+  isAdmin = false,
 }: ThreadPredictionMarketEditorCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isFutarchyEnabled = useFlag('futarchy');
@@ -30,6 +34,8 @@ export const ThreadPredictionMarketEditorCard = ({
   const hasPredictionMarket = markets.length > 0;
 
   if (!isFutarchyEnabled || !thread?.id) return null;
+
+  const canResolveMarket = isAuthor || isAdmin;
 
   if (hasPredictionMarket) {
     return (
@@ -47,47 +53,59 @@ export const ThreadPredictionMarketEditorCard = ({
                 duration?: number;
                 resolution_threshold?: number;
                 collateral_address?: string;
+                proposal_id?: string | null;
+                governor_address?: string | null;
+                end_time?: Date | string | null;
                 [key: string]: unknown;
               }
             }
-            isAuthor={true}
+            isAuthor={isAuthor}
+            canResolveMarket={canResolveMarket}
           />
         ))}
       </>
     );
   }
 
-  return (
-    <>
-      <CWContentPageCard
-        header="Add a prediction market to this thread?"
-        showCollapsedIcon={true}
-        content={
-          <div className="PollEditorCard">
-            <CWButton
-              buttonHeight="sm"
-              className="create-poll-button"
-              label="Create prediction market"
-              onClick={(e) => {
-                e.preventDefault();
-                setIsModalOpen(true);
-              }}
+  if (!hasPredictionMarket && !isAuthor) {
+    return null;
+  }
+
+  if (!hasPredictionMarket) {
+    return (
+      <>
+        <CWContentPageCard
+          header="Add a prediction market to this thread?"
+          showCollapsedIcon={true}
+          content={
+            <div className="PollEditorCard">
+              <CWButton
+                buttonHeight="sm"
+                className="create-poll-button"
+                label="Create prediction market"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsModalOpen(true);
+                }}
+              />
+            </div>
+          }
+        />
+        <CWModal
+          size="medium"
+          content={
+            <PredictionMarketEditorModal
+              thread={thread}
+              onModalClose={() => setIsModalOpen(false)}
+              onSuccess={() => setIsModalOpen(false)}
             />
-          </div>
-        }
-      />
-      <CWModal
-        size="medium"
-        content={
-          <PredictionMarketEditorModal
-            thread={thread}
-            onModalClose={() => setIsModalOpen(false)}
-            onSuccess={() => setIsModalOpen(false)}
-          />
-        }
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
-      />
-    </>
-  );
+          }
+          onClose={() => setIsModalOpen(false)}
+          open={isModalOpen}
+        />
+      </>
+    );
+  }
+
+  return null;
 };
