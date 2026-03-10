@@ -9,6 +9,7 @@ import XPTable from '../../Leaderboard/XPTable/XPTable';
 import { TrendingCommunitiesPreview } from '../../user_dashboard/TrendingCommunitiesPreview';
 import ExploreContestList from '../ExploreContestList';
 import MarketsList from '../MarketsList';
+import PredictionMarketsList from '../PredictionMarketsList';
 import QuestList from '../QuestList';
 import TokensList from '../TokensList';
 import './AllTabContent.scss';
@@ -25,6 +26,7 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
   onClearSearch,
 }) => {
   const marketsEnabled = useFlag('markets');
+  const predictionMarketsEnabled = useFlag('futarchy');
   const navigate = useCommonNavigate();
 
   return (
@@ -96,6 +98,26 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
             searchText={searchText}
             onClearSearch={onClearSearch}
           />
+        </div>
+      )}
+
+      {/* Prediction Markets section */}
+      {predictionMarketsEnabled && (
+        <div className="section-container">
+          <CWSectionHeader
+            title="Prediction Markets"
+            seeAllText="See all prediction markets"
+            onSeeAllClick={() => navigate('/explore?tab=prediction-markets')}
+          />
+          <div className="horizontal-scroll-container">
+            <PredictionMarketsList
+              hideHeader
+              hideFilters
+              hideSearchTag
+              searchText={searchText}
+              onClearSearch={onClearSearch}
+            />
+          </div>
         </div>
       )}
 

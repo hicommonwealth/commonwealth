@@ -24,14 +24,36 @@ export type DeployPredictionMarketOnChainParams = {
   initial_liquidity: string;
 };
 
+const EVM_ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/;
+
+function assertValidEthereumAddress(
+  value: unknown,
+  fieldName: string,
+): asserts value is `0x${string}` {
+  if (typeof value !== 'string' || !value.trim()) {
+    throw new Error(
+      `Invalid parameters: must provide an Ethereum address for ${fieldName}`,
+    );
+  }
+  const trimmed = value.trim();
+  if (!EVM_ADDRESS_REGEX.test(trimmed)) {
+    throw new Error(
+      `Invalid parameters: ${fieldName} must be a valid Ethereum address (0x + 40 hex chars)`,
+    );
+  }
+}
+
 /**
  * Executes the on-chain deployment flow using PredictionMarket helper.
  *
- * @throws Error when chain not configured or wallet not connected
+ * @throws Error when chain not configured, wallet not connected, or addresses invalid
  */
 export async function deployPredictionMarketOnChain(
   params: DeployPredictionMarketOnChainParams,
 ): Promise<DeployPredictionMarketPayload> {
+  assertValidEthereumAddress(params.user_address, 'user_address (wallet)');
+  assertValidEthereumAddress(params.collateral_address, 'collateral_address');
+
   const governorAddress = PredictionMarket.getGovernorAddress(
     params.eth_chain_id,
   );

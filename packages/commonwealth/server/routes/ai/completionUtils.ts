@@ -2,6 +2,7 @@ import {
   AICompletionType,
   generateCommentPrompt,
   generatePollPrompt,
+  generatePredictionMarketPrompt,
   generateThreadPrompt,
   StructuredPrompt,
 } from '@hicommonwealth/model/services';
@@ -23,6 +24,8 @@ export function generatePromptForType(
       return generateCommentPrompt(contextString);
     case AICompletionType.Poll:
       return generatePollPrompt(contextString);
+    case AICompletionType.PredictionMarket:
+      return generatePredictionMarketPrompt(contextString);
     default:
       throw new Error(`Unknown completion type: ${completionType}`);
   }
