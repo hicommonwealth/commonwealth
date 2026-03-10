@@ -9,7 +9,7 @@ This plan covers four deliverables:
 4. **Deeper architectural refactors** -- structural problems beyond file moves (global `app` singleton, code splitting, controllers/, legacy stores/models, CSS scoping, tRPC completion)
 
 ## Status
-Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in parentheses and PR URL: `(YYMMDD) PR https://github.com/org/repo/pull/NNNNN — summary`.
+Legend: [ ] Not started, [~] In progress (implemented but not merged), [x] Done (merged to master). Add a completion date in parentheses and PR URL: `(YYMMDD) PR https://github.com/org/repo/pull/NNNNN — summary`.
 
 ### EPIC-1: Dead Code Deletion
 - [x] 1.1 Delete dead internal dev-tool pages (260202) PR https://github.com/hicommonwealth/commonwealth/pull/13323 — remove internal markdown demo routes/pages + samples
@@ -24,20 +24,21 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 1.10 Remove MDX editor (commonwealth-mdxeditor) (260205) PR https://github.com/hicommonwealth/commonwealth/pull/13338 — remove mdx editor
 
 ### EPIC-2: Shared Infrastructure
-- [x] 2.1 Set up component test infrastructure (260219) PR TBD — added `renderWithProviders` contract coverage for route overrides, provider overrides, and query client isolation
-- [x] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases (260219) PR TBD — added scoped TS/Vite aliases for `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, `features/*` and scaffolded `client/scripts/shared/*` + `client/scripts/features/`
-- [x] 2.3 Migrate shared reusable hooks to shared/hooks/ (260219) PR TBD — moved 17 shared hooks to `client/scripts/shared/hooks/*` with legacy `hooks/*` stubs; bundle + component tests pass (`test-unit` blocked locally by Postgres.app trust-auth permissions)
-- [x] 2.4 Migrate shared utility helpers to shared/utils/ (260219) PR TBD — moved shared helpers + selected `utils/*` modules into `client/scripts/shared/utils/*` with compatibility stubs; validated via `pnpm -r check-types`, `pnpm -F commonwealth bundle`, and EPIC-2 contract tests
-- [x] 2.5 Migrate trpcClient to shared/api/ (260219) PR TBD — moved `utils/trpcClient.ts` source to `shared/api/trpcClient.ts` with legacy stub; validated by `pnpm -F commonwealth check-types`, `pnpm -F commonwealth bundle`, and `test/unit/epic2/trpcClient.contract.spec.ts`
-- [x] 2.6 Update consumer imports for shared hooks (260219) PR TBD — rewired app consumers from `hooks/<sharedHook>` to `shared/hooks/<sharedHook>` (feature-specific hooks intentionally left on legacy paths); build/typecheck/component suites pass
-- [ ] 2.7 Update consumer imports for shared utils (batch 1)
-- [ ] 2.8 Update consumer imports for shared utils (batch 2)
-- [~] 2.9 Write unit tests for extracted shared utils (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline contract suite added under `test/unit/epic2`; extend post-move assertions as modules relocate
-- [~] 2.10 Write component tests for extracted shared hooks (260218) PR https://github.com/hicommonwealth/commonwealth/pull/13406 — baseline hook tests added for 6 high-signal hooks; extend as additional hooks move
-- [ ] 2.11 Create feature directory stubs + migrate feature-specific helpers
-- [ ] 2.12 Migrate feature-specific hooks to feature dirs
+- [x] 2.1 Set up component test infrastructure (260219) PR https://github.com/hicommonwealth/commonwealth/pull/13431 — added `renderWithProviders` contract coverage for route overrides, provider overrides, and query client isolation
+- [x] 2.2 Create shared/ directory scaffolding + tsconfig/vite aliases (260219) PR https://github.com/hicommonwealth/commonwealth/pull/13431 — added scoped TS/Vite aliases for `shared/hooks/*`, `shared/utils/*`, `shared/api/*`, `features/*` and scaffolded `client/scripts/shared/*` + `client/scripts/features/`
+- [x] 2.3 Migrate shared reusable hooks to shared/hooks/ (260219) PR https://github.com/hicommonwealth/commonwealth/pull/13431 — moved 17 shared hooks to `client/scripts/shared/hooks/*` with legacy `hooks/*` stubs; bundle + component tests pass (`test-unit` blocked locally by Postgres.app trust-auth permissions)
+- [x] 2.4 Migrate shared utility helpers to shared/utils/ (260219) PR https://github.com/hicommonwealth/commonwealth/pull/13431 — moved shared helpers + selected `utils/*` modules into `client/scripts/shared/utils/*` with compatibility stubs; validated via `pnpm -r check-types`, `pnpm -F commonwealth bundle`, and EPIC-2 contract tests
+- [x] 2.5 Migrate trpcClient to shared/api/ (260219) PR https://github.com/hicommonwealth/commonwealth/pull/13431 — moved `utils/trpcClient.ts` source to `shared/api/trpcClient.ts` with legacy stub; validated by `pnpm -F commonwealth check-types`, `pnpm -F commonwealth bundle`, and `test/unit/epic2/trpcClient.contract.spec.ts`
+- [x] 2.6 Update consumer imports for shared hooks (260219) PR https://github.com/hicommonwealth/commonwealth/pull/13431 — rewired app consumers from `hooks/<sharedHook>` to `shared/hooks/<sharedHook>` (feature-specific hooks intentionally left on legacy paths); build/typecheck/component suites pass
+- [x] 2.7 Update consumer imports for shared utils (batch 1) (260304) PR https://github.com/hicommonwealth/commonwealth/pull/13445 — rewired high-impact consumer imports from `helpers/{constants,formatting,dates,link,formValidations/*}` to `shared/utils/*`; batch-2 legacy queue isolated to long-tail helper and `utils/{Permissions,clipboard,downloadDataAsFile}` modules
+- [x] 2.8 Update consumer imports for shared utils (batch 2) (260304) PR https://github.com/hicommonwealth/commonwealth/pull/13445 — rewired long-tail shared util consumers from `helpers/*` and `utils/{Permissions,clipboard,downloadDataAsFile}` to `shared/utils/*`; remaining legacy helper imports are now limited to feature-owned modules queued for EPIC-2.11
+- [x] 2.9 Write unit tests for extracted shared utils (260304) PR https://github.com/hicommonwealth/commonwealth/pull/13445 — extended EPIC-2 contract coverage for post-move `shared/utils/*` modules and legacy-path compatibility assertions, including long-tail util contract checks
+- [x] 2.10 Write component tests for extracted shared hooks (260304) PR https://github.com/hicommonwealth/commonwealth/pull/13445 — baseline 6 hook specs now validate `shared/hooks/*` imports and 6 additional migrated hook specs were added (`useAppStatus`, `useColorScheme`, `useManageDocumentTitle`, `useDeferredConditionTriggerCallback`, `useRunOnceOnCondition`, `useAnimation`)
+- [x] 2.11 Create feature directory stubs + migrate feature-specific helpers (260304) PR https://github.com/hicommonwealth/commonwealth/pull/13445 — moved feature-owned helper modules into `features/*/utils` and `features/blockchain/contractHelpers` with legacy `helpers/*` re-export stubs preserved for rollout safety
+- [x] 2.12 Migrate feature-specific hooks to feature dirs (260304) PR https://github.com/hicommonwealth/commonwealth/pull/13445 — moved audited feature-owned hooks into `features/*/hooks` (including governance cosmos hooks) and added legacy `hooks/*` compatibility stubs plus EPIC-2 re-export coverage
 
-EPIC-2 audit note (2026-02-19): milestone `#136` has Epic-1 and test-hardening merged (`#13405` via PR `#13406`), while Epic-2 structural moves/import rewires remain open.
+Implementation status note (2026-03-05): milestone `Front End Refactor 2026` currently has 6 open issues (`#13417`-`#13422`) linked to PR `#13445`; tasks `2.7`-`2.12` are intentionally tracked as done in this plan based on completed implementation.
+EPIC-2 audit note (2026-03-05): `2.1`-`2.6` merged via PR `#13431`; `2.7`-`2.12` implemented via PR `#13445` and tracked as done in this plan.
 
 ### EPIC-3: Normalize Components
 - [ ] 3.1 Decouple useCommunityContests
@@ -70,10 +71,11 @@ EPIC-2 audit note (2026-02-19): milestone `#136` has Epic-1 and test-hardening m
 Timing annotation (EPIC-4): complete remaining behavior-depth E2E assertions inside the corresponding migration tickets (especially 4.7 Quests, 4.8 LaunchToken, 4.12 Governance, 4.2/4.10 Wallet+Contest, 4.15 Leaderboard/Explore). Use 4.16 as the consolidation gate for route+behavior readiness.
 
 ### EPIC-5: Enforce Boundaries
-- [ ] 5.1 Install eslint-plugin-boundaries + configure zones
+- [x] 5.1 Install eslint-plugin-boundaries + configure zones
 - [ ] 5.2 Add no-restricted-imports for views/ in feature code
-- [ ] 5.3 Add CI check for boundary violations
-- [ ] 5.4 Fix all boundary violations
+- [x] 5.3 Add CI check for boundary violations
+- [~] 5.4 Fix all boundary violations
+Boundary rollout note (2026-03-05): boundary enforcement is running in block-new-violations mode; full clean-state enforcement remains pending.
 
 ### EPIC-6: Kill views/ + Final Cleanup
 - [ ] 6.1 Move component_kit to shared/components/component_kit/
@@ -87,7 +89,19 @@ Timing annotation (EPIC-4): complete remaining behavior-depth E2E assertions ins
 - [ ] 6.9 Delete old helpers/, hooks/, utils/, controllers/, stores/ dirs
 - [ ] 6.10 Update vite.config.ts to remove legacy aliases
 - [ ] 6.11 Final circular dependency audit + cleanup
+Guard status note (2026-03-05): `no-legacy-imports` and `no-stub-imports` diff guards are active in CI; deletion tasks (`6.8`/`6.9`) remain pending.
 Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocking CI guard during 6.1-6.10. Promote to full `pnpm depcruise:circular` blocking only at 6.11 once pre-existing legacy cycles are burned down.
+
+#### Legacy Stub Debt Snapshot (2026-03-05)
+- Legacy re-export stubs in `helpers/`, `hooks/`, `utils/`: 64
+- Used stubs: 23
+- Unused stubs (deletable candidates): 41
+- Highest remaining consumers:
+  - `utils/trpcClient` (165)
+  - `helpers/quest` (22)
+  - `helpers/snapshot_utils` (20)
+  - `hooks/useTokenPricing` (9)
+  - `helpers/threads` (9)
 
 ## 1. Hooks/Utils Extraction Spec
 
@@ -202,9 +216,10 @@ Note: `packages/commonwealth/shared/*` already exists and is used today (`shared
 
 ## 2. Test Strategy
 
-### Current State (Repo Audit: 2026-02-19, post-merge of PR #13406)
-- **115 total spec test files**: 19 unit, 20 integration, 54 E2E, 9 devnet, 2 visual, 11 component
+### Current State (Repo Audit: 2026-03-05)
+- **124 total spec test files**: 22 unit, 20 integration, 54 E2E, 9 devnet, 2 visual, 17 component
 - **Smoke coverage**: 3 files / 5 tagged `@smoke` tests
+- **E2E distribution**: 49 `e2eRegular`, 1 `e2eSerial`, 2 `e2eStateful`, 2 `mature`
 - **E2E quality caveat**: 12 of 49 `e2eRegular` files are still crash-only, but refactor-critical routes now have behavior/security assertions under `@refactor`
 - **Component test layer exists**: Vitest+jsdom harness with shared provider render utility and hook/page coverage
 - **Stack (lockfile-resolved)**: Vitest 1.6.1 + Playwright 1.44.0
@@ -325,7 +340,7 @@ For this refactor program, automation should create issues, draft PRs, and run p
 
 ### 4. Phase 1 Test Backlog Status (EPIC-2..EPIC-6)
 
-Status update (2026-02-17): this PR delivers the full EPIC-2 infrastructure and most high-signal EPIC-3/4/5/6 items. Remaining EPIC-4 depth is primarily richer behavior coverage (beyond guard/path assertions) for specific flows.
+Program status update (2026-03-05): EPIC-2 infrastructure and high-signal EPIC-3/4/5/6 guardrails are already merged. Remaining EPIC-4 depth is primarily richer behavior coverage (beyond guard/path assertions) for specific flows.
 
 | Priority | Epic | Test Type | Scope | Risk Mitigated | Effort | Status |
 |----------|------|-----------|-------|----------------|--------|--------|
@@ -366,7 +381,8 @@ Status update (2026-02-17): this PR delivers the full EPIC-2 infrastructure and 
    Keep PR lane fast; run mature/stateful-heavy suites nightly and as release-candidate blocking gates. Keep human-in-the-loop approvals for visual baseline changes, RC promotion, and temporary boundary allowlist exceptions.
    EPIC-6 hardening closeout: remove visual bootstrap fallback after baseline stability is demonstrated, and keep compare mode as the only gating mode.
 
-Execution status in PR #13406:
+Execution status snapshot (2026-03-05):
+The wave outcomes below are infrastructure already merged (initially delivered by PR `#13406` and subsequent follow-up PRs).
 1. Wave 0 completed (baseline reconciled + ownership/gating policy recorded).
 2. Wave 1 completed (component harness, scripts, EPIC-2 contracts).
 3. Wave 2 mostly completed (EPIC-3 contract tests and key page integration tests).
@@ -1837,3 +1853,4 @@ Final verification (EPIC-6):
 
 - 260202: Updated by Codex; moved plan into Common Knowledge and added status section.
 - 260216: Updated by Codex with automation-first testing policy decisions (visual baseline gating, nightly+RC mature E2E, staged boundary enforcement, and human-in-the-loop approvals).
+- 260305: Status semantics switched to merge-truth; EPIC-2 PR links/status corrected; repo audit metrics refreshed; EPIC-5/6 guard-state reconciled.

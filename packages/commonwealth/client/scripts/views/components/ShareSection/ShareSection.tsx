@@ -1,9 +1,9 @@
 import { formatAddressShort } from 'helpers';
 import { uniqBy } from 'lodash';
 import React, { useEffect, useState } from 'react';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import app from 'state';
 import useUserStore from 'state/ui/user';
-import { saveToClipboard } from 'utils/clipboard';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';

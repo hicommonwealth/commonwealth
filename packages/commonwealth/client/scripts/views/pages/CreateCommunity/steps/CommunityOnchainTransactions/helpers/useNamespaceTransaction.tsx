@@ -12,6 +12,7 @@ import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack'
 import { useFlag } from 'shared/hooks/useFlag';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
+import { bytesToHex } from 'web3-utils';
 import {
   TransactionData,
   TransactionHookResult,
@@ -100,13 +101,17 @@ const useNamespaceTransaction = ({
               userAddress,
               chainId,
             );
+      const txHash =
+        typeof txReceipt.transactionHash === 'string'
+          ? txReceipt.transactionHash
+          : bytesToHex(txReceipt.transactionHash);
 
       await updateCommunity(
         buildUpdateCommunityInput({
           communityId,
           namespace,
           symbol,
-          transactionHash: txReceipt.transactionHash,
+          transactionHash: txHash,
         }),
       );
 

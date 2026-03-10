@@ -1,7 +1,7 @@
 import {
   emailValidationSchema,
   usernameSchema,
-} from 'helpers/formValidations/common';
+} from 'shared/utils/formValidations/common';
 import z from 'zod';
 
 export const personalInformationFormValidation = z.object({

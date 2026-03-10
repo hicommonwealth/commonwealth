@@ -1,6 +1,6 @@
 import { OpenFeature } from '@openfeature/web-sdk';
-import { initializeFeatureFlags } from 'helpers/feature-flags';
 import { useEffect, useState } from 'react';
+import { initializeFeatureFlags } from 'shared/utils/feature-flags';
 import { initAppState } from 'state';
 import useGroupMutationBannerStore from 'state/ui/group';
 
