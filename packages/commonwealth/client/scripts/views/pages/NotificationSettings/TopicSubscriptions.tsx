@@ -1,4 +1,5 @@
 import { TopicSubscription } from '@hicommonwealth/schemas';
+import { useTopicSubscriptions } from 'features/notifications/hooks/useTopicSubscriptions';
 import React, { useMemo } from 'react';
 import useUserStore from 'state/ui/user';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
@@ -6,7 +7,6 @@ import { CWCollapsible } from 'views/components/component_kit/cw_collapsible';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import { TopicEntry } from 'views/pages/NotificationSettings/TopicEntry';
-import { useTopicSubscriptions } from 'views/pages/NotificationSettings/useTopicSubscriptions';
 import { z } from 'zod';
 
 type TopicEntryData = {

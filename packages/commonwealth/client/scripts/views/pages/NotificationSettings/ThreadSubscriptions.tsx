@@ -1,8 +1,8 @@
 import { ThreadSubscription } from '@hicommonwealth/schemas';
+import { useThreadSubscriptions } from 'features/notifications/hooks/useThreadSubscriptions';
 import React, { useCallback, useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ThreadSubscriptionEntry } from 'views/pages/NotificationSettings/ThreadSubscriptionEntry';
-import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import { z } from 'zod';
 
 export const ThreadSubscriptions = () => {

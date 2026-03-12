@@ -1,4 +1,6 @@
 import { CommunityAlert } from '@hicommonwealth/schemas';
+import { useSupportsPushNotifications } from 'features/notifications/hooks/useSupportsPushNotifications';
+import { useThreadSubscriptions } from 'features/notifications/hooks/useThreadSubscriptions';
 import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
@@ -16,8 +18,6 @@ import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNo
 import { PushNotificationsToggleMaster } from 'views/pages/NotificationSettings/PushNotificationsToggleMaster';
 import { ThreadSubscriptions } from 'views/pages/NotificationSettings/ThreadSubscriptions';
 import { TopicSubscriptions } from 'views/pages/NotificationSettings/TopicSubscriptions';
-import { useSupportsPushNotifications } from 'views/pages/NotificationSettings/useSupportsPushNotifications';
-import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
 import { LoadingIndicator } from '../../components/LoadingIndicator/LoadingIndicator';
