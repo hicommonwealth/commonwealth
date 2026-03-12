@@ -2,14 +2,14 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'client/scripts/helpers/snapshot_utils';
+import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import DetailCard from 'client/scripts/views/components/proposals/DetailCard';
+import TimeLineCard from 'client/scripts/views/components/proposals/TimeLineCard';
+import VotingResultView from 'client/scripts/views/components/proposals/VotingResultView';
+import { VotingActions } from 'client/scripts/views/components/proposals/voting_actions';
+import { VotingResults } from 'client/scripts/views/components/proposals/voting_results';
 import React from 'react';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from 'views/components/component_kit/cw_text';
-import DetailCard from 'views/components/proposals/DetailCard';
-import TimeLineCard from 'views/components/proposals/TimeLineCard';
-import VotingResultView from 'views/components/proposals/VotingResultView';
-import { VotingActions } from 'views/components/proposals/voting_actions';
-import { VotingResults } from 'views/components/proposals/voting_results';
 import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
 import ProposalVotesDrawer from '../NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { SnapshotPollCardContainer } from '../Snapshots/ViewSnapshotProposal/SnapshotPollCard';

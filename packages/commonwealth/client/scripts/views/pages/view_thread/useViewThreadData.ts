@@ -6,15 +6,21 @@ import {
   GatedActionEnum,
   getThreadUrl,
 } from '@hicommonwealth/shared';
+import { isDefaultStage } from 'client/scripts/helpers';
+import { filterLinks } from 'client/scripts/helpers/threads';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import useGetThreadByIdQuery from 'client/scripts/state/api/threads/getThreadById';
 import useGetThreadToken from 'client/scripts/state/api/tokens/getThreadToken';
+import { checkIsTopicInContest } from 'client/scripts/views/components/NewThreadForm/helpers';
+import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
+import {
+  breakpointFnValidator,
+  isWindowMediumSmallInclusive,
+} from 'client/scripts/views/components/component_kit/helpers';
 import { notifyError } from 'controllers/app/notifications';
 import useCommunityContests from 'features/contests/hooks/useCommunityContests';
-import { isDefaultStage } from 'helpers';
-import { filterLinks } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -40,12 +46,6 @@ import useUserStore, {
   useAIFeatureEnabled,
   useUserAiSettingsStore,
 } from 'state/ui/user';
-import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
-import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
-import {
-  breakpointFnValidator,
-  isWindowMediumSmallInclusive,
-} from 'views/components/component_kit/helpers';
 import { z } from 'zod';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';

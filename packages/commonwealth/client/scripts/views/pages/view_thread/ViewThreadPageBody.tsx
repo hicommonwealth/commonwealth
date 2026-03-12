@@ -2,13 +2,13 @@ import {
   GatedActionEnum,
   MIN_CHARS_TO_SHOW_MORE,
 } from '@hicommonwealth/shared';
+import JoinCommunityBanner from 'client/scripts/views/components/JoinCommunityBanner';
+import MarkdownViewerWithFallback from 'client/scripts/views/components/MarkdownViewerWithFallback';
+import { CWGatedTopicBanner } from 'client/scripts/views/components/component_kit/CWGatedTopicBanner';
+import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import moment from 'moment';
 import React, { type ReactNode } from 'react';
-import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
-import { CWGatedTopicBanner } from 'views/components/component_kit/CWGatedTopicBanner';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { EditBody } from './edit_body';
 import { LockMessage } from './lock_message';
 import type { UseViewThreadDataResult } from './useViewThreadData';

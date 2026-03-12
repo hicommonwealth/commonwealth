@@ -1,7 +1,7 @@
 import React from 'react';
-import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context';
-import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import { CreateComment } from '../../components/Comments/CreateComment';
+import { StickyCommentElementSelector } from '../../components/StickEditorContainer/context';
+import { WithDefaultStickyComment } from '../../components/StickEditorContainer/context/WithDefaultStickyComment';
 import type { UseViewThreadDataResult } from './useViewThreadData';
 
 type ViewThreadPageComposerProps = {

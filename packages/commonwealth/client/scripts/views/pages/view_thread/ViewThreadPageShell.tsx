@@ -1,14 +1,14 @@
-import { extractDomain } from 'helpers';
+import { extractDomain } from 'client/scripts/helpers';
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import app from 'state';
-import ExternalLink from 'views/components/ExternalLink';
-import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import ExternalLink from '../../components/ExternalLink';
 import { ImageActionModal } from '../../components/ImageActionModal/ImageActionModal';
 import MetaTags from '../../components/MetaTags';
+import { StickCommentProvider } from '../../components/StickEditorContainer/context/StickCommentProvider';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
 import { CommentTree } from '../discussions/CommentTree';
 import { ViewThreadPageBody } from './ViewThreadPageBody';
 import { ViewThreadPageComposer } from './ViewThreadPageComposer';

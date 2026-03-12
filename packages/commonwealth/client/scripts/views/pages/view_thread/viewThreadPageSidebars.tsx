@@ -1,14 +1,14 @@
 import type { AnyProposal } from 'client/scripts/models/types';
-import React from 'react';
-import { ThreadTokenWidget } from 'views/components/NewThreadForm/ToketWidget';
+import { ThreadTokenWidget } from 'client/scripts/views/components/NewThreadForm/ToketWidget';
 import {
   type ContentPageSidebarItem,
   type SidebarComponents,
-} from 'views/components/component_kit/CWContentPage';
-import DetailCard from 'views/components/proposals/DetailCard';
-import TimeLineCard from 'views/components/proposals/TimeLineCard';
-import VotingResultView from 'views/components/proposals/VotingResultView';
-import { VotingResults } from 'views/components/proposals/voting_results';
+} from 'client/scripts/views/components/component_kit/CWContentPage';
+import DetailCard from 'client/scripts/views/components/proposals/DetailCard';
+import TimeLineCard from 'client/scripts/views/components/proposals/TimeLineCard';
+import VotingResultView from 'client/scripts/views/components/proposals/VotingResultView';
+import { VotingResults } from 'client/scripts/views/components/proposals/voting_results';
+import React from 'react';
 import app from '../../../state';
 import { LinkedUrlCard } from './LinkedUrlCard';
 import { ThreadPollCard } from './ThreadPollCard';
