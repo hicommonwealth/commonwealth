@@ -48,7 +48,7 @@ export const launchPostToken = async (
   bondingCurveAddress: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tokenContract: any,
-  curveId: number = 1,
+  curveId: number = 0,
   scalar: number = 0,
 ) => {
   try {
@@ -59,7 +59,7 @@ export const launchPostToken = async (
       walletAddress,
     );
     const txReceipt = await contract.methods
-      .launchTokenWithLiquidity(
+      .launchTokenWithLiquidity([
         name,
         symbol,
         shares,
@@ -74,8 +74,8 @@ export const launchPostToken = async (
         exchangeToken,
         initPurchaseAmount,
         initPurchaseAmount,
-      )
-      .send({ from: walletAddress, value: 1e15 });
+      ])
+      .send({ from: walletAddress, value: 1e16 });
     return txReceipt;
   } catch (error) {
     console.error('Error launching token:', error);
