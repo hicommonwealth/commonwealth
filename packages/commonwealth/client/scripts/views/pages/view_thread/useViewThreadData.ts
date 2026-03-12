@@ -248,16 +248,16 @@ export const useViewThreadData = ({ identifier }: ViewThreadPageProps) => {
   }, []);
 
   const handleGenerateAIComment = useCallback(
-    async (mainThreadId: number): Promise<void> => {
+    (mainThreadId: number): Promise<void> => {
       if (!effectiveAiCommentsToggleEnabled || !user.activeAccount) {
-        return;
+        return Promise.resolve();
       }
 
       if (
         (thread?.numberOfComments && thread.numberOfComments > 0) ||
         initalAiCommentPosted.current
       ) {
-        return;
+        return Promise.resolve();
       }
 
       const modelsToUse =
@@ -280,6 +280,7 @@ export const useViewThreadData = ({ identifier }: ViewThreadPageProps) => {
 
       setStreamingInstances(newInstances);
       initalAiCommentPosted.current = true;
+      return Promise.resolve();
     },
     [
       effectiveAiCommentsToggleEnabled,
@@ -326,14 +327,19 @@ export const useViewThreadData = ({ identifier }: ViewThreadPageProps) => {
   });
 
   useEffect(() => {
-    breakpointFnValidator(
-      isCollapsedSize,
-      (state: boolean) => {
-        setIsCollapsedSize(state);
-      },
-      isWindowMediumSmallInclusive,
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setIsCollapsedSize((currentState) => {
+      let nextState = currentState;
+
+      breakpointFnValidator(
+        currentState,
+        (state: boolean) => {
+          nextState = state;
+        },
+        isWindowMediumSmallInclusive,
+      );
+
+      return nextState;
+    });
   }, []);
 
   useBrowserAnalyticsTrack({

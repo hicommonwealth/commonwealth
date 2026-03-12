@@ -115,6 +115,10 @@ If the split reveals a real EPIC-3/EPIC-4 sequencing change, update `common_know
 
 - Strict ESLint on task-owned EPIC-3.3 files
   - passed
+- Root `pnpm lint-diff`
+  - passed after a small CI follow-up in `useViewThreadData.ts`:
+    - removed an unnecessary `async` wrapper from `handleGenerateAIComment` to satisfy `@typescript-eslint/require-await`
+    - removed a `react-hooks/exhaustive-deps` disable comment that broke the boundaries diff lint when that rule was unavailable in the boundaries config
 - Manual working-tree legacy import guard
   - passed
 - Manual working-tree stub import guard
@@ -132,7 +136,8 @@ If the split reveals a real EPIC-3/EPIC-4 sequencing change, update `common_know
 - `pnpm -F commonwealth test-select test/unit/epic3/viewThreadPage.contracts.spec.ts test/unit/epic3/discussionsPage.contracts.spec.ts`
   - blocked by the shared local Vitest DB bootstrap (`Postgres.app` trust auth rejection)
 - Direct boundary lint on task-owned files
-  - blocked by local tooling because `eslint-plugin-boundaries` is not resolvable in this environment
+  - still blocked locally because `eslint-plugin-boundaries` is not resolvable in this environment
+  - the EPIC-3.3 follow-up removed the boundaries-lint-specific false positive from `useViewThreadData.ts`
 
 ## Lessons Learned
 
