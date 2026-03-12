@@ -69,3 +69,27 @@ export const shouldShowCreateCommentComposer = ({
       !isGloballyEditing &&
       isUserLoggedIn,
   );
+
+export const shouldShowJoinCommunityBanner = ({
+  hasActiveAccount,
+  isBannerVisible,
+}: {
+  hasActiveAccount: boolean;
+  isBannerVisible: boolean;
+}) => !hasActiveAccount && isBannerVisible;
+
+export const shouldShowViewThreadGatedTopicBanner = ({
+  hideGatingBanner,
+  isThreadAuthor,
+  isTopicGated,
+}: {
+  hideGatingBanner: boolean;
+  isThreadAuthor: boolean;
+  isTopicGated: boolean;
+}) => Boolean(isTopicGated && !hideGatingBanner && !isThreadAuthor);
+
+export const shouldShowViewThreadSidebar = ({
+  isWindowSmallInclusive,
+}: {
+  isWindowSmallInclusive: boolean;
+}) => !isWindowSmallInclusive;

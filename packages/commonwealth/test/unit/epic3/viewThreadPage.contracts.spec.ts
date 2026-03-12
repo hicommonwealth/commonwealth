@@ -2,6 +2,9 @@ import { describe, expect, test } from 'vitest';
 import {
   resolveViewThreadRenderState,
   shouldShowCreateCommentComposer,
+  shouldShowJoinCommunityBanner,
+  shouldShowViewThreadGatedTopicBanner,
+  shouldShowViewThreadSidebar,
 } from '../../../client/scripts/views/pages/view_thread/viewThreadPage.contracts';
 
 describe('ViewThreadPage contracts', () => {
@@ -141,6 +144,75 @@ describe('ViewThreadPage contracts', () => {
           fromDiscordBot: false,
           isGloballyEditing: true,
           isUserLoggedIn: true,
+        }),
+      ).toBe(false);
+    });
+  });
+
+  describe('shouldShowJoinCommunityBanner', () => {
+    test('shows the join banner only for signed-out users when the banner flag is enabled', () => {
+      expect(
+        shouldShowJoinCommunityBanner({
+          hasActiveAccount: false,
+          isBannerVisible: true,
+        }),
+      ).toBe(true);
+
+      expect(
+        shouldShowJoinCommunityBanner({
+          hasActiveAccount: true,
+          isBannerVisible: true,
+        }),
+      ).toBe(false);
+
+      expect(
+        shouldShowJoinCommunityBanner({
+          hasActiveAccount: false,
+          isBannerVisible: false,
+        }),
+      ).toBe(false);
+    });
+  });
+
+  describe('shouldShowViewThreadGatedTopicBanner', () => {
+    test('shows the gated topic banner only for gated non-author thread views that are not dismissed', () => {
+      expect(
+        shouldShowViewThreadGatedTopicBanner({
+          hideGatingBanner: false,
+          isThreadAuthor: false,
+          isTopicGated: true,
+        }),
+      ).toBe(true);
+
+      expect(
+        shouldShowViewThreadGatedTopicBanner({
+          hideGatingBanner: true,
+          isThreadAuthor: false,
+          isTopicGated: true,
+        }),
+      ).toBe(false);
+
+      expect(
+        shouldShowViewThreadGatedTopicBanner({
+          hideGatingBanner: false,
+          isThreadAuthor: true,
+          isTopicGated: true,
+        }),
+      ).toBe(false);
+    });
+  });
+
+  describe('shouldShowViewThreadSidebar', () => {
+    test('keeps the sidebar desktop-only during the EPIC-3 split', () => {
+      expect(
+        shouldShowViewThreadSidebar({
+          isWindowSmallInclusive: false,
+        }),
+      ).toBe(true);
+
+      expect(
+        shouldShowViewThreadSidebar({
+          isWindowSmallInclusive: true,
         }),
       ).toBe(false);
     });
