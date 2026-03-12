@@ -1,12 +1,12 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import ContestsList from 'views/pages/CommunityManagement/Contests/ContestsList';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
 import { BLOG_SUBDOMAIN } from '@hicommonwealth/shared';
 import { CWDivider } from '../../components/component_kit/cw_divider';

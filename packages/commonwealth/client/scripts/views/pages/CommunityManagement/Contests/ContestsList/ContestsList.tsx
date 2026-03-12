@@ -1,6 +1,7 @@
 import moment from 'moment';
 import React, { useState } from 'react';
 
+import type { Contest } from 'features/contests/types/contest';
 import { Skeleton } from 'views/components/Skeleton';
 
 import ContestCard from 'views/components/ContestCard';
@@ -8,39 +9,6 @@ import FundContestDrawer from '../FundContestDrawer';
 import { ContestView } from '../types';
 
 import './ContestsList.scss';
-
-export type Contest = {
-  is_farcaster_contest?: boolean;
-  community_id?: string;
-  contest_address?: string;
-  created_at?: Date;
-  name?: string;
-  image_url?: string;
-  topics?: { id?: number; name?: string }[];
-  cancelled?: boolean;
-  decimals?: number;
-  funding_token_address?: string;
-  interval?: number;
-  payout_structure?: number[];
-  prize_percentage?: number;
-  ticker?: string;
-  namespace_judges?: string[];
-  namespace_judge_token_id?: number;
-  contests?: {
-    contest_id?: number;
-    score?: {
-      creator_address?: string;
-      content_id?: string;
-      votes?: number;
-      prize?: string;
-      tickerPrize?: number;
-    }[];
-    score_updated_at?: Date;
-    start_time?: Date;
-    end_time?: Date;
-    contest_balance?: string;
-  }[];
-};
 
 interface ContestsListProps {
   contests: Contest[];
@@ -94,12 +62,9 @@ const ContestsList = ({
               <ContestCard
                 key={contest.contest_address}
                 isAdmin={isAdmin}
-                // @ts-expect-error <StrictNullChecks/>
                 address={contest.contest_address}
-                // @ts-expect-error <StrictNullChecks/>
                 name={contest.name}
                 imageUrl={contest.image_url}
-                // @ts-expect-error <StrictNullChecks/>
                 topics={contest.topics}
                 decimals={contest.decimals}
                 ticker={contest.ticker}
@@ -120,12 +85,9 @@ const ContestsList = ({
               <ContestCard
                 key={contest.contest_address}
                 isAdmin={isAdmin}
-                // @ts-expect-error <StrictNullChecks/>
                 address={contest.contest_address}
-                // @ts-expect-error <StrictNullChecks/>
                 name={contest.name}
                 imageUrl={contest.image_url}
-                // @ts-expect-error <StrictNullChecks/>
                 topics={contest.topics}
                 decimals={contest.decimals}
                 ticker={contest.ticker}
@@ -159,3 +121,4 @@ const ContestsList = ({
 };
 
 export default ContestsList;
+export type { Contest };

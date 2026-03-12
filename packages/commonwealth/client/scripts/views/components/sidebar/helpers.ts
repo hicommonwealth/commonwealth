@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
 import { FeedItem } from '@knocklabs/client';
+import type { Contest } from 'features/contests/types/contest';
+import { isContestActive } from 'features/contests/utils/contestUtils';
 import app from 'state';
-import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
-import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import type { ToggleTree } from './types';
 
 function comparisonCustomizer(value1, value2) {
@@ -30,14 +30,19 @@ export const getUniqueTopicIdsIncludedInActiveContest = (
     return [];
   }
 
-  const topicIds = contestData.reduce((acc, contest) => {
+  const topicIds = contestData.reduce<number[]>((acc, contest) => {
     const isActive = isContestActive({ contest });
 
     if (!isActive) {
       return acc;
     }
 
-    return [...acc, ...(contest?.topics || []).map((t) => t.id)];
+    return [
+      ...acc,
+      ...contest.topics
+        .map((topic) => topic.id)
+        .filter((topicId): topicId is number => topicId !== undefined),
+    ];
   }, []);
 
   return [...new Set(topicIds)];

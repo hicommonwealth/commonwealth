@@ -57,6 +57,8 @@ import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 // eslint-disable-next-line max-len
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
+import { isContestActive } from 'features/contests/utils/contestUtils';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import TokenBanner from 'views/components/TokenBanner';
@@ -68,8 +70,6 @@ import {
   getTextFromDelta,
 } from 'views/components/react_quill_editor';
 import { serializeDelta } from 'views/components/react_quill_editor/utils';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';

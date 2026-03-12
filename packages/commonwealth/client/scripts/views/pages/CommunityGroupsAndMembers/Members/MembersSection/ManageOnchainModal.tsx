@@ -23,7 +23,7 @@ import {
   CWTab,
   CWTabsRow,
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
-import useCommunityContests from 'client/scripts/views/pages/CommunityManagement/Contests/useCommunityContests';
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import React, { useMemo, useState } from 'react';
 import { useFlag } from 'shared/hooks/useFlag';
 import app from 'state';

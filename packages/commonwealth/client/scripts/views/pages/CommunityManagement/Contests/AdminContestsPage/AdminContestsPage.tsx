@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import commonUrl from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
 import shape2Url from 'assets/img/shapes/shape2.svg';
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
   BaseMixpanelPayload,
@@ -28,7 +29,6 @@ import { TransactionType } from '../../../CreateCommunity/steps/CommunityOnchain
 import ContestsList from '../ContestsList';
 import EmptyContestsList from '../EmptyContestsList';
 import { ContestType, ContestView } from '../types';
-import useCommunityContests from '../useCommunityContests';
 import FeeManagerBanner from './FeeManagerBanner';
 
 import './AdminContestsPage.scss';

@@ -1,10 +1,10 @@
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import moment from 'moment';
 import React from 'react';
 import { trpc } from 'utils/trpcClient';
 import ContestCard from 'views/components/ContestCard/ContestCard';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
-import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
 import './ExploreContestList.scss';

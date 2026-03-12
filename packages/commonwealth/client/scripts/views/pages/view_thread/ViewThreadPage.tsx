@@ -18,6 +18,7 @@ import { AnyProposal } from 'client/scripts/models/types';
 import useGetThreadByIdQuery from 'client/scripts/state/api/threads/getThreadById';
 import useGetThreadToken from 'client/scripts/state/api/tokens/getThreadToken';
 import { notifyError } from 'controllers/app/notifications';
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
@@ -58,7 +59,6 @@ import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { z } from 'zod';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';

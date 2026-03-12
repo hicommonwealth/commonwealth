@@ -1,4 +1,4 @@
-import ContestsList, { Contest } from './ContestsList';
+import ContestsList from './ContestsList';
 
 export default ContestsList;
-export type { Contest };
+export type { Contest } from 'features/contests/types/contest';

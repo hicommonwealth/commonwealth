@@ -4,6 +4,7 @@ import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import { PageNotFound } from 'client/scripts/views/pages/404';
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import { findDenominationString } from 'helpers/findDenomination';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
@@ -19,7 +20,6 @@ import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sidebar/helpers';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
@@ -169,7 +169,6 @@ export const CommunitySection = ({
 
         <CWDivider />
         <DiscussionSection
-          // @ts-expect-error <StrictNullChecks/>
           topicIdsIncludedInContest={topicIdsIncludedInContest}
         />
         <CWDivider />

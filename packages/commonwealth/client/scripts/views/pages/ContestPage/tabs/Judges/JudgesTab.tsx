@@ -1,4 +1,7 @@
 import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
+import type { Contest } from 'features/contests/types/contest';
+import { isContestActive } from 'features/contests/utils/contestUtils';
 import React, { useState } from 'react';
 import Permissions from 'shared/utils/Permissions';
 import { useGetMembersQuery } from 'state/api/communities';
@@ -13,9 +16,6 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { User } from 'views/components/user/user';
 import { ManageOnchainModal } from 'views/pages/CommunityGroupsAndMembers/Members/MembersSection/ManageOnchainModal';
 import { AddressInfo } from 'views/pages/CommunityGroupsAndMembers/Members/MembersSection/MembersSection';
-import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 
 import './JudgesTab.scss';
 

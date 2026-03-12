@@ -6,9 +6,9 @@ import {
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
+import type { Contest } from 'features/contests/types/contest';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import { checkIsTopicInContest } from '../../components/NewThreadForm/helpers';
 import { ThreadCard } from './ThreadCard';
 
