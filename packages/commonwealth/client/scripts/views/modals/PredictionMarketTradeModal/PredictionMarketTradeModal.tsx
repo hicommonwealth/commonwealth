@@ -1,3 +1,4 @@
+import { ChainBase } from '@hicommonwealth/shared';
 import { ArrowsDownUp, CaretDown, CaretUp } from '@phosphor-icons/react';
 import {
   notifyError,
@@ -18,13 +19,14 @@ import {
   swapTokens,
   type TradeParams,
 } from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
+import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import useGetCommunityByIdQuery from 'client/scripts/state/api/communities/getCommuityById';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import { fetchNodes } from 'client/scripts/state/api/nodes';
 import { useGetPredictionMarketPositionsQuery } from 'client/scripts/state/api/predictionMarket';
 import useUserStore from 'client/scripts/state/ui/user';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -36,10 +38,16 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
+import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
 import CWTab from '../../components/component_kit/new_designs/CWTabs/CWTab';
 import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { CWTooltip } from '../../components/component_kit/new_designs/CWTooltip';
+import {
+  CustomAddressOption,
+  CustomAddressOptionElement,
+} from '../ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+import { convertAddressToDropdownOption } from '../TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import './PredictionMarketTradeModal.scss';
 
 const COLLATERAL_DECIMALS = 18;
@@ -81,6 +89,10 @@ type PredictionMarketTradeModalProps = {
   threadCommunityId: string;
   onClose: () => void;
   onSuccess?: () => void;
+  /** When opening from PM card, pass the card's selected address so the modal opens with it. */
+  initialAddress?: string;
+  /** When true, sync selectedAddress from initialAddress (e.g. when modal just opened). */
+  open?: boolean;
 };
 
 type TabId = 'mint' | 'swap' | 'merge' | 'redeem';
@@ -110,9 +122,28 @@ export const PredictionMarketTradeModal = ({
   threadCommunityId,
   onClose,
   onSuccess,
+  initialAddress,
+  open: modalOpen,
 }: PredictionMarketTradeModalProps) => {
   const user = useUserStore();
-  const activeAddress = user.activeAccount?.address ?? '';
+  const prevOpenRef = useRef(false);
+  const uniqueAddresses =
+    getUniqueUserAddresses({ forChain: ChainBase.Ethereum }) ?? [];
+  const [selectedAddress, setSelectedAddress] = useState<string>(() => {
+    const initial =
+      initialAddress ??
+      user.activeAccount?.address ??
+      user.addressSelectorSelectedAddress ??
+      uniqueAddresses[0];
+    return initial ?? '';
+  });
+  useEffect(() => {
+    if (modalOpen && !prevOpenRef.current && initialAddress) {
+      setSelectedAddress(initialAddress);
+    }
+    prevOpenRef.current = !!modalOpen;
+  }, [modalOpen, initialAddress]);
+  const activeAddress = selectedAddress;
   const [activeTab, setActiveTab] = useState<TabId>(() =>
     market.status === 'resolved' ? 'redeem' : 'mint',
   );
@@ -1007,6 +1038,32 @@ export const PredictionMarketTradeModal = ({
       />
       <CWDivider />
       <CWModalBody>
+        <div className="address-selector-row">
+          <CWSelectList
+            components={{
+              Option: (originalProps) =>
+                CustomAddressOption({
+                  originalProps,
+                  selectedAddressValue: activeAddress,
+                }),
+            }}
+            noOptionsMessage={() => 'No available address'}
+            value={convertAddressToDropdownOption(activeAddress)}
+            formatOptionLabel={(option) => (
+              <CustomAddressOptionElement
+                value={option.value}
+                label={option.label}
+                selectedAddressValue={activeAddress}
+              />
+            )}
+            isClearable={false}
+            isSearchable={false}
+            options={uniqueAddresses.map(convertAddressToDropdownOption)}
+            onChange={(option) =>
+              option?.value && setSelectedAddress(option.value)
+            }
+          />
+        </div>
         <div className="collateral-row">
           <button
             type="button"

@@ -1,17 +1,17 @@
 import { trpc } from 'client/scripts/utils/trpcClient';
 
 interface UseCancelPredictionMarketMutationProps {
-  threadId: number;
+  thread_id: number;
 }
 
 const useCancelPredictionMarketMutation = ({
-  threadId,
+  thread_id,
 }: UseCancelPredictionMarketMutationProps) => {
   const utils = trpc.useUtils();
   return trpc.predictionMarket.cancelPredictionMarket.useMutation({
     onSuccess: () => {
       utils.predictionMarket.getPredictionMarkets
-        .invalidate({ thread_id: threadId })
+        .invalidate({ thread_id })
         .catch(console.error);
     },
   });
