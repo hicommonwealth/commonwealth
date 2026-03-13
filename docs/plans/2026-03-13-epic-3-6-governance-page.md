@@ -101,6 +101,12 @@ If this task reveals a real EPIC-3 or EPIC-4 sequencing change, update `common_k
     - `useGovernancePageData.ts`
 - `pnpm -F commonwealth bundle`
   - still fails on the existing repo-wide `BinaryVaultAbi` export error in `libs/evm-protocols/src/event-registry/eventRegistry.ts`
+- `pnpm -F commonwealth no-legacy-imports`
+  - passed
+- `pnpm -F commonwealth no-stub-imports`
+  - passed
+- `pnpm -F commonwealth lint-boundaries`
+  - still blocked locally because `eslint-plugin-boundaries` is not resolvable in this environment
 
 ## Lessons Learned
 
