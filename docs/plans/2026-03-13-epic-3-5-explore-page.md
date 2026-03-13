@@ -129,6 +129,13 @@ If the split changes EPIC-3/EPIC-4 sequencing, update `common_knowledge/Commonwe
     - `client/scripts/views/pages/ExplorePage/MarketsList/MarketsList.tsx` (`useInfiniteQuery`)
 - `pnpm -F commonwealth bundle`
   - still fails on the existing repo-wide `BinaryVaultAbi` export error in `libs/evm-protocols/src/event-registry/eventRegistry.ts`
+- `pnpm -F commonwealth no-legacy-imports`
+  - initially failed on newly introduced `views/*` aliases in the split shell/modal modules
+  - passed after repointing those imports back to local relative paths
+- `pnpm -F commonwealth no-stub-imports`
+  - passed
+- `pnpm -F commonwealth lint-boundaries`
+  - still blocked locally because `eslint-plugin-boundaries` is not resolvable in this environment
 
 ## Lessons Learned
 
