@@ -4,7 +4,6 @@ import {
   notifyError,
   notifySuccess,
 } from 'client/scripts/controllers/app/notifications';
-import MagicWebWalletController from 'client/scripts/controllers/app/webWallets/MagicWebWallet';
 import { formatAddressShort } from 'client/scripts/helpers';
 import {
   applySlippage,
@@ -19,14 +18,14 @@ import {
   swapTokens,
   type TradeParams,
 } from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
+import { getEthereumProviderForAddress } from 'client/scripts/helpers/getEthereumProviderForAddress';
 import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import useGetCommunityByIdQuery from 'client/scripts/state/api/communities/getCommuityById';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
-import { fetchNodes } from 'client/scripts/state/api/nodes';
 import { useGetPredictionMarketPositionsQuery } from 'client/scripts/state/api/predictionMarket';
 import useUserStore from 'client/scripts/state/ui/user';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -355,21 +354,6 @@ export const PredictionMarketTradeModal = ({
   const swapDisabled = isResolved;
   const winner = market.winner ?? 0;
 
-  const getProvider = useCallback(async () => {
-    const { userStore: store } = await import('client/scripts/state/ui/user');
-    const addresses = store.getState().addresses ?? [];
-    const isMagic = addresses.some(
-      (addr: { address: string; walletId?: string }) =>
-        addr.address?.toLowerCase() === activeAddress?.toLowerCase() &&
-        addr.walletId?.toLowerCase()?.includes('magic'),
-    );
-    if (!isMagic) return undefined;
-    await fetchNodes();
-    const controller = new MagicWebWalletController();
-    await controller.enable(String(ethChainId));
-    return (controller as { provider?: unknown }).provider;
-  }, [activeAddress, ethChainId]);
-
   const mintDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
 
   const handleMint = async () => {
@@ -391,7 +375,17 @@ export const PredictionMarketTradeModal = ({
     setErrorMessage(null);
     setIsLoading(true);
     try {
-      const provider = await getProvider();
+      const provider = await getEthereumProviderForAddress(
+        activeAddress,
+        ethChainId,
+      );
+      if (activeAddress && !provider) {
+        setErrorMessage(
+          'Could not find the wallet for the selected address. Ensure the wallet is connected.',
+        );
+        notifyError('Wallet not found for this address.');
+        return;
+      }
       await mintTokens({
         ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
         collateral_amount_wei: amountWei,
@@ -439,7 +433,17 @@ export const PredictionMarketTradeModal = ({
     setErrorMessage(null);
     setIsLoading(true);
     try {
-      const provider = await getProvider();
+      const provider = await getEthereumProviderForAddress(
+        activeAddress,
+        ethChainId,
+      );
+      if (activeAddress && !provider) {
+        setErrorMessage(
+          'Could not find the wallet for the selected address. Ensure the wallet is connected.',
+        );
+        notifyError('Wallet not found for this address.');
+        return;
+      }
       await swapTokens({
         ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
         buy_pass: swapBuyPass,
@@ -486,7 +490,17 @@ export const PredictionMarketTradeModal = ({
     setErrorMessage(null);
     setIsLoading(true);
     try {
-      const provider = await getProvider();
+      const provider = await getEthereumProviderForAddress(
+        activeAddress,
+        ethChainId,
+      );
+      if (activeAddress && !provider) {
+        setErrorMessage(
+          'Could not find the wallet for the selected address. Ensure the wallet is connected.',
+        );
+        notifyError('Wallet not found for this address.');
+        return;
+      }
       await mergeTokens({
         ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
         amount_wei: amountWei,
@@ -537,7 +551,17 @@ export const PredictionMarketTradeModal = ({
     setErrorMessage(null);
     setIsLoading(true);
     try {
-      const provider = await getProvider();
+      const provider = await getEthereumProviderForAddress(
+        activeAddress,
+        ethChainId,
+      );
+      if (activeAddress && !provider) {
+        setErrorMessage(
+          'Could not find the wallet for the selected address. Ensure the wallet is connected.',
+        );
+        notifyError('Wallet not found for this address.');
+        return;
+      }
       await redeemTokens({
         ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
         amount_wei: amountWei,
