@@ -16,10 +16,12 @@ const {
   useActiveCosmosProposalsQueryMock: vi.fn(),
   useCompletedCosmosProposalsQueryMock: vi.fn(),
   appMock: {
+    isAdapterReady: true,
     chain: {
       apiInitialized: true,
       base: 'cosmos',
       failed: false,
+      initApi: vi.fn(),
       loaded: true,
       meta: {},
     },
@@ -35,7 +37,7 @@ vi.mock('client/scripts/hooks/useFlag', () => ({
   useFlag: useFlagMock,
 }));
 
-vi.mock('client/scripts/hooks/useInitChainIfNeeded', () => ({
+vi.mock('features/governance/hooks/useInitChainIfNeeded', () => ({
   useInitChainIfNeeded: useInitChainIfNeededMock,
 }));
 
@@ -96,6 +98,7 @@ describe('GovernancePage integration', () => {
       apiInitialized: true,
       base: ChainBase.CosmosSDK,
       failed: false,
+      initApi: vi.fn(),
       loaded: true,
       meta: {},
     } as unknown as typeof appMock.chain;

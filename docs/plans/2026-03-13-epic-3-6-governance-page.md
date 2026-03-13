@@ -91,6 +91,7 @@ If this task reveals a real EPIC-3 or EPIC-4 sequencing change, update `common_k
 - `pnpm -F commonwealth test-component -- test/component/pages/governancePage.integration.spec.tsx`
   - blocked by the current component-test environment before tests execute
   - Vitest cannot resolve `@testing-library/jest-dom/vitest` from `packages/commonwealth/test/component/setup.ts`
+  - CI later confirmed the suite executes there; the EPIC-3.6 follow-up was to repoint the spec to the new `features/governance/hooks/useInitChainIfNeeded` mock path and add a minimal `initApi` stub on the mocked app chain
 - `pnpm lint-diff`
   - passed with the same ignored-test warnings already present on this branch
 - `pnpm -F commonwealth check-types`
@@ -113,3 +114,4 @@ If this task reveals a real EPIC-3 or EPIC-4 sequencing change, update `common_k
 - `GovernancePage` only needed a page-state hook and a single content boundary; anything more would have been abstraction noise for EPIC-3.6.
 - `chainAdapterReady` cleanup should use the same callback reference that was registered. The previous inline cleanup shape was fragile and harder to reason about during refactor work.
 - The component-test environment is still globally broken, so route-page smoke specs remain useful for intent and documentation but not currently executable as regression signal.
+- When a page refactor switches from a legacy compatibility re-export to a feature-owned import path, the corresponding spec mocks need to move with it; otherwise the real side-effect hook runs under test and produces noisy failures unrelated to the page behavior.
