@@ -1,9 +1,9 @@
+import { ChainBase } from '@hicommonwealth/shared';
 import { ArrowsDownUp, CaretDown, CaretUp } from '@phosphor-icons/react';
 import {
   notifyError,
   notifySuccess,
 } from 'client/scripts/controllers/app/notifications';
-import MagicWebWalletController from 'client/scripts/controllers/app/webWallets/MagicWebWallet';
 import { formatAddressShort } from 'client/scripts/helpers';
 import {
   applySlippage,
@@ -18,13 +18,14 @@ import {
   swapTokens,
   type TradeParams,
 } from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
+import { getEthereumProviderForAddress } from 'client/scripts/helpers/getEthereumProviderForAddress';
+import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import useGetCommunityByIdQuery from 'client/scripts/state/api/communities/getCommuityById';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
-import { fetchNodes } from 'client/scripts/state/api/nodes';
 import { useGetPredictionMarketPositionsQuery } from 'client/scripts/state/api/predictionMarket';
 import useUserStore from 'client/scripts/state/ui/user';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -36,10 +37,16 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
+import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
 import CWTab from '../../components/component_kit/new_designs/CWTabs/CWTab';
 import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { CWTooltip } from '../../components/component_kit/new_designs/CWTooltip';
+import {
+  CustomAddressOption,
+  CustomAddressOptionElement,
+} from '../ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+import { convertAddressToDropdownOption } from '../TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import './PredictionMarketTradeModal.scss';
 
 const COLLATERAL_DECIMALS = 18;
@@ -81,6 +88,10 @@ type PredictionMarketTradeModalProps = {
   threadCommunityId: string;
   onClose: () => void;
   onSuccess?: () => void;
+  /** When opening from PM card, pass the card's selected address so the modal opens with it. */
+  initialAddress?: string;
+  /** When true, sync selectedAddress from initialAddress (e.g. when modal just opened). */
+  open?: boolean;
 };
 
 type TabId = 'mint' | 'swap' | 'merge' | 'redeem';
@@ -110,9 +121,28 @@ export const PredictionMarketTradeModal = ({
   threadCommunityId,
   onClose,
   onSuccess,
+  initialAddress,
+  open: modalOpen,
 }: PredictionMarketTradeModalProps) => {
   const user = useUserStore();
-  const activeAddress = user.activeAccount?.address ?? '';
+  const prevOpenRef = useRef(false);
+  const uniqueAddresses =
+    getUniqueUserAddresses({ forChain: ChainBase.Ethereum }) ?? [];
+  const [selectedAddress, setSelectedAddress] = useState<string>(() => {
+    const initial =
+      initialAddress ??
+      user.activeAccount?.address ??
+      user.addressSelectorSelectedAddress ??
+      uniqueAddresses[0];
+    return initial ?? '';
+  });
+  useEffect(() => {
+    if (modalOpen && !prevOpenRef.current && initialAddress) {
+      setSelectedAddress(initialAddress);
+    }
+    prevOpenRef.current = !!modalOpen;
+  }, [modalOpen, initialAddress]);
+  const activeAddress = selectedAddress;
   const [activeTab, setActiveTab] = useState<TabId>(() =>
     market.status === 'resolved' ? 'redeem' : 'mint',
   );
@@ -324,21 +354,6 @@ export const PredictionMarketTradeModal = ({
   const swapDisabled = isResolved;
   const winner = market.winner ?? 0;
 
-  const getProvider = useCallback(async () => {
-    const { userStore: store } = await import('client/scripts/state/ui/user');
-    const addresses = store.getState().addresses ?? [];
-    const isMagic = addresses.some(
-      (addr: { address: string; walletId?: string }) =>
-        addr.address?.toLowerCase() === activeAddress?.toLowerCase() &&
-        addr.walletId?.toLowerCase()?.includes('magic'),
-    );
-    if (!isMagic) return undefined;
-    await fetchNodes();
-    const controller = new MagicWebWalletController();
-    await controller.enable(String(ethChainId));
-    return (controller as { provider?: unknown }).provider;
-  }, [activeAddress, ethChainId]);
-
   const mintDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
 
   const handleMint = async () => {
@@ -360,7 +375,17 @@ export const PredictionMarketTradeModal = ({
     setErrorMessage(null);
     setIsLoading(true);
     try {
-      const provider = await getProvider();
+      const provider = await getEthereumProviderForAddress(
+        activeAddress,
+        ethChainId,
+      );
+      if (activeAddress && !provider) {
+        setErrorMessage(
+          'Could not find the wallet for the selected address. Ensure the wallet is connected.',
+        );
+        notifyError('Wallet not found for this address.');
+        return;
+      }
       await mintTokens({
         ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
         collateral_amount_wei: amountWei,
@@ -408,7 +433,17 @@ export const PredictionMarketTradeModal = ({
     setErrorMessage(null);
     setIsLoading(true);
     try {
-      const provider = await getProvider();
+      const provider = await getEthereumProviderForAddress(
+        activeAddress,
+        ethChainId,
+      );
+      if (activeAddress && !provider) {
+        setErrorMessage(
+          'Could not find the wallet for the selected address. Ensure the wallet is connected.',
+        );
+        notifyError('Wallet not found for this address.');
+        return;
+      }
       await swapTokens({
         ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
         buy_pass: swapBuyPass,
@@ -455,7 +490,17 @@ export const PredictionMarketTradeModal = ({
     setErrorMessage(null);
     setIsLoading(true);
     try {
-      const provider = await getProvider();
+      const provider = await getEthereumProviderForAddress(
+        activeAddress,
+        ethChainId,
+      );
+      if (activeAddress && !provider) {
+        setErrorMessage(
+          'Could not find the wallet for the selected address. Ensure the wallet is connected.',
+        );
+        notifyError('Wallet not found for this address.');
+        return;
+      }
       await mergeTokens({
         ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
         amount_wei: amountWei,
@@ -506,7 +551,17 @@ export const PredictionMarketTradeModal = ({
     setErrorMessage(null);
     setIsLoading(true);
     try {
-      const provider = await getProvider();
+      const provider = await getEthereumProviderForAddress(
+        activeAddress,
+        ethChainId,
+      );
+      if (activeAddress && !provider) {
+        setErrorMessage(
+          'Could not find the wallet for the selected address. Ensure the wallet is connected.',
+        );
+        notifyError('Wallet not found for this address.');
+        return;
+      }
       await redeemTokens({
         ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
         amount_wei: amountWei,
@@ -1007,6 +1062,32 @@ export const PredictionMarketTradeModal = ({
       />
       <CWDivider />
       <CWModalBody>
+        <div className="address-selector-row">
+          <CWSelectList
+            components={{
+              Option: (originalProps) =>
+                CustomAddressOption({
+                  originalProps,
+                  selectedAddressValue: activeAddress,
+                }),
+            }}
+            noOptionsMessage={() => 'No available address'}
+            value={convertAddressToDropdownOption(activeAddress)}
+            formatOptionLabel={(option) => (
+              <CustomAddressOptionElement
+                value={option.value}
+                label={option.label}
+                selectedAddressValue={activeAddress}
+              />
+            )}
+            isClearable={false}
+            isSearchable={false}
+            options={uniqueAddresses.map(convertAddressToDropdownOption)}
+            onChange={(option) =>
+              option?.value && setSelectedAddress(option.value)
+            }
+          />
+        </div>
         <div className="collateral-row">
           <button
             type="button"

@@ -1,19 +1,28 @@
 import { PredictionMarketStatus } from '@hicommonwealth/schemas';
-import { getCollateralBalanceAndSymbol } from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
+import { ChainBase } from '@hicommonwealth/shared';
+import {
+  getCollateralBalanceAndSymbol,
+  getPredictionMarketBalancesFromChain,
+  getVaultCollateralBalance,
+} from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
+import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import type Thread from 'client/scripts/models/Thread';
 import useGetCommunityByIdQuery from 'client/scripts/state/api/communities/getCommuityById';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import {
+  useCancelPredictionMarketMutation,
   useGetPredictionMarketPositionsQuery,
+  useGetPredictionMarketsQuery,
   useGetPredictionMarketTradesQuery,
 } from 'client/scripts/state/api/predictionMarket';
 import { openConfirmation } from 'client/scripts/views/modals/confirmation_modal';
+import {
+  CustomAddressOption,
+  CustomAddressOptionElement,
+} from 'client/scripts/views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+import { convertAddressToDropdownOption } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import {
-  useCancelPredictionMarketMutation,
-  useGetPredictionMarketsQuery,
-} from 'state/api/prediction-markets';
 import useUserStore from 'state/ui/user';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWDivider } from '../../components/component_kit/cw_divider';
@@ -23,6 +32,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { PopoverMenu } from '../../components/component_kit/CWPopoverMenu';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { DeployDraftPredictionMarketModal } from '../../modals/PredictionMarket/DeployDraftPredictionMarketModal';
 import { PredictionMarketResolveModal } from '../../modals/PredictionMarket/PredictionMarketResolveModal';
@@ -140,14 +150,23 @@ export const ThreadPredictionMarketCard = ({
   const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
   const [timeDisplay, setTimeDisplay] = useState<string | null>(null);
   const user = useUserStore();
+  const uniqueAddresses =
+    getUniqueUserAddresses({ forChain: ChainBase.Ethereum }) ?? [];
+  const [selectedAddress, setSelectedAddress] = useState<string>(() => {
+    const initial =
+      user.activeAccount?.address ??
+      user.addressSelectorSelectedAddress ??
+      uniqueAddresses[0];
+    return initial ?? '';
+  });
 
   const { data: marketsData, isLoading } = useGetPredictionMarketsQuery({
-    threadId: thread.id!,
-    apiCallEnabled: !marketProp,
+    thread_id: thread.id!,
+    apiCallEnabled: marketProp === undefined,
   });
 
   const { mutateAsync: cancelMarket } = useCancelPredictionMarketMutation({
-    threadId: thread.id!,
+    thread_id: thread.id!,
   });
 
   const market =
@@ -160,8 +179,7 @@ export const ThreadPredictionMarketCard = ({
   const userPosition = Array.isArray(positions)
     ? positions.find(
         (p: { user_address: string }) =>
-          p.user_address?.toLowerCase() ===
-          user.activeAccount?.address?.toLowerCase(),
+          p.user_address?.toLowerCase() === selectedAddress?.toLowerCase(),
       )
     : undefined;
 
@@ -181,8 +199,17 @@ export const ThreadPredictionMarketCard = ({
     balance: string;
     decimals: number;
   } | null>(null);
+  const [onChainPassFail, setOnChainPassFail] = useState<{
+    p: bigint;
+    f: bigint;
+  } | null>(null);
+  const [vaultBalanceOnChain, setVaultBalanceOnChain] = useState<{
+    balanceWei: bigint;
+    symbol: string;
+    decimals: number;
+  } | null>(null);
 
-  const activeAddress = user.activeAccount?.address ?? '';
+  const activeAddress = selectedAddress;
   const { data: community } = useGetCommunityByIdQuery({
     id: thread?.communityId ?? '',
     includeNodeInfo: true,
@@ -252,6 +279,71 @@ export const ThreadPredictionMarketCard = ({
     };
   }, [chainRpc, activeAddress, market?.collateral_address, ethBalance]);
 
+  // When API has no position, fetch PASS/FAIL balances from chain (same fallback as trade modal)
+  useEffect(() => {
+    if (userPosition) {
+      setOnChainPassFail(null);
+      return;
+    }
+    if (
+      !chainRpc ||
+      !activeAddress ||
+      !market?.p_token_address ||
+      !market?.f_token_address
+    ) {
+      return;
+    }
+    let cancelled = false;
+    getPredictionMarketBalancesFromChain(
+      chainRpc,
+      activeAddress,
+      market.p_token_address,
+      market.f_token_address,
+    )
+      .then(({ pTokenBalanceWei, fTokenBalanceWei }) => {
+        if (!cancelled)
+          setOnChainPassFail({ p: pTokenBalanceWei, f: fTokenBalanceWei });
+      })
+      .catch(() => {
+        if (!cancelled) setOnChainPassFail(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    chainRpc,
+    activeAddress,
+    market?.p_token_address,
+    market?.f_token_address,
+    userPosition,
+  ]);
+
+  // Fetch vault collateral balance on-chain so "Total minted" matches trade modal when DB is stale
+  useEffect(() => {
+    const vaultAddr = market?.vault_address;
+    const collateralAddr = market?.collateral_address;
+    if (
+      !chainRpc ||
+      !vaultAddr ||
+      !collateralAddr ||
+      collateralAddr.toLowerCase() === ZERO_ADDR.toLowerCase()
+    ) {
+      setVaultBalanceOnChain(null);
+      return;
+    }
+    let cancelled = false;
+    getVaultCollateralBalance(chainRpc, vaultAddr, collateralAddr)
+      .then((info) => {
+        if (!cancelled) setVaultBalanceOnChain(info);
+      })
+      .catch(() => {
+        if (!cancelled) setVaultBalanceOnChain(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [chainRpc, market?.vault_address, market?.collateral_address]);
+
   const handleCancelMarket = () => {
     if (!market) return;
 
@@ -313,13 +405,17 @@ export const ThreadPredictionMarketCard = ({
         BigInt(String(userPosition.p_token_balance)),
         decimals,
       )
-    : '0.00';
+    : onChainPassFail != null
+      ? formatCollateralBalance(onChainPassFail.p, decimals)
+      : '0.00';
   const fBalance = userPosition?.f_token_balance
     ? formatCollateralBalance(
         BigInt(String(userPosition.f_token_balance)),
         decimals,
       )
-    : '0.00';
+    : onChainPassFail != null
+      ? formatCollateralBalance(onChainPassFail.f, decimals)
+      : '0.00';
 
   const passProbability = market?.current_probability ?? 0.5;
   const failProbability = 1 - passProbability;
@@ -355,6 +451,32 @@ export const ThreadPredictionMarketCard = ({
   return (
     <>
       <CWCard className="ThreadPredictionMarketCard">
+        <div className="address-selector-row">
+          <CWSelectList
+            components={{
+              Option: (originalProps) =>
+                CustomAddressOption({
+                  originalProps,
+                  selectedAddressValue: activeAddress,
+                }),
+            }}
+            noOptionsMessage={() => 'No available address'}
+            value={convertAddressToDropdownOption(activeAddress)}
+            formatOptionLabel={(option) => (
+              <CustomAddressOptionElement
+                value={option.value}
+                label={option.label}
+                selectedAddressValue={activeAddress}
+              />
+            )}
+            isClearable={false}
+            isSearchable={false}
+            options={uniqueAddresses.map(convertAddressToDropdownOption)}
+            onChange={(option) =>
+              option?.value && setSelectedAddress(option.value)
+            }
+          />
+        </div>
         <div className="prediction-market-header">
           <div className="market-prompt-row">
             <CWText type="b2" className="market-prompt">
@@ -437,9 +559,17 @@ export const ThreadPredictionMarketCard = ({
                 TOTAL MINTED
               </CWText>
               <CWText type="b1" className="metric-value">
-                {formatCollateral(market.total_collateral ?? '0')}&nbsp;
+                {vaultBalanceOnChain != null
+                  ? formatCollateralBalance(
+                      vaultBalanceOnChain.balanceWei,
+                      vaultBalanceOnChain.decimals,
+                    )
+                  : formatCollateral(market.total_collateral ?? '0')}
+                &nbsp;
                 <CWText type="b2">
-                  <span className="metric-symbol">{symbol}</span>
+                  <span className="metric-symbol">
+                    {vaultBalanceOnChain?.symbol ?? symbol}
+                  </span>
                 </CWText>
               </CWText>
             </div>
@@ -559,6 +689,8 @@ export const ThreadPredictionMarketCard = ({
           <PredictionMarketTradeModal
             market={market}
             threadCommunityId={thread?.communityId ?? ''}
+            initialAddress={selectedAddress}
+            open={isTradeModalOpen}
             onClose={() => setIsTradeModalOpen(false)}
             onSuccess={() => setIsTradeModalOpen(false)}
           />

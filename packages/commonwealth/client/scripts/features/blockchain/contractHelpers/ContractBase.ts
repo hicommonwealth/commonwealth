@@ -55,7 +55,10 @@ abstract class ContractBase<
           provider = this.wallet.api.givenProvider;
           this.walletEnabled = true;
 
-          await distributeSkale(this.getPrimaryAccountAddress(), chainId);
+          const primaryAccount = this.getPrimaryAccountAddress();
+          if (primaryAccount && /^0x[a-fA-F0-9]{40}$/.test(primaryAccount)) {
+            await distributeSkale(primaryAccount, chainId);
+          }
         }
 
         this.web3 =

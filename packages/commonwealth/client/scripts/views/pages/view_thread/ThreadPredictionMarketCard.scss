@@ -8,6 +8,10 @@
   gap: 16px;
   margin-bottom: 16px;
 
+  .address-selector-row {
+    width: 100%;
+  }
+
   .prediction-market-header {
     display: flex;
     flex-direction: column;

@@ -1,3 +1,4 @@
+import useCancelPredictionMarketMutation from './cancelPredictionMarket';
 import useCreatePredictionMarketMutation from './createPredictionMarket';
 import useDeployPredictionMarketMutation from './deployPredictionMarket';
 import useDiscoverPredictionMarketsQuery, {
@@ -11,6 +12,7 @@ import useGetPredictionMarketTradesQuery from './getPredictionMarketTrades';
 import useResolvePredictionMarketMutation from './resolvePredictionMarket';
 
 export {
+  useCancelPredictionMarketMutation,
   useCreatePredictionMarketMutation,
   useDeployPredictionMarketMutation,
   useDiscoverPredictionMarketsQuery,
