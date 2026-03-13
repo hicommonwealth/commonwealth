@@ -1,8 +1,8 @@
+import useCommunityStake from 'features/communityStake/hooks/useCommunityStake';
+import { chainIdsWithStakeEnabled } from 'features/communityStake/utils/stakeChains';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
-import { chainIdsWithStakeEnabled } from 'views/components/CommunityInformationForm/constants';
-import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';

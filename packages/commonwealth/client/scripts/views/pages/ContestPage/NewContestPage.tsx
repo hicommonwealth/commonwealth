@@ -2,9 +2,9 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import ContestCard from '../../components/ContestCard';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWGrid from '../../components/component_kit/new_designs/CWGrid';

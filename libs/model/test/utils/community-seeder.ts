@@ -13,6 +13,16 @@ import { seed, seedRecord } from '../../src/tester';
 import { getSignersInfo } from './canvas-signers';
 
 const chance = new Chance();
+let generatedCommunitySeedCount = 0;
+
+const getCommunitySeedId = (id?: string) => {
+  if (id) {
+    return id;
+  }
+
+  generatedCommunitySeedCount += 1;
+  return `${chance.company()}-${generatedCommunitySeedCount}`;
+};
 
 export type CommunitySeedRoles =
   | 'admin'
@@ -83,6 +93,7 @@ export async function seedCommunity({
     (typeof roles)[number],
     z.infer<typeof schemas.Address>
   >;
+  const communityId = getCommunitySeedId(id);
 
   const signerInfo = await getSignersInfo(roles);
 
@@ -101,7 +112,7 @@ export async function seedCommunity({
 
   // seed base community
   const [base] = await seed('Community', {
-    id: `base-of-${id || chance.company()}`,
+    id: `base-of-${communityId}`,
     tier: CommunityTierMap.ManuallyVerified,
     chain_node_id: node!.id!,
     base: chain_base,
@@ -122,7 +133,7 @@ export async function seedCommunity({
   });
 
   const [community] = await seed('Community', {
-    id: id || chance.company(),
+    id: communityId,
     tier: CommunityTierMap.ChainVerified,
     chain_node_id: node!.id!,
     base: chain_base,

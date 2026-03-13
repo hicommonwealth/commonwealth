@@ -1,10 +1,10 @@
 import clsx from 'clsx';
+import { useThreadSubscriptions } from 'features/notifications/hooks/useThreadSubscriptions';
 import Thread from 'models/Thread';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useCreateThreadSubscriptionMutation } from 'state/api/trpc/subscription/useCreateThreadSubscriptionMutation';
 import { useDeleteThreadSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteThreadSubscriptionMutation';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 
 type ToggleThreadSubscribeProps = Readonly<{
   readonly thread: Thread;

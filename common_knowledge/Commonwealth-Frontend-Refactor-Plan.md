@@ -9,10 +9,10 @@ This plan covers four deliverables:
 4. **Deeper architectural refactors** -- structural problems beyond file moves (global `app` singleton, code splitting, controllers/, legacy stores/models, CSS scoping, tRPC completion)
 
 ## Status
-Legend: [ ] Not started, [~] In progress (implemented but not merged), [x] Done (merged to master). Add a completion date in parentheses and PR URL: `(YYMMDD) PR https://github.com/org/repo/pull/NNNNN — summary`.
+Legend: [ ] Not started, [~] In progress / partially landed, [x] Done in the audited codebase snapshot. If work is implemented on a long-lived branch/PR but not yet merged, call that out explicitly in the bullet body. Add a completion date in parentheses and PR URL: `(YYMMDD) PR https://github.com/org/repo/pull/NNNNN — summary`.
 
 ### EPIC-1: Dead Code Deletion
-- [x] 1.1 Delete dead internal dev-tool pages (260202) PR https://github.com/hicommonwealth/commonwealth/pull/13323 — remove internal markdown demo routes/pages + samples; `/components` is intentionally retained for visual coverage until EPIC-6/EPIC-10 replacement work lands
+- [x] 1.1 Delete dead internal dev-tool pages (260202) PR https://github.com/hicommonwealth/commonwealth/pull/13323 — remove internal markdown demo routes/pages + samples; `/components` is intentionally retained for visual coverage until EPIC-6 / EPIC-10 replacement work lands
 - [x] 1.2 Delete dead helper: momentUpdateLocale.ts (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13324 — remove unused momentUpdateLocale helper
 - [x] 1.3 Delete confirmed zero-import components (batch 1) (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13332 — remove dead client files
 - [x] 1.4 Delete permanently-flagged legacy code (batch 2) (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13327 — remove newEditor flag + drop NewThreadFormModern path
@@ -37,19 +37,18 @@ Legend: [ ] Not started, [~] In progress (implemented but not merged), [x] Done 
 - [x] 2.11 Create feature directory stubs + migrate feature-specific helpers (260310) PR https://github.com/hicommonwealth/commonwealth/pull/13445 — moved feature-owned helper modules into `features/*/utils` and `features/blockchain/contractHelpers` with legacy `helpers/*` re-export stubs preserved for rollout safety
 - [x] 2.12 Migrate feature-specific hooks to feature dirs (260310) PR https://github.com/hicommonwealth/commonwealth/pull/13445 — moved audited feature-owned hooks into `features/*/hooks` (including governance cosmos hooks) and added legacy `hooks/*` compatibility stubs plus EPIC-2 re-export coverage
 
-Milestone note (2026-03-11): GitHub milestone `Front End Refactor 2026` now shows `23` closed issues and `0` open issues, including `#13405` (test-hardening umbrella) and `#13417`-`#13422` (EPIC-2.7..2.12).
+EPIC-2 audit note (2026-03-13): `2.1`-`2.6` merged via PR `#13431`; `2.7`-`2.12` merged via PR `#13445`. Milestone `Front End Refactor 2026` now stands at 23 closed / 8 open issues; the remaining open issues are the EPIC-3 tickets waiting on merge of PR `#13463`.
 
 ### EPIC-3: Normalize Components
-- [ ] 3.1 Decouple `useCommunityContests` into `features/contests/hooks/` + move supporting contest shape/filter helpers out of `views/pages/CommunityManagement/Contests/`
-- [ ] 3.2 Decouple notification subscription hooks into `features/notifications/hooks/` and remove cross-imports between `NotificationSettings/` and discussions components
-- [ ] 3.3 Split `ViewThreadPage` into route/data controller, content shell, and sidebar/composer modules
-- [ ] 3.4 Split `DiscussionsPage` into route/filter controller, feed renderer, and sticky-composer shell
-- [ ] 3.5 Split `ExplorePage` into tab shell + feature-owned section modules
-- [ ] 3.6 Normalize `GovernancePage` init/data shell (goal: boundary cleanup, not over-abstraction)
-- [ ] 3.7 Split CommunityManagement sub-pages (Contests/Stake/Integrations first)
-- [ ] 3.8 Normalize Home surfaces (`HomePage` + `CommunityHomePage`) and extract shared discovery sections
-EPIC-3 audit note (2026-03-11): `ViewThreadPage.tsx` is still `1229` lines, `DiscussionsPage.tsx` is `617`, `ExplorePage.tsx` is `217`, `GovernancePage.tsx` is `101`, `CommunityHomePage.tsx` is `211`, and `HomePage.tsx` is `74`. `useCommunityContests` still has `17` consumers and still depends on `views/components/CommunityStake/useCommunityStake.ts`; notification subscription hooks still live under `views/pages/NotificationSettings/` and are consumed from both NotificationSettings and discussions toggles. Prediction-market UI now spans `29` legacy `views/*` files under `ExplorePage`, `HomePage`, `view_thread`, `views/modals/PredictionMarket*`, and `views/components/ThreadPredictionMarketTag`, so EPIC-3/4 must treat those surfaces as first-class migration scope.
-EPIC-3 sequencing note (2026-03-11): `3.1`/`3.2` are enabling tasks for downstream feature moves, but `3.3`/`3.4`/`3.5`/`3.6`/`3.8` can begin immediately because page-shell extraction is already protected by merged contract tests from PR `#13406`.
+- [x] 3.1 Decouple useCommunityContests (260312) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — moved the live hook to `features/contests/hooks/`, extracted contest types/utils, and left the old `views/pages/CommunityManagement/Contests/` file as a compatibility shim
+- [x] 3.2 Decouple notification subscription hooks (260312) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — moved shared notification hooks to `features/notifications/hooks/` and rewired discussion toggles + Notification Settings to the feature-owned paths
+- [x] 3.3 Split ViewThreadPage container/presentational (260313) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — reduced the entry page to a thin route shell and extracted `useViewThreadData`, shell/body/sub-body/composer/sidebar modules
+- [x] 3.4 Split DiscussionsPage container/presentational (260313) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — reduced the entry page to a thin composition shell and extracted `useDiscussionsData`, feed/composer/private-topic modules
+- [x] 3.5 Split ExplorePage container/presentational (260313) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — extracted `useExploreData`, shell/content/modal modules, and promoted prediction markets to an explicit content branch
+- [x] 3.6 Split GovernancePage (260313) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — normalized the page into `useGovernancePageData` + `GovernancePageContent` and switched to the feature-owned governance init hook
+- [x] 3.7 Split CommunityManagement sub-pages (260313) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — split `AdminContestsPage` and `StakeIntegration`, extracted topic-flow contracts, and moved community-stake ownership to `features/communityStake/*`
+- [x] 3.8 Split CommunityHomePage + HomePage (260313) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — extracted shared home discovery sections, normalized Community Home through `useCommunityHomePageData`, and kept prediction-market home surfaces in scope
+EPIC-3 planning status note (2026-03-13): treat EPIC-3 as done for planning. All eight tasks are implemented on branch `codex/epic-3-normalize-components` in PR `#13463` (draft/open, 13/13 GitHub checks green as of 2026-03-13). The milestone issues `#13454`-`#13461` remain open only because they close on merge. Milestone URL: https://github.com/hicommonwealth/commonwealth/milestone/136?closed=1
 
 ### EPIC-4: Feature Migration
 - [ ] 4.1 Migrate Leaderboard
@@ -62,7 +61,7 @@ EPIC-3 sequencing note (2026-03-11): `3.1`/`3.2` are enabling tasks for downstre
 - [ ] 4.8 Migrate LaunchToken
 - [ ] 4.9 Migrate Snapshots
 - [ ] 4.10 Migrate Contests
-- [ ] 4.11 Migrate Discussions + thread/detail surfaces (split 4.11a discussions routes, 4.11b thread/detail surfaces, 4.11c shared comment + prediction-market components)
+- [ ] 4.11 Migrate Discussions + thread/detail surfaces (split 4.11a discussions routes, 4.11b thread/detail shells, 4.11c shared comment + prediction-market components)
 - [ ] 4.12 Migrate Governance
 - [ ] 4.13 Migrate Notifications page + subscription controls
 - [ ] 4.14 Migrate CommunityManagement (split 4.14a admin pages, 4.14b community pages)
@@ -76,7 +75,7 @@ Timing annotation (EPIC-4): complete remaining behavior-depth E2E assertions ins
 - [ ] 5.2 Add no-restricted-imports for views/ in feature code
 - [x] 5.3 Add CI check for boundary violations
 - [~] 5.4 Fix all boundary violations
-Boundary rollout note (2026-03-11): boundary enforcement is running in block-new-violations mode; full clean-state enforcement remains pending. Repo audit still shows live `legacy-core -> views/*` imports, so `5.4` remains substantive cleanup work rather than a mechanical flip to strict mode.
+Boundary rollout note (2026-03-13): diff-based boundary enforcement is live in CI and green on PR `#13463`; full clean-state enforcement remains pending because the repo still has 18 legacy core/state/helper files importing from `views/*` and 63 route lazy imports still targeting `views/pages/*`.
 
 ### EPIC-6: Kill views/ + Final Cleanup
 - [ ] 6.1 Move component_kit to shared/components/component_kit/
@@ -90,24 +89,24 @@ Boundary rollout note (2026-03-11): boundary enforcement is running in block-new
 - [ ] 6.9 Delete old helpers/, hooks/, utils/, controllers/, stores/ dirs
 - [ ] 6.10 Update vite.config.ts to remove legacy aliases
 - [ ] 6.11 Final circular dependency audit + cleanup
-Guard status note (2026-03-11): `no-legacy-imports`, `no-stub-imports`, and `depcruise:circular:diff` guards are active in CI; deletion tasks (`6.8`/`6.9`) remain pending.
+Guard status note (2026-03-13): `no-legacy-imports`, `no-stub-imports`, and `depcruise:circular:diff` guards are active in CI and green on PR `#13463`; deletion tasks (`6.8`/`6.9`) remain pending because 77 legacy re-export stubs still exist.
 Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocking CI guard during 6.1-6.10. Promote to full `pnpm depcruise:circular` blocking only at 6.11 once pre-existing legacy cycles are burned down.
 
-#### Legacy Stub Debt Snapshot (2026-03-11)
-- Legacy re-export stubs in `helpers/`, `hooks/`, `utils/`: 60
-- Used stubs (at least one live import site): 57
-- Unused stubs (deletable candidates after grep validation): 3
+#### Legacy Stub Debt Snapshot (2026-03-13)
+- Legacy re-export stubs in `helpers/`, `hooks/`, `utils/`: 77
+- Used stubs: 45
+- Unused stubs (deletable candidates): 32
 - Highest remaining consumers:
-  - `utils/trpcClient` (205 import sites)
-  - `utils/Permissions` (40 import sites)
-  - `hooks/useFlag` (39 import sites)
-  - `hooks/useAppStatus` (34 import sites)
-  - `hooks/useBrowserAnalyticsTrack` (29 import sites)
-  - `helpers/snapshot_utils` (28 import sites)
-- Zero-consumer stub candidates:
-  - `helpers/feature-flags`
-  - `hooks/index`
-  - `hooks/useDeviceProfile`
+  - `utils/trpcClient` (196)
+  - `helpers` (62)
+  - `helpers/quest` (23)
+  - `helpers/snapshot_utils` (22)
+  - `hooks/useFlag` (13)
+  - `hooks/useTopicGating` (11)
+  - `utils/clipboard` (10)
+  - `hooks/useTokenPricing` (9)
+  - `helpers/threads` (9)
+  - `utils/Permissions` (7)
 
 ## 1. Hooks/Utils Extraction Spec
 
@@ -149,16 +148,16 @@ Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocki
 | `useGetAllCosmosProposals` | `features/governance/hooks/cosmos/` |
 | `useShowImage` | `features/discussions/hooks/` |
 
-### Cross-Feature Hooks (must decouple first)
+### Cross-Feature Hooks (EPIC-3 status; remaining shims to burn down in EPIC-4/6)
 
-| Hook | Source | Dest | Why It's Critical |
-|------|--------|------|-------------------|
-| `useCommunityContests` | `CommunityManagement/Contests/` | `features/contests/hooks/` | 17 consumers across thread/discussions/explore/home/admin surfaces, and the hook still depends on `views/components/CommunityStake` plus `views/pages/CommunityManagement/Contests/ContestsList` |
-| `useThreadSubscriptions` | `NotificationSettings/` | `features/notifications/hooks/` | Used by NotificationSettings and discussions thread-option toggles |
-| `useCommentSubscriptions` | `NotificationSettings/` | `features/notifications/hooks/` | Used by NotificationSettings and discussions comment-option toggles |
-| `useTopicSubscriptions` | `NotificationSettings/` | `features/notifications/hooks/` | Still page-local data shaping inside NotificationSettings |
-| `useSubscriptionPreference*` (2 hooks) | `NotificationSettings/` | `features/notifications/hooks/` | Push-preference state is still page-local notification plumbing |
-| `useSupportsPushNotifications` | `NotificationSettings/` | `features/notifications/hooks/` | Page-local capability detection currently keeps the page coupled to notification-specific device logic |
+| Hook | Live Owner | Legacy Shim | Current Status |
+|------|------------|-------------|----------------|
+| `useCommunityContests` | `features/contests/hooks/useCommunityContests.ts` | `views/pages/CommunityManagement/Contests/useCommunityContests.ts` | Decoupled in EPIC-3.1; 16 current imports still hit the shim, so EPIC-4 should flip consumers directly to the feature path |
+| `useThreadSubscriptions` | `features/notifications/hooks/useThreadSubscriptions.ts` | `views/pages/NotificationSettings/useThreadSubscriptions.ts` | Decoupled in EPIC-3.2; shim still used by 3 files |
+| `useCommentSubscriptions` | `features/notifications/hooks/useCommentSubscriptions.ts` | `views/pages/NotificationSettings/useCommentSubscriptions.ts` | Decoupled in EPIC-3.2; shim still used by 2 files |
+| `useTopicSubscriptions` | `features/notifications/hooks/useTopicSubscriptions.ts` | `views/pages/NotificationSettings/useTopicSubscriptions.ts` | Decoupled in EPIC-3.2; shim is now NotificationSettings-only |
+| `useSubscriptionPreference*` (3 hooks) | `features/notifications/hooks/` | `views/pages/NotificationSettings/useSubscriptionPreference*.ts` | Core notification ownership moved out of the page tree; remaining shim consumers are NotificationSettings-only |
+| `useSupportsPushNotifications` | `features/notifications/hooks/useSupportsPushNotifications.ts` | `views/pages/NotificationSettings/useSupportsPushNotifications.ts` | Capability detection is feature-owned now; the legacy page-local file is only a compatibility shim |
 
 ### Shared Utils --> `client/scripts/shared/utils/`
 
@@ -200,7 +199,7 @@ Note: `packages/commonwealth/shared/*` already exists and is used today (`shared
 
 | File | Source | Dest | Consumers | Strategy |
 |------|--------|------|-----------|---------|
-| `trpcClient.ts` | `utils/trpcClient.ts` | `shared/api/trpcClient.ts` | **205 files** | Re-export stub; update consumers opportunistically during EPIC-4 |
+| `trpcClient.ts` | `utils/trpcClient.ts` | `shared/api/trpcClient.ts` | **199 files** | Re-export stub; update consumers opportunistically during EPIC-4 |
 
 ### What NOT to move
 
@@ -223,18 +222,18 @@ Note: `packages/commonwealth/shared/*` already exists and is used today (`shared
 
 ## 2. Test Strategy
 
-### Current State (Repo Audit: 2026-03-11)
-- **125 total spec/test files**: 23 unit, 20 integration, 54 E2E, 9 devnet, 2 visual, 17 component
+### Current State (Repo Audit: 2026-03-13)
+- **127 total spec test files**: 25 unit, 20 integration, 54 E2E, 9 devnet, 2 visual, 17 component
 - **Smoke coverage**: 3 files / 5 tagged `@smoke` tests
 - **E2E distribution**: 49 `e2eRegular`, 1 `e2eSerial`, 2 `e2eStateful`, 2 `mature`
 - **E2E quality caveat**: 12 of 49 `e2eRegular` files are still crash-only, but refactor-critical routes now have behavior/security assertions under `@refactor`
-- **Component test layer exists**: Vitest+jsdom harness with shared provider render utility and hook/page coverage
-- **Legacy route shell still dominates**: 62 lazy `views/pages/*` imports remain across `CommonDomainRoutes.tsx`, `CustomDomainRoutes.tsx`, and `GeneralRoutes.tsx`
-- **Prediction-market refactor gap**: new futarchy surfaces currently have unit coverage and incidental Home/CommunityHome mocks, but they are not yet represented in the refactor-specific component/E2E backlog
+- **Component test layer exists**: Vitest+jsdom harness with shared provider render utility and hook/page coverage; the full component suite is green in CI on PR `#13463`
+- **Legacy route shell still dominates**: 63 lazy `views/pages/*` imports remain across `CommonDomainRoutes.tsx`, `CustomDomainRoutes.tsx`, and `GeneralRoutes.tsx`
+- **Prediction-market refactor gap**: prediction-market UI now spans 28 live `views/*` surfaces, but dedicated refactor-specific component/E2E coverage is still missing
 - **Stack (lockfile-resolved)**: Vitest 1.6.1 + Playwright 1.44.0
 - **Testing-library infra is present**: `@testing-library/react` `^16.3.2`, `@testing-library/jest-dom` `^6.9.1`, `@testing-library/user-event` `^14.6.1`
 
-### Infrastructure Already Merged (PR #13406, merged 2026-02-18)
+### Infrastructure Baseline Already Merged (PR #13406, merged 2026-02-18)
 
 **Dependencies** (devDependencies in `packages/commonwealth/package.json`):
 - `@testing-library/react`
@@ -256,7 +255,7 @@ Note: `packages/commonwealth/shared/*` already exists and is used today (`shared
 "test-component:watch": "NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true vitest --config ./vitest.component.config.ts test/component"
 ```
 
-### Coverage Added (merged in PR #13406)
+### Coverage Added (baseline from PR #13406 plus later EPIC-2/EPIC-3 work)
 
 **EPIC-2 safety-net tests:**
 - Shared infrastructure unit contracts: `packages/commonwealth/test/unit/epic2/sharedInfrastructure.utils.contract.spec.ts`
@@ -274,13 +273,14 @@ Note: `packages/commonwealth/shared/*` already exists and is used today (`shared
 - View-thread and discussions extraction contracts:
   - `packages/commonwealth/test/unit/epic3/viewThreadPage.contracts.spec.ts`
   - `packages/commonwealth/test/unit/epic3/discussionsPage.contracts.spec.ts`
+  - `packages/commonwealth/test/unit/epic3/adminContestsPage.contracts.spec.ts`
 - Page-level component integration contracts:
   - `packages/commonwealth/test/component/pages/explorePage.integration.spec.tsx`
   - `packages/commonwealth/test/component/pages/homePage.integration.spec.tsx`
   - `packages/commonwealth/test/component/pages/governancePage.integration.spec.tsx`
   - `packages/commonwealth/test/component/pages/communityHomePage.integration.spec.tsx`
 
-### E2E Coverage Status (post-PR #13406)
+### E2E Coverage Status (current program state)
 
 | Feature | Current E2E State | Priority |
 |---------|-------------------|----------|
@@ -327,7 +327,6 @@ Note: `packages/commonwealth/shared/*` already exists and is used today (`shared
 
 1. **ComponentsShowcase mismatch (`/components`)**
    Keep `/components` temporarily, mark as deprecated, and remove only after replacement visual targets are in place. This prevents noisy false failures in automated visual flows.
-   Current code note (2026-03-11): `/components` is still routed from `GeneralRoutes.tsx` and still used by `test/visual/pages/key-pages.spec.ts` and `test/visual/components/showcase.spec.ts`.
 
 2. **Visual baseline strategy**
    Use **committed canonical baselines** for visual tests that are gating quality. Run compare mode (`test-visual`) in automated quality gates (nightly + release-candidate). Restrict baseline updates to dedicated PRs using `test-visual:update` with explicit human approval.
@@ -351,7 +350,7 @@ For this refactor program, automation should create issues, draft PRs, and run p
 
 ### 4. Phase 1 Test Backlog Status (EPIC-2..EPIC-6)
 
-Program status update (2026-03-11): EPIC-2 infrastructure and high-signal EPIC-3/4/5/6 guardrails are merged. Remaining work is not just deeper EPIC-4 behavior coverage: the March 10 prediction-market merge added a new backlog slice across view-thread, explore, and home surfaces, and the route shell is still overwhelmingly pointed at legacy `views/pages/*`.
+Program status update (2026-03-13): EPIC-2 is merged and EPIC-3 implementation is complete on PR `#13463` with green CI. Remaining test work is deeper EPIC-4 behavior coverage, dedicated prediction-market coverage across thread/explore/home surfaces, and stronger component integration coverage for the largest EPIC-3 splits.
 
 | Priority | Epic | Test Type | Scope | Risk Mitigated | Effort | Status |
 |----------|------|-----------|-------|----------------|--------|--------|
@@ -359,8 +358,9 @@ Program status update (2026-03-11): EPIC-2 infrastructure and high-signal EPIC-3
 | P0 | EPIC-2 | Component (Vitest + jsdom) | Shared hooks suite (`useFlag`, `useDraft`, `useBeforeUnload`, `useWindowResize`, `useNecessaryEffect`, `useForceRerender`) | Functional and side-effect regressions in hook migration | M | Done |
 | P0 | EPIC-2 | Unit/Integration | `trpcClient` contract tests (exports, header shape, query utils) before/after path move | API call and auth header regressions | S | Done |
 | P0 | EPIC-2 | Static/Unit | Re-export compatibility tests for old → new paths (high-consumer modules) | Import path breakages after moves | S | Done |
-| P0 | EPIC-3 | Component integration | `ViewThreadPage` split contract: loading, error, content, key CTA visibility | Functional/UI regressions from decomposition | M | Partial (contract unit coverage added) |
-| P0 | EPIC-3 | Component integration | `DiscussionsPage` split contract: filters, topic parsing, list rendering modes | Functional regressions in critical page behavior | M | Partial (contract unit coverage added) |
+| P0 | EPIC-3 | Component integration | `ViewThreadPage` split contract: loading, error, content, key CTA visibility | Functional/UI regressions from decomposition | M | Partial (unit contract coverage landed; dedicated component integration still missing) |
+| P0 | EPIC-3 | Component integration | `DiscussionsPage` split contract: filters, topic parsing, list rendering modes | Functional regressions in critical page behavior | M | Partial (unit contract coverage landed; dedicated component integration still missing) |
+| P1 | EPIC-3 | Unit | `AdminContestsPage` flow contract (`adminContestsPage.contracts.ts`) | Regressions in contest/admin decomposition before EPIC-4.10 | S | Done |
 | P1 | EPIC-3 | Component integration | `ExplorePage`, `GovernancePage`, `CommunityHomePage`, `HomePage` split smoke + key-state checks | UI regressions and state propagation issues | M | Done |
 | P0 | EPIC-4 | E2E | Route migration matrix for touched feature entry routes in common/custom/general routing modes | Functional regressions from route rewiring | M | Done |
 | P0 | EPIC-4 | E2E Security | Unauthorized-access checks for `/admin-panel` and community-manage routes | Security regressions on privileged surfaces | S | Done |
@@ -368,7 +368,7 @@ Program status update (2026-03-11): EPIC-2 infrastructure and high-signal EPIC-3
 | P1 | EPIC-4 | E2E behavior | LaunchToken happy-path render + key form interactions | Missing feature coverage | M | Partial (render + metadata inputs) |
 | P1 | EPIC-4 | E2E behavior | Governance page flag ON/OFF behavior + proposal navigation | Feature-flag and routing regressions | M | Partial (route behavior guard) |
 | P1 | EPIC-4 | E2E behavior | Wallet full-page (`/wallet`) and public contest page (`/contest/:id`) | Missing high-risk route coverage | M | Partial (signed-in/out + route resolution) |
-| P1 | EPIC-4 | Component + E2E behavior | Prediction-market discovery and thread surfaces (`PredictionMarketsList`, `ActivePredictionMarketList`, `ThreadPredictionMarketCard`, `ThreadPredictionMarketEditorCard`) | Newly landed futarchy UI can regress during EPIC-3/4 page decomposition without dedicated coverage | M | Not started |
+| P1 | EPIC-4 | Component + E2E behavior | Prediction-market discovery and thread surfaces (`PredictionMarketsList`, `ActivePredictionMarketList`, `ThreadPredictionMarketCard`, `ThreadPredictionMarketEditorCard`) | Newly landed futarchy UI can regress during EPIC-4 route/page migration without dedicated coverage | M | Not started |
 | P1 | EPIC-5 | Static lint | Boundary rules + rule-test fixtures + CI enforcement (`lint-boundaries`) | Cross-feature coupling regressions | M | Done |
 | P0 | EPIC-6 | Static lint | No-legacy-import checks (`views`, old aliases) + no-stub-import checks | Cleanup regressions after deletions | S | Done |
 | P1 | EPIC-6 | Static analysis | Circular dependency gate via dependency-cruiser (`depcruise:circular`) | Runtime/logical regressions from cycles | S | Partial (`depcruise:circular:diff` blocking in CI) |
@@ -383,7 +383,7 @@ Program status update (2026-03-11): EPIC-2 infrastructure and high-signal EPIC-3
 3. **Wave 2: EPIC-3 Pre-Split Guards**
    Add page contract tests for `ViewThreadPage` and `DiscussionsPage` before decomposition. Add focused component integration tests for `Explore/Governance/Home` containers.
 4. **Wave 3: EPIC-4 Migration-by-Wave Policy**
-   For each migration PR, require touched-route smoke coverage, one behavior scenario, and one security assertion for privileged pages. Fill missing E2E in priority order: Quests → LaunchToken → Governance → Wallet/Contest public → Leaderboard/Explore filters → Prediction-market discovery/thread flows.
+   For each migration PR, require touched-route smoke coverage, one behavior scenario, and one security assertion for privileged pages. Fill missing E2E in priority order: Quests → LaunchToken → Governance → Wallet/Contest public → Leaderboard/Explore filters → prediction-market discovery/thread flows.
    Timing annotation: behavior-depth scenarios are implemented within each corresponding EPIC-4 migration ticket and validated again at 4.16 (not deferred to a post-EPIC cleanup).
 5. **Wave 4: EPIC-5 Boundaries**
    Add `eslint-plugin-boundaries` and `lint-boundaries` script. Roll out as block-new-violations immediately (diff-based), legacy violations warning/allowlist for one sprint, then full blocking.
@@ -393,11 +393,11 @@ Program status update (2026-03-11): EPIC-2 infrastructure and high-signal EPIC-3
    Keep PR lane fast; run mature/stateful-heavy suites nightly and as release-candidate blocking gates. Keep human-in-the-loop approvals for visual baseline changes, RC promotion, and temporary boundary allowlist exceptions.
    EPIC-6 hardening closeout: remove visual bootstrap fallback after baseline stability is demonstrated, and keep compare mode as the only gating mode.
 
-Execution status snapshot (2026-03-11):
-The wave outcomes below are infrastructure already merged (initially delivered by PR `#13406` and subsequent follow-up PRs).
+Execution status snapshot (2026-03-13):
+The wave outcomes below reflect merged EPIC-2 work plus implemented-and-green EPIC-3 work on PR `#13463`.
 1. Wave 0 completed (baseline reconciled + ownership/gating policy recorded).
 2. Wave 1 completed (component harness, scripts, EPIC-2 contracts).
-3. Wave 2 mostly completed (EPIC-3 contract tests and key page integration tests).
+3. Wave 2 completed for EPIC-3 implementation; dedicated component integration for `ViewThreadPage` / `DiscussionsPage` remains partial.
 4. Wave 3 completed for route/security coverage; behavior depth is partially completed for selected features and still missing prediction-market-specific coverage.
 5. Wave 4 completed (boundary fixtures + blocking diff gate in CI).
 6. Wave 5 completed with diff-blocking cleanup guards (`no-legacy-imports`, `no-stub-imports`, `depcruise:circular:diff`).
@@ -416,7 +416,7 @@ EPIC-1: Dead Code Deletion ─────────────────�
 EPIC-2: Shared Infrastructure ───────────────── 12 tickets, max 4 parallel lanes
     |
     v
-EPIC-3: Normalize Components ───────────────── 8 tickets, max 7 parallel lanes
+EPIC-3: Normalize Components ───────────────── 8 tickets, max 7 parallel lanes (implemented on PR #13463)
     |
     v
 EPIC-4: Feature Migration ──────────────────── 17 tickets, max 7 parallel lanes
@@ -429,7 +429,8 @@ EPIC-6: Kill views/ + Final Cleanup ────────── 11 tickets, m
 ```
 
 **Total: 62 tickets. Max theoretical parallelism: 10 engineers.**
-**Critical path (longest sequential chain): 1.x → 2.2 → 2.4 → 2.7 → 3.3 → 4.11 → 4.16 → 5.1 → 5.4 → 6.1 → 6.7 → 6.11**
+**Historical critical path through EPIC-3 delivery: 1.x → 2.2 → 2.4 → 2.7 → 3.1 → 3.3.**
+**Current upcoming critical path: 4.10 / 4.11 / 4.14 / 4.16 → 5.1 → 5.4 → 6.1 → 6.7 → 6.11. `4.11 Discussions` remains the largest single migration risk even after the EPIC-3 split work landed.**
 
 ---
 
@@ -495,28 +496,31 @@ Lane assignments:
 ```
                   EPIC-2 done
                       │
-      ┌───────┬───────┬───────┬───────┬───────┬───────┐
-      v       v       v       v       v       v       v
-     3.1     3.2     3.3     3.4     3.5     3.6     3.8
-  (contests)(notif)(view t)(disc) (explore)(gov)   (home)
-      │
-      v
-     3.7
-    (CM)
+              ┌───────┼───────┐
+              v       v       v
+            3.1     3.2    ┌──┴──┬─────┐
+         (decouple (decouple│    │     │
+         contests) notif)  3.6  3.7   3.8
+              │       │   (gov)(CM) (home)
+         ┌────┼───────┘
+         v    v    v
+        3.3  3.4  3.5        ← 3.3/3.4/3.5 parallel (after 3.1)
+      (view (disc (explore)
+      thread) page)
 
-Parallelism: max 7 lanes (3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.8 can start immediately; 3.7 follows 3.1)
-Sequential depth: 2 layers (parallel start → 3.7 follow-up)
+Parallelism: max 6 lanes (3.1, 3.2, 3.6, 3.7, 3.8 all start immediately; 3.3-3.5 after 3.1)
+Sequential depth: 2 layers (3.1 → 3.3/3.4/3.5)
 
 Lane assignments:
-  Lane A: 3.3 (split ViewThreadPage shell/data/sidebars)  [largest page shell]
-  Lane B: 3.4 (split DiscussionsPage controller/feed/composer)
-  Lane C: 3.5 (split ExplorePage tab shell + query-param controller)
-  Lane D: 3.1 → 3.7 (decouple contest hook → split CommunityManagement pages)
-  Lane E: 3.2 (decouple notification hooks)
-  Lane F: 3.6 (normalize GovernancePage init/data shell)
-  Lane G: 3.8 (normalize HomePage + CommunityHomePage surfaces)
+  Lane A: 3.1 → 3.3 (decouple contests → split ViewThreadPage)
+  Lane B: 3.1 → 3.4 (decouple contests → split DiscussionsPage)  [shares 3.1 with A]
+  Lane C: 3.1 → 3.5 (decouple contests → split ExplorePage)      [shares 3.1 with A]
+  Lane D: 3.2 (decouple notification hooks)
+  Lane E: 3.6 (split GovernancePage)
+  Lane F: 3.7 (split CommunityManagement sub-pages)
+  Lane G: 3.8 (split CommunityHomePage + HomePage)
 
-Note: 3.1 is still an enablement hotspot for EPIC-4 contests/discussions, but 3.3 is now the schedule bottleneck because `ViewThreadPage.tsx` grew to 1229 lines and absorbed prediction-market surfaces.
+Note: 3.1 is the CRITICAL PATH bottleneck. Assign your strongest eng.
 ```
 
 #### EPIC-4 DAG: Feature Migration
@@ -542,11 +546,11 @@ Note: 3.1 is still an enablement hotspot for EPIC-4 contests/discussions, but 3.
               ┌───┬───┬───┼───┐
               v   v   v   v   v
             4.10 4.11 4.12 4.13 4.14    ← 5 parallel lanes
-           (cont)(disc+thread)(gov)(notif)(CM)
+           (cont)(disc)(gov)(notif)(CM)
                           │
     WAVE 4 ───────────────┼──────────────────────
                           v
-                        4.15 (Explore + Home + discovery remaining)
+                        4.15 (Explore + Dashboard + remaining)
                           │
                           v
                         4.16 (update ALL routes, verify)
@@ -567,12 +571,11 @@ Wave 1 lane assignments (ALL INDEPENDENT -- assign freely):
   Eng G: 4.7 (Quests)
 
 Wave 3 lane assignments (check blockers):
-  4.10 blocked-by: 3.1, 3.7
-  4.11 blocked-by: 3.1, 3.2, 3.3, 3.4 (thread/detail + prediction-market surfaces make this the critical path)
+  4.10 blocked-by: 3.1
+  4.11 blocked-by: 3.1, 3.2, 3.3, 3.4 (LATEST to unblock -- critical path)
   4.12 blocked-by: 3.6, 4.9
   4.13 blocked-by: 3.2
   4.14 blocked-by: 3.7, 4.10
-  4.15 blocked-by: 3.5, 3.8
 ```
 
 #### EPIC-5 DAG: Enforce Boundaries
@@ -624,8 +627,8 @@ Sequential depth: 7 layers (6.1 → 6.2 → 6.3 → 6.7 → 6.8 → 6.9 → 6.11
 |------|---------|-------------------|-----------------|------------|
 | 1: Dead Code | 10 | **10** | 1 | Product sign-off on 1.4 |
 | 2: Shared Infra | 12 | **4** | 4 | 2.2 (aliases) gates everything |
-| 3: Normalize | 8 | **7** | 2 | 3.3 (`ViewThreadPage`) is the largest remaining shell; 3.1 still gates contest-heavy follow-up work |
-| 4: Feature Migration | 17 | **7** | 4 waves | 4.11 (Discussions + thread/detail) has most blockers |
+| 3: Normalize | 8 | **6** | 2 | 3.1 (useCommunityContests) gates 3.3-3.5 |
+| 4: Feature Migration | 17 | **7** | 4 waves | 4.11 (Discussions) has most blockers |
 | 5: Boundaries | 4 | **1** | 4 | Sequential by nature |
 | 6: Kill views/ | 11 | **4** | 7 | 6.1 (component_kit, 8k LOC) |
 | **Total** | **62** | **10 peak** | -- | -- |
@@ -638,10 +641,9 @@ All tickets are parallelizable.
 EPIC-1: Dead Code Deletion
 ├── 1.1: Delete dead internal dev-tool pages [PARALLEL]
 │   files: views/pages/QuillPage/, MarkdownEditorPage/, MarkdownViewerPage/,
-│          MarkdownHitHighlighterPage/
-│          + corresponding route entries
+│          MarkdownHitHighlighterPage/, ComponentsShowcase/
+│          + route entries in CommonDomainRoutes.tsx, GeneralRoutes.tsx
 │   ~1200 LOC delete, ~20 LOC modify
-│   note: keep `/components`/`ComponentsShowcase` until replacement visual targets exist
 │   blocked-by: none
 │   reviewer: frontend
 │
@@ -771,7 +773,7 @@ EPIC-2: Shared Infrastructure
 │
 ├── 2.11: Create feature directory stubs + migrate feature-specific helpers [blocked-by: 2.2]
 │   new dirs: features/{quests,governance,tokens,explore,blockchain,wallet,
-│             discussions,auth,communities,search}/
+│             discussions,auth,contests,notifications,communities,search}/
 │   move: 10 helper files/directories
 │   HIGH-IMPACT: quest.ts (23 consumers), snapshot_utils.ts (23), ContractHelpers/ (30)
 │   ~3000 LOC move
@@ -787,60 +789,54 @@ EPIC-2: Shared Infrastructure
 ### EPIC-3: Normalize Components
 
 ```
-EPIC-3: Normalize Components
-├── 3.1: Decouple useCommunityContests [blocked-by: 2.11]
-│   move: CommunityManagement/Contests/useCommunityContests.ts
-│         -> features/contests/hooks/useCommunityContests.ts
-│   also move: ContestsList `Contest` shape + contest filtering helpers + `isContestActive`
-│   remove view dependency: `useCommunityContests` currently imports `views/components/CommunityStake/useCommunityStake.ts`
-│   create: `features/contests/{hooks,utils,types}/` + re-export at old location
-│   17 consumers across contest pages, thread/discussion pages, home/explore, sidebars, and onboarding
-│   ~220 LOC move + dependency extraction
+EPIC-3: Normalize Components [implemented on branch `codex/epic-3-normalize-components`; PR #13463]
+├── 3.1: Decouple useCommunityContests [done 260312]
+│   live owner: features/contests/hooks/useCommunityContests.ts
+│   compatibility: legacy shim remains at views/pages/CommunityManagement/Contests/useCommunityContests.ts
+│   remaining shim consumers: 16 files
 │   reviewer: frontend
 │
-├── 3.2: Decouple notification subscription hooks [blocked-by: 2.12] [PARALLEL w/ 3.1]
-│   move: 6 hooks from NotificationSettings/ -> features/notifications/hooks/
-│   preserve: schema-parse wrappers around TRPC subscription queries
-│   remove cross-imports between NotificationSettings page files and discussion toggle components
-│   create: `features/notifications/hooks/` + re-export stubs at old locations during rollout
-│   ~300 LOC move
+├── 3.2: Decouple notification subscription hooks [done 260312]
+│   live owner: features/notifications/hooks/
+│   compatibility: NotificationSettings `use*.ts` files remain as thin shims
 │   reviewer: frontend
 │
-├── 3.3: Split ViewThreadPage container/presentational [blocked-by: EPIC-2] [CRITICAL PATH]
-│   extract: route/data hook + content shell + sidebar/composer modules from ViewThreadPage.tsx (1229 lines)
-│   preserve: polls, prediction markets, snapshot/cosmos proposal sidebars, join-community banner, comment composer
-│   note: prediction-market feature added multiple new `view_thread/` and modal surfaces after the original plan
-│   ~400 LOC new, ~900 LOC modify
+├── 3.3: Split ViewThreadPage container/presentational [done 260313]
+│   extracted: useViewThreadData.ts, ViewThreadPageShell.tsx,
+│              ViewThreadPageBody.tsx, ViewThreadPageSubBody.tsx,
+│              ViewThreadPageComposer.tsx, viewThreadPageSidebars.tsx
+│   current entrypoint size: ViewThreadPage.tsx = 38 lines
 │   reviewer: frontend
 │
-├── 3.4: Split DiscussionsPage container/presentational [blocked-by: EPIC-2] [PARALLEL w/ 3.3]
-│   extract: route/filter controller + feed shell + sticky-composer shell from DiscussionsPage.tsx (617 lines)
-│   keep reusable: HeaderWithFilters, RenderThreadCard, OverviewPage, contract helpers
-│   ~250 LOC new, ~500 LOC modify
+├── 3.4: Split DiscussionsPage container/presentational [done 260313]
+│   extracted: useDiscussionsData.ts, DiscussionsPageShell.tsx,
+│              DiscussionsPageFeed.tsx, DiscussionsPageComposer.tsx,
+│              DiscussionsPagePrivateTopic.tsx
+│   current entrypoint size: DiscussionsPage.tsx = 88 lines
 │   reviewer: frontend
 │
-├── 3.5: Split ExplorePage container/presentational [blocked-by: EPIC-2] [PARALLEL w/ 3.3-3.4]
-│   extract: tab/query-param controller + shell from ExplorePage.tsx (217 lines)
-│   keep explicit scope for Markets + Prediction Markets tabs, search box state, and stake modal wiring
-│   ~150 LOC new, ~220 LOC modify
+├── 3.5: Split ExplorePage container/presentational [done 260313]
+│   extracted: useExploreData.ts, ExplorePageShell.tsx,
+│              ExplorePageContent.tsx, ExplorePageManageCommunityStakeModal.tsx
+│   prediction-market tab promoted to an explicit content branch
+│   current entrypoint size: ExplorePage.tsx = 57 lines
 │   reviewer: frontend
 │
-├── 3.6: Split GovernancePage [blocked-by: EPIC-2] [PARALLEL w/ 3.3-3.5]
-│   extract: chain readiness/init controller from GovernancePage.tsx (101 lines)
-│   goal: remove legacy hook imports and isolate route guards without over-fragmenting the page
-│   ~80 LOC new, ~120 LOC modify
+├── 3.6: Split GovernancePage [done 260313]
+│   extracted: useGovernancePageData.ts, GovernancePageContent.tsx
+│   current entrypoint size: GovernancePage.tsx = 43 lines
 │   reviewer: frontend
 │
-├── 3.7: Split CommunityManagement sub-pages [blocked-by: 3.1] [PARALLEL after 3.1]
-│   first wave: Contests/, Stake integration, Integrations/
-│   extract shared page shells/layout from community-admin surfaces before EPIC-4 feature moves
-│   ~300 LOC new, ~800 LOC modify
+├── 3.7: Split CommunityManagement sub-pages [done 260313]
+│   extracted: useAdminContestsPageData.ts, StakeIntegrationContent.tsx,
+│              useStakeIntegrationData.ts, Topics/topicFlow.ts,
+│              features/communityStake/{hooks,utils}
 │   reviewer: frontend
 │
-└── 3.8: Split CommunityHomePage + HomePage [blocked-by: EPIC-2] [PARALLEL w/ 3.3-3.6]
-    extract: shared discovery sections (`IdeaLaunchpad`, `TrendingThreadList`, `ActiveContestList`, `ActivePredictionMarketList`) from Home surfaces
-    keep CommunityHomePage sticky-composer/create-thread flow isolated from the plain HomePage shell
-    ~250 LOC new, ~350 LOC modify
+└── 3.8: Split CommunityHomePage + HomePage [done 260313]
+    extracted: HomeDiscoverySections.tsx, HomePageManageCommunityStakeModal.tsx,
+               useCommunityHomePageData.ts, CommunityHomePageContent.tsx
+    current entrypoint sizes: CommunityHomePage.tsx = 13 lines, HomePage.tsx = 42 lines
     reviewer: frontend
 ```
 
@@ -888,21 +884,21 @@ EPIC-4: Feature Migration
 │   ~1800 LOC move
 │
 │  WAVE 3 -- Tight coupling (requires decoupling from EPIC-3)
-├── 4.10: Migrate Contests [blocked-by: 3.1, 3.7]
-│   -> features/contests/ (pages, admin, hooks, utils, shared cards)
+├── 4.10: Migrate Contests [blocked-by: 3.1]
+│   -> features/contests/ (pages, admin, components)
 │   ~3000 LOC move
 │
-├── 4.11: Migrate Discussions + thread/detail surfaces [blocked-by: 3.1, 3.2, 3.3, 3.4]
-│   -> features/discussions/ (pages, components, thread/detail surfaces)
-│   LARGEST PR -- split into 4.11a (discussion routes), 4.11b (thread/detail shells), 4.11c (comment + prediction-market components)
-│   ~6500 LOC move
+├── 4.11: Migrate Discussions [blocked-by: 3.1, 3.2, 3.3, 3.4]
+│   -> features/discussions/ (pages, components)
+│   LARGEST PR -- split into 4.11a (pages) + 4.11b (components)
+│   ~6000 LOC move
 │
 ├── 4.12: Migrate Governance [blocked-by: 3.6, 4.9]
 │   -> features/governance/ (pages, components)
 │   ~3500 LOC move
 │
 ├── 4.13: Migrate Notifications [blocked-by: 3.2]
-│   -> features/notifications/ (page, subscription hooks, components)
+│   -> features/notifications/ (pages, components)
 │   ~1500 LOC move
 │
 ├── 4.14: Migrate CommunityManagement (remaining) [blocked-by: 3.7, 4.10]
@@ -912,9 +908,8 @@ EPIC-4: Feature Migration
 │
 │  WAVE 4 -- Hub/aggregator features
 ├── 4.15: Migrate Explore + Dashboard + HomePage + remaining [blocked-by: 3.5, 3.8]
-│   -> features/explore/, features/dashboard/, shared home/discovery sections, prediction-market discovery UI
-│   includes: `PredictionMarketsList`, `ActivePredictionMarketList`, and shared discovery sections pulled out during 3.8
-│   ~3400 LOC move
+│   -> features/explore/, features/dashboard/, misc
+│   ~3000 LOC move
 │
 ├── 4.16: Update ALL route definitions + verify [blocked-by: 4.1-4.15]
 │   files: CommonDomainRoutes.tsx, CustomDomainRoutes.tsx, GeneralRoutes.tsx
@@ -929,22 +924,20 @@ EPIC-4: Feature Migration
 
 ```
 EPIC-5: Enforce Boundaries
-├── 5.1: Install eslint-plugin-boundaries + configure zones [DONE via PR #13406]
-│   current state: `.eslintrc-boundaries.cjs` defines `legacy-view`, `legacy-core`, and `app-shell`
-│   current rule: `legacy-core` cannot import `legacy-view`
-│   follow-up: expand toward feature/shared zoning after EPIC-4 migration reduces noise
+├── 5.1: Install eslint-plugin-boundaries + configure zones [blocked-by: EPIC-4]
+│   define: shared, feature, stateApi, legacy zones
+│   rules: features/* cannot import features/<other>/*; shared cannot import features
 │   ~120 LOC new
 │   reviewer: full-stack
 │
 ├── 5.2: Add no-restricted-imports for views/ in feature code [blocked-by: 5.1]
 │   ~30 LOC modify
 │
-├── 5.3: Add CI check for boundary violations [DONE via PR #13406]
-│   current state: diff-blocking `lint-boundaries` job runs `packages/commonwealth/scripts/lint-boundaries-diff.sh`
+├── 5.3: Add CI check for boundary violations [blocked-by: 5.2]
 │   ~30 LOC modify
 │
 └── 5.4: Fix all boundary violations [blocked-by: 5.3]
-    Remove remaining `legacy-core -> views/*` violations and expand boundaries toward feature/shared isolation
+    Move shared components to shared/; create proper shared interfaces
     ~300-500 LOC modify
 ```
 
@@ -995,7 +988,23 @@ EPIC-6: Kill views/ + Final Cleanup
 
 ## Before/After LOC Analysis & DevX Impact
 
-### Current State: `client/scripts/` (historical pre-hardening topology snapshot)
+### Audited Current State (post-EPIC-3 branch: 2026-03-13)
+
+- `client/scripts/`: 193,249 LOC across 2,537 files
+- `views/`: 157,905 LOC across 1,938 files
+- `views/pages/`: 76,919 LOC
+- `views/components/`: 62,970 LOC
+- EPIC-3 shrank the highest-risk page entrypoints to thin shells:
+  - `ViewThreadPage.tsx`: 38 lines
+  - `DiscussionsPage.tsx`: 88 lines
+  - `ExplorePage.tsx`: 57 lines
+  - `GovernancePage.tsx`: 43 lines
+  - `CommunityHomePage.tsx`: 13 lines
+  - `HomePage.tsx`: 42 lines
+- PR `#13463` currently carries the full EPIC-3 implementation: 118 changed files, `+5858/-3421`, 18 commits, all 13 checks green as of 2026-03-13.
+- Prediction-market UI remains an active cross-cutting surface inside `views/*`: 28 files currently reference prediction-market modules or cards. That is expected and rolls forward into EPIC-4 / EPIC-6 cleanup.
+
+### Baseline State (pre-EPIC-1 audit): `client/scripts/` (159k LOC, 1,986 files)
 
 ```
 client/scripts/                    159,062 LOC   1,986 files
@@ -1018,7 +1027,7 @@ client/scripts/                    159,062 LOC   1,986 files
 │   │   ├── CreateQuest/             3,229   2%
 │   │   ├── ExplorePage/             2,924   2%
 │   │   ├── AdminPanel/              2,640   2%
-│   │   ├── ComponentsShowcase/      2,432   2%               ← temporary visual harness route; delete later
+│   │   ├── ComponentsShowcase/      2,432   2%               ← dead code
 │   │   ├── view_thread/             2,257   1%
 │   │   ├── CreateCommunity/         2,047   1%
 │   │   ├── (19 more dirs >100 LOC) ~14,000
@@ -1051,7 +1060,7 @@ client/scripts/                    159,062 LOC   1,986 files
 
 ---
 
-### After State: `client/scripts/` (~152k LOC, ~1,850 files)
+### Target End State: `client/scripts/` (~152k LOC, ~1,850 files)
 
 **~7k LOC deleted** (dead code + duplicates), rest reorganized:
 
@@ -1230,9 +1239,9 @@ client/scripts/                    ~152,000 LOC   ~1,850 files
 
 ---
 
-### What Changes, What Doesn't
+### Planned EPIC-6 End-State Delta
 
-| Directory | Before | After | Change |
+| Directory | Baseline | Planned EPIC-6 End State | Change |
 |-----------|--------|-------|--------|
 | `views/` | 125,824 LOC (79%) | **0 LOC (deleted)** | Fully decomposed |
 | `features/` | 0 | ~95,000 LOC (63%) | New -- all feature code lives here |
@@ -1249,13 +1258,13 @@ client/scripts/                    ~152,000 LOC   ~1,850 files
 
 ---
 
-### DevX Before vs After
+### DevX Baseline vs Planned End State
 
 | DevX Dimension | Before (Pre-hardening baseline) | After (End State) |
 |----------------|-----------------|-------------------|
 | **"Where do I put new code?"** | Guess: hooks/ vs helpers/ vs utils/ vs controllers/ vs state/? | **Clear:** `features/<name>/` for feature code, `shared/` for reusable code |
 | **"Where is the Discussions feature?"** | Search 4+ directories: views/pages/discussions/, views/components/Comments/, hooks/useDraft.tsx, state/api/threads/, helpers/threads.ts | **One directory:** `features/discussions/` (pages, components, hooks, utils, modals) |
-| **"Can I import from another feature?"** | No rules. CommunityManagement/Contests/ is imported by 17 files across 7 features | **Lint enforced:** `features/*` cannot import from `features/<other>/*`. Must go through `shared/` |
+| **"Can I import from another feature?"** | No rules. Cross-feature hooks leaked through legacy page trees like `CommunityManagement/Contests/` and `NotificationSettings/` | **Lint enforced:** `features/*` cannot import from `features/<other>/*`. Must go through `shared/` |
 | **"What's the design system?"** | Buried at views/components/component_kit/ inside a 125k LOC views/ directory | **Top-level:** `shared/components/component_kit/` -- clearly separated |
 | **"How do I test this component?"** | No component test harness; E2E-only fallback. | **Testing Library setup** with renderWithProviders, per-feature smoke tests, shared hook/util unit tests |
 | **"What can I safely delete?"** | No idea. Import graph is tangled. | **Boundary lint rules** prevent new tangles. Dead code shows up as lint violations. |
@@ -1267,7 +1276,7 @@ client/scripts/                    ~152,000 LOC   ~1,850 files
 
 ---
 
-### Feature Size Distribution (After)
+### Feature Size Distribution (Target end state)
 
 ```
 communities ████████████████████ 18k LOC  (largest -- includes admin sub-features)
@@ -1852,11 +1861,15 @@ Phase 2 can start as soon as EPIC-6 completes for EPIC-7 and EPIC-12.4. EPICs 8,
 
 - `packages/commonwealth/client/vite.config.ts` -- resolve aliases
 - `packages/commonwealth/tsconfig.json` -- path mappings
-- `packages/commonwealth/client/scripts/navigation/CommonDomainRoutes.tsx` -- 60+ lazy imports
-- `views/pages/CommunityManagement/Contests/useCommunityContests.ts` -- tightest cross-feature coupling (17 consumers)
+- `packages/commonwealth/client/scripts/navigation/CommonDomainRoutes.tsx` -- route migration choke point; 63 lazy imports still target `views/pages/*`
+- `packages/commonwealth/client/scripts/views/pages/view_thread/useViewThreadData.ts` -- main EPIC-3.3 seam feeding the later discussions feature migration
+- `packages/commonwealth/client/scripts/views/pages/discussions/useDiscussionsData.ts` -- main EPIC-3.4 seam feeding EPIC-4.11
+- `packages/commonwealth/client/scripts/views/pages/CommunityManagement/Contests/useCommunityContests.ts` -- compatibility shim only now, but still imported by 16 files and should be burned down during EPIC-4 / EPIC-6
 - `.eslintrc.cjs` -- boundary enforcement
 
 ## Verification
+
+Current status note (2026-03-13): EPIC-3 is marked done in this plan based on the live audited branch state. PR `#13463` is still a draft, but all 13 GitHub checks are green (`Build & Type Checks`, `Lint`, `Boundary Lint`, `Cleanup Guards`, component/unit/integration tests, E2E smoke + refactor route safety, visual regression, and devnet coverage).
 
 After each epic:
 1. `pnpm -r check-types` passes
@@ -1876,9 +1889,11 @@ Final verification (EPIC-6):
 - No deprecated re-export stubs remain
 - No legacy aliases/imports remain (`views`, `helpers`, `hooks`, `controllers`, `models`)
 - Release-candidate promotion has explicit human sign-off
+- Milestone `Front End Refactor 2026` is closed with EPIC-3 and EPIC-4/5/6 tickets merged, not just implemented on a draft branch
 
 ## Change Log
 
 - 260202: Updated by Codex; moved plan into Common Knowledge and added status section.
 - 260216: Updated by Codex with automation-first testing policy decisions (visual baseline gating, nightly+RC mature E2E, staged boundary enforcement, and human-in-the-loop approvals).
 - 260305: Status semantics switched to merge-truth; EPIC-2 PR links/status corrected; repo audit metrics refreshed; EPIC-5/6 guard-state reconciled.
+- 260313: Updated by Codex against the live post-EPIC-3 branch state; marked EPIC-3 complete for planning, refreshed repo/test/boundary/stub metrics, and relabeled the LOC section to separate current audited state from the planned EPIC-6 end state.

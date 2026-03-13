@@ -1,8 +1,8 @@
 import { CommentSubscription } from '@hicommonwealth/schemas';
+import { useCommentSubscriptions } from 'features/notifications/hooks/useCommentSubscriptions';
 import React, { useCallback, useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CommentSubscriptionEntry } from 'views/pages/NotificationSettings/CommentSubscriptionEntry';
-import { useCommentSubscriptions } from 'views/pages/NotificationSettings/useCommentSubscriptions';
 import { z } from 'zod';
 
 export const CommentSubscriptions = () => {

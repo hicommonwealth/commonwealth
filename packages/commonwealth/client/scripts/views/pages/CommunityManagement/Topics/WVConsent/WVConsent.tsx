@@ -4,9 +4,9 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 
+import { HandleCreateTopicProps } from '../topicFlow';
 import { CreateTopicStep } from '../utils';
 
-import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
 import './WVConsent.scss';
 
 interface WVConsentProps {

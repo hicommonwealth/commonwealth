@@ -1,4 +1,5 @@
 import Thread from 'client/scripts/models/Thread';
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Select } from 'views/components/Select';
@@ -6,7 +7,6 @@ import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { RenderThreadCard } from 'views/pages/discussions/RenderThreadCard';
-import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from '../../CommunityManagement/Contests/utils';
 import { SortType, sortOptions } from '../types';
 import './CommonEntriesList.scss';

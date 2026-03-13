@@ -30,16 +30,22 @@ vi.mock('state/api/feeds/fetchUserActivity', () => ({
   useFetchGlobalActivityQuery: vi.fn(),
 }));
 
-vi.mock('views/components/component_kit/new_designs/CWPageLayout', () => ({
-  default: React.forwardRef<
+vi.mock('views/components/component_kit/new_designs/CWPageLayout', () => {
+  const MockHomePageLayout = React.forwardRef<
     HTMLDivElement,
     { children?: React.ReactNode; className?: string }
   >(({ children, className }, ref) => (
     <div ref={ref} className={className} data-testid="home-page-layout">
       {children}
     </div>
-  )),
-}));
+  ));
+
+  MockHomePageLayout.displayName = 'MockHomePageLayout';
+
+  return {
+    default: MockHomePageLayout,
+  };
+});
 
 vi.mock('views/components/component_kit/cw_text', () => ({
   CWText: ({ children }: { children: React.ReactNode }) => (
@@ -124,6 +130,12 @@ describe('HomePage integration', () => {
     expect(screen.getByText('Recently Launched')).toBeInTheDocument();
     expect(screen.getByText('Graduated')).toBeInTheDocument();
     expect(screen.getByTestId('home-trending-communities')).toBeInTheDocument();
+    expect(screen.getByTestId('home-active-contests')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('home-active-prediction-markets'),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('home-quests')).toBeInTheDocument();
+    expect(screen.getByTestId('home-trending-threads')).toBeInTheDocument();
   });
 
   test('renders iOS banner when mobile-download feature flag is on', () => {

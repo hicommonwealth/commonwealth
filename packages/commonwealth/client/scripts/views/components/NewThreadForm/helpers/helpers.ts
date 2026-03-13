@@ -1,6 +1,6 @@
 import { notifyError } from 'controllers/app/notifications';
-import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
-import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
+import type { Contest } from 'features/contests/types/contest';
+import { isContestActive } from 'features/contests/utils/contestUtils';
 import { ThreadKind } from '../../../../models/types';
 import type { NewThreadFormType } from '../types';
 import { NewThreadErrors } from '../types';

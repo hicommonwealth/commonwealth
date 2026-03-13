@@ -10,7 +10,7 @@ import { CreateTopicStep } from '../utils';
 
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
-import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
+import { HandleCreateTopicProps } from '../topicFlow';
 import './WVSuiNFTDetails.scss';
 
 interface NFTConfig {
