@@ -19,7 +19,6 @@ import {
   SessionKeyError,
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
-import { isRateLimitError, RATE_LIMIT_MESSAGE } from 'helpers/rateLimit';
 import { detectURL } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
@@ -36,6 +35,8 @@ import React, {
 import { useLocation } from 'react-router-dom';
 import useAppStatus from 'shared/hooks/useAppStatus';
 import { useFlag } from 'shared/hooks/useFlag';
+import Permissions from 'shared/utils/Permissions';
+import { isRateLimitError, RATE_LIMIT_MESSAGE } from 'shared/utils/rateLimit';
 import app from 'state';
 import { AICompletionType, useAiCompletion } from 'state/api/ai';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -51,7 +52,6 @@ import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore, { useUserAiSettingsStore } from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import CustomTopicOption from 'views/components/NewThreadForm/CustomTopicOption';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';

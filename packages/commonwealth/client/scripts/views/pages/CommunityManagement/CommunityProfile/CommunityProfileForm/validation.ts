@@ -2,7 +2,7 @@ import {
   COMMUNITY_NAME_ERROR,
   COMMUNITY_NAME_REGEX,
 } from '@hicommonwealth/shared';
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
+import { VALIDATION_MESSAGES } from 'shared/utils/formValidations/messages';
 import z from 'zod';
 
 export const communityProfileValidationSchema = z.object({

@@ -33,6 +33,7 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import { bytesToHex } from 'web3-utils';
 import useAppStatus from '../../../../hooks/useAppStatus';
 import { trpc } from '../../../../utils/trpcClient';
 import useAuthentication from '../../../modals/AuthModal/useAuthentication';
@@ -76,6 +77,9 @@ const StakeExchangeForm = ({
   onSetNumberOfStakeToExchange,
   denomination,
 }: StakeExchangeFormProps) => {
+  const normalizeTxHash = (hash: string | Uint8Array) =>
+    typeof hash === 'string' ? hash : bytesToHex(hash);
+
   const user = useUserStore();
 
   const { selectedCommunity: community } = useManageCommunityStakeModalStore();
@@ -153,15 +157,16 @@ const StakeExchangeForm = ({
           chainId: `${community.ChainNode.ethChainId}`,
         }),
       });
+      const txHash = normalizeTxHash(txReceipt.transactionHash);
 
       user.setData({ addressSelectorSelectedAddress: selectedAddress?.value });
       await createStakeTransaction.mutateAsync({
-        transaction_hash: txReceipt.transactionHash,
+        transaction_hash: txHash,
         community_id: communityId,
       });
       user.setData({ addressSelectorSelectedAddress: undefined });
 
-      onSetSuccessTransactionHash(txReceipt?.transactionHash);
+      onSetSuccessTransactionHash(txHash);
       onSetModalState(ManageCommunityStakeModalState.Success);
 
       // join user to community if not already a member
@@ -206,13 +211,14 @@ const StakeExchangeForm = ({
         walletAddress: selectedAddress?.value,
         ethChainId,
       });
+      const txHash = normalizeTxHash(txReceipt.transactionHash);
 
       await createStakeTransaction.mutateAsync({
-        transaction_hash: txReceipt.transactionHash,
+        transaction_hash: txHash,
         community_id: communityId,
       });
 
-      onSetSuccessTransactionHash(txReceipt?.transactionHash);
+      onSetSuccessTransactionHash(txHash);
       onSetModalState(ManageCommunityStakeModalState.Success);
 
       trackAnalytics({

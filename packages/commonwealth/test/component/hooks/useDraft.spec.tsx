@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, test } from 'vitest';
-import { useDraft } from '../../../client/scripts/hooks/useDraft';
+import { useDraft } from '../../../client/scripts/shared/hooks/useDraft';
 
 describe('useDraft', () => {
   beforeEach(() => {

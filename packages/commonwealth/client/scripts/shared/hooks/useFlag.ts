@@ -1,5 +1,5 @@
 import { useBooleanFlagValue } from '@openfeature/react-sdk';
-import { AvailableFeatureFlag } from 'helpers/feature-flags';
+import { AvailableFeatureFlag } from 'shared/utils/feature-flags';
 
 export const useFlag = (name: AvailableFeatureFlag): boolean => {
   return (

@@ -4,13 +4,13 @@ import { CWModal } from 'client/scripts/views/components/component_kit/new_desig
 import ManageCommunityStakeModal from 'client/scripts/views/modals/ManageCommunityStakeModal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { findDenominationString } from 'helpers/findDenomination';
+import type { DeltaStatic } from 'quill';
+import React, { useRef, useState } from 'react';
 import {
   isRateLimitError,
   RATE_LIMIT_MESSAGE,
   RateLimitErrorType,
-} from 'helpers/rateLimit';
-import type { DeltaStatic } from 'quill';
-import React, { useRef, useState } from 'react';
+} from 'shared/utils/rateLimit';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';

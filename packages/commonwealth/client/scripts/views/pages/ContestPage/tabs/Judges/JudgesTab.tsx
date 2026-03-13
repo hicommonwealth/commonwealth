@@ -1,8 +1,8 @@
 import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import React, { useState } from 'react';
+import Permissions from 'shared/utils/Permissions';
 import { useGetMembersQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
-import Permissions from 'utils/Permissions';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';

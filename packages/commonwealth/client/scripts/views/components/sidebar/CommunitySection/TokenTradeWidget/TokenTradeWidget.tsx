@@ -1,13 +1,13 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { formatAddressShort } from 'helpers';
+import { useTokenPricing } from 'hooks/useTokenPricing';
+import React, { useState } from 'react';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import {
   currencyNameToSymbolMap,
   SupportedFiatCurrencies,
-} from 'helpers/currency';
-import { useTokenPricing } from 'hooks/useTokenPricing';
-import React, { useState } from 'react';
-import { saveToClipboard } from 'utils/clipboard';
+} from 'shared/utils/currency';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';

@@ -7,9 +7,9 @@ import {
 } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
-import { getRelativeTimestamp } from 'helpers/dates';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
+import { getRelativeTimestamp } from 'shared/utils/dates';
 import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
 import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';

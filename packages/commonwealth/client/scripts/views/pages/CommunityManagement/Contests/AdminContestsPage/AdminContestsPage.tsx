@@ -11,12 +11,12 @@ import {
 import useAppStatus from 'shared/hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'shared/hooks/useFlag';
+import Permissions from 'shared/utils/Permissions';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';

@@ -2,9 +2,9 @@ import { Webhook, WebhookSupportedEvents } from '@hicommonwealth/schemas';
 import { DOCS_SUBDOMAIN, getWebhookDestination } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import { linkValidationSchema } from 'helpers/formValidations/common';
 import React, { useState } from 'react';
 import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
+import { linkValidationSchema } from 'shared/utils/formValidations/common';
 import app from 'state';
 import {
   useCreateWebhookMutation,

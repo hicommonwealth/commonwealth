@@ -1,10 +1,10 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import { useTokenPricing } from 'hooks/useTokenPricing';
+import React, { useState } from 'react';
 import {
   currencyNameToSymbolMap,
   SupportedFiatCurrencies,
-} from 'helpers/currency';
-import { useTokenPricing } from 'hooks/useTokenPricing';
-import React, { useState } from 'react';
+} from 'shared/utils/currency';
 import { useInviteLinkModal } from 'state/ui/modals';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWDivider } from 'views/components/component_kit/cw_divider';

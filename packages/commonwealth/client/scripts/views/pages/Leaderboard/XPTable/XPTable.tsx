@@ -1,6 +1,6 @@
-import { APIOrderDirection } from 'helpers/constants';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { APIOrderDirection } from 'shared/utils/constants';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import useGetXPsRanked from 'state/api/user/getXPsRanked';
 import { Avatar } from 'views/components/Avatar';

@@ -6,10 +6,10 @@ import {
 } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
-import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
 import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import { disabledStakeButtonTooltipText } from 'shared/utils/tooltipTexts';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { z } from 'zod';

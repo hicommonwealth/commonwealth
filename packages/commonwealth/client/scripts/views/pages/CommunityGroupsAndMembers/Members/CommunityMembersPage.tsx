@@ -1,5 +1,4 @@
 import { DEFAULT_NAME, MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
-import { APIOrderDirection } from 'helpers/constants';
 import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -10,6 +9,8 @@ import {
   MixpanelPageViewEventPayload,
 } from 'shared/analytics/types';
 import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import Permissions from 'shared/utils/Permissions';
+import { APIOrderDirection } from 'shared/utils/constants';
 import app from 'state';
 import {
   useGetCommunityByIdQuery,
@@ -19,7 +20,6 @@ import { useFetchGroupsQuery } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
-import Permissions from 'utils/Permissions';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';

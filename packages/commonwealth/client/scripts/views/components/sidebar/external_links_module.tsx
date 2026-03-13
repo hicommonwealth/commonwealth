@@ -1,5 +1,5 @@
-import { categorizeSocialLinks } from 'helpers/link';
 import React, { useState } from 'react';
+import { categorizeSocialLinks } from 'shared/utils/link';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { SocialAccountLinkModal } from '../../modals/SocialAccountLinkModal/SocialAccountLinkModal';

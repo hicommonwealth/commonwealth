@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 
 import { useFlag } from 'client/scripts/hooks/useFlag';
-import { communityNameSchema } from 'helpers/formValidations/common';
+import { communityNameSchema } from 'shared/utils/formValidations/common';
 import { useFetchPublicEnvVarQuery } from 'state/api/configuration';
 import {
   CWImageInput,

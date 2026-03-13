@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, test, vi } from 'vitest';
-import useBeforeUnload from '../../../client/scripts/hooks/useBeforeUnload';
+import useBeforeUnload from '../../../client/scripts/shared/hooks/useBeforeUnload';
 
 describe('useBeforeUnload', () => {
   test('registers listener and blocks unload when enabled', () => {

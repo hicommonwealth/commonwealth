@@ -7,6 +7,7 @@ import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import type { NavigateOptions, To } from 'react-router-dom';
+import Permissions from 'shared/utils/Permissions';
 import app from 'state';
 import {
   fetchCachedCustomDomain,
@@ -15,7 +16,6 @@ import {
 import { useCreateDiscordBotConfigMutation } from 'state/api/discord';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import useUserStore, { userStore } from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
