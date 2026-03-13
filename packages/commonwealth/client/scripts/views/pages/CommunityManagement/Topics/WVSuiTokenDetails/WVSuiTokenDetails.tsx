@@ -12,7 +12,7 @@ import { CreateTopicStep } from '../utils';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
 import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
-import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
+import { HandleCreateTopicProps } from '../topicFlow';
 import './WVSuiTokenDetails.scss';
 
 interface TokenConfig {

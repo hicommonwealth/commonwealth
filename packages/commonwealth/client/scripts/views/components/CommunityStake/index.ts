@@ -1,4 +1,4 @@
+import useCommunityStake from 'features/communityStake/hooks/useCommunityStake';
 import VoteWeightModule from './VoteWeightModule';
-import useCommunityStake from './useCommunityStake';
 
 export { VoteWeightModule, useCommunityStake };
