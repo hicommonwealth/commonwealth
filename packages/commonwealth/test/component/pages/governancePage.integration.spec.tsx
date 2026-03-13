@@ -141,6 +141,23 @@ describe('GovernancePage integration', () => {
     );
   });
 
+  test('shows loading while cosmos proposals are still fetching', () => {
+    useActiveCosmosProposalsQueryMock.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    });
+    useCompletedCosmosProposalsQueryMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    });
+
+    renderWithProviders(<GovernancePage />);
+
+    expect(screen.getByTestId('governance-loading')).toHaveTextContent(
+      'Connecting to chain',
+    );
+  });
+
   test('renders governance content when chain is ready', () => {
     renderWithProviders(<GovernancePage />);
 
