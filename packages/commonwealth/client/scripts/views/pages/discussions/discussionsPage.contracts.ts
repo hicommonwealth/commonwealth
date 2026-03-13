@@ -7,6 +7,8 @@ export const DISCUSSIONS_VIEWS = {
 export type DiscussionsView =
   (typeof DISCUSSIONS_VIEWS)[keyof typeof DISCUSSIONS_VIEWS];
 
+export type DiscussionsFeedVariant = 'list' | 'overview' | 'grid';
+
 type TopicIdentifierFromUrl = {
   topicId?: number | null;
   topicName?: string | null;
@@ -60,6 +62,26 @@ export const resolveDiscussionsViewFromTab = (
   return DISCUSSIONS_VIEWS.ALL;
 };
 
+export const resolveDiscussionsFeedVariant = (
+  selectedView: DiscussionsView,
+): DiscussionsFeedVariant => {
+  if (selectedView === DISCUSSIONS_VIEWS.OVERVIEW) {
+    return 'overview';
+  }
+
+  if (selectedView === DISCUSSIONS_VIEWS.CARDVIEW) {
+    return 'grid';
+  }
+
+  return 'list';
+};
+
+export const shouldFetchDiscussionsThreads = (
+  selectedView: DiscussionsView,
+): boolean =>
+  selectedView === DISCUSSIONS_VIEWS.ALL ||
+  selectedView === DISCUSSIONS_VIEWS.CARDVIEW;
+
 export const shouldShowPrivateTopicBlock = ({
   bypassGating,
   isAllowedMember,
@@ -91,6 +113,16 @@ export const filterVisibleThreads = <T extends FilterableThread>({
 
     return true;
   });
+
+export const getDiscussionsTotalThreadCount = ({
+  filteredThreadsLength,
+  isOnArchivePage,
+  totalResults,
+}: {
+  filteredThreadsLength: number;
+  isOnArchivePage: boolean;
+  totalResults?: number | null;
+}): number => (isOnArchivePage ? filteredThreadsLength : totalResults || 0);
 
 export const getTopicValidationNavigationDecision = ({
   generateUrlPartForTopicIdentifiers,

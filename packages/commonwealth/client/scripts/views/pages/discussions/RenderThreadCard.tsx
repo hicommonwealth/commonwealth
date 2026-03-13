@@ -17,6 +17,7 @@ type contestsData = {
   finished: Contest[];
   active: Contest[];
 };
+export type DiscussionsContestsData = contestsData;
 export type RenderThreadCardProps = {
   thread: Thread;
   isCardView?: boolean;

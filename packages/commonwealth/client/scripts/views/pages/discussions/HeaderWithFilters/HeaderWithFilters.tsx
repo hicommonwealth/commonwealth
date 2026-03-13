@@ -62,6 +62,13 @@ type TabsProps = {
   value: string;
 };
 
+type WeightedTopic = Topic & {
+  secondary_tokens?: Array<{
+    token_address?: string | null;
+    token_symbol?: string | null;
+  }> | null;
+};
+
 type ViewType = {
   id: number;
   value: string;
@@ -171,7 +178,9 @@ export const HeaderWithFilters = ({
     .filter((t) => !t.featured_in_sidebar)
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  const selectedTopic = (topics || []).find((t) => topic && topic === t.name);
+  const selectedTopic = (topics || []).find(
+    (t) => topic && topic === t.name,
+  ) as WeightedTopic | undefined;
 
   const contestNameOptions = (contestsData.all || []).map((contest) => ({
     label: contest?.name,
@@ -431,8 +440,12 @@ export const HeaderWithFilters = ({
                                 iconName="copy"
                                 iconSize="small"
                                 onClick={() => {
+                                  if (!token?.token_address) {
+                                    return;
+                                  }
+
                                   saveToClipboard(
-                                    token?.token_address,
+                                    token.token_address,
                                     true,
                                   ).catch(console.error);
                                 }}
