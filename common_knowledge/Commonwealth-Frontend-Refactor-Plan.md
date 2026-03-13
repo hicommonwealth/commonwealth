@@ -9,7 +9,7 @@ This plan covers four deliverables:
 4. **Deeper architectural refactors** -- structural problems beyond file moves (global `app` singleton, code splitting, controllers/, legacy stores/models, CSS scoping, tRPC completion)
 
 ## Status
-Legend: [ ] Not started, [~] In progress (implemented but not merged), [x] Done (merged to master). Add a completion date in parentheses and PR URL: `(YYMMDD) PR https://github.com/org/repo/pull/NNNNN — summary`.
+Legend: [ ] Not started, [~] In progress / partially landed, [x] Done in the audited codebase snapshot. If work is implemented on a long-lived branch/PR but not yet merged, call that out explicitly in the bullet body. Add a completion date in parentheses and PR URL: `(YYMMDD) PR https://github.com/org/repo/pull/NNNNN — summary`.
 
 ### EPIC-1: Dead Code Deletion
 - [x] 1.1 Delete dead internal dev-tool pages (260202) PR https://github.com/hicommonwealth/commonwealth/pull/13323 — remove internal markdown demo routes/pages + samples
@@ -37,18 +37,18 @@ Legend: [ ] Not started, [~] In progress (implemented but not merged), [x] Done 
 - [x] 2.11 Create feature directory stubs + migrate feature-specific helpers (260304) PR https://github.com/hicommonwealth/commonwealth/pull/13445 — moved feature-owned helper modules into `features/*/utils` and `features/blockchain/contractHelpers` with legacy `helpers/*` re-export stubs preserved for rollout safety
 - [x] 2.12 Migrate feature-specific hooks to feature dirs (260304) PR https://github.com/hicommonwealth/commonwealth/pull/13445 — moved audited feature-owned hooks into `features/*/hooks` (including governance cosmos hooks) and added legacy `hooks/*` compatibility stubs plus EPIC-2 re-export coverage
 
-Implementation status note (2026-03-05): milestone `Front End Refactor 2026` currently has 6 open issues (`#13417`-`#13422`) linked to PR `#13445`; tasks `2.7`-`2.12` are intentionally tracked as done in this plan based on completed implementation.
-EPIC-2 audit note (2026-03-05): `2.1`-`2.6` merged via PR `#13431`; `2.7`-`2.12` implemented via PR `#13445` and tracked as done in this plan.
+EPIC-2 audit note (2026-03-13): `2.1`-`2.6` merged via PR `#13431`; `2.7`-`2.12` merged via PR `#13445`. Milestone `Front End Refactor 2026` now stands at 23 closed / 8 open issues; the remaining open issues are the EPIC-3 tickets waiting on merge of PR `#13463`.
 
 ### EPIC-3: Normalize Components
-- [ ] 3.1 Decouple useCommunityContests
-- [ ] 3.2 Decouple notification subscription hooks
-- [ ] 3.3 Split ViewThreadPage container/presentational
-- [ ] 3.4 Split DiscussionsPage container/presentational
-- [ ] 3.5 Split ExplorePage container/presentational
-- [ ] 3.6 Split GovernancePage
-- [ ] 3.7 Split CommunityManagement sub-pages
-- [ ] 3.8 Split CommunityHomePage + HomePage
+- [x] 3.1 Decouple useCommunityContests (260312) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — moved the live hook to `features/contests/hooks/`, extracted contest types/utils, and left the old `views/pages/CommunityManagement/Contests/` file as a compatibility shim
+- [x] 3.2 Decouple notification subscription hooks (260312) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — moved shared notification hooks to `features/notifications/hooks/` and rewired discussion toggles + Notification Settings to the feature-owned paths
+- [x] 3.3 Split ViewThreadPage container/presentational (260313) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — reduced the entry page to a thin route shell and extracted `useViewThreadData`, shell/body/sub-body/composer/sidebar modules
+- [x] 3.4 Split DiscussionsPage container/presentational (260313) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — reduced the entry page to a thin composition shell and extracted `useDiscussionsData`, feed/composer/private-topic modules
+- [x] 3.5 Split ExplorePage container/presentational (260313) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — extracted `useExploreData`, shell/content/modal modules, and promoted prediction markets to an explicit content branch
+- [x] 3.6 Split GovernancePage (260313) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — normalized the page into `useGovernancePageData` + `GovernancePageContent` and switched to the feature-owned governance init hook
+- [x] 3.7 Split CommunityManagement sub-pages (260313) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — split `AdminContestsPage` and `StakeIntegration`, extracted topic-flow contracts, and moved community-stake ownership to `features/communityStake/*`
+- [x] 3.8 Split CommunityHomePage + HomePage (260313) PR https://github.com/hicommonwealth/commonwealth/pull/13463 — extracted shared home discovery sections, normalized Community Home through `useCommunityHomePageData`, and kept prediction-market home surfaces in scope
+EPIC-3 planning status note (2026-03-13): treat EPIC-3 as done for planning. All eight tasks are implemented on branch `codex/epic-3-normalize-components` in PR `#13463` (draft/open, 13/13 GitHub checks green as of 2026-03-13). The milestone issues `#13454`-`#13461` remain open only because they close on merge. Milestone URL: https://github.com/hicommonwealth/commonwealth/milestone/136?closed=1
 
 ### EPIC-4: Feature Migration
 - [ ] 4.1 Migrate Leaderboard
@@ -75,7 +75,7 @@ Timing annotation (EPIC-4): complete remaining behavior-depth E2E assertions ins
 - [ ] 5.2 Add no-restricted-imports for views/ in feature code
 - [x] 5.3 Add CI check for boundary violations
 - [~] 5.4 Fix all boundary violations
-Boundary rollout note (2026-03-05): boundary enforcement is running in block-new-violations mode; full clean-state enforcement remains pending.
+Boundary rollout note (2026-03-13): diff-based boundary enforcement is live in CI and green on PR `#13463`; full clean-state enforcement remains pending because the repo still has 18 legacy core/state/helper files importing from `views/*` and 63 route lazy imports still targeting `views/pages/*`.
 
 ### EPIC-6: Kill views/ + Final Cleanup
 - [ ] 6.1 Move component_kit to shared/components/component_kit/
@@ -89,19 +89,24 @@ Boundary rollout note (2026-03-05): boundary enforcement is running in block-new
 - [ ] 6.9 Delete old helpers/, hooks/, utils/, controllers/, stores/ dirs
 - [ ] 6.10 Update vite.config.ts to remove legacy aliases
 - [ ] 6.11 Final circular dependency audit + cleanup
-Guard status note (2026-03-05): `no-legacy-imports` and `no-stub-imports` diff guards are active in CI; deletion tasks (`6.8`/`6.9`) remain pending.
+Guard status note (2026-03-13): `no-legacy-imports` and `no-stub-imports` diff guards are active in CI and green on PR `#13463`; deletion tasks (`6.8`/`6.9`) remain pending because 77 legacy re-export stubs still exist.
 Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocking CI guard during 6.1-6.10. Promote to full `pnpm depcruise:circular` blocking only at 6.11 once pre-existing legacy cycles are burned down.
 
-#### Legacy Stub Debt Snapshot (2026-03-05)
-- Legacy re-export stubs in `helpers/`, `hooks/`, `utils/`: 64
-- Used stubs: 23
-- Unused stubs (deletable candidates): 41
+#### Legacy Stub Debt Snapshot (2026-03-13)
+- Legacy re-export stubs in `helpers/`, `hooks/`, `utils/`: 77
+- Used stubs: 45
+- Unused stubs (deletable candidates): 32
 - Highest remaining consumers:
-  - `utils/trpcClient` (165)
-  - `helpers/quest` (22)
-  - `helpers/snapshot_utils` (20)
+  - `utils/trpcClient` (196)
+  - `helpers` (62)
+  - `helpers/quest` (23)
+  - `helpers/snapshot_utils` (22)
+  - `hooks/useFlag` (13)
+  - `hooks/useTopicGating` (11)
+  - `utils/clipboard` (10)
   - `hooks/useTokenPricing` (9)
   - `helpers/threads` (9)
+  - `utils/Permissions` (7)
 
 ## 1. Hooks/Utils Extraction Spec
 
@@ -143,15 +148,15 @@ Timing annotation (EPIC-6.11): keep `pnpm depcruise:circular:diff` as the blocki
 | `useGetAllCosmosProposals` | `features/governance/hooks/cosmos/` |
 | `useShowImage` | `features/discussions/hooks/` |
 
-### Cross-Feature Hooks (must decouple first)
+### Cross-Feature Hooks (EPIC-3 status; remaining shims to burn down in EPIC-4/6)
 
-| Hook | Source | Dest | Why It's Critical |
-|------|--------|------|-------------------|
-| `useCommunityContests` | `CommunityManagement/Contests/` | `features/contests/hooks/` | 17 consumers across 7+ features -- tightest coupling |
-| `useThreadSubscriptions` | `NotificationSettings/` | `features/notifications/hooks/` | Used by Discussions |
-| `useCommentSubscriptions` | `NotificationSettings/` | `features/notifications/hooks/` | Used by Discussions |
-| `useTopicSubscriptions` | `NotificationSettings/` | `features/notifications/hooks/` | Used by NotificationSettings |
-| `useSubscriptionPreference*` (3 hooks) | `NotificationSettings/` | `features/notifications/hooks/` | Internal notification plumbing |
+| Hook | Live Owner | Legacy Shim | Current Status |
+|------|------------|-------------|----------------|
+| `useCommunityContests` | `features/contests/hooks/useCommunityContests.ts` | `views/pages/CommunityManagement/Contests/useCommunityContests.ts` | Decoupled in EPIC-3.1; 16 current imports still hit the shim, so EPIC-4 should flip consumers directly to the feature path |
+| `useThreadSubscriptions` | `features/notifications/hooks/useThreadSubscriptions.ts` | `views/pages/NotificationSettings/useThreadSubscriptions.ts` | Decoupled in EPIC-3.2; shim still used by 3 files |
+| `useCommentSubscriptions` | `features/notifications/hooks/useCommentSubscriptions.ts` | `views/pages/NotificationSettings/useCommentSubscriptions.ts` | Decoupled in EPIC-3.2; shim still used by 2 files |
+| `useTopicSubscriptions` | `features/notifications/hooks/useTopicSubscriptions.ts` | `views/pages/NotificationSettings/useTopicSubscriptions.ts` | Decoupled in EPIC-3.2; shim is now NotificationSettings-only |
+| `useSubscriptionPreference*` (3 hooks) | `features/notifications/hooks/` | `views/pages/NotificationSettings/useSubscriptionPreference*.ts` | Core notification ownership moved out of the page tree; remaining shim consumers are NotificationSettings-only |
 
 ### Shared Utils --> `client/scripts/shared/utils/`
 
@@ -216,16 +221,16 @@ Note: `packages/commonwealth/shared/*` already exists and is used today (`shared
 
 ## 2. Test Strategy
 
-### Current State (Repo Audit: 2026-03-05)
-- **124 total spec test files**: 22 unit, 20 integration, 54 E2E, 9 devnet, 2 visual, 17 component
+### Current State (Repo Audit: 2026-03-13)
+- **127 total spec test files**: 25 unit, 20 integration, 54 E2E, 9 devnet, 2 visual, 17 component
 - **Smoke coverage**: 3 files / 5 tagged `@smoke` tests
 - **E2E distribution**: 49 `e2eRegular`, 1 `e2eSerial`, 2 `e2eStateful`, 2 `mature`
 - **E2E quality caveat**: 12 of 49 `e2eRegular` files are still crash-only, but refactor-critical routes now have behavior/security assertions under `@refactor`
-- **Component test layer exists**: Vitest+jsdom harness with shared provider render utility and hook/page coverage
+- **Component test layer exists**: Vitest+jsdom harness with shared provider render utility and hook/page coverage; the full component suite is green in CI on PR `#13463`
 - **Stack (lockfile-resolved)**: Vitest 1.6.1 + Playwright 1.44.0
 - **Testing-library infra is present**: `@testing-library/react` `^16.3.2`, `@testing-library/jest-dom` `^6.9.1`, `@testing-library/user-event` `^14.6.1`
 
-### Infrastructure Already Merged (PR #13406, merged 2026-02-18)
+### Infrastructure Baseline Already Merged (PR #13406, merged 2026-02-18)
 
 **Dependencies** (devDependencies in `packages/commonwealth/package.json`):
 - `@testing-library/react`
@@ -247,7 +252,7 @@ Note: `packages/commonwealth/shared/*` already exists and is used today (`shared
 "test-component:watch": "NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true vitest --config ./vitest.component.config.ts test/component"
 ```
 
-### Coverage Added (merged in PR #13406)
+### Coverage Added (baseline from PR #13406 plus later EPIC-2/EPIC-3 work)
 
 **EPIC-2 safety-net tests:**
 - Shared infrastructure unit contracts: `packages/commonwealth/test/unit/epic2/sharedInfrastructure.utils.contract.spec.ts`
@@ -265,13 +270,14 @@ Note: `packages/commonwealth/shared/*` already exists and is used today (`shared
 - View-thread and discussions extraction contracts:
   - `packages/commonwealth/test/unit/epic3/viewThreadPage.contracts.spec.ts`
   - `packages/commonwealth/test/unit/epic3/discussionsPage.contracts.spec.ts`
+  - `packages/commonwealth/test/unit/epic3/adminContestsPage.contracts.spec.ts`
 - Page-level component integration contracts:
   - `packages/commonwealth/test/component/pages/explorePage.integration.spec.tsx`
   - `packages/commonwealth/test/component/pages/homePage.integration.spec.tsx`
   - `packages/commonwealth/test/component/pages/governancePage.integration.spec.tsx`
   - `packages/commonwealth/test/component/pages/communityHomePage.integration.spec.tsx`
 
-### E2E Coverage Status (post-PR #13406)
+### E2E Coverage Status (current program state)
 
 | Feature | Current E2E State | Priority |
 |---------|-------------------|----------|
@@ -340,7 +346,7 @@ For this refactor program, automation should create issues, draft PRs, and run p
 
 ### 4. Phase 1 Test Backlog Status (EPIC-2..EPIC-6)
 
-Program status update (2026-03-05): EPIC-2 infrastructure and high-signal EPIC-3/4/5/6 guardrails are already merged. Remaining EPIC-4 depth is primarily richer behavior coverage (beyond guard/path assertions) for specific flows.
+Program status update (2026-03-13): EPIC-2 is merged and EPIC-3 implementation is complete on PR `#13463` with green CI. Remaining test work is mostly deeper EPIC-4 behavior coverage plus stronger dedicated component integration coverage for the largest EPIC-3 splits.
 
 | Priority | Epic | Test Type | Scope | Risk Mitigated | Effort | Status |
 |----------|------|-----------|-------|----------------|--------|--------|
@@ -348,8 +354,9 @@ Program status update (2026-03-05): EPIC-2 infrastructure and high-signal EPIC-3
 | P0 | EPIC-2 | Component (Vitest + jsdom) | Shared hooks suite (`useFlag`, `useDraft`, `useBeforeUnload`, `useWindowResize`, `useNecessaryEffect`, `useForceRerender`) | Functional and side-effect regressions in hook migration | M | Done |
 | P0 | EPIC-2 | Unit/Integration | `trpcClient` contract tests (exports, header shape, query utils) before/after path move | API call and auth header regressions | S | Done |
 | P0 | EPIC-2 | Static/Unit | Re-export compatibility tests for old → new paths (high-consumer modules) | Import path breakages after moves | S | Done |
-| P0 | EPIC-3 | Component integration | `ViewThreadPage` split contract: loading, error, content, key CTA visibility | Functional/UI regressions from decomposition | M | Partial (contract unit coverage added) |
-| P0 | EPIC-3 | Component integration | `DiscussionsPage` split contract: filters, topic parsing, list rendering modes | Functional regressions in critical page behavior | M | Partial (contract unit coverage added) |
+| P0 | EPIC-3 | Component integration | `ViewThreadPage` split contract: loading, error, content, key CTA visibility | Functional/UI regressions from decomposition | M | Partial (unit contract coverage landed; dedicated component integration still missing) |
+| P0 | EPIC-3 | Component integration | `DiscussionsPage` split contract: filters, topic parsing, list rendering modes | Functional regressions in critical page behavior | M | Partial (unit contract coverage landed; dedicated component integration still missing) |
+| P1 | EPIC-3 | Unit | `AdminContestsPage` flow contract (`adminContestsPage.contracts.ts`) | Regressions in contest/admin decomposition before EPIC-4.10 | S | Done |
 | P1 | EPIC-3 | Component integration | `ExplorePage`, `GovernancePage`, `CommunityHomePage`, `HomePage` split smoke + key-state checks | UI regressions and state propagation issues | M | Done |
 | P0 | EPIC-4 | E2E | Route migration matrix for touched feature entry routes in common/custom/general routing modes | Functional regressions from route rewiring | M | Done |
 | P0 | EPIC-4 | E2E Security | Unauthorized-access checks for `/admin-panel` and community-manage routes | Security regressions on privileged surfaces | S | Done |
@@ -381,11 +388,11 @@ Program status update (2026-03-05): EPIC-2 infrastructure and high-signal EPIC-3
    Keep PR lane fast; run mature/stateful-heavy suites nightly and as release-candidate blocking gates. Keep human-in-the-loop approvals for visual baseline changes, RC promotion, and temporary boundary allowlist exceptions.
    EPIC-6 hardening closeout: remove visual bootstrap fallback after baseline stability is demonstrated, and keep compare mode as the only gating mode.
 
-Execution status snapshot (2026-03-05):
-The wave outcomes below are infrastructure already merged (initially delivered by PR `#13406` and subsequent follow-up PRs).
+Execution status snapshot (2026-03-13):
+The wave outcomes below reflect merged EPIC-2 work plus implemented-and-green EPIC-3 work on PR `#13463`.
 1. Wave 0 completed (baseline reconciled + ownership/gating policy recorded).
 2. Wave 1 completed (component harness, scripts, EPIC-2 contracts).
-3. Wave 2 mostly completed (EPIC-3 contract tests and key page integration tests).
+3. Wave 2 completed for EPIC-3 implementation; dedicated component integration for `ViewThreadPage` / `DiscussionsPage` remains partial.
 4. Wave 3 completed for route/security coverage; behavior depth is partially completed for selected features.
 5. Wave 4 completed (boundary fixtures + blocking diff gate in CI).
 6. Wave 5 completed with diff-blocking cleanup guards (`no-legacy-imports`, `no-stub-imports`, `depcruise:circular:diff`).
@@ -404,7 +411,7 @@ EPIC-1: Dead Code Deletion ─────────────────�
 EPIC-2: Shared Infrastructure ───────────────── 12 tickets, max 4 parallel lanes
     |
     v
-EPIC-3: Normalize Components ───────────────── 8 tickets, max 6 parallel lanes
+EPIC-3: Normalize Components ───────────────── 8 tickets, max 6 parallel lanes (implemented on PR #13463)
     |
     v
 EPIC-4: Feature Migration ──────────────────── 17 tickets, max 7 parallel lanes
@@ -417,7 +424,8 @@ EPIC-6: Kill views/ + Final Cleanup ────────── 11 tickets, m
 ```
 
 **Total: 62 tickets. Max theoretical parallelism: 10 engineers.**
-**Critical path (longest sequential chain): 1.x → 2.2 → 2.4 → 2.7 → 3.1 → 3.3 → 4.11 → 4.16 → 5.1 → 5.4 → 6.1 → 6.7 → 6.11**
+**Historical critical path through EPIC-3 delivery: 1.x → 2.2 → 2.4 → 2.7 → 3.1 → 3.3.**
+**Current upcoming critical path: 4.10 / 4.11 / 4.14 / 4.16 → 5.1 → 5.4 → 6.1 → 6.7 → 6.11. `4.11 Discussions` remains the largest single migration risk even after the EPIC-3 split work landed.**
 
 ---
 
@@ -776,46 +784,54 @@ EPIC-2: Shared Infrastructure
 ### EPIC-3: Normalize Components
 
 ```
-EPIC-3: Normalize Components
-├── 3.1: Decouple useCommunityContests [blocked-by: 2.11] [CRITICAL PATH]
-│   move: CommunityManagement/Contests/useCommunityContests.ts
-│         -> features/contests/hooks/useCommunityContests.ts
-│   create: re-export at old location
-│   17 consumers -- must decouple before Discussions/ViewThread/Explore migration
-│   ~200 LOC move
+EPIC-3: Normalize Components [implemented on branch `codex/epic-3-normalize-components`; PR #13463]
+├── 3.1: Decouple useCommunityContests [done 260312]
+│   live owner: features/contests/hooks/useCommunityContests.ts
+│   compatibility: legacy shim remains at views/pages/CommunityManagement/Contests/useCommunityContests.ts
+│   remaining shim consumers: 16 files
 │   reviewer: frontend
 │
-├── 3.2: Decouple notification subscription hooks [blocked-by: 2.12] [PARALLEL w/ 3.1]
-│   move: 7 hooks from NotificationSettings/ -> features/notifications/hooks/
-│   ~400 LOC move
+├── 3.2: Decouple notification subscription hooks [done 260312]
+│   live owner: features/notifications/hooks/
+│   compatibility: NotificationSettings `use*.ts` files remain as thin shims
 │   reviewer: frontend
 │
-├── 3.3: Split ViewThreadPage container/presentational [blocked-by: 3.1]
-│   extract: useViewThreadData.ts hook from ViewThreadPage.tsx (1201 lines)
-│   ~300 LOC new, ~800 LOC modify
+├── 3.3: Split ViewThreadPage container/presentational [done 260313]
+│   extracted: useViewThreadData.ts, ViewThreadPageShell.tsx,
+│              ViewThreadPageBody.tsx, ViewThreadPageSubBody.tsx,
+│              ViewThreadPageComposer.tsx, viewThreadPageSidebars.tsx
+│   current entrypoint size: ViewThreadPage.tsx = 38 lines
 │   reviewer: frontend
 │
-├── 3.4: Split DiscussionsPage container/presentational [blocked-by: 3.1] [PARALLEL w/ 3.3]
-│   extract: useDiscussionsData.ts hook
-│   ~200 LOC new, ~600 LOC modify
+├── 3.4: Split DiscussionsPage container/presentational [done 260313]
+│   extracted: useDiscussionsData.ts, DiscussionsPageShell.tsx,
+│              DiscussionsPageFeed.tsx, DiscussionsPageComposer.tsx,
+│              DiscussionsPagePrivateTopic.tsx
+│   current entrypoint size: DiscussionsPage.tsx = 88 lines
 │   reviewer: frontend
 │
-├── 3.5: Split ExplorePage container/presentational [blocked-by: 3.1] [PARALLEL w/ 3.3-3.4]
-│   extract: useExploreData.ts hook
-│   ~200 LOC new, ~500 LOC modify
+├── 3.5: Split ExplorePage container/presentational [done 260313]
+│   extracted: useExploreData.ts, ExplorePageShell.tsx,
+│              ExplorePageContent.tsx, ExplorePageManageCommunityStakeModal.tsx
+│   prediction-market tab promoted to an explicit content branch
+│   current entrypoint size: ExplorePage.tsx = 57 lines
 │   reviewer: frontend
 │
-├── 3.6: Split GovernancePage [blocked-by: EPIC-2] [PARALLEL w/ 3.3-3.5]
-│   ~150 LOC new, ~400 LOC modify
+├── 3.6: Split GovernancePage [done 260313]
+│   extracted: useGovernancePageData.ts, GovernancePageContent.tsx
+│   current entrypoint size: GovernancePage.tsx = 43 lines
 │   reviewer: frontend
 │
-├── 3.7: Split CommunityManagement sub-pages [blocked-by: EPIC-2] [PARALLEL w/ 3.3-3.6]
-│   Topics/, Integrations/, AdminsAndModerators/
-│   ~400 LOC new, ~1000 LOC modify
+├── 3.7: Split CommunityManagement sub-pages [done 260313]
+│   extracted: useAdminContestsPageData.ts, StakeIntegrationContent.tsx,
+│              useStakeIntegrationData.ts, Topics/topicFlow.ts,
+│              features/communityStake/{hooks,utils}
 │   reviewer: frontend
 │
-└── 3.8: Split CommunityHomePage + HomePage [blocked-by: EPIC-2] [PARALLEL w/ 3.3-3.7]
-    ~300 LOC new, ~600 LOC modify
+└── 3.8: Split CommunityHomePage + HomePage [done 260313]
+    extracted: HomeDiscoverySections.tsx, HomePageManageCommunityStakeModal.tsx,
+               useCommunityHomePageData.ts, CommunityHomePageContent.tsx
+    current entrypoint sizes: CommunityHomePage.tsx = 13 lines, HomePage.tsx = 42 lines
     reviewer: frontend
 ```
 
@@ -967,7 +983,23 @@ EPIC-6: Kill views/ + Final Cleanup
 
 ## Before/After LOC Analysis & DevX Impact
 
-### Current State: `client/scripts/` (159k LOC, 1,986 files)
+### Audited Current State (post-EPIC-3 branch: 2026-03-13)
+
+- `client/scripts/`: 193,249 LOC across 2,537 files
+- `views/`: 157,905 LOC across 1,938 files
+- `views/pages/`: 76,919 LOC
+- `views/components/`: 62,970 LOC
+- EPIC-3 shrank the highest-risk page entrypoints to thin shells:
+  - `ViewThreadPage.tsx`: 38 lines
+  - `DiscussionsPage.tsx`: 88 lines
+  - `ExplorePage.tsx`: 57 lines
+  - `GovernancePage.tsx`: 43 lines
+  - `CommunityHomePage.tsx`: 13 lines
+  - `HomePage.tsx`: 42 lines
+- PR `#13463` currently carries the full EPIC-3 implementation: 118 changed files, `+5858/-3421`, 18 commits, all 13 checks green as of 2026-03-13.
+- Prediction-market UI remains an active cross-cutting surface inside `views/*`: 28 files currently reference prediction-market modules or cards. That is expected and rolls forward into EPIC-4 / EPIC-6 cleanup.
+
+### Baseline State (pre-EPIC-1 audit): `client/scripts/` (159k LOC, 1,986 files)
 
 ```
 client/scripts/                    159,062 LOC   1,986 files
@@ -1023,7 +1055,7 @@ client/scripts/                    159,062 LOC   1,986 files
 
 ---
 
-### After State: `client/scripts/` (~152k LOC, ~1,850 files)
+### Target End State: `client/scripts/` (~152k LOC, ~1,850 files)
 
 **~7k LOC deleted** (dead code + duplicates), rest reorganized:
 
@@ -1202,9 +1234,9 @@ client/scripts/                    ~152,000 LOC   ~1,850 files
 
 ---
 
-### What Changes, What Doesn't
+### Planned EPIC-6 End-State Delta
 
-| Directory | Before | After | Change |
+| Directory | Baseline | Planned EPIC-6 End State | Change |
 |-----------|--------|-------|--------|
 | `views/` | 125,824 LOC (79%) | **0 LOC (deleted)** | Fully decomposed |
 | `features/` | 0 | ~95,000 LOC (63%) | New -- all feature code lives here |
@@ -1221,13 +1253,13 @@ client/scripts/                    ~152,000 LOC   ~1,850 files
 
 ---
 
-### DevX Before vs After
+### DevX Baseline vs Planned End State
 
 | DevX Dimension | Before (Pre-hardening baseline) | After (End State) |
 |----------------|-----------------|-------------------|
 | **"Where do I put new code?"** | Guess: hooks/ vs helpers/ vs utils/ vs controllers/ vs state/? | **Clear:** `features/<name>/` for feature code, `shared/` for reusable code |
 | **"Where is the Discussions feature?"** | Search 4+ directories: views/pages/discussions/, views/components/Comments/, hooks/useDraft.tsx, state/api/threads/, helpers/threads.ts | **One directory:** `features/discussions/` (pages, components, hooks, utils, modals) |
-| **"Can I import from another feature?"** | No rules. CommunityManagement/Contests/ is imported by 17 files across 7 features | **Lint enforced:** `features/*` cannot import from `features/<other>/*`. Must go through `shared/` |
+| **"Can I import from another feature?"** | No rules. Cross-feature hooks leaked through legacy page trees like `CommunityManagement/Contests/` and `NotificationSettings/` | **Lint enforced:** `features/*` cannot import from `features/<other>/*`. Must go through `shared/` |
 | **"What's the design system?"** | Buried at views/components/component_kit/ inside a 125k LOC views/ directory | **Top-level:** `shared/components/component_kit/` -- clearly separated |
 | **"How do I test this component?"** | No component test harness; E2E-only fallback. | **Testing Library setup** with renderWithProviders, per-feature smoke tests, shared hook/util unit tests |
 | **"What can I safely delete?"** | No idea. Import graph is tangled. | **Boundary lint rules** prevent new tangles. Dead code shows up as lint violations. |
@@ -1239,7 +1271,7 @@ client/scripts/                    ~152,000 LOC   ~1,850 files
 
 ---
 
-### Feature Size Distribution (After)
+### Feature Size Distribution (Target end state)
 
 ```
 communities ████████████████████ 18k LOC  (largest -- includes admin sub-features)
@@ -1824,11 +1856,15 @@ Phase 2 can start as soon as EPIC-6 completes for EPIC-7 and EPIC-12.4. EPICs 8,
 
 - `packages/commonwealth/client/vite.config.ts` -- resolve aliases
 - `packages/commonwealth/tsconfig.json` -- path mappings
-- `packages/commonwealth/client/scripts/navigation/CommonDomainRoutes.tsx` -- 60+ lazy imports
-- `views/pages/CommunityManagement/Contests/useCommunityContests.ts` -- tightest cross-feature coupling (17 consumers)
+- `packages/commonwealth/client/scripts/navigation/CommonDomainRoutes.tsx` -- route migration choke point; 63 lazy imports still target `views/pages/*`
+- `packages/commonwealth/client/scripts/views/pages/view_thread/useViewThreadData.ts` -- main EPIC-3.3 seam feeding the later discussions feature migration
+- `packages/commonwealth/client/scripts/views/pages/discussions/useDiscussionsData.ts` -- main EPIC-3.4 seam feeding EPIC-4.11
+- `packages/commonwealth/client/scripts/views/pages/CommunityManagement/Contests/useCommunityContests.ts` -- compatibility shim only now, but still imported by 16 files and should be burned down during EPIC-4 / EPIC-6
 - `.eslintrc.cjs` -- boundary enforcement
 
 ## Verification
+
+Current status note (2026-03-13): EPIC-3 is marked done in this plan based on the live audited branch state. PR `#13463` is still a draft, but all 13 GitHub checks are green (`Build & Type Checks`, `Lint`, `Boundary Lint`, `Cleanup Guards`, component/unit/integration tests, E2E smoke + refactor route safety, visual regression, and devnet coverage).
 
 After each epic:
 1. `pnpm -r check-types` passes
@@ -1848,9 +1884,11 @@ Final verification (EPIC-6):
 - No deprecated re-export stubs remain
 - No legacy aliases/imports remain (`views`, `helpers`, `hooks`, `controllers`, `models`)
 - Release-candidate promotion has explicit human sign-off
+- Milestone `Front End Refactor 2026` is closed with EPIC-3 and EPIC-4/5/6 tickets merged, not just implemented on a draft branch
 
 ## Change Log
 
 - 260202: Updated by Codex; moved plan into Common Knowledge and added status section.
 - 260216: Updated by Codex with automation-first testing policy decisions (visual baseline gating, nightly+RC mature E2E, staged boundary enforcement, and human-in-the-loop approvals).
 - 260305: Status semantics switched to merge-truth; EPIC-2 PR links/status corrected; repo audit metrics refreshed; EPIC-5/6 guard-state reconciled.
+- 260313: Updated by Codex against the live post-EPIC-3 branch state; marked EPIC-3 complete for planning, refreshed repo/test/boundary/stub metrics, and relabeled the LOC section to separate current audited state from the planned EPIC-6 end state.
