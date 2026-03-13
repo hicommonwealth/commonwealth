@@ -65,7 +65,7 @@ function buildCreateGroupPayload(
     metadata: {
       name: chance.name(),
       description: chance.sentence(),
-      groupImageUrl: chance.url(),
+      groupImageUrl: 'https://example.com/group.png',
       required_requirements: 1,
       membership_ttl: 100,
     },
@@ -808,7 +808,7 @@ describe('Community lifecycle', () => {
     const baseRequest = {
       default_symbol: 'EDG',
       base: ChainBase.Substrate,
-      icon_url: 'assets/img/protocols/edg.png',
+      icon_url: 'https://assets.commonwealth.im/edg.png',
       active: true,
       type: ChainType.Chain,
       social_links: [],
@@ -836,7 +836,7 @@ describe('Community lifecycle', () => {
       assert.equal(updated?.default_symbol, 'EDG');
       // don't allow updating base
       assert.equal(updated?.base, 'ethereum');
-      assert.equal(updated?.icon_url, 'assets/img/protocols/edg.png');
+      assert.equal(updated?.icon_url, 'https://assets.commonwealth.im/edg.png');
       assert.equal(updated?.active, true);
       expect(updated?.social_links).toContain('http://discord.gg');
       expect(updated?.social_links).toContain('https://t.me/');

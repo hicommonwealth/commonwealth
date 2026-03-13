@@ -23,7 +23,7 @@ import { StakeTransaction } from '../entities/stake.schemas';
 import { Tags } from '../entities/tag.schemas';
 import { Topic } from '../entities/topic.schemas';
 import { Address } from '../entities/user.schemas';
-import { PG_INT, checkIconSize } from '../utils';
+import { ImageUrl, PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
   input: z.object({
@@ -45,11 +45,9 @@ export const CreateCommunity = {
       }),
     chain_node_id: PG_INT,
     description: z.string().optional(),
-    icon_url: z
-      .string()
-      .url()
-      .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
-      .optional(),
+    icon_url: ImageUrl.superRefine(
+      async (val, ctx) => await checkIconSize(val, ctx),
+    ).optional(),
     social_links: z.array(z.string().url()).default([]),
     tags: z.array(z.string()).default([]), // community tags are dynamic, tags should be validated in service method
     directory_page_enabled: z.boolean().default(false),
@@ -147,6 +145,7 @@ export const UpdateCommunity = {
     .partial()
     .extend({
       community_id: z.string(),
+      icon_url: ImageUrl.nullish(),
       name: z
         .string()
         .max(255)
@@ -161,7 +160,7 @@ export const UpdateCommunity = {
       snapshot: Snapshot.or(z.array(Snapshot)).optional(),
       transactionHash: z.string().optional(),
       launchpad_weighted_voting: z.boolean().optional(),
-      launchpad_token_image: z.string().optional(),
+      launchpad_token_image: ImageUrl.optional(),
     }),
   output: Community,
   context: AuthContext,
@@ -284,7 +283,7 @@ export const ToggleArchiveTopic = {
 const GroupMetadata = z.object({
   name: z.string().max(40),
   description: z.string().max(250),
-  groupImageUrl: z.string().nullish(),
+  groupImageUrl: ImageUrl.nullish(),
   required_requirements: PG_INT.nullish(),
   membership_ttl: PG_INT.optional(),
 });
@@ -535,7 +534,7 @@ export const SubscribeMarket = {
     start_time: z.coerce.date(),
     end_time: z.coerce.date(),
     status: z.enum(MarketStatus),
-    image_url: z.string().nullish(),
+    image_url: ImageUrl.nullish(),
   }),
   output: z.boolean(),
   context: AuthContext,

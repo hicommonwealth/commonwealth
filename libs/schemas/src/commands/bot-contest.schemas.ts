@@ -6,7 +6,7 @@ import {
 import { z } from 'zod';
 import { Community } from '../entities';
 import { TokenView } from '../queries';
-import { checkIconSize } from '../utils';
+import { ImageUrl, checkIconSize } from '../utils';
 
 export const CreateBotContest = {
   input: z.object({
@@ -30,11 +30,9 @@ export const CreateBotNamespace = {
         message: `String must not contain '${ALL_COMMUNITIES}'`,
       }),
     description: z.string().optional(),
-    icon_url: z
-      .string()
-      .url()
-      .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
-      .optional(),
+    icon_url: ImageUrl.superRefine(
+      async (val, ctx) => await checkIconSize(val, ctx),
+    ).optional(),
     admin_address: z.string(),
     chain_id: z.number().describe('The chain id to create contest for'),
   }),
@@ -50,7 +48,7 @@ export const LaunchToken = {
     symbol: z.string().describe('The symbol of the token'),
     totalSupply: z.number().describe('The total supply of the token'),
     eth_chain_id: z.number().describe('The chain id to create token for'),
-    icon_url: z.string().optional().describe('The icon url of the token'),
+    icon_url: ImageUrl.optional().describe('The icon url of the token'),
     description: z.string().optional().describe('The description of the token'),
   }),
   output: TokenView.extend({

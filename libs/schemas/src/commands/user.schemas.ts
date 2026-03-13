@@ -9,6 +9,7 @@ import {
   User,
   UserProfile,
 } from '../entities';
+import { ImageUrl } from '../utils';
 
 export const SignIn = {
   input: z.object({
@@ -70,6 +71,13 @@ export const UpdateUser = {
             message: 'Username must not contain the word "Common"',
           },
         ),
+      avatar_url: ImageUrl.nullish(),
+      background_image: z
+        .object({
+          url: ImageUrl.nullish(),
+          imageBehavior: z.string().nullish(),
+        })
+        .nullish(),
     }),
   }),
   output: User,

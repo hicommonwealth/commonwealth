@@ -1,7 +1,11 @@
 import { z } from 'zod';
 import { AuthContext } from '../context';
 import { Quest, QuestActionMeta } from '../entities';
-import { EVM_ADDRESS_STRICT, EVM_EVENT_SIGNATURE_STRICT } from '../utils';
+import {
+  EVM_ADDRESS_STRICT,
+  EVM_EVENT_SIGNATURE_STRICT,
+  ImageUrl,
+} from '../utils';
 
 const QuestView = Quest.omit({ scheduled_job_id: true });
 
@@ -9,7 +13,7 @@ export const CreateQuest = {
   input: z.object({
     name: z.string(),
     description: z.string(),
-    image_url: z.string(),
+    image_url: ImageUrl,
     start_date: z.coerce.date(),
     end_date: z.coerce.date(),
     max_xp_to_end: z.number().default(0),
@@ -52,7 +56,7 @@ export const UpdateQuest = {
     name: z.string().optional(),
     description: z.string().optional(),
     community_id: z.string().optional().nullable(),
-    image_url: z.string().optional(),
+    image_url: ImageUrl.optional(),
     start_date: z.coerce.date().optional(),
     end_date: z.coerce.date().optional(),
     max_xp_to_end: z.number().optional(),
