@@ -1,31 +1,17 @@
-import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
-import { findDenominationString } from 'helpers/findDenomination';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useFlag } from 'shared/hooks/useFlag';
-import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal';
 import IdeaLaunchpad from '../ExplorePage/IdeaLaunchpad';
 import { TrendingCommunitiesPreview } from '../user_dashboard/TrendingCommunitiesPreview/TrendingCommunitiesPreview';
-import ActiveContestList from './ActiveContestList/ActiveContestList';
-import ActivePredictionMarketList from './ActivePredictionMarketList/ActivePredictionMarketList';
+import HomeDiscoverySections from './HomeDiscoverySections';
 import './HomePage.scss';
-import TrendingThreadList from './TrendingThreadList/TrendingThreadList';
+import HomePageManageCommunityStakeModal from './HomePageManageCommunityStakeModal';
 import TrendingTokensList from './TrendingTokenList/TrendingTokenList';
-import XpQuestList from './XpQuestList/XpQuestList';
 import IOSBanner from './iOSBanner';
 
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mobileDownloadEnabled = useFlag('mobileDownload');
-
-  const {
-    setModeOfManageCommunityStakeModal,
-    modeOfManageCommunityStakeModal,
-  } = useManageCommunityStakeModalStore();
-
-  const [selectedCommunityId] = useState<string>();
 
   return (
     <CWPageLayout ref={containerRef} className="ExplorePageLayout">
@@ -46,26 +32,8 @@ const HomePage = () => {
           limit={10}
         />
         <TrendingCommunitiesPreview />
-        <ActiveContestList />
-        <ActivePredictionMarketList />
-        <XpQuestList />
-        <TrendingThreadList query={useFetchGlobalActivityQuery} />
-        <CWModal
-          size="small"
-          content={
-            <ManageCommunityStakeModal
-              mode={modeOfManageCommunityStakeModal}
-              // @ts-expect-error <StrictNullChecks/>
-              onModalClose={() => setModeOfManageCommunityStakeModal(null)}
-              denomination={
-                findDenominationString(selectedCommunityId || '') || 'ETH'
-              }
-            />
-          }
-          // @ts-expect-error <StrictNullChecks/>
-          onClose={() => setModeOfManageCommunityStakeModal(null)}
-          open={!!modeOfManageCommunityStakeModal}
-        />
+        <HomeDiscoverySections />
+        <HomePageManageCommunityStakeModal />
       </div>
     </CWPageLayout>
   );
