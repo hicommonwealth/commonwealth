@@ -1,8 +1,8 @@
 import { ContentType } from '@hicommonwealth/shared';
-import Account from 'models/Account';
+import Account from 'client/scripts/models/Account';
+import type { Topic } from 'client/scripts/models/Topic';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
-import type { Topic } from '../../../models/Topic';
 import { getTextFromDelta } from '../../components/react_quill_editor';
 import { StickyInput } from '../../components/StickEditorContainer';
 import { WithDefaultStickyComment } from '../../components/StickEditorContainer/context/WithDefaultStickyComment';

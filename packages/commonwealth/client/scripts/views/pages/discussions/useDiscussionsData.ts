@@ -8,11 +8,17 @@ import {
   sanitizeTopicName,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
+import Thread, { ThreadView } from 'client/scripts/models/Thread';
+import type { Topic } from 'client/scripts/models/Topic';
+import {
+  ThreadFeaturedFilterTypes,
+  ThreadKind,
+  ThreadTimelineFilterTypes,
+} from 'client/scripts/models/types';
 import { notifyError } from 'controllers/app/notifications';
 import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import { isContestActive } from 'features/contests/utils/contestUtils';
 import useTopicGating from 'hooks/useTopicGating';
-import { ThreadKind } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import type { DeltaStatic } from 'quill';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -29,12 +35,6 @@ import useGetThreadsQuery from 'state/api/threads/getThreads';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import useTokenMetadataQuery from 'state/api/tokens/getTokenMetadata';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import Thread, { ThreadView } from '../../../models/Thread';
-import type { Topic } from '../../../models/Topic';
-import {
-  ThreadFeaturedFilterTypes,
-  ThreadTimelineFilterTypes,
-} from '../../../models/types';
 import app from '../../../state';
 import { useGetUserEthBalanceQuery } from '../../../state/api/communityStake';
 import useUserStore from '../../../state/ui/user';
