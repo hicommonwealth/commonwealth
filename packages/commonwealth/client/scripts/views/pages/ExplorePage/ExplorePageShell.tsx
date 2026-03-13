@@ -1,9 +1,9 @@
 import React from 'react';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import CWTab from 'views/components/component_kit/new_designs/CWTabs/CWTab';
-import CWTabsRow from 'views/components/component_kit/new_designs/CWTabs/CWTabsRow';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
+import CWTab from '../../components/component_kit/new_designs/CWTabs/CWTab';
+import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsRow';
+import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import './ExplorePage.scss';
 import IdeaLaunchpad from './IdeaLaunchpad';
 import type { ExploreTabView } from './useExploreData';

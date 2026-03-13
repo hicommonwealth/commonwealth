@@ -1,8 +1,8 @@
 import { findDenominationString } from 'helpers/findDenomination';
 import React from 'react';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal';
-import type { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal';
+import type { ManageCommunityStakeModalMode } from '../../modals/ManageCommunityStakeModal/types';
 
 type ExplorePageManageCommunityStakeModalProps = {
   mode: ManageCommunityStakeModalMode | null;
