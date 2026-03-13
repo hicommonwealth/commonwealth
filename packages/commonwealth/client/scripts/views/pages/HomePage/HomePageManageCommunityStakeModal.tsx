@@ -2,7 +2,7 @@ import { findDenominationString } from 'helpers/findDenomination';
 import React from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal';
+import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal';
 
 type HomePageManageCommunityStakeModalProps = {
   communityId?: string;
