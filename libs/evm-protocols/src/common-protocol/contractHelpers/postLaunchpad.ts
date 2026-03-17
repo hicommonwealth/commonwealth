@@ -103,9 +103,10 @@ export const buyPostToken = async (
       safeAmountIn,
       walletAddress,
     );
-    const feeAmount = await contract.methods
-      .getETHFeeAmount(tokenAddress, safeAmountIn, true)
+    const feeAmountRaw = await contract.methods
+      .getETHFeeAmount(tokenAddress, safeAmountIn, false)
       .call();
+    const feeAmount = feeAmountRaw[0].toString();
     const txReceipt = await contract.methods
       .buyToken(tokenAddress, safeAmountIn, safMinAmountOut)
       .send({ from: walletAddress, value: feeAmount });
@@ -135,9 +136,10 @@ export const sellPostToken = async (
       safeAmountIn,
       walletAddress,
     );
-    const feeAmount = await contract.methods
+    const feeAmountRaw = await contract.methods
       .getETHFeeAmount(tokenAddress, safeAmountIn, false)
       .call();
+    const feeAmount = feeAmountRaw[0].toString();
     const txReceipt = await contract.methods
       .sellToken(tokenAddress, safeAmountIn, safeMinAmountOut)
       .send({ from: walletAddress, value: feeAmount });
