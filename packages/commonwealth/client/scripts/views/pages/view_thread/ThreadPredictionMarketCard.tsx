@@ -2,8 +2,8 @@ import { PredictionMarketStatus } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import {
   getCollateralBalanceAndSymbol,
+  getMarketCollateralBalanceFromLogs,
   getPredictionMarketBalancesFromChain,
-  getVaultCollateralBalance,
 } from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
 import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import type Thread from 'client/scripts/models/Thread';
@@ -148,6 +148,7 @@ export const ThreadPredictionMarketCard = ({
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [isResolveModalOpen, setIsResolveModalOpen] = useState(false);
   const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
+  const [tradeRefreshNonce, setTradeRefreshNonce] = useState(0);
   const [timeDisplay, setTimeDisplay] = useState<string | null>(null);
   const user = useUserStore();
   const uniqueAddresses =
@@ -189,6 +190,7 @@ export const ThreadPredictionMarketCard = ({
   const trades =
     (tradesData as { results?: { collateral_amount: string }[] })?.results ??
     [];
+  const latestTradeFingerprint = JSON.stringify(tradesData ?? null);
   const marketVolume = trades.reduce(
     (sum, t) => sum + BigInt(t.collateral_amount || '0'),
     0n,
@@ -203,11 +205,9 @@ export const ThreadPredictionMarketCard = ({
     p: bigint;
     f: bigint;
   } | null>(null);
-  const [vaultBalanceOnChain, setVaultBalanceOnChain] = useState<{
-    balanceWei: bigint;
-    symbol: string;
-    decimals: number;
-  } | null>(null);
+  const [marketCollateralOnChain, setMarketCollateralOnChain] = useState<
+    bigint | null
+  >(null);
 
   const activeAddress = selectedAddress;
   const { data: community } = useGetCommunityByIdQuery({
@@ -318,31 +318,37 @@ export const ThreadPredictionMarketCard = ({
     userPosition,
   ]);
 
-  // Fetch vault collateral balance on-chain so "Total minted" matches trade modal when DB is stale
+  // Prefer on-chain market-specific collateral over DB total_collateral
   useEffect(() => {
     const vaultAddr = market?.vault_address;
-    const collateralAddr = market?.collateral_address;
-    if (
-      !chainRpc ||
-      !vaultAddr ||
-      !collateralAddr ||
-      collateralAddr.toLowerCase() === ZERO_ADDR.toLowerCase()
-    ) {
-      setVaultBalanceOnChain(null);
+    const marketId = market?.market_id;
+    if (!chainRpc || !vaultAddr || !marketId) {
+      setMarketCollateralOnChain(null);
       return;
     }
     let cancelled = false;
-    getVaultCollateralBalance(chainRpc, vaultAddr, collateralAddr)
-      .then((info) => {
-        if (!cancelled) setVaultBalanceOnChain(info);
+    getMarketCollateralBalanceFromLogs(chainRpc, vaultAddr, marketId)
+      .then((balance) => {
+        if (!cancelled) setMarketCollateralOnChain(balance);
       })
       .catch(() => {
-        if (!cancelled) setVaultBalanceOnChain(null);
+        if (!cancelled) setMarketCollateralOnChain(null);
       });
     return () => {
       cancelled = true;
     };
-  }, [chainRpc, market?.vault_address, market?.collateral_address]);
+  }, [
+    chainRpc,
+    market?.vault_address,
+    market?.market_id,
+    latestTradeFingerprint,
+    tradeRefreshNonce,
+  ]);
+
+  const handleTradeModalSuccess = () => {
+    setTradeRefreshNonce((prev) => prev + 1);
+    setIsTradeModalOpen(false);
+  };
 
   const handleCancelMarket = () => {
     if (!market) return;
@@ -559,17 +565,15 @@ export const ThreadPredictionMarketCard = ({
                 TOTAL MINTED
               </CWText>
               <CWText type="b1" className="metric-value">
-                {vaultBalanceOnChain != null
+                {marketCollateralOnChain != null
                   ? formatCollateralBalance(
-                      vaultBalanceOnChain.balanceWei,
-                      vaultBalanceOnChain.decimals,
+                      marketCollateralOnChain,
+                      collateralDisplay?.decimals ?? 18,
                     )
                   : formatCollateral(market.total_collateral ?? '0')}
                 &nbsp;
                 <CWText type="b2">
-                  <span className="metric-symbol">
-                    {vaultBalanceOnChain?.symbol ?? symbol}
-                  </span>
+                  <span className="metric-symbol">{symbol}</span>
                 </CWText>
               </CWText>
             </div>
@@ -692,7 +696,7 @@ export const ThreadPredictionMarketCard = ({
             initialAddress={selectedAddress}
             open={isTradeModalOpen}
             onClose={() => setIsTradeModalOpen(false)}
-            onSuccess={() => setIsTradeModalOpen(false)}
+            onSuccess={handleTradeModalSuccess}
           />
         }
         onClose={() => setIsTradeModalOpen(false)}

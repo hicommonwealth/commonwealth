@@ -140,8 +140,9 @@ export async function getCollateralBalanceAndSymbol(
 }
 
 /**
- * Fetch the vault's balance of the collateral token (on-chain). Use this to verify
- * the market actually holds collateral even if the app DB total_collateral is stale.
+ * Fetch the vault's total balance of the collateral token on-chain. This is the
+ * sum across all markets that share this vault, not per-market. For "Total minted"
+ * per thread/market, use the API's market.total_collateral instead.
  */
 export async function getVaultCollateralBalance(
   chainRpc: string,
@@ -160,6 +161,75 @@ export async function getVaultCollateralBalance(
     vaultAddress,
     collateralAddress,
   );
+}
+
+/**
+ * Compute market-specific locked collateral from vault events:
+ * minted - merged - redeemed for a single marketId.
+ */
+export async function getMarketCollateralBalanceFromLogs(
+  chainRpc: string,
+  vaultAddress: string,
+  marketId: string,
+): Promise<bigint> {
+  if (!chainRpc || !vaultAddress || !marketId) return 0n;
+
+  const web3 = new Web3(chainRpc);
+  const marketTopic = marketIdToBytes32(marketId).toLowerCase();
+  const sigMinted = (
+    web3 as unknown as { utils: { sha3: (s: string) => string } }
+  ).utils.sha3('TokensMinted(bytes32,address,uint256)');
+  const sigMerged = (
+    web3 as unknown as { utils: { sha3: (s: string) => string } }
+  ).utils.sha3('TokensMerged(bytes32,address,uint256)');
+  const sigRedeemed = (
+    web3 as unknown as { utils: { sha3: (s: string) => string } }
+  ).utils.sha3('TokensRedeemed(bytes32,address,uint256,uint8)');
+  if (!sigMinted || !sigMerged || !sigRedeemed) return 0n;
+
+  const [mintedLogs, mergedLogs, redeemedLogs] = await Promise.all([
+    web3.eth.getPastLogs({
+      address: vaultAddress,
+      fromBlock: 0,
+      toBlock: 'latest',
+      topics: [sigMinted, marketTopic],
+    }),
+    web3.eth.getPastLogs({
+      address: vaultAddress,
+      fromBlock: 0,
+      toBlock: 'latest',
+      topics: [sigMerged, marketTopic],
+    }),
+    web3.eth.getPastLogs({
+      address: vaultAddress,
+      fromBlock: 0,
+      toBlock: 'latest',
+      topics: [sigRedeemed, marketTopic],
+    }),
+  ]);
+
+  const sumSingleUintLogData = (logs: Array<{ data?: string } | string>) =>
+    logs.reduce((acc, log) => {
+      if (typeof log === 'string' || !log.data) return acc;
+      const decoded = web3.eth.abi.decodeParameter('uint256', log.data);
+      return acc + BigInt(String(decoded ?? 0));
+    }, 0n);
+
+  const sumRedeemedLogData = (logs: Array<{ data?: string } | string>) =>
+    logs.reduce((acc, log) => {
+      if (typeof log === 'string' || !log.data) return acc;
+      const decoded = web3.eth.abi.decodeParameters(
+        ['uint256', 'uint8'],
+        log.data,
+      );
+      return acc + BigInt(String(decoded?.[0] ?? 0));
+    }, 0n);
+
+  const minted = sumSingleUintLogData(mintedLogs);
+  const merged = sumSingleUintLogData(mergedLogs);
+  const redeemed = sumRedeemedLogData(redeemedLogs);
+  const net = minted - merged - redeemed;
+  return net > 0n ? net : 0n;
 }
 
 /** Parse human-readable token amount to smallest units. */

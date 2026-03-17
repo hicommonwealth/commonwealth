@@ -9,8 +9,8 @@ import {
   applySlippage,
   fetchMarketIdFromChain,
   getCollateralBalanceAndSymbol,
+  getMarketCollateralBalanceFromLogs,
   getPredictionMarketBalancesFromChain,
-  getVaultCollateralBalance,
   mergeTokens,
   mintTokens,
   parseTokenAmount,
@@ -168,11 +168,9 @@ export const PredictionMarketTradeModal = ({
     symbol: string;
     decimals: number;
   } | null>(null);
-  const [vaultBalanceOnChain, setVaultBalanceOnChain] = useState<{
-    balanceWei: bigint;
-    symbol: string;
-    decimals: number;
-  } | null>(null);
+  const [marketCollateralOnChain, setMarketCollateralOnChain] = useState<
+    bigint | null
+  >(null);
   const [detailsCollapsed, setDetailsCollapsed] = useState(true);
 
   const { data: community } = useGetCommunityByIdQuery({
@@ -323,32 +321,26 @@ export const PredictionMarketTradeModal = ({
     };
   }, [chainRpc, activeAddress, market.collateral_address]);
 
-  // Fetch vault's collateral balance on-chain so user can verify even if app DB is stale
+  // Prefer on-chain market-specific collateral over DB total_collateral
   useEffect(() => {
     const vaultAddr = effectiveMarket.vault_address;
-    const collateralAddr = market.collateral_address;
-    const zeroAddr = '0x0000000000000000000000000000000000000000';
-    if (
-      !chainRpc ||
-      !vaultAddr ||
-      !collateralAddr ||
-      collateralAddr.toLowerCase() === zeroAddr
-    ) {
-      setVaultBalanceOnChain(null);
+    const marketId = effectiveMarket.market_id;
+    if (!chainRpc || !vaultAddr || !marketId) {
+      setMarketCollateralOnChain(null);
       return;
     }
     let cancelled = false;
-    getVaultCollateralBalance(chainRpc, vaultAddr, collateralAddr)
-      .then((info) => {
-        if (!cancelled) setVaultBalanceOnChain(info);
+    getMarketCollateralBalanceFromLogs(chainRpc, vaultAddr, marketId)
+      .then((balance) => {
+        if (!cancelled) setMarketCollateralOnChain(balance);
       })
       .catch(() => {
-        if (!cancelled) setVaultBalanceOnChain(null);
+        if (!cancelled) setMarketCollateralOnChain(null);
       });
     return () => {
       cancelled = true;
     };
-  }, [chainRpc, effectiveMarket.vault_address, market.collateral_address]);
+  }, [chainRpc, effectiveMarket.vault_address, effectiveMarket.market_id]);
 
   const isResolved = market.status === 'resolved';
   const swapDisabled = isResolved;
@@ -1096,21 +1088,24 @@ export const PredictionMarketTradeModal = ({
             aria-expanded={!detailsCollapsed}
           >
             <div className="collateral-row-summary">
-              {(vaultBalanceOnChain ?? market.total_collateral != null) && (
+              {(marketCollateralOnChain != null ||
+                market.total_collateral != null) && (
                 <CWText
                   type="caption"
                   className="collateral-label total-minted"
                 >
                   Total minted:&nbsp;
-                  {vaultBalanceOnChain != null
-                    ? `${formatTokenDisplay(
-                        vaultBalanceOnChain.balanceWei,
-                        vaultBalanceOnChain.decimals,
-                      )} ${vaultBalanceOnChain.symbol}`
-                    : `${formatTokenDisplay(
-                        BigInt(market.total_collateral ?? '0'),
-                        collateralInfo?.decimals ?? 18,
-                      )} ${collateralInfo ? collateralInfo.symbol : 'ETH'}`}
+                  {`${
+                    marketCollateralOnChain != null
+                      ? formatTokenDisplay(
+                          marketCollateralOnChain,
+                          collateralInfo?.decimals ?? 18,
+                        )
+                      : formatTokenDisplay(
+                          BigInt(market.total_collateral ?? '0'),
+                          collateralInfo?.decimals ?? 18,
+                        )
+                  } ${collateralInfo ? collateralInfo.symbol : 'ETH'}`}
                 </CWText>
               )}
               {market.end_time && (
