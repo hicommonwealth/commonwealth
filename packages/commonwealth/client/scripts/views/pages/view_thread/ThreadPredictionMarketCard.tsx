@@ -1,5 +1,5 @@
 import { PredictionMarketStatus } from '@hicommonwealth/schemas';
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import {
   getCollateralBalanceAndSymbol,
   getMarketCollateralBalanceFromLogs,
@@ -147,8 +147,6 @@ const getTimeRemaining = (m: PredictionMarketResult) => {
   return `${minutes}m ${seconds}s`;
 };
 
-const ZERO_ADDR = '0x0000000000000000000000000000000000000000';
-
 export const ThreadPredictionMarketCard = ({
   thread,
   market: marketProp,
@@ -200,13 +198,23 @@ export const ThreadPredictionMarketCard = ({
       prediction_market_id: market?.id ?? 0,
     });
   const trades =
-    (tradesData as { results?: { collateral_amount: string }[] })?.results ??
-    [];
+    (
+      tradesData as {
+        results?: {
+          collateral_amount: string;
+          p_token_amount: string;
+          f_token_amount: string;
+        }[];
+      }
+    )?.results ?? [];
   const latestTradeFingerprint = JSON.stringify(tradesData ?? null);
-  const marketVolume = trades.reduce(
-    (sum, t) => sum + BigInt(t.collateral_amount || '0'),
-    0n,
-  );
+  const marketVolume = trades.reduce((sum, t) => {
+    const collateral = BigInt(t.collateral_amount || '0');
+    if (collateral > 0n) return sum + collateral;
+    const p = BigInt(t.p_token_amount || '0');
+    const f = BigInt(t.f_token_amount || '0');
+    return sum + (p > f ? p : f);
+  }, 0n);
 
   const [collateralDisplay, setCollateralDisplay] = useState<{
     symbol: string;
@@ -236,7 +244,7 @@ export const ThreadPredictionMarketCard = ({
 
   const isCollateralZero =
     !market?.collateral_address ||
-    market?.collateral_address.toLowerCase() === ZERO_ADDR.toLowerCase();
+    market?.collateral_address.toLowerCase() === ZERO_ADDRESS.toLowerCase();
   const { data: ethBalance = '' } = useGetUserEthBalanceQuery({
     chainRpc,
     walletAddress: activeAddress,
@@ -263,7 +271,7 @@ export const ThreadPredictionMarketCard = ({
 
   useEffect(() => {
     const addr = market?.collateral_address;
-    const isZero = !addr || addr.toLowerCase() === ZERO_ADDR.toLowerCase();
+    const isZero = !addr || addr.toLowerCase() === ZERO_ADDRESS.toLowerCase();
     if (isZero) {
       const bal = ethBalance === '0.' ? '0' : ethBalance || '—';
       setCollateralDisplay({ symbol: 'ETH', balance: bal, decimals: 18 });

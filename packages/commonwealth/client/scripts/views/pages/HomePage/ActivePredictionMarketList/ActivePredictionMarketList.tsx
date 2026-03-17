@@ -3,8 +3,12 @@ import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/c
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import FractionalValue from 'client/scripts/views/components/FractionalValue';
+import { useCollateralMeta } from 'client/scripts/views/components/PredictionMarket/useCollateralMeta';
 import { Skeleton } from 'client/scripts/views/components/Skeleton';
-import { weiToDisplayNumber } from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
+import {
+  sumWeiValues,
+  weiToDisplayNumber,
+} from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -43,6 +47,8 @@ const PredictionMarketCardCompact = ({
     end_time?: string | Date | null;
     status: string;
     total_collateral?: string;
+    initial_liquidity?: string | null;
+    collateral_address?: string;
   };
 }) => {
   const threadUrl = getThreadUrl(
@@ -57,7 +63,19 @@ const PredictionMarketCardCompact = ({
     endTime && endTime.isValid() && endTime.isAfter(moment())
       ? formatTimeRemaining(endTime)
       : null;
-  const totalMinted = weiToDisplayNumber(market.total_collateral, 18);
+  const collateralMeta = useCollateralMeta({
+    communityId: market.community_id,
+    collateralAddress: market.collateral_address,
+  });
+
+  const totalMintedWei = sumWeiValues(
+    market.total_collateral,
+    market.initial_liquidity,
+  );
+  const totalMinted = weiToDisplayNumber(
+    totalMintedWei,
+    collateralMeta.decimals,
+  );
   const navigate = useCommonNavigate();
 
   const handleViewThread = (e: React.MouseEvent) => {
@@ -83,7 +101,12 @@ const PredictionMarketCardCompact = ({
         {totalMinted > 0 && (
           <div className="volume-row">
             <CWIcon iconName="chartLineUp" iconSize="small" />
-            <FractionalValue type="caption" value={totalMinted} symbolLast />
+            <FractionalValue
+              type="caption"
+              value={totalMinted}
+              currencySymbol={` ${collateralMeta.symbol}`}
+              symbolLast
+            />
             <CWText type="caption">&nbsp;minted</CWText>
           </div>
         )}
@@ -97,6 +120,8 @@ const PredictionMarketCardCompact = ({
               fontWeight="semiBold"
               className="metric-value"
               value={totalMinted}
+              currencySymbol={` ${collateralMeta.symbol}`}
+              symbolLast
             />
           </div>
           <div className="metric-box">

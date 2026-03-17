@@ -4,6 +4,7 @@
  * deployPredictionMarket mutation.
  */
 
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import PredictionMarket, {
   type DeployPredictionMarketPayload,
 } from 'client/scripts/helpers/ContractHelpers/predictionMarket';
@@ -28,7 +29,6 @@ export type DeployPredictionMarketOnChainParams = {
 
 const EVM_ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/;
 const POSITIVE_DECIMAL_REGEX = /^\d+(\.\d+)?$/;
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 function assertValidEthereumAddress(
   value: unknown,

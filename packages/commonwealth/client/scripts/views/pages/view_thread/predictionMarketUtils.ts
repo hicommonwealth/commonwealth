@@ -39,3 +39,16 @@ export function weiToDisplayNumber(
     return 0;
   }
 }
+
+export function sumWeiValues(
+  ...values: Array<string | bigint | null | undefined>
+): bigint {
+  return values.reduce<bigint>((acc, value) => {
+    try {
+      const wei = typeof value === 'bigint' ? value : BigInt(value ?? '0');
+      return acc + wei;
+    } catch {
+      return acc;
+    }
+  }, 0n);
+}

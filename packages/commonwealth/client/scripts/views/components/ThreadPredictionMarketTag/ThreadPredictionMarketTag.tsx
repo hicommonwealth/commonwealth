@@ -2,12 +2,16 @@ import moment from 'moment';
 import React from 'react';
 
 import FractionalValue from 'client/scripts/views/components/FractionalValue';
+import { useCollateralMeta } from 'client/scripts/views/components/PredictionMarket/useCollateralMeta';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import CWPopover, {
   usePopover,
 } from 'client/scripts/views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
-import { weiToDisplayNumber } from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
+import {
+  sumWeiValues,
+  weiToDisplayNumber,
+} from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
 
 import './ThreadPredictionMarketTag.scss';
 
@@ -26,22 +30,34 @@ export type ThreadPredictionMarketTagMarket = {
   current_probability?: number | null;
   end_time?: string | null;
   total_collateral?: string | null;
+  initial_liquidity?: string | null;
+  collateral_address?: string | null;
 };
 
 interface ThreadPredictionMarketTagProps {
   market: ThreadPredictionMarketTagMarket;
+  communityId?: string;
 }
 
 const ThreadPredictionMarketTag = ({
   market,
+  communityId,
 }: ThreadPredictionMarketTagProps) => {
   const popoverProps = usePopover();
+  const collateralMeta = useCollateralMeta({
+    communityId,
+    collateralAddress: market.collateral_address,
+  });
+
   const passPct = Math.round((market.current_probability ?? 0.5) * 100);
   const failPct = 100 - passPct;
   const isPassLeading = passPct >= 50;
   const label = isPassLeading ? `PASS ${passPct}%` : `FAIL ${failPct}%`;
   const tagType = isPassLeading ? 'passed' : 'failed';
-  const lockedDisplay = weiToDisplayNumber(market.total_collateral, 18);
+  const lockedDisplay = weiToDisplayNumber(
+    sumWeiValues(market.total_collateral, market.initial_liquidity),
+    collateralMeta.decimals,
+  );
 
   return (
     <div className="ThreadPredictionMarketTag">
@@ -74,7 +90,7 @@ const ThreadPredictionMarketTag = ({
               <FractionalValue
                 type="caption"
                 value={lockedDisplay}
-                currencySymbol=" USDC"
+                currencySymbol={` ${collateralMeta.symbol}`}
                 symbolLast
               />
               <CWText type="caption">&nbsp;locked</CWText>

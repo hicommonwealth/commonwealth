@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { ArrowsDownUp, CaretDown, CaretUp } from '@phosphor-icons/react';
 import {
   notifyError,
@@ -314,9 +314,7 @@ export const PredictionMarketTradeModal = ({
   // Fetch collateral token balance when market uses an ERC20 (e.g. WETH). Vault pulls this token, not native ETH.
   useEffect(() => {
     const addr = market.collateral_address;
-    const isZero =
-      !addr ||
-      addr.toLowerCase() === '0x0000000000000000000000000000000000000000';
+    const isZero = !addr || addr.toLowerCase() === ZERO_ADDRESS.toLowerCase();
     if (isZero || !chainRpc || !activeAddress) {
       setCollateralInfo(null);
       return;

@@ -1,5 +1,9 @@
 import { getThreadUrl } from '@hicommonwealth/shared';
-import { weiToDisplayNumber } from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
+import { useCollateralMeta } from 'client/scripts/views/components/PredictionMarket/useCollateralMeta';
+import {
+  sumWeiValues,
+  weiToDisplayNumber,
+} from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -59,8 +63,11 @@ export type ExplorePredictionMarketCardMarket = {
   status: string;
   end_time?: string | null;
   total_collateral?: string;
+  market_volume?: string;
+  initial_liquidity?: string | null;
   current_probability?: number | null;
   community_id: string;
+  collateral_address?: string;
   [key: string]: unknown;
 };
 
@@ -74,10 +81,24 @@ export const ExplorePredictionMarketCard = ({
   showVolume = false,
 }: ExplorePredictionMarketCardProps) => {
   const navigate = useCommonNavigate();
+  const collateralMeta = useCollateralMeta({
+    communityId: market.community_id,
+    collateralAddress: market.collateral_address,
+  });
 
   const timeDisplay = formatTimeLeft(market.end_time, market.status);
-  const totalMinted = weiToDisplayNumber(market.total_collateral, 18);
-  const volume = weiToDisplayNumber(market.total_collateral, 18);
+  const totalMintedWei = sumWeiValues(
+    market.total_collateral,
+    market.initial_liquidity,
+  );
+  const totalMinted = weiToDisplayNumber(
+    totalMintedWei,
+    collateralMeta.decimals,
+  );
+  const volume = weiToDisplayNumber(
+    market.market_volume ?? '0',
+    collateralMeta.decimals,
+  );
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -117,7 +138,7 @@ export const ExplorePredictionMarketCard = ({
               type="b1"
               className="metric-value"
               value={totalMinted}
-              currencySymbol=" USDC"
+              currencySymbol={` ${collateralMeta.symbol}`}
               symbolLast
             />
           </div>
@@ -129,7 +150,7 @@ export const ExplorePredictionMarketCard = ({
               type="b1"
               className="metric-value"
               value={volume}
-              currencySymbol=" USDC"
+              currencySymbol={` ${collateralMeta.symbol}`}
               symbolLast
             />
           </div>
