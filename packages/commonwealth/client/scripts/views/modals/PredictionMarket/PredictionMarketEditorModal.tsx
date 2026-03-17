@@ -7,6 +7,7 @@ import {
 import PredictionMarket from 'client/scripts/helpers/ContractHelpers/predictionMarket';
 import type Thread from 'client/scripts/models/Thread';
 import { trpc } from 'client/scripts/utils/trpcClient';
+import clsx from 'clsx';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import {
   useCreatePredictionMarketMutation,
@@ -285,7 +286,7 @@ export const PredictionMarketEditorModal = ({
                     name="prompt"
                     hookToForm
                     label="Prompt"
-                    placeholder="What outcome should this market resolve?"
+                    placeholder="What outcome should this market resolve? This will determine PASS vs FAIL resolution"
                     maxLength={PROMPT_MAX_LENGTH}
                     charCount={PROMPT_MAX_LENGTH}
                   />
@@ -307,12 +308,13 @@ export const PredictionMarketEditorModal = ({
                     </span>
                   )}
                 </div>
-                <CWText type="caption" className="help-text">
-                  This question will determine PASS vs FAIL resolution.
-                </CWText>
               </div>
 
-              <div className="collateral-select-row">
+              <div
+                className={clsx('collateral-select-row', {
+                  fullRow: watch('collateralOption')?.value !== 'custom',
+                })}
+              >
                 <CWSelectList
                   name="collateralOption"
                   hookToForm
@@ -322,65 +324,55 @@ export const PredictionMarketEditorModal = ({
                   placeholder="Select collateral"
                 />
                 {watch('collateralOption')?.value === 'custom' && (
-                  <div className="custom-address-row">
-                    <CWTextInput
-                      name="customCollateralAddress"
-                      hookToForm
-                      placeholder="0x..."
-                      label="ERC20 contract address"
-                    />
-                  </div>
+                  <CWTextInput
+                    name="customCollateralAddress"
+                    hookToForm
+                    placeholder="0x..."
+                    label="ERC20 contract address"
+                    fullWidth
+                  />
                 )}
               </div>
 
-              <div className="duration-threshold-row">
-                <div className="duration-input-row">
-                  <CWTextInput
-                    name="durationDays"
-                    hookToForm
-                    type="number"
-                    label="Duration (days)"
-                    placeholder={`${DURATION_MIN}-${DURATION_MAX}`}
-                  />
-                  <CWText type="caption" className="help-text">
-                    Market will be open for trading for this many days.
-                  </CWText>
-                </div>
-
-                <div className="threshold-row">
-                  <div className="threshold-label-row">
-                    <CWLabel label="Resolution threshold (%)" />
-                    <span className="threshold-value" aria-live="polite">
-                      {watch('resolutionThreshold') ?? THRESHOLD_DEFAULT}%
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={THRESHOLD_MIN}
-                    max={THRESHOLD_MAX}
-                    {...register('resolutionThreshold', {
-                      valueAsNumber: true,
-                    })}
-                    aria-label="Resolution threshold percentage"
-                    style={{ width: '100%' }}
-                  />
-                  <CWText type="caption" className="help-text">
-                    When the PASS token TWAP reaches this percentage, the market
-                    resolves to PASS. Otherwise it resolves to FAIL.
-                  </CWText>
-                </div>
-              </div>
-
-              <div className="liquidity-row">
+              <div className="duration-liquidity-row">
+                <CWTextInput
+                  name="durationDays"
+                  hookToForm
+                  type="number"
+                  label="Duration Days"
+                  placeholder={`${DURATION_MIN}-${DURATION_MAX}`}
+                  instructionalMessage="Market will be open for trading for this many days."
+                  fullWidth
+                />
                 <CWTextInput
                   name="initialLiquidity"
                   hookToForm
-                  label="Initial liquidity (optional)"
+                  label="Initial Liquidity"
                   placeholder="0"
+                  fullWidth
+                />
+              </div>
+
+              <div className="threshold-row">
+                <div className="threshold-label-row">
+                  <CWLabel label="Resolution threshold (%)" />
+                  <span className="threshold-value" aria-live="polite">
+                    {watch('resolutionThreshold') ?? THRESHOLD_DEFAULT}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={THRESHOLD_MIN}
+                  max={THRESHOLD_MAX}
+                  {...register('resolutionThreshold', {
+                    valueAsNumber: true,
+                  })}
+                  aria-label="Resolution threshold percentage"
+                  style={{ width: '100%' }}
                 />
                 <CWText type="caption" className="help-text">
-                  Optional amount of collateral to add when the market is
-                  created.
+                  When the PASS token TWAP reaches this percentage, the market
+                  resolves to PASS. Otherwise it resolves to FAIL.
                 </CWText>
               </div>
 
