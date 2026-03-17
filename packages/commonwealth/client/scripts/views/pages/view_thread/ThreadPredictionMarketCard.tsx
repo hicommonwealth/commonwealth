@@ -174,9 +174,10 @@ export const ThreadPredictionMarketCard = ({
     marketProp ??
     (marketsData?.results?.[0] as PredictionMarketResult | undefined);
 
-  const { data: positions = [] } = useGetPredictionMarketPositionsQuery({
-    prediction_market_id: market?.id ?? 0,
-  });
+  const { data: positions = [], refetch: refetchPositions } =
+    useGetPredictionMarketPositionsQuery({
+      prediction_market_id: market?.id ?? 0,
+    });
   const userPosition = Array.isArray(positions)
     ? positions.find(
         (p: { user_address: string }) =>
@@ -184,9 +185,10 @@ export const ThreadPredictionMarketCard = ({
       )
     : undefined;
 
-  const { data: tradesData } = useGetPredictionMarketTradesQuery({
-    prediction_market_id: market?.id ?? 0,
-  });
+  const { data: tradesData, refetch: refetchTrades } =
+    useGetPredictionMarketTradesQuery({
+      prediction_market_id: market?.id ?? 0,
+    });
   const trades =
     (tradesData as { results?: { collateral_amount: string }[] })?.results ??
     [];
@@ -279,18 +281,15 @@ export const ThreadPredictionMarketCard = ({
     };
   }, [chainRpc, activeAddress, market?.collateral_address, ethBalance]);
 
-  // When API has no position, fetch PASS/FAIL balances from chain (same fallback as trade modal)
+  // Fetch PASS/FAIL balances from chain and prefer them for immediate UI freshness.
   useEffect(() => {
-    if (userPosition) {
-      setOnChainPassFail(null);
-      return;
-    }
     if (
       !chainRpc ||
       !activeAddress ||
       !market?.p_token_address ||
       !market?.f_token_address
     ) {
+      setOnChainPassFail(null);
       return;
     }
     let cancelled = false;
@@ -315,7 +314,8 @@ export const ThreadPredictionMarketCard = ({
     activeAddress,
     market?.p_token_address,
     market?.f_token_address,
-    userPosition,
+    latestTradeFingerprint,
+    tradeRefreshNonce,
   ]);
 
   // Prefer on-chain market-specific collateral over DB total_collateral
@@ -345,9 +345,19 @@ export const ThreadPredictionMarketCard = ({
     tradeRefreshNonce,
   ]);
 
-  const handleTradeModalSuccess = () => {
+  const refreshTradeData = async () => {
+    await Promise.allSettled([refetchPositions(), refetchTrades()]);
     setTradeRefreshNonce((prev) => prev + 1);
+  };
+
+  const handleTradeModalSuccess = async () => {
+    await refreshTradeData();
     setIsTradeModalOpen(false);
+  };
+
+  const handleTradeModalClose = async () => {
+    setIsTradeModalOpen(false);
+    await refreshTradeData();
   };
 
   const handleCancelMarket = () => {
@@ -406,22 +416,24 @@ export const ThreadPredictionMarketCard = ({
 
   const decimals = collateralDisplay?.decimals ?? 18;
   const symbol = collateralDisplay?.symbol ?? 'ETH';
-  const pBalance = userPosition?.p_token_balance
-    ? formatCollateralBalance(
-        BigInt(String(userPosition.p_token_balance)),
-        decimals,
-      )
-    : onChainPassFail != null
+  const pBalance =
+    onChainPassFail != null
       ? formatCollateralBalance(onChainPassFail.p, decimals)
-      : '0.00';
-  const fBalance = userPosition?.f_token_balance
-    ? formatCollateralBalance(
-        BigInt(String(userPosition.f_token_balance)),
-        decimals,
-      )
-    : onChainPassFail != null
+      : userPosition?.p_token_balance
+        ? formatCollateralBalance(
+            BigInt(String(userPosition.p_token_balance)),
+            decimals,
+          )
+        : '0.00';
+  const fBalance =
+    onChainPassFail != null
       ? formatCollateralBalance(onChainPassFail.f, decimals)
-      : '0.00';
+      : userPosition?.f_token_balance
+        ? formatCollateralBalance(
+            BigInt(String(userPosition.f_token_balance)),
+            decimals,
+          )
+        : '0.00';
 
   const passProbability = market?.current_probability ?? 0.5;
   const failProbability = 1 - passProbability;
@@ -695,11 +707,11 @@ export const ThreadPredictionMarketCard = ({
             threadCommunityId={thread?.communityId ?? ''}
             initialAddress={selectedAddress}
             open={isTradeModalOpen}
-            onClose={() => setIsTradeModalOpen(false)}
+            onClose={handleTradeModalClose}
             onSuccess={handleTradeModalSuccess}
           />
         }
-        onClose={() => setIsTradeModalOpen(false)}
+        onClose={handleTradeModalClose}
         open={isTradeModalOpen}
       />
     </>
