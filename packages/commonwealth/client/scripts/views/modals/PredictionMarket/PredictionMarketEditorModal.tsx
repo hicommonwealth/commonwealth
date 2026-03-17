@@ -316,9 +316,7 @@ export const PredictionMarketEditorModal = ({
                 <CWSelectList
                   name="collateralOption"
                   hookToForm
-                  value={watch('collateralOption')}
                   label="Collateral token"
-                  menuPortalTarget={modalContainerRef?.current}
                   isSearchable={false}
                   options={COLLATERAL_OPTIONS}
                   placeholder="Select collateral"
