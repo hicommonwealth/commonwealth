@@ -24,7 +24,8 @@ export type DeployPredictionMarketOnChainParams = {
   collateral_address: `0x${string}`;
   duration_days: number;
   resolution_threshold: number;
-  initial_liquidity: string;
+  initial_liquidity?: string;
+  initial_liquidity_wei?: string;
 };
 
 const EVM_ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/;
@@ -106,6 +107,7 @@ export async function deployPredictionMarketOnChain(
     collateral_address: params.collateral_address,
     duration_days: params.duration_days,
     resolution_threshold: params.resolution_threshold,
-    initial_liquidity: params.initial_liquidity,
+    initial_liquidity: params.initial_liquidity ?? '0',
+    initial_liquidity_wei: params.initial_liquidity_wei,
   });
 }

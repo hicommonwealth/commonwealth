@@ -32,6 +32,7 @@ export type DeployParams = {
   duration_days: number;
   resolution_threshold: number;
   initial_liquidity: string;
+  initial_liquidity_wei?: string | bigint;
 };
 
 function randomBytes32(): `0x${string}` {
@@ -183,6 +184,8 @@ class PredictionMarket extends ContractBase {
       const currentBalance = BigInt(
         (await collateralToken.methods.balanceOf(fromAddress).call()) as string,
       );
+      console.log('currentBalance', currentBalance);
+      console.log('initialLiquidityWei', initialLiquidityWei);
       if (currentBalance < initialLiquidityWei) {
         throw new Error(
           'Insufficient collateral balance for initial liquidity.',
@@ -224,6 +227,7 @@ class PredictionMarket extends ContractBase {
    * Propose a new market, decode events, and return the payload for deployPredictionMarket mutation.
    */
   async deploy(params: DeployParams): Promise<DeployPredictionMarketPayload> {
+    console.log('params => ', params);
     this.isInitialized();
     const proposalId = randomBytes32();
     const marketId = randomBytes32();
@@ -242,20 +246,29 @@ class PredictionMarket extends ContractBase {
       18,
     );
 
-    // Use collateral token decimals so amount matches balance
     let initialLiquidityWei = 0n;
-    const liquidityInput = params.initial_liquidity?.trim();
-    if (liquidityInput && liquidityInput !== '0') {
-      const collateralToken = new this.web3.eth.Contract(
-        erc20Abi as unknown as AbiItem[],
-        params.collateral_address,
-      );
-      const decimals = Number(
-        (await collateralToken.methods.decimals().call()) as string | number,
-      );
-      const decimalsNum =
-        typeof decimals === 'number' && !Number.isNaN(decimals) ? decimals : 18;
-      initialLiquidityWei = parseTokenAmount(liquidityInput, decimalsNum);
+    if (
+      params.initial_liquidity_wei !== undefined &&
+      params.initial_liquidity_wei !== null
+    ) {
+      initialLiquidityWei = BigInt(params.initial_liquidity_wei);
+    } else {
+      // Use collateral token decimals so amount matches balance
+      const liquidityInput = params.initial_liquidity?.trim();
+      if (liquidityInput && liquidityInput !== '0') {
+        const collateralToken = new this.web3.eth.Contract(
+          erc20Abi as unknown as AbiItem[],
+          params.collateral_address,
+        );
+        const decimals = Number(
+          (await collateralToken.methods.decimals().call()) as string | number,
+        );
+        const decimalsNum =
+          typeof decimals === 'number' && !Number.isNaN(decimals)
+            ? decimals
+            : 18;
+        initialLiquidityWei = parseTokenAmount(liquidityInput, decimalsNum);
+      }
     }
     if (initialLiquidityWei <= 0n) {
       throw new Error(

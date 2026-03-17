@@ -17,12 +17,8 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
-import {
-  convertInitialLiquidityToWei,
-  deployPredictionMarketOnChain,
-} from './deployPredictionMarketOnChain';
+import { deployPredictionMarketOnChain } from './deployPredictionMarketOnChain';
 import './PredictionMarketEditorModal.scss';
-import { INITIAL_LIQUIDITY_MIN } from './predictionMarketEditorValidation';
 
 type DraftMarket = {
   id: number;
@@ -84,11 +80,11 @@ export const DeployDraftPredictionMarketModal = ({
   const isValidCollateral =
     collateralAddress.startsWith('0x') && collateralAddress.length === 42;
   const initialLiquidity = (market.initial_liquidity ?? '').toString().trim();
-  const initialLiquidityNum = Number(initialLiquidity);
-  const hasValidInitialLiquidity =
-    initialLiquidity.length > 0 &&
-    Number.isFinite(initialLiquidityNum) &&
-    initialLiquidityNum >= INITIAL_LIQUIDITY_MIN;
+  const initialLiquidityWei =
+    /^\d+$/.test(initialLiquidity) && initialLiquidity.length > 0
+      ? BigInt(initialLiquidity)
+      : 0n;
+  const hasValidInitialLiquidity = initialLiquidityWei > 0n;
 
   const handleDeploy = async () => {
     if (!thread?.id || !activeAddress) {
@@ -116,7 +112,7 @@ export const DeployDraftPredictionMarketModal = ({
 
     if (!hasValidInitialLiquidity) {
       setErrorMessage(
-        `Initial liquidity must be at least ${INITIAL_LIQUIDITY_MIN} to deploy on-chain.`,
+        'Initial liquidity must be greater than 0 to deploy on-chain.',
       );
       notifyError('Initial liquidity is required for deployment.');
       setPhase('error');
@@ -124,16 +120,6 @@ export const DeployDraftPredictionMarketModal = ({
     }
 
     try {
-      const initialLiquidityWei = await convertInitialLiquidityToWei({
-        chain_rpc: chainRpc,
-        collateral_address: collateralAddress as `0x${string}`,
-        initial_liquidity: initialLiquidity,
-        user_address: activeAddress,
-      });
-      if (initialLiquidityWei <= 0n) {
-        throw new Error('Initial liquidity is too small for token decimals.');
-      }
-
       const payload = await deployPredictionMarketOnChain({
         eth_chain_id: ethChainId,
         chain_rpc: chainRpc,
@@ -142,7 +128,7 @@ export const DeployDraftPredictionMarketModal = ({
         collateral_address: collateralAddress as `0x${string}`,
         duration_days: durationDays,
         resolution_threshold: resolutionThreshold,
-        initial_liquidity: initialLiquidity,
+        initial_liquidity_wei: initialLiquidityWei.toString(),
       });
 
       await deployMutation.mutateAsync({
@@ -214,8 +200,8 @@ export const DeployDraftPredictionMarketModal = ({
         </CWText>
         {!hasValidInitialLiquidity && (
           <CWText type="caption" className="help-text">
-            This draft has no initial liquidity. Set initial liquidity to at
-            least {INITIAL_LIQUIDITY_MIN} before deploying.
+            This draft has no initial liquidity. Set initial liquidity before
+            deploying.
           </CWText>
         )}
         {!deployConfigured && (

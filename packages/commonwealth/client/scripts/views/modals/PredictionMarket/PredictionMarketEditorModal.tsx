@@ -199,7 +199,7 @@ export const PredictionMarketEditorModal = ({
         collateral_address: collateralAddress as `0x${string}`,
         duration_days: values.durationDays,
         resolution_threshold: values.resolutionThreshold / 100,
-        initial_liquidity: initialLiquidity,
+        initial_liquidity_wei: initialLiquidityWei.toString(),
       });
 
       await deployMutation.mutateAsync({
