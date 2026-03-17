@@ -29,15 +29,15 @@ import {
   getSessionFromWallet,
   signSessionWithAccount,
 } from 'controllers/server/sessions';
-import {
-  LocalStorageKeys,
-  getLocalStorageItem,
-  removeLocalStorageItem,
-} from 'helpers/localStorage';
 import _ from 'lodash';
 import { Magic } from 'magic-sdk';
 import { useCallback, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import {
+  LocalStorageKeys,
+  getLocalStorageItem,
+  removeLocalStorageItem,
+} from 'shared/utils/localStorage';
 import app, { initAppState } from 'state';
 import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
 import { fetchNodes } from 'state/api/nodes';

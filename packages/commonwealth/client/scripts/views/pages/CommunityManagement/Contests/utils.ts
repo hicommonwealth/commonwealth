@@ -3,8 +3,8 @@ import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
 import { OpenFeature } from '@openfeature/web-sdk';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import moment from 'moment';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import { fetchCachedPublicEnvVar } from 'state/api/configuration/fetchPublicEnvVar';
-import { saveToClipboard } from 'utils/clipboard';
 import { Contest } from './ContestsList';
 
 const client = OpenFeature.getClient();

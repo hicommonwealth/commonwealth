@@ -1,4 +1,4 @@
-import { APIOrderDirection } from 'helpers/constants';
+import { APIOrderDirection } from 'shared/utils/constants';
 
 export enum TokenSortOptions {
   MostRecent = 'Most Recent',

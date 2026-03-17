@@ -84,8 +84,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import clsx from 'clsx';
-import { getRelativeTimestamp } from 'helpers/dates';
 import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
+import { getRelativeTimestamp } from 'shared/utils/dates';
 import { Avatar } from '../../../Avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';

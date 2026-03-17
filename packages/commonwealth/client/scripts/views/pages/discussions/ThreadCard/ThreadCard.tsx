@@ -4,6 +4,7 @@ import {
   isValidImageUrl,
 } from '@hicommonwealth/shared';
 import { useShowImage } from 'client/scripts/hooks/useShowImage';
+import { ThreadPredictionMarketTagContainer } from 'client/scripts/views/components/ThreadPredictionMarketTag';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -255,6 +256,8 @@ export const ThreadCard = ({
             </div>
             <div className="content-top-tags">
               {thread.hasPoll && <CWTag label="Poll" type="poll" />}
+
+              <ThreadPredictionMarketTagContainer thread={thread} />
 
               {linkedSnapshots.length > 0 && (
                 <CWTag

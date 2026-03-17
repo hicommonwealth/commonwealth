@@ -1,5 +1,5 @@
-import { communityNameSchema } from 'helpers/formValidations/common';
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
+import { communityNameSchema } from 'shared/utils/formValidations/common';
+import { VALIDATION_MESSAGES } from 'shared/utils/formValidations/messages';
 import z from 'zod';
 
 export const tokenInformationFormValidationSchema = z.object({

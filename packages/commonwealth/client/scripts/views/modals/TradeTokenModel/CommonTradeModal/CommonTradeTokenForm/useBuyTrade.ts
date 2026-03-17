@@ -1,8 +1,8 @@
 import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
-import { SupportedCryptoCurrencies } from 'helpers/currency';
 import { useEffect, useMemo, useState } from 'react';
+import { SupportedCryptoCurrencies } from 'shared/utils/currency';
 import {
   useFetchTokenUsdRateQuery,
   useGetUserEthBalanceQuery,

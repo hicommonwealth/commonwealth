@@ -167,7 +167,14 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
       tools: tools.map((tool) => ({
         name: tool.name,
         description: tool.description,
-        inputSchema: z.toJSONSchema(tool.inputSchema),
+        inputSchema: z.toJSONSchema(tool.inputSchema, {
+          unrepresentable: 'any',
+          override: ({ zodSchema, jsonSchema }) => {
+            if (zodSchema instanceof z.ZodDate) {
+              jsonSchema.type = 'string';
+            }
+          },
+        }),
       })),
     };
   });
@@ -263,17 +270,13 @@ export function buildMCPRouter() {
     }),
   );
 
-  // handle post requests
-
-  // eslint-disable-next-line
-  router.post('/', async (req: Request, res: Response) => {
+  // Handle MCP requests (POST for JSON-RPC, GET for SSE streams)
+  const handleMCPRequest = async (req: Request, res: Response) => {
     try {
       const authHeader =
         req.headers['authorization'] || req.headers['Authorization'];
-      const authToken = authHeader?.toString().split(' ')[1];
-      if (!authToken) {
-        throw new Error('No authorization token provided');
-      }
+      const authToken = authHeader?.toString().split(' ')[1] ?? null;
+
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined,
       });
@@ -284,9 +287,11 @@ export function buildMCPRouter() {
       });
       await mcpServer.connect(transport);
 
-      (req as IncomingMessage & { auth?: { token: string } }).auth = {
-        token: authToken,
-      };
+      if (authToken) {
+        (req as IncomingMessage & { auth?: { token: string } }).auth = {
+          token: authToken,
+        };
+      }
       await transport.handleRequest(req, res, req.body);
     } catch (error) {
       log.error('Error handling MCP request:', error);
@@ -301,10 +306,14 @@ export function buildMCPRouter() {
         });
       }
     }
-  });
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  router.post('/', handleMCPRequest);
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  router.get('/', handleMCPRequest);
 
   // handle unsupported methods
-  router.get('/', unsupportedMethodHandler);
   router.put('/', unsupportedMethodHandler);
   router.delete('/', unsupportedMethodHandler);
 

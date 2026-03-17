@@ -3,16 +3,16 @@ import { buildCreateCommentInput } from 'client/scripts/state/api/comments/creat
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import {
-  isRateLimitError,
-  isTierRateLimitError,
-  RATE_LIMIT_MESSAGE,
-} from 'helpers/rateLimit';
 import { useMentionExtractor } from 'hooks/useMentionExtractor';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDraft } from 'shared/hooks/useDraft';
+import {
+  isRateLimitError,
+  isTierRateLimitError,
+  RATE_LIMIT_MESSAGE,
+} from 'shared/utils/rateLimit';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import useUserStore from 'state/ui/user';

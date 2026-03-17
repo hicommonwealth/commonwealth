@@ -2,9 +2,9 @@ import {
   notifyError,
   notifySuccess,
 } from 'client/scripts/controllers/app/notifications';
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'node_modules/zod';
 import React from 'react';
+import { VALIDATION_MESSAGES } from 'shared/utils/formValidations/messages';
 import { useUpdateResourceTimestamps } from 'state/api/superAdmin';
 import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
 import { CWText } from 'views/components/component_kit/cw_text';

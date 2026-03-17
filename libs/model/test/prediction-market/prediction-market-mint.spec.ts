@@ -69,6 +69,7 @@ describe('Prediction Market Mint', () => {
         strategy_address: '0x0000000000000000000000000000000000000004',
         p_token_address: '0x0000000000000000000000000000000000000005',
         f_token_address: '0x0000000000000000000000000000000000000006',
+        proposal_id: `0x${'a'.repeat(64)}`,
         start_time: new Date(),
         end_time: new Date(Date.now() + 86400 * 7 * 1000),
       },

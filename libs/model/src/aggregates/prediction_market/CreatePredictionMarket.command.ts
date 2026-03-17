@@ -20,12 +20,20 @@ export function CreatePredictionMarket(): Command<
         actor,
         context,
       );
-      const { prompt, collateral_address, duration, resolution_threshold } =
-        payload;
+      const {
+        prompt,
+        collateral_address,
+        duration,
+        resolution_threshold,
+        initial_liquidity,
+      } = payload;
 
       // Check if a prediction market already exists for this thread
       const existingMarket = await models.PredictionMarket.findOne({
-        where: { thread_id: thread.id },
+        where: {
+          thread_id: thread.id,
+          status: schemas.PredictionMarketStatus.Active,
+        },
       });
       if (existingMarket) {
         throw new InvalidState(
@@ -60,6 +68,7 @@ export function CreatePredictionMarket(): Command<
             duration,
             resolution_threshold,
             total_collateral: 0n,
+            ...(initial_liquidity !== undefined && { initial_liquidity }),
           },
           { transaction },
         );

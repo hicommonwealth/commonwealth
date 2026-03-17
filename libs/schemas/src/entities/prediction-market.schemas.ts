@@ -54,6 +54,7 @@ export const PredictionMarket = z.object({
   end_time: z.coerce.date().nullish(),
   resolved_at: z.coerce.date().nullish(),
   total_collateral: PG_ETH,
+  initial_liquidity: PG_ETH.nullish(),
   current_probability: z.number().nullish(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),

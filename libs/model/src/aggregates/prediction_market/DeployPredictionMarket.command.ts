@@ -27,8 +27,10 @@ export function DeployPredictionMarket(): Command<
         strategy_address,
         p_token_address,
         f_token_address,
+        proposal_id,
         start_time,
         end_time,
+        initial_liquidity,
       } = payload;
 
       const market =
@@ -55,8 +57,10 @@ export function DeployPredictionMarket(): Command<
             strategy_address,
             p_token_address,
             f_token_address,
+            proposal_id,
             start_time,
             end_time,
+            ...(initial_liquidity !== undefined && { initial_liquidity }),
             status: schemas.PredictionMarketStatus.Active,
           },
           { transaction },
@@ -69,8 +73,8 @@ export function DeployPredictionMarket(): Command<
               event_name: 'PredictionMarketDeployed',
               event_payload: {
                 prediction_market_id: market.id!,
-                proposal_id: market.proposal_id,
-                market_id: market.market_id,
+                proposal_id,
+                market_id,
                 eth_chain_id: market.eth_chain_id,
                 vault_address,
                 governor_address,

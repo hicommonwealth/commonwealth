@@ -17,7 +17,7 @@ vi.mock('react-device-detect', () => ({
   isMobile: true,
 }));
 
-import useWindowResize from '../../../client/scripts/hooks/useWindowResize';
+import useWindowResize from '../../../client/scripts/shared/hooks/useWindowResize';
 
 describe('useWindowResize', () => {
   beforeEach(() => {

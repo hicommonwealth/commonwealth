@@ -1,14 +1,14 @@
 import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
-import {
-  linkValidationSchema,
-  usernameSchema,
-} from 'helpers/formValidations/common';
-import { getLinkType, isLinkValid } from 'helpers/link';
 import AddressInfo from 'models/AddressInfo';
 import NewProfile from 'models/NewProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
+import {
+  linkValidationSchema,
+  usernameSchema,
+} from 'shared/utils/formValidations/common';
+import { getLinkType, isLinkValid } from 'shared/utils/link';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useUserStore, { useUserAiSettingsStore } from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';

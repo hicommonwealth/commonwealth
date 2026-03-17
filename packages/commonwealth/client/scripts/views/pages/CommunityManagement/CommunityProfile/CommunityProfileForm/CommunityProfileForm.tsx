@@ -1,10 +1,10 @@
 import { DefaultPage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { linkValidationSchema } from 'helpers/formValidations/common';
-import { getLinkType, isLinkValid } from 'helpers/link';
 import React, { useCallback, useState } from 'react';
 import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { slugifyPreserveDashes } from 'shared/utils';
+import { linkValidationSchema } from 'shared/utils/formValidations/common';
+import { getLinkType, isLinkValid } from 'shared/utils/link';
 import app from 'state';
 import {
   useEditCommunityBannerMutation,

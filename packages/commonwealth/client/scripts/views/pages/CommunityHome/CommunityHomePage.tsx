@@ -4,13 +4,13 @@ import { CWModal } from 'client/scripts/views/components/component_kit/new_desig
 import ManageCommunityStakeModal from 'client/scripts/views/modals/ManageCommunityStakeModal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { findDenominationString } from 'helpers/findDenomination';
+import type { DeltaStatic } from 'quill';
+import React, { useRef, useState } from 'react';
 import {
   isRateLimitError,
   RATE_LIMIT_MESSAGE,
   RateLimitErrorType,
-} from 'helpers/rateLimit';
-import type { DeltaStatic } from 'quill';
-import React, { useRef, useState } from 'react';
+} from 'shared/utils/rateLimit';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
@@ -28,6 +28,7 @@ import {
 import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import ActiveContestList from '../HomePage/ActiveContestList/ActiveContestList';
+import ActivePredictionMarketList from '../HomePage/ActivePredictionMarketList/ActivePredictionMarketList';
 import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
 import XpQuestList from '../HomePage/XpQuestList/XpQuestList';
 import './CommunityHomePage.scss';
@@ -161,6 +162,10 @@ const CommunityHome = () => {
             communityIdFilter={chain}
           />
           <ActiveContestList isCommunityHomePage />
+          <ActivePredictionMarketList
+            isCommunityHomePage
+            communityIdFilter={chain}
+          />
           {communityToken && <CommunityTransactions />}
           <XpQuestList communityIdFilter={chain} />
           <CWModal
