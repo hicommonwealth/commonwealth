@@ -42,6 +42,7 @@ import CWTab from '../../components/component_kit/new_designs/CWTabs/CWTab';
 import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { CWTooltip } from '../../components/component_kit/new_designs/CWTooltip';
+import FractionalValue from '../../components/FractionalValue';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -52,13 +53,25 @@ import './PredictionMarketTradeModal.scss';
 const COLLATERAL_DECIMALS = 18;
 const DEFAULT_SLIPPAGE_BPS = 100; // 1%
 
-/** Format wei (bigint) to readable string with 2 decimals. */
+/** Format wei (bigint) to full token string (no forced rounding). */
 function formatTokenDisplay(wei: bigint, decimals = 18): string {
-  if (wei === 0n) return '0.00';
+  if (wei === 0n) return '0';
   const divisor = 10n ** BigInt(decimals);
   const whole = wei / divisor;
-  const frac = ((wei % divisor) * 100n) / divisor;
-  return `${whole}.${frac.toString().padStart(2, '0').slice(0, 2)}`;
+  const fractionalRaw = (wei % divisor).toString().padStart(decimals, '0');
+  const fractionalTrimmed = fractionalRaw.replace(/0+$/, '');
+  return fractionalTrimmed ? `${whole}.${fractionalTrimmed}` : whole.toString();
+}
+
+function weiToDisplayNumber(wei: bigint, decimals = 18): number {
+  if (wei <= 0n) return 0;
+  const safeDecimals = Math.max(0, decimals);
+  const raw = wei.toString();
+  if (safeDecimals === 0) return Number(raw);
+  const padded = raw.padStart(safeDecimals + 1, '0');
+  const whole = padded.slice(0, -safeDecimals);
+  const frac = padded.slice(-safeDecimals).replace(/0+$/, '');
+  return Number(frac ? `${whole}.${frac}` : whole);
 }
 
 type Market = {
@@ -347,6 +360,12 @@ export const PredictionMarketTradeModal = ({
   const winner = market.winner ?? 0;
 
   const mintDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
+  const totalMintedDisplay = weiToDisplayNumber(
+    marketCollateralOnChain ?? BigInt(market.total_collateral ?? '0'),
+    mintDecimals,
+  );
+  const pBalanceDisplay = weiToDisplayNumber(pTokenBalance, mintDecimals);
+  const fBalanceDisplay = weiToDisplayNumber(fTokenBalance, mintDecimals);
 
   const handleMint = async () => {
     const amountWei = parseTokenAmount(mintAmount, mintDecimals);
@@ -537,7 +556,9 @@ export const PredictionMarketTradeModal = ({
     const amountWei = parseTokenAmount(redeemAmount, redeemDecimals);
     const maxRedeem = winner === 1 ? pTokenBalance : fTokenBalance;
     if (amountWei <= 0n || amountWei > maxRedeem) {
-      setErrorMessage(`Enter a valid amount (max ${maxRedeem.toString()}).`);
+      setErrorMessage(
+        `Enter a valid amount (max ${formatTokenDisplay(maxRedeem, redeemDecimals)}).`,
+      );
       return;
     }
     setErrorMessage(null);
@@ -1090,23 +1111,15 @@ export const PredictionMarketTradeModal = ({
             <div className="collateral-row-summary">
               {(marketCollateralOnChain != null ||
                 market.total_collateral != null) && (
-                <CWText
-                  type="caption"
-                  className="collateral-label total-minted"
-                >
-                  Total minted:&nbsp;
-                  {`${
-                    marketCollateralOnChain != null
-                      ? formatTokenDisplay(
-                          marketCollateralOnChain,
-                          collateralInfo?.decimals ?? 18,
-                        )
-                      : formatTokenDisplay(
-                          BigInt(market.total_collateral ?? '0'),
-                          collateralInfo?.decimals ?? 18,
-                        )
-                  } ${collateralInfo ? collateralInfo.symbol : 'ETH'}`}
-                </CWText>
+                <div className="collateral-label total-minted">
+                  <CWText type="caption">Total minted:&nbsp;</CWText>
+                  <FractionalValue
+                    type="caption"
+                    value={totalMintedDisplay}
+                    currencySymbol={` ${collateralInfo ? collateralInfo.symbol : 'ETH'}`}
+                    symbolLast
+                  />
+                </div>
               )}
               {market.end_time && (
                 <CWText type="caption" className="collateral-label market-ends">
@@ -1306,9 +1319,11 @@ export const PredictionMarketTradeModal = ({
               )}
             </div>
             <div className="balance-card-value">
-              <CWText type="b1" fontWeight="bold">
-                {formatTokenDisplay(pTokenBalance, mintDecimals)}
-              </CWText>
+              <FractionalValue
+                type="b1"
+                fontWeight="bold"
+                value={pBalanceDisplay}
+              />
               <CWText type="b2" fontWeight="regular">
                 &nbsp;PASS
               </CWText>
@@ -1347,9 +1362,11 @@ export const PredictionMarketTradeModal = ({
               )}
             </div>
             <div className="balance-card-value">
-              <CWText type="b1" fontWeight="bold">
-                {formatTokenDisplay(fTokenBalance, mintDecimals)}
-              </CWText>
+              <FractionalValue
+                type="b1"
+                fontWeight="bold"
+                value={fBalanceDisplay}
+              />
               <CWText type="b2" fontWeight="regular">
                 &nbsp;FAIL
               </CWText>

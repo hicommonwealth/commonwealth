@@ -7,6 +7,10 @@
 import PredictionMarket, {
   type DeployPredictionMarketPayload,
 } from 'client/scripts/helpers/ContractHelpers/predictionMarket';
+import {
+  getCollateralBalanceAndSymbol,
+  parseTokenAmount,
+} from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
 import { getEthereumProviderForAddress } from 'client/scripts/helpers/getEthereumProviderForAddress';
 
 export type { DeployPredictionMarketPayload };
@@ -23,6 +27,8 @@ export type DeployPredictionMarketOnChainParams = {
 };
 
 const EVM_ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/;
+const POSITIVE_DECIMAL_REGEX = /^\d+(\.\d+)?$/;
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 function assertValidEthereumAddress(
   value: unknown,
@@ -39,6 +45,28 @@ function assertValidEthereumAddress(
       `Invalid parameters: ${fieldName} must be a valid Ethereum address (0x + 40 hex chars)`,
     );
   }
+}
+
+export async function convertInitialLiquidityToWei(params: {
+  chain_rpc: string;
+  collateral_address: `0x${string}`;
+  initial_liquidity: string;
+  user_address?: string;
+}): Promise<bigint> {
+  const initialLiquidity = params.initial_liquidity.trim();
+  if (!POSITIVE_DECIMAL_REGEX.test(initialLiquidity)) {
+    throw new Error('Initial liquidity must be a valid decimal number.');
+  }
+  const readAddress =
+    params.user_address && EVM_ADDRESS_REGEX.test(params.user_address)
+      ? params.user_address
+      : ZERO_ADDRESS;
+  const { decimals } = await getCollateralBalanceAndSymbol(
+    params.chain_rpc,
+    readAddress,
+    params.collateral_address,
+  );
+  return parseTokenAmount(initialLiquidity, decimals);
 }
 
 /**

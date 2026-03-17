@@ -17,7 +17,10 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
-import { deployPredictionMarketOnChain } from './deployPredictionMarketOnChain';
+import {
+  convertInitialLiquidityToWei,
+  deployPredictionMarketOnChain,
+} from './deployPredictionMarketOnChain';
 import './PredictionMarketEditorModal.scss';
 import { INITIAL_LIQUIDITY_MIN } from './predictionMarketEditorValidation';
 
@@ -121,6 +124,16 @@ export const DeployDraftPredictionMarketModal = ({
     }
 
     try {
+      const initialLiquidityWei = await convertInitialLiquidityToWei({
+        chain_rpc: chainRpc,
+        collateral_address: collateralAddress as `0x${string}`,
+        initial_liquidity: initialLiquidity,
+        user_address: activeAddress,
+      });
+      if (initialLiquidityWei <= 0n) {
+        throw new Error('Initial liquidity is too small for token decimals.');
+      }
+
       const payload = await deployPredictionMarketOnChain({
         eth_chain_id: ethChainId,
         chain_rpc: chainRpc,
@@ -145,7 +158,7 @@ export const DeployDraftPredictionMarketModal = ({
         proposal_id: payload.proposal_id,
         start_time: payload.start_time,
         end_time: payload.end_time,
-        initial_liquidity: initialLiquidity,
+        initial_liquidity: initialLiquidityWei.toString(),
       });
 
       notifySuccess('Prediction market deployed.');

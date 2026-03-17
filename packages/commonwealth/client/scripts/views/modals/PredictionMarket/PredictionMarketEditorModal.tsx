@@ -26,7 +26,10 @@ import {
 } from '../../components/component_kit/new_designs/CWModal';
 import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
-import { deployPredictionMarketOnChain } from './deployPredictionMarketOnChain';
+import {
+  convertInitialLiquidityToWei,
+  deployPredictionMarketOnChain,
+} from './deployPredictionMarketOnChain';
 import './PredictionMarketEditorModal.scss';
 import {
   DURATION_MAX,
@@ -124,6 +127,15 @@ export const PredictionMarketEditorModal = ({
     try {
       setPhase('creating');
       const initialLiquidity = (values.initialLiquidity ?? '').trim() || '0';
+      const initialLiquidityWei = await convertInitialLiquidityToWei({
+        chain_rpc: chainRpc,
+        collateral_address: collateralAddress as `0x${string}`,
+        initial_liquidity: initialLiquidity,
+        user_address: activeAddress,
+      });
+      if (initialLiquidityWei <= 0n) {
+        throw new Error('Initial liquidity is too small for token decimals.');
+      }
 
       await createMutation.mutateAsync({
         thread_id: thread.id,
@@ -131,7 +143,7 @@ export const PredictionMarketEditorModal = ({
         collateral_address: collateralAddress as `0x${string}`,
         duration: values.durationDays * 86400,
         resolution_threshold: values.resolutionThreshold / 100,
-        initial_liquidity: initialLiquidity,
+        initial_liquidity: initialLiquidityWei.toString(),
       });
 
       if (!activeAddress) {
@@ -202,7 +214,7 @@ export const PredictionMarketEditorModal = ({
         f_token_address: payload.f_token_address as string,
         start_time: payload.start_time as unknown,
         end_time: payload.end_time as unknown,
-        initial_liquidity: initialLiquidity,
+        initial_liquidity: initialLiquidityWei.toString(),
       });
 
       notifySuccess('Prediction market created and deployed.');

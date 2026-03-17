@@ -35,11 +35,12 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
+import FractionalValue from '../../components/FractionalValue';
 import { DeployDraftPredictionMarketModal } from '../../modals/PredictionMarket/DeployDraftPredictionMarketModal';
 import { PredictionMarketResolveModal } from '../../modals/PredictionMarket/PredictionMarketResolveModal';
 import { PredictionMarketTradeModal } from '../../modals/PredictionMarketTradeModal';
 import './poll_cards.scss';
-import { formatCollateral } from './predictionMarketUtils';
+import { weiToDisplayNumber } from './predictionMarketUtils';
 import './ThreadPredictionMarketCard.scss';
 
 function formatCollateralBalance(wei: bigint, decimals: number): string {
@@ -48,6 +49,14 @@ function formatCollateralBalance(wei: bigint, decimals: number): string {
   const whole = wei / divisor;
   const frac = ((wei % divisor) * 100n) / divisor;
   return `${whole}.${frac.toString().padStart(2, '0').slice(0, 2)}`;
+}
+
+function parseWeiString(value?: string | null): bigint {
+  try {
+    return BigInt(value ?? '0');
+  } catch {
+    return 0n;
+  }
 }
 
 export type PredictionMarketResult = {
@@ -421,27 +430,25 @@ export const ThreadPredictionMarketCard = ({
 
   const decimals = collateralDisplay?.decimals ?? 18;
   const symbol = collateralDisplay?.symbol ?? 'ETH';
-  const pBalance =
-    onChainPassFail != null
-      ? formatCollateralBalance(onChainPassFail.p, decimals)
-      : userPosition?.p_token_balance
-        ? formatCollateralBalance(
-            BigInt(String(userPosition.p_token_balance)),
-            decimals,
-          )
-        : '0.00';
-  const fBalance =
-    onChainPassFail != null
-      ? formatCollateralBalance(onChainPassFail.f, decimals)
-      : userPosition?.f_token_balance
-        ? formatCollateralBalance(
-            BigInt(String(userPosition.f_token_balance)),
-            decimals,
-          )
-        : '0.00';
+  const pBalanceWei =
+    onChainPassFail?.p ??
+    (userPosition?.p_token_balance
+      ? BigInt(String(userPosition.p_token_balance))
+      : 0n);
+  const fBalanceWei =
+    onChainPassFail?.f ??
+    (userPosition?.f_token_balance
+      ? BigInt(String(userPosition.f_token_balance))
+      : 0n);
+  const pBalanceDisplay = weiToDisplayNumber(pBalanceWei, decimals);
+  const fBalanceDisplay = weiToDisplayNumber(fBalanceWei, decimals);
 
   const passProbability = market?.current_probability ?? 0.5;
   const failProbability = 1 - passProbability;
+  const totalMintedWei =
+    marketCollateralOnChain ?? parseWeiString(market?.total_collateral);
+  const totalMintedDisplay = weiToDisplayNumber(totalMintedWei, decimals);
+  const marketVolumeDisplay = weiToDisplayNumber(marketVolume, decimals);
 
   if (marketProp === undefined && isLoading) {
     return (
@@ -581,18 +588,13 @@ export const ThreadPredictionMarketCard = ({
               <CWText type="caption" className="metric-label">
                 TOTAL MINTED
               </CWText>
-              <CWText type="b1" className="metric-value">
-                {marketCollateralOnChain != null
-                  ? formatCollateralBalance(
-                      marketCollateralOnChain,
-                      collateralDisplay?.decimals ?? 18,
-                    )
-                  : formatCollateral(market.total_collateral ?? '0')}
-                &nbsp;
-                <CWText type="b2">
-                  <span className="metric-symbol">{symbol}</span>
-                </CWText>
-              </CWText>
+              <FractionalValue
+                type="b1"
+                className="metric-value"
+                value={totalMintedDisplay}
+                currencySymbol={` ${symbol}`}
+                symbolLast
+              />
             </div>
           </div>
           <div className="metric-card">
@@ -600,12 +602,13 @@ export const ThreadPredictionMarketCard = ({
               <CWText type="caption" className="metric-label">
                 MARKET VOL.
               </CWText>
-              <CWText type="b1" className="metric-value">
-                {formatCollateral(marketVolume.toString())}&nbsp;
-                <CWText type="b2">
-                  <span className="metric-symbol">{symbol}</span>
-                </CWText>
-              </CWText>
+              <FractionalValue
+                type="b1"
+                className="metric-value"
+                value={marketVolumeDisplay}
+                currencySymbol={` ${symbol}`}
+                symbolLast
+              />
             </div>
           </div>
         </div>
@@ -635,17 +638,25 @@ export const ThreadPredictionMarketCard = ({
               <CWText type="caption" className="pass-label">
                 PASS BALANCE
               </CWText>
-              <CWText type="b2" className="pass-value">
-                {pBalance}&nbsp;
-              </CWText>
+              <FractionalValue
+                type="b2"
+                className="pass-value"
+                value={pBalanceDisplay}
+                currencySymbol={` ${symbol}`}
+                symbolLast
+              />
             </div>
             <div className="balance-label end">
               <CWText type="caption" className="fail-label">
                 FAIL BALANCE
               </CWText>
-              <CWText type="b2" className="fail-value">
-                {fBalance}&nbsp;
-              </CWText>
+              <FractionalValue
+                type="b2"
+                className="fail-value"
+                value={fBalanceDisplay}
+                currencySymbol={` ${symbol}`}
+                symbolLast
+              />
             </div>
           </div>
           <div className="probability-bar">

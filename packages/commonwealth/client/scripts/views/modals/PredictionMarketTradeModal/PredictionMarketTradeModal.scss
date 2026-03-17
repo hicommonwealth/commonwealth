@@ -129,6 +129,11 @@
     .collateral-label {
       color: colors.$neutral-500;
 
+      &.total-minted {
+        display: flex;
+        gap: 2px;
+      }
+
       &.total-minted,
       &.vault-on-chain,
       &.market-ends {

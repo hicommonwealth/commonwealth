@@ -19,3 +19,23 @@ export function formatCollateral(amount: string): string {
     return '0.00';
   }
 }
+
+export function weiToDisplayNumber(
+  value: string | bigint | null | undefined,
+  decimals = 18,
+): number {
+  try {
+    const wei = typeof value === 'bigint' ? value : BigInt(value ?? '0');
+    if (wei <= 0n) return 0;
+    const safeDecimals = Math.max(0, decimals);
+    const raw = wei.toString();
+    if (safeDecimals === 0) return Number(raw);
+    const padded = raw.padStart(safeDecimals + 1, '0');
+    const whole = padded.slice(0, -safeDecimals);
+    const frac = padded.slice(-safeDecimals).replace(/0+$/, '');
+    const composed = frac ? `${whole}.${frac}` : whole;
+    return Number(composed);
+  } catch {
+    return 0;
+  }
+}

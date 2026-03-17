@@ -1,29 +1,14 @@
 import { getThreadUrl } from '@hicommonwealth/shared';
+import { weiToDisplayNumber } from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import FractionalValue from '../../../components/FractionalValue';
 import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CWButton } from '../../../components/component_kit/new_designs/CWButton';
 import { CWTag } from '../../../components/component_kit/new_designs/CWTag';
 import './PredictionMarketsList.scss';
-
-function formatCollateralVolume(wei: string, decimals = 18): string {
-  const n = BigInt(wei);
-  if (n === 0n) return '0';
-  const divisor = 10n ** BigInt(decimals);
-  const whole = n / divisor;
-  const frac = (n % divisor) / (divisor / 1000n);
-  if (whole >= 1_000_000n) {
-    const m = Number(whole) / 1_000_000;
-    return `${m.toFixed(1)}M`;
-  }
-  if (whole >= 1000n) {
-    const k = Number(whole) / 1000;
-    return `${k.toFixed(1)}k`;
-  }
-  return whole.toString() + (frac > 0n ? `.${frac}` : '');
-}
 
 function formatTimeLeft(
   endTime: string | null | undefined,
@@ -91,12 +76,8 @@ export const ExplorePredictionMarketCard = ({
   const navigate = useCommonNavigate();
 
   const timeDisplay = formatTimeLeft(market.end_time, market.status);
-  const totalMinted = market.total_collateral
-    ? formatCollateralVolume(market.total_collateral)
-    : '—';
-  const volume = market.total_collateral
-    ? formatCollateralVolume(market.total_collateral)
-    : '—';
+  const totalMinted = weiToDisplayNumber(market.total_collateral, 18);
+  const volume = weiToDisplayNumber(market.total_collateral, 18);
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -132,17 +113,25 @@ export const ExplorePredictionMarketCard = ({
             <CWText type="caption" className="metric-label">
               Total minted
             </CWText>
-            <CWText type="b1" className="metric-value">
-              {totalMinted} USDC
-            </CWText>
+            <FractionalValue
+              type="b1"
+              className="metric-value"
+              value={totalMinted}
+              currencySymbol=" USDC"
+              symbolLast
+            />
           </div>
           <div className="metric-box">
             <CWText type="caption" className="metric-label">
               Volume
             </CWText>
-            <CWText type="b1" className="metric-value">
-              {volume} USDC
-            </CWText>
+            <FractionalValue
+              type="b1"
+              className="metric-value"
+              value={volume}
+              currencySymbol=" USDC"
+              symbolLast
+            />
           </div>
         </div>
       )}
