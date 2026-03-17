@@ -4,12 +4,10 @@
  * deployPredictionMarket mutation.
  */
 
-import MagicWebWalletController from 'client/scripts/controllers/app/webWallets/MagicWebWallet';
 import PredictionMarket, {
   type DeployPredictionMarketPayload,
 } from 'client/scripts/helpers/ContractHelpers/predictionMarket';
-import { fetchNodes } from 'state/api/nodes';
-import { userStore } from 'state/ui/user';
+import { getEthereumProviderForAddress } from 'client/scripts/helpers/getEthereumProviderForAddress';
 
 export type { DeployPredictionMarketPayload };
 
@@ -61,21 +59,15 @@ export async function deployPredictionMarketOnChain(
     throw new Error('On-chain deployment is not configured for this chain.');
   }
 
-  const userAddresses = userStore.getState().addresses;
-  const isMagicAddress = userAddresses.some(
-    (addr) =>
-      addr.address.toLowerCase() === params.user_address.toLowerCase() &&
-      addr.walletId?.toLowerCase().includes('magic'),
+  // Use the wallet that owns user_address so deploy works with multiple wallets (e.g. MetaMask + OKX).
+  const provider = await getEthereumProviderForAddress(
+    params.user_address,
+    params.eth_chain_id,
   );
-
-  // Use wallet provider for signing (required for eth_sendTransaction).
-  // RPC URLs don't support signing; only Magic needs explicit provider.
-  let provider: string | unknown = undefined;
-  if (isMagicAddress) {
-    await fetchNodes();
-    const controller = new MagicWebWalletController();
-    await controller.enable(String(params.eth_chain_id));
-    provider = (controller as { provider?: unknown }).provider;
+  if (!provider) {
+    throw new Error(
+      'Could not find the wallet for this address. Ensure the wallet is connected.',
+    );
   }
 
   const pm = new PredictionMarket(governorAddress, params.chain_rpc);
