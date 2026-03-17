@@ -20,7 +20,7 @@ import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from 'client/scripts/views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
-// eslint-disable-next-line prettier/prettier
+// eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
