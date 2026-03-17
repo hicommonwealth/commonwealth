@@ -670,11 +670,11 @@ export const PredictionMarketTradeModal = ({
             type="info"
             body={
               sellBalanceZero ? (
-                <>
+                <div>
                   You&apos;re selling <strong>{sellToken}</strong> but your
                   balance is 0. Use the <strong>Mint</strong> tab first (you get
                   equal PASS and FAIL), then return here to swap.
-                </>
+                </div>
               ) : (
                 <>
                   Mint in the&nbsp;<strong>Mint</strong>&nbsp;tab to get PASS
