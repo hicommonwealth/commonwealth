@@ -104,7 +104,7 @@ export const buyPostToken = async (
       walletAddress,
     );
     const feeAmountRaw = await contract.methods
-      .getETHFeeAmount(tokenAddress, safeAmountIn, false)
+      .getETHFeeAmount(tokenAddress, safeAmountIn, true)
       .call();
     const feeAmount = feeAmountRaw[0].toString();
     const txReceipt = await contract.methods
