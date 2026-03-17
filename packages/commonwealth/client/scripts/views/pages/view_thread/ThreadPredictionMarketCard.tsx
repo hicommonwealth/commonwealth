@@ -20,6 +20,7 @@ import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from 'client/scripts/views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+// eslint-disable-next-line prettier/prettier
 import { convertAddressToDropdownOption } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
@@ -350,14 +351,18 @@ export const ThreadPredictionMarketCard = ({
     setTradeRefreshNonce((prev) => prev + 1);
   };
 
-  const handleTradeModalSuccess = async () => {
-    await refreshTradeData();
-    setIsTradeModalOpen(false);
+  const handleTradeModalSuccess = () => {
+    void (async () => {
+      await refreshTradeData();
+      setIsTradeModalOpen(false);
+    })();
   };
 
-  const handleTradeModalClose = async () => {
-    setIsTradeModalOpen(false);
-    await refreshTradeData();
+  const handleTradeModalClose = () => {
+    void (async () => {
+      setIsTradeModalOpen(false);
+      await refreshTradeData();
+    })();
   };
 
   const handleCancelMarket = () => {
