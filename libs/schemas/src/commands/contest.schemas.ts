@@ -4,7 +4,7 @@ import { AuthContext } from '../context';
 import { ContestManager } from '../entities/contest-manager.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
 import { ContestAction } from '../projections';
-import { PG_INT } from '../utils';
+import { ImageUrl, PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {
   input: z.object({
@@ -12,7 +12,7 @@ export const CreateContestManagerMetadata = {
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string(),
     description: z.string().nullish(),
-    image_url: z.string().optional(),
+    image_url: ImageUrl.optional(),
     funding_token_address: z
       .string()
       .optional()
@@ -49,7 +49,7 @@ export const UpdateContestManagerMetadata = {
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string().optional(),
     description: z.string().optional(),
-    image_url: z.string().optional(),
+    image_url: ImageUrl.optional(),
     topic_id: PG_INT.optional(),
     namespace_judge_token_id: PG_INT.optional(),
   }),

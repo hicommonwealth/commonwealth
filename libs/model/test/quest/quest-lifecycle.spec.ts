@@ -36,7 +36,7 @@ async function createQuest(
       community_id,
       name,
       description: chance.sentence(),
-      image_url: chance.url(),
+      image_url: 'https://example.com/image.png',
       start_date,
       end_date,
       max_xp_to_end,

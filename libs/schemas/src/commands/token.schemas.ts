@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { AuthContext } from '../context';
 import { events } from '../events';
 import { LaunchpadTradeView, TokenView } from '../queries';
+import { ImageUrl } from '../utils';
 
 export const CreateToken = {
   input: z.object({
@@ -9,7 +10,7 @@ export const CreateToken = {
     eth_chain_id: z.number(),
     transaction_hash: z.string().length(66),
     description: z.string().nullish(),
-    icon_url: z.string().nullish(),
+    icon_url: ImageUrl.nullish(),
   }),
   output: TokenView.extend({
     community_id: z.string().nullish(),

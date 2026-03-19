@@ -165,7 +165,7 @@ describe('Launchpad Lifecycle', () => {
       payload: {
         name: 'launchpad quest',
         description: chance.sentence(),
-        image_url: chance.url(),
+        image_url: 'https://example.com/image.png',
         start_date: dayjs().add(2, 'day').toDate(),
         end_date: dayjs().add(3, 'day').toDate(),
         max_xp_to_end: 100,
@@ -212,7 +212,7 @@ describe('Launchpad Lifecycle', () => {
         transaction_hash: CREATE_TOKEN_TXN_HASH,
         eth_chain_id,
         description: 'test',
-        icon_url: 'test',
+        icon_url: 'https://example.com/icon.png',
         community_id: community_id!,
       },
     });

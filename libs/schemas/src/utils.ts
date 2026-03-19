@@ -5,6 +5,7 @@ import {
   MIN_SCHEMA_ETH,
   MIN_SCHEMA_INT,
   getFileSizeBytes,
+  isValidImageUrl,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
@@ -43,6 +44,11 @@ export const EVM_BYTES_REGEX = /^0x[0-9a-fA-F]*$/;
 
 export const EVM_ADDRESS = z.string().regex(EVM_ADDRESS_STRICT_REGEX);
 
+export const ImageUrl = z.string().refine((val) => isValidImageUrl(val), {
+  message:
+    'Must be a valid image URL (HTTPS with image extension, data:image/, or ipfs://)',
+});
+
 export const EVM_ADDRESS_STRICT = z.templateLiteral([
   z.literal('0x'),
   z.string().regex(/^[0-9a-fA-F]{40}$/),
@@ -60,7 +66,33 @@ export const EVM_TRANSACTION_HASH = z.templateLiteral([
   z.string().regex(/^[0-9a-fA-F]{64}$/),
 ]);
 
+const ALLOWED_IMAGE_DOMAINS = [
+  'assets.commonwealth.im',
+  's3.us-east-1.amazonaws.com',
+];
+
 export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
+  try {
+    const urlObj = new URL(val);
+    if (
+      !ALLOWED_IMAGE_DOMAINS.some(
+        (d) => urlObj.hostname === d || urlObj.hostname.endsWith('.' + d),
+      )
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Image must be hosted on assets.commonwealth.im',
+      });
+      return;
+    }
+  } catch {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Invalid URL',
+    });
+    return;
+  }
+
   const fileSizeBytes = await getFileSizeBytes(val);
   if (fileSizeBytes === 0) {
     ctx.addIssue({

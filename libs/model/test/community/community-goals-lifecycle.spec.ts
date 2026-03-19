@@ -47,7 +47,7 @@ describe('community goals lifecycle', () => {
       payload: {
         name: `xp ${type} quest`,
         description: chance.sentence(),
-        image_url: chance.url(),
+        image_url: 'https://example.com/image.png',
         start_date: dayjs().add(2, 'day').toDate(),
         end_date: dayjs().add(3, 'day').toDate(),
         max_xp_to_end: 100,
