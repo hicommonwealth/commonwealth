@@ -7,6 +7,7 @@ import {
   withMCPAuthUsername,
 } from '@hicommonwealth/model/services';
 import { buildMCPTools } from '../../api/mcp-server';
+import { config } from '../../config';
 
 const log = logger(import.meta);
 
@@ -46,10 +47,30 @@ export async function getAllMCPServers(
     ],
   });
 
-  return mcpServers.map((server) => ({
-    ...withMCPAuthUsername(server),
-    headers: {},
-  }));
+  return mcpServers.map((server) => {
+    const serverJson = withMCPAuthUsername(server);
+
+    // For the common MCP server, override server_url and headers from config
+    // so OpenAI's servers can reach it with proper authentication
+    if (server.id === 1 && server.handle === 'common') {
+      const authToken = config.MCP.MCP_AUTH_TOKEN;
+      if (!authToken) {
+        log.warn(
+          'MCP_AUTH_TOKEN not configured — common MCP server tools will fail auth',
+        );
+      }
+      return {
+        ...serverJson,
+        server_url: `${config.SERVER_URL}/mcp`,
+        headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+      };
+    }
+
+    return {
+      ...serverJson,
+      headers: {},
+    };
+  });
 }
 
 /**
