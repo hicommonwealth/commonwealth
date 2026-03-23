@@ -35,9 +35,11 @@ async function checkBypass(req: Request) {
   const address = req.headers['address'] as string;
   const apiKey = req.headers['x-api-key'] as string;
 
+  const token = `${address}:${apiKey}`;
   const shouldBypass =
-    config.MCP.MCP_KEY_BYPASS?.length &&
-    `${address}:${apiKey}` === config.MCP.MCP_KEY_BYPASS;
+    (config.MCP.MCP_KEY_BYPASS?.length &&
+      token === config.MCP.MCP_KEY_BYPASS) ||
+    (config.MCP.MCP_AUTH_TOKEN?.length && token === config.MCP.MCP_AUTH_TOKEN);
 
   // If the bypass key doesn't match, we should use normal API key auth
   if (!shouldBypass) {
