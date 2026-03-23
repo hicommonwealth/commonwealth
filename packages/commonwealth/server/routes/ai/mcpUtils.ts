@@ -59,10 +59,13 @@ export async function getAllMCPServers(
           'MCP_AUTH_TOKEN not configured — common MCP server tools will fail auth',
         );
       }
+      const headers: Record<string, string> = authToken
+        ? { Authorization: `Bearer ${authToken}` }
+        : {};
       return {
         ...serverJson,
         server_url: `${config.SERVER_URL}/mcp`,
-        headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+        headers,
       };
     }
 
