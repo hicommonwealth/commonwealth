@@ -3,10 +3,7 @@ import { Community } from '@hicommonwealth/schemas';
 import TokenLaunchpad from 'helpers/ContractHelpers/tokenLaunchpad';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
 import { useMemo, useState } from 'react';
-import {
-  useFetchTokenUsdRateQuery,
-  useGetUserEthBalanceQuery,
-} from 'state/api/communityStake';
+import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import {
   useBuyThreadTokenMutation,
   useCreateThreadTokenTradeMutation,
@@ -83,18 +80,6 @@ export const useThreadTokenWidget = ({
     !primaryTokenAddress ||
     primaryTokenAddress === '0x0000000000000000000000000000000000000000';
 
-  const { data: userEthBalance = '0.0', isLoading: isLoadingEthBalance } =
-    useGetUserEthBalanceQuery({
-      chainRpc,
-      ethChainId,
-      walletAddress: selectedAddress,
-      apiEnabled:
-        tokenizedThreadsEnabled &&
-        !!selectedAddress &&
-        !!chainRpc &&
-        isPrimaryTokenEth,
-    });
-
   const {
     data: userPrimaryTokenBalance = '0.0',
     isLoading: isLoadingPrimaryTokenBalance,
@@ -109,11 +94,9 @@ export const useThreadTokenWidget = ({
       !isPrimaryTokenEth,
   });
 
-  const userBalance = isPrimaryTokenEth
-    ? userEthBalance
-    : userPrimaryTokenBalance;
+  const userBalance = userPrimaryTokenBalance;
   const isLoadingBalance = isPrimaryTokenEth
-    ? isLoadingEthBalance
+    ? false
     : isLoadingPrimaryTokenBalance;
 
   const { data: userTokenBalance = '0.0', isLoading: isLoadingTokenBalance } =

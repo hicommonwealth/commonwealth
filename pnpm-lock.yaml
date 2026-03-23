@@ -28,8 +28,8 @@ importers:
         specifier: ^0.0.3
         version: 0.0.3
       '@commonxyz/common-protocol-abis':
-        specifier: 1.4.14
-        version: 1.4.14
+        specifier: 1.4.15
+        version: 1.4.15
       '@coral-xyz/anchor':
         specifier: ^0.31.1
         version: 0.31.1(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)
@@ -3256,8 +3256,8 @@ packages:
   '@commonxyz/common-governance-abis@0.0.3':
     resolution: {integrity: sha512-679NR5D4sxdm9RczroauX/BF84tULVSkmz/KtzMuFUq4fo0/iQ9HF30xk7X9ADnC2iyrslR7ZB2WHOwDYoMfVQ==}
 
-  '@commonxyz/common-protocol-abis@1.4.14':
-    resolution: {integrity: sha512-yKlnelS+BvDbavj/BdZa9H9qXWkmI0wq38kNINL38XQ+8u1XSvcaCWF63g0g3g/L9czHl7c6qb9F+bAwZgtPDQ==}
+  '@commonxyz/common-protocol-abis@1.4.15':
+    resolution: {integrity: sha512-oXTOKss2DxfxhXnXvHtIgrMHxjzPODIN7OJTbavFXJ/sDQtg5Dua0OpqDMxkWSXtSdw3Pn5QZBAI1551f8HflA==}
 
   '@commonxyz/uniswap-widgets@1.0.0':
     resolution: {integrity: sha512-NL9faQucl1h6s0xCFJnkeeU0pgnKf1tW3O8HtOJY6Z4LTaSkeXp3geSbVqW4o02vCNqUSm9uboWCddhhrECUmQ==}
@@ -23617,7 +23617,7 @@ snapshots:
 
   '@commonxyz/common-governance-abis@0.0.3': {}
 
-  '@commonxyz/common-protocol-abis@1.4.14': {}
+  '@commonxyz/common-protocol-abis@1.4.15': {}
 
   '@commonxyz/uniswap-widgets@1.0.0(@babel/core@7.27.4)(@babel/runtime@7.27.6)(@babel/template@7.27.2)(@ethersproject/abi@5.7.0)(@ethersproject/bignumber@5.8.0)(@ethersproject/contracts@5.7.0)(@types/react@18.3.3)(@urql/core@5.1.1(graphql@16.9.0))(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.17(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.12))(@types/node@24.0.3)(typescript@5.8.2))(typescript@5.8.2)(utf-8-validate@5.0.10))(react-dom@18.3.1(react@18.3.1))(react-redux@9.1.2(@types/react@18.3.3)(react@18.3.1)(redux@4.2.1))(react@18.3.1)(redux@4.2.1)(styled-components@6.1.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.2)(valtio@1.13.2(@types/react@18.3.3)(react@18.3.1))(wonka@6.3.5)(zod@4.1.1)':
     dependencies:

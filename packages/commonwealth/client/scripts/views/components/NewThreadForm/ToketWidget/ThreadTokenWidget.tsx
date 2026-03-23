@@ -526,8 +526,7 @@ const ThreadTokenWidget = ({
                 isThreadCreationMode || !isSellMode
                   ? userBalance
                   : userTokenBalance,
-              ) ||
-            isWrongNetwork
+              )
           }
           className="buy-button"
         />
