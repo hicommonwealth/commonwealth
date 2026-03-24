@@ -39,7 +39,8 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
     if (!inputSchema) {
       throw new Error(`No input schema for ${key}`);
     }
-    const outputSchema = procedure._def.output as ZodType | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const outputSchema = (procedure._def as any).output as ZodType | undefined;
     return {
       name: key,
       description: inputSchema.description || '',
@@ -100,7 +101,9 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
   // Per-tool MCP overrides: strip fields that shouldn't be exposed to LLM callers
   const getThreadsTool = tools.find((t) => t.name === 'getThreads');
   if (getThreadsTool) {
-    getThreadsTool.inputSchema = (getThreadsTool.inputSchema as z.AnyZodObject)
+    getThreadsTool.inputSchema = (
+      getThreadsTool.inputSchema as z.ZodObject<z.ZodRawShape>
+    )
       .omit({ stage: true, contestAddress: true, status: true })
       .describe(
         'Search and list threads in a community with filtering and sorting.',
