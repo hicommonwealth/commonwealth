@@ -275,7 +275,9 @@ export const GetThreads = {
     status: GetThreadsStatus.optional(),
     withXRecentComments: z.number().optional(),
   }).describe(
-    'Search and list threads in a community with filtering and sorting',
+    'Search and list threads in a community with filtering and sorting. ' +
+      'Do not provide both "stage" and "status" — they are mutually exclusive. ' +
+      '"status" requires "contestAddress" to also be provided.',
   ),
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),

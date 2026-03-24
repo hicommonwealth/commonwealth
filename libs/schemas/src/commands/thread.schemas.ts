@@ -36,7 +36,10 @@ export const CreateThread = {
     canvas_msg_id: z.string().optional(),
     is_linking_token: z.boolean().optional(),
     turnstile_token: z.string().nullish(),
-  }).describe('Create a new discussion or link thread in a community topic'),
+  }).describe(
+    'Create a new thread in a community topic. ' +
+      'Set kind to "discussion" for text posts or "link" for link posts (requires url).',
+  ),
   output: Thread.extend({ community_tier: COMMUNITY_TIER }),
   context: TopicContext,
 };

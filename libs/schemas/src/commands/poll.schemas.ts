@@ -36,7 +36,11 @@ export const CreatePollVote = {
       poll_id: PG_INT,
       option: z.string(),
     })
-    .describe('Vote on a poll option'),
+    .describe(
+      'Vote on a poll option. ' +
+        "The option must be one of the poll's defined options. " +
+        'The thread must not be archived or locked.',
+    ),
   output: Vote,
   context: PollContext,
 };

@@ -352,7 +352,10 @@ export const UpdateGroup = {
         )
         .optional(),
     })
-    .describe("Update a group's metadata, requirements, or topic permissions"),
+    .describe(
+      "Update a group's metadata, requirements, or topic permissions. " +
+        'Cannot update system-managed groups.',
+    ),
   output: Group.partial(),
   context: AuthContext,
 };
@@ -363,7 +366,9 @@ export const DeleteGroup = {
       community_id: z.string(),
       group_id: PG_INT,
     })
-    .describe('Delete a group from a community'),
+    .describe(
+      'Delete a group from a community. Cannot delete system-managed groups.',
+    ),
   output: z.object({
     community_id: z.string(),
     group_id: PG_INT,
@@ -404,7 +409,8 @@ export const UpdateRole = {
       role: z.enum(Roles),
     })
     .describe(
-      "Update a member's role in a community (member, moderator, admin)",
+      "Update a member's role in a community (member, moderator, admin). " +
+        'A community must always have at least one admin.',
     ),
   output: Address.partial(),
   context: AuthContext,

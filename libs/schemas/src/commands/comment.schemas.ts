@@ -17,7 +17,11 @@ export const CreateComment = {
   input: CanvasComment.extend({
     discord_meta: DiscordMetaSchema.optional(),
     turnstile_token: z.string().nullish(),
-  }).describe('Create a comment on a thread'),
+  }).describe(
+    'Create a comment on a thread. ' +
+      'The thread must not be read-only or archived. ' +
+      'Use parent_id to reply to an existing comment (max 8 levels deep).',
+  ),
   output: Comment.extend({ community_id: z.string() }),
   context: ThreadContext,
 };

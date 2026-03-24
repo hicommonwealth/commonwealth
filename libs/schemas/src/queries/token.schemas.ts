@@ -94,7 +94,10 @@ export const GetLaunchpadTrades = {
       trader_addresses: z.string().optional(),
       user_id: z.number().optional(),
     })
-    .describe('Get launchpad token trade history'),
+    .describe(
+      'Get launchpad token trade history. ' +
+        'At least one of token_address, trader_addresses, or user_id must be provided.',
+    ),
   output: LaunchpadTrade.extend({
     community_token_amount: z.string(),
     floating_supply: z.string(),

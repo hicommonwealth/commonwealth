@@ -48,7 +48,12 @@ export const GetComments = {
     .omit({
       order_direction: true,
     })
-    .describe('Get comments on a thread with pagination'),
+    .describe(
+      'Get comments on a thread with pagination. ' +
+        'Provide thread_id to get all comments on a thread, ' +
+        'or comment_id to get a specific comment, ' +
+        'or parent_id to get replies to a comment.',
+    ),
   output: PaginatedResultSchema.extend({
     results: z.array(CommentsView),
   }),
