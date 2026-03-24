@@ -35,7 +35,7 @@ export const GetTokens = {
     with_stats: z.boolean().optional(),
     is_graduated: z.boolean().optional(),
     token_type: TokenTypeEnum.optional(),
-  }),
+  }).describe('Search and list launchpad tokens with sorting options'),
   output: PaginatedResultSchema.extend({
     results: z.union([LaunchpadTokenView, ThreadTokenView]).array(),
   }),
@@ -88,11 +88,13 @@ export const LaunchpadTradeView = LaunchpadTrade.extend({
 });
 
 export const GetLaunchpadTrades = {
-  input: z.object({
-    token_address: z.string().optional(),
-    trader_addresses: z.string().optional(),
-    user_id: z.number().optional(),
-  }),
+  input: z
+    .object({
+      token_address: z.string().optional(),
+      trader_addresses: z.string().optional(),
+      user_id: z.number().optional(),
+    })
+    .describe('Get launchpad token trade history'),
   output: LaunchpadTrade.extend({
     community_token_amount: z.string(),
     floating_supply: z.string(),
@@ -118,10 +120,12 @@ export const GetTokenizedThreadsAllowed = {
 };
 
 export const GetTokenInfoAlchemy = {
-  input: z.object({
-    eth_chain_id: z.number(),
-    token_address: z.string(),
-  }),
+  input: z
+    .object({
+      eth_chain_id: z.number(),
+      token_address: z.string(),
+    })
+    .describe('Get token price and market data from Alchemy'),
   output: z.object({
     network: z.string(),
     address: z.string(),

@@ -72,24 +72,26 @@ export const GetCommunities = {
       ])
       .optional(),
     order_direction: z.enum(['ASC', 'DESC']).optional(),
-  }).refine(
-    (data) => {
-      // order_by can't be 'last_30_day_thread_count' if 'include_last_30_day_thread_count' is falsy
-      if (
-        !data.include_last_30_day_thread_count &&
-        data.order_by === 'last_30_day_thread_count'
-      ) {
-        return false; // fail validation
-      }
+  })
+    .refine(
+      (data) => {
+        // order_by can't be 'last_30_day_thread_count' if 'include_last_30_day_thread_count' is falsy
+        if (
+          !data.include_last_30_day_thread_count &&
+          data.order_by === 'last_30_day_thread_count'
+        ) {
+          return false; // fail validation
+        }
 
-      // pass validation
-      return true;
-    },
-    {
-      message:
-        "'order_by' cannot be 'last_30_day_thread_count' when 'include_last_30_day_thread_count' is not specified",
-    },
-  ),
+        // pass validation
+        return true;
+      },
+      {
+        message:
+          "'order_by' cannot be 'last_30_day_thread_count' when 'include_last_30_day_thread_count' is not specified",
+      },
+    )
+    .describe('Search and filter communities with pagination'),
   output: PaginatedResultSchema.extend({
     results: Community.extend({
       last_30_day_thread_count: PG_INT.optional().nullish(),
@@ -98,12 +100,14 @@ export const GetCommunities = {
 };
 
 export const GetCommunity = {
-  input: z.object({
-    id: z.string(),
-    include_node_info: z.boolean().optional(),
-    include_groups: z.boolean().optional(),
-    include_mcp_servers: z.boolean().optional(),
-  }),
+  input: z
+    .object({
+      id: z.string(),
+      include_node_info: z.boolean().optional(),
+      include_groups: z.boolean().optional(),
+      include_mcp_servers: z.boolean().optional(),
+    })
+    .describe('Get detailed information about a specific community'),
   output: z.union([ExtendedCommunity, z.undefined()]),
 };
 
@@ -169,7 +173,7 @@ export const GetCommunityMembers = {
       .optional(),
     /** If true, search will match both profile name and address. */
     searchByNameAndAddress: z.boolean().optional().default(false),
-  }),
+  }).describe('Search and list members of a community'),
   output: PaginatedResultSchema.extend({
     results: CommunityMember.array(),
   }),
@@ -245,11 +249,13 @@ export const TopicView = Topic.extend({
 });
 
 export const GetTopics = {
-  input: z.object({
-    community_id: z.string(),
-    with_contest_managers: z.boolean().optional(),
-    with_archived_topics: z.boolean().optional(),
-  }),
+  input: z
+    .object({
+      community_id: z.string(),
+      with_contest_managers: z.boolean().optional(),
+      with_archived_topics: z.boolean().optional(),
+    })
+    .describe('Get topics for a community'),
   output: z.array(TopicView),
 };
 

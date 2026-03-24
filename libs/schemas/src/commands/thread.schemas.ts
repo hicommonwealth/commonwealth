@@ -36,34 +36,36 @@ export const CreateThread = {
     canvas_msg_id: z.string().optional(),
     is_linking_token: z.boolean().optional(),
     turnstile_token: z.string().nullish(),
-  }),
+  }).describe('Create a new discussion or link thread in a community topic'),
   output: Thread.extend({ community_tier: COMMUNITY_TIER }),
   context: TopicContext,
 };
 
 export const UpdateThread = {
-  input: z.object({
-    thread_id: PG_INT,
-    body: z.string().optional(),
-    title: z.string().optional(),
-    topic_id: PG_INT.optional(),
-    stage: z.string().optional(),
-    url: z.string().url().optional(),
-    locked: z.boolean().optional(),
-    pinned: z.boolean().optional(),
-    archived: z.boolean().optional(),
-    spam: z.boolean().optional(),
-    collaborators: z
-      .object({
-        toAdd: z.array(PG_INT).optional(),
-        toRemove: z.array(PG_INT).optional(),
-      })
-      .optional(),
-    canvas_signed_data: z.string().optional(),
-    canvas_msg_id: z.string().optional(),
-    is_linking_token: z.boolean().optional(),
-    launchpad_token_address: z.string().nullish(),
-  }),
+  input: z
+    .object({
+      thread_id: PG_INT,
+      body: z.string().optional(),
+      title: z.string().optional(),
+      topic_id: PG_INT.optional(),
+      stage: z.string().optional(),
+      url: z.string().url().optional(),
+      locked: z.boolean().optional(),
+      pinned: z.boolean().optional(),
+      archived: z.boolean().optional(),
+      spam: z.boolean().optional(),
+      collaborators: z
+        .object({
+          toAdd: z.array(PG_INT).optional(),
+          toRemove: z.array(PG_INT).optional(),
+        })
+        .optional(),
+      canvas_signed_data: z.string().optional(),
+      canvas_msg_id: z.string().optional(),
+      is_linking_token: z.boolean().optional(),
+      launchpad_token_address: z.string().nullish(),
+    })
+    .describe("Update a thread's title, body, topic, or moderation status"),
   output: Thread.extend({ spam_toggled: z.boolean() }),
   context: ThreadContext,
 };
@@ -77,7 +79,7 @@ export const ThreadCanvasReaction = z.object({
 });
 
 export const CreateThreadReaction = {
-  input: ThreadCanvasReaction,
+  input: ThreadCanvasReaction.describe('Like a thread'),
   output: Reaction.extend({
     community_id: z.string(),
     thread_id: PG_INT,
@@ -86,11 +88,13 @@ export const CreateThreadReaction = {
 };
 
 export const DeleteThread = {
-  input: z.object({
-    thread_id: PG_INT,
-    canvas_signed_data: z.string().optional(),
-    canvas_msg_id: z.string().optional(),
-  }),
+  input: z
+    .object({
+      thread_id: PG_INT,
+      canvas_signed_data: z.string().optional(),
+      canvas_msg_id: z.string().optional(),
+    })
+    .describe('Delete a thread'),
   output: z.object({
     thread_id: PG_INT,
     community_id: z.string(),
@@ -101,21 +105,25 @@ export const DeleteThread = {
 };
 
 export const DeleteReaction = {
-  input: z.object({
-    community_id: z.string(),
-    reaction_id: PG_INT,
-    canvas_signed_data: z.string().optional(),
-    canvas_msg_id: z.string().optional(),
-  }),
+  input: z
+    .object({
+      community_id: z.string(),
+      reaction_id: PG_INT,
+      canvas_signed_data: z.string().optional(),
+      canvas_msg_id: z.string().optional(),
+    })
+    .describe('Remove a reaction from a thread or comment'),
   output: Reaction,
   context: ReactionContext,
 };
 
 export const AddLinks = {
-  input: z.object({
-    thread_id: PG_INT,
-    links: z.array(Link),
-  }),
+  input: z
+    .object({
+      thread_id: PG_INT,
+      links: z.array(Link),
+    })
+    .describe('Add links to a thread'),
   output: Thread.extend({
     new_links: z.array(Link),
   }),
@@ -123,20 +131,24 @@ export const AddLinks = {
 };
 
 export const DeleteLinks = {
-  input: z.object({
-    thread_id: PG_INT,
-    links: z.array(Link),
-  }),
+  input: z
+    .object({
+      thread_id: PG_INT,
+      links: z.array(Link),
+    })
+    .describe('Remove links from a thread'),
   output: Thread,
   context: ThreadContext,
 };
 
 export const CreateThreadToken = {
-  input: z.object({
-    community_id: z.string(),
-    eth_chain_id: z.number(),
-    transaction_hash: z.string().length(66),
-  }),
+  input: z
+    .object({
+      community_id: z.string(),
+      eth_chain_id: z.number(),
+      transaction_hash: z.string().length(66),
+    })
+    .describe('Create a token associated with a thread'),
   output: ThreadToken,
   context: AuthContext,
 };
@@ -147,17 +159,21 @@ export const ThreadTokenTradeView = ThreadTokenTrade.extend({
 });
 
 export const CreateThreadTokenTrade = {
-  input: z.object({
-    eth_chain_id: z.number(),
-    transaction_hash: z.string().length(66),
-  }),
+  input: z
+    .object({
+      eth_chain_id: z.number(),
+      transaction_hash: z.string().length(66),
+    })
+    .describe('Execute a trade on a thread token'),
   output: ThreadTokenTradeView.optional(),
 };
 
 export const GetThreadTokenHolders = {
-  input: z.object({
-    thread_id: PG_INT.optional(),
-  }),
+  input: z
+    .object({
+      thread_id: PG_INT.optional(),
+    })
+    .describe('Get token holders for a thread token'),
   output: z
     .object({
       user_id: z.string().nullish(),

@@ -26,50 +26,52 @@ import { Address } from '../entities/user.schemas';
 import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
-  input: z.object({
-    id: z.string(),
-    name: z
-      .string()
-      .max(255)
-      .regex(COMMUNITY_NAME_REGEX, {
-        message: COMMUNITY_NAME_ERROR,
-      })
-      .refine((data) => !data.includes(ALL_COMMUNITIES), {
-        message: `String must not contain '${ALL_COMMUNITIES}'`,
-      })
-      .refine((val) => !emojiRegex().test(val), {
-        message: 'name must not contain emojis',
-      })
-      .refine((val) => !/common/i.test(val), {
-        message: 'Name must not contain the word "Common"',
-      }),
-    chain_node_id: PG_INT,
-    description: z.string().optional(),
-    icon_url: z
-      .string()
-      .url()
-      .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
-      .optional(),
-    social_links: z.array(z.string().url()).default([]),
-    tags: z.array(z.string()).default([]), // community tags are dynamic, tags should be validated in service method
-    directory_page_enabled: z.boolean().default(false),
-    type: z.enum(ChainType).default(ChainType.Offchain),
-    base: z.enum(ChainBase),
-    allow_tokenized_threads: z.boolean().optional(),
-    thread_purchase_token: z.string().optional(),
+  input: z
+    .object({
+      id: z.string(),
+      name: z
+        .string()
+        .max(255)
+        .regex(COMMUNITY_NAME_REGEX, {
+          message: COMMUNITY_NAME_ERROR,
+        })
+        .refine((data) => !data.includes(ALL_COMMUNITIES), {
+          message: `String must not contain '${ALL_COMMUNITIES}'`,
+        })
+        .refine((val) => !emojiRegex().test(val), {
+          message: 'name must not contain emojis',
+        })
+        .refine((val) => !/common/i.test(val), {
+          message: 'Name must not contain the word "Common"',
+        }),
+      chain_node_id: PG_INT,
+      description: z.string().optional(),
+      icon_url: z
+        .string()
+        .url()
+        .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
+        .optional(),
+      social_links: z.array(z.string().url()).default([]),
+      tags: z.array(z.string()).default([]), // community tags are dynamic, tags should be validated in service method
+      directory_page_enabled: z.boolean().default(false),
+      type: z.enum(ChainType).default(ChainType.Offchain),
+      base: z.enum(ChainBase),
+      allow_tokenized_threads: z.boolean().optional(),
+      thread_purchase_token: z.string().optional(),
 
-    // hidden optional params
-    token_name: z.string().optional(),
+      // hidden optional params
+      token_name: z.string().optional(),
 
-    // deprecated params to be removed
-    default_symbol: z.string().max(9),
-    website: z.string().url().optional(),
-    github: z.string().url().startsWith('https://github.com/').optional(),
-    telegram: z.string().url().startsWith('https://t.me/').optional(),
-    element: z.string().url().startsWith('https://matrix.to/').optional(),
-    discord: z.string().url().startsWith('https://discord.com/').optional(),
-    turnstile_token: z.string().nullish(),
-  }),
+      // deprecated params to be removed
+      default_symbol: z.string().max(9),
+      website: z.string().url().optional(),
+      github: z.string().url().startsWith('https://github.com/').optional(),
+      telegram: z.string().url().startsWith('https://t.me/').optional(),
+      element: z.string().url().startsWith('https://matrix.to/').optional(),
+      discord: z.string().url().startsWith('https://discord.com/').optional(),
+      turnstile_token: z.string().nullish(),
+    })
+    .describe('Create a new community with chain configuration'),
   output: z.object({
     community: Community,
     admin_address: z.string().optional(),
@@ -162,7 +164,8 @@ export const UpdateCommunity = {
       transactionHash: z.string().optional(),
       launchpad_weighted_voting: z.boolean().optional(),
       launchpad_token_image: z.string().optional(),
-    }),
+    })
+    .describe('Update community settings and metadata'),
   output: Community,
   context: AuthContext,
 };
@@ -227,7 +230,8 @@ export const CreateTopic = {
         allow_tokenized_threads: true,
         secondary_tokens: true,
       }),
-    ),
+    )
+    .describe('Create a new topic in a community'),
   output: z.object({
     topic: Topic.partial(),
     user_id: z.number(),
@@ -251,7 +255,8 @@ export const UpdateTopic = {
         default_offchain_template: z.string().nullish(),
         allow_tokenized_threads: z.boolean().optional(),
       }),
-    ),
+    )
+    .describe("Update a topic's name, description, or settings"),
   output: z.object({
     topic: Topic.partial(),
     user_id: z.number(),
@@ -269,11 +274,13 @@ export const UpdateTopicChannel = {
 };
 
 export const ToggleArchiveTopic = {
-  input: z.object({
-    community_id: z.string(),
-    topic_id: PG_INT,
-    archive: z.boolean(),
-  }),
+  input: z
+    .object({
+      community_id: z.string(),
+      topic_id: PG_INT,
+      archive: z.boolean(),
+    })
+    .describe('Archive or unarchive a topic'),
   output: z.object({
     community_id: z.string(),
     topic_id: PG_INT,
@@ -290,20 +297,22 @@ const GroupMetadata = z.object({
 });
 
 export const CreateGroup = {
-  input: z.object({
-    community_id: z.string(),
-    metadata: GroupMetadata,
-    requirements: z.array(Requirement).optional(),
-    topics: z
-      .array(
-        z.object({
-          id: PG_INT,
-          is_private: z.boolean().optional(),
-          permissions: z.array(z.enum(GatedActionEnum)),
-        }),
-      )
-      .optional(),
-  }),
+  input: z
+    .object({
+      community_id: z.string(),
+      metadata: GroupMetadata,
+      requirements: z.array(Requirement).optional(),
+      topics: z
+        .array(
+          z.object({
+            id: PG_INT,
+            is_private: z.boolean().optional(),
+            permissions: z.array(z.enum(GatedActionEnum)),
+          }),
+        )
+        .optional(),
+    })
+    .describe('Create a gated group with membership requirements'),
   output: Community.extend({ groups: z.array(Group).optional() }).partial(),
   context: AuthContext,
 };
@@ -327,30 +336,34 @@ export const LinkNamespace = {
 };
 
 export const UpdateGroup = {
-  input: z.object({
-    community_id: z.string(),
-    group_id: PG_INT,
-    metadata: GroupMetadata.optional(),
-    requirements: z.array(Requirement).optional(),
-    topics: z
-      .array(
-        z.object({
-          id: PG_INT,
-          is_private: z.boolean().optional(),
-          permissions: z.array(z.enum(GatedActionEnum)),
-        }),
-      )
-      .optional(),
-  }),
+  input: z
+    .object({
+      community_id: z.string(),
+      group_id: PG_INT,
+      metadata: GroupMetadata.optional(),
+      requirements: z.array(Requirement).optional(),
+      topics: z
+        .array(
+          z.object({
+            id: PG_INT,
+            is_private: z.boolean().optional(),
+            permissions: z.array(z.enum(GatedActionEnum)),
+          }),
+        )
+        .optional(),
+    })
+    .describe("Update a group's metadata, requirements, or topic permissions"),
   output: Group.partial(),
   context: AuthContext,
 };
 
 export const DeleteGroup = {
-  input: z.object({
-    community_id: z.string(),
-    group_id: PG_INT,
-  }),
+  input: z
+    .object({
+      community_id: z.string(),
+      group_id: PG_INT,
+    })
+    .describe('Delete a group from a community'),
   output: z.object({
     community_id: z.string(),
     group_id: PG_INT,
@@ -384,11 +397,15 @@ export const DeleteAllAddresses = {
 };
 
 export const UpdateRole = {
-  input: z.object({
-    community_id: z.string(),
-    address: z.string(),
-    role: z.enum(Roles),
-  }),
+  input: z
+    .object({
+      community_id: z.string(),
+      address: z.string(),
+      role: z.enum(Roles),
+    })
+    .describe(
+      "Update a member's role in a community (member, moderator, admin)",
+    ),
   output: Address.partial(),
   context: AuthContext,
 };
@@ -427,9 +444,11 @@ export const SelectCommunity = {
 };
 
 export const JoinCommunity = {
-  input: z.object({
-    community_id: z.string(),
-  }),
+  input: z
+    .object({
+      community_id: z.string(),
+    })
+    .describe("Join a community with the authenticated user's address"),
   output: z.object({
     community_id: z.string(),
     base: z.enum(ChainBase),
@@ -442,10 +461,12 @@ export const JoinCommunity = {
 };
 
 export const BanAddress = {
-  input: z.object({
-    community_id: z.string(),
-    address: z.string(),
-  }),
+  input: z
+    .object({
+      community_id: z.string(),
+      address: z.string(),
+    })
+    .describe('Ban an address from a community'),
   output: z.object({}),
   context: AuthContext,
 };

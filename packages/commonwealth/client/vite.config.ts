@@ -159,7 +159,11 @@ export default defineConfig(({ mode }) => {
           secure: false,
         },
       },
-      allowedHosts: ['common.ngrok.app', 'tim.affinity.fun'],
+      allowedHosts: [
+        'common.ngrok.app',
+        'tim.affinity.fun',
+        ...(env.APP_ENV !== 'production' ? ['.ngrok-free.app'] : []),
+      ],
     },
     resolve: {
       alias: [

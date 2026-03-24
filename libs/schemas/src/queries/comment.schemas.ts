@@ -44,9 +44,11 @@ export const GetComments = {
     include_spam_comments: zBoolean.optional().default(false),
     is_chat_mode: zBoolean.optional().default(false),
     order_by: GetCommentsOrderBy.optional().default('newest'),
-  }).omit({
-    order_direction: true,
-  }),
+  })
+    .omit({
+      order_direction: true,
+    })
+    .describe('Get comments on a thread with pagination'),
   output: PaginatedResultSchema.extend({
     results: z.array(CommentsView),
   }),

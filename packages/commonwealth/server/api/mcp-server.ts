@@ -1,7 +1,4 @@
 import { Actor, logger } from '@hicommonwealth/core';
-import { config } from '@hicommonwealth/model';
-import { models } from '@hicommonwealth/model/db';
-import { User } from '@hicommonwealth/schemas';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
@@ -14,7 +11,6 @@ import {
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 import { IncomingMessage } from 'http';
-import { Op } from 'sequelize';
 import { z, ZodType } from 'zod';
 import {
   api as externalApi,
@@ -28,53 +24,9 @@ type CommonMCPTool<T extends z.ZodType = z.ZodType> = {
   name: string;
   description: string;
   inputSchema: T;
+  outputSchema?: z.ZodType;
   fn: (token: string | null, input: z.infer<T>) => Promise<unknown>;
 };
-
-async function checkBypass(req: Request) {
-  const address = req.headers['address'] as string;
-  const apiKey = req.headers['x-api-key'] as string;
-
-  const token = `${address}:${apiKey}`;
-  const shouldBypass =
-    (config.MCP.MCP_KEY_BYPASS?.length &&
-      token === config.MCP.MCP_KEY_BYPASS) ||
-    (config.MCP.MCP_AUTH_TOKEN?.length && token === config.MCP.MCP_AUTH_TOKEN);
-
-  // If the bypass key doesn't match, we should use normal API key auth
-  if (!shouldBypass) {
-    return false;
-  }
-
-  // If bypass key matches but no address provided, we can't proceed
-  if (!address) {
-    throw new Error('Address header required for MCP bypass');
-  }
-
-  // Look up the address and set the user
-  const addr = await models.Address.findOne({
-    where: {
-      address: address,
-      verified: { [Op.ne]: null },
-    },
-    include: [
-      {
-        model: models.User,
-        required: true,
-      },
-    ],
-  });
-  if (!addr?.User?.id) {
-    throw new Error(`No verified user found for address: ${address}`);
-  }
-
-  req.address = addr;
-  const user = addr.User;
-  // Remove ApiKey from user object like the middleware does
-  delete user.ApiKey;
-  req.user = models.User.build(user as z.infer<typeof User>);
-  return true;
-}
 
 // map external trpc router procedures to MCP tools
 export const buildMCPTools = (): Array<CommonMCPTool> => {
@@ -87,12 +39,20 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
     if (!inputSchema) {
       throw new Error(`No input schema for ${key}`);
     }
+    const outputSchema = procedure._def.output as ZodType | undefined;
     return {
       name: key,
       description: inputSchema.description || '',
       inputSchema,
+      outputSchema,
       fn: async (token: string | null, input: z.infer<typeof inputSchema>) => {
         const [address, apiKey] = token?.split(':') || [];
+
+        if (!address || !apiKey) {
+          throw new Error(
+            'MCP tool auth requires Authorization header with Bearer <address>:<apiKey>',
+          );
+        }
 
         // build request and response objects to pass to the middleware
         const req = {
@@ -105,26 +65,23 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
 
         const res = {} as Response;
 
-        // execute api key middleware
-        const shouldBypass = await checkBypass(req);
-        if (!shouldBypass) {
-          let err: Error | null = null;
-          await apiKeyAuthMiddleware(req, res, (error?: unknown) => {
-            if (error) {
-              err = error as Error;
-            }
-          });
-          if (err) {
-            throw err;
+        // authenticate via real API key — no bypass
+        let err: Error | null = null;
+        await apiKeyAuthMiddleware(req, res, (error?: unknown) => {
+          if (error) {
+            err = error as Error;
           }
+        });
+        if (err) {
+          log.error(`MCP tool auth failed for ${key}:`, err);
+          throw err;
         }
 
-        // Ensure user is set after authentication
         if (!req.user) {
           throw new Error('User not authenticated');
         }
 
-        // trigger trcp procedure pipeline
+        // trigger trpc procedure pipeline
         const trpcCaller = externalTrpcRouter.createCaller({
           req,
           res,
@@ -164,20 +121,34 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
     },
   );
 
+  const toJsonSchema = (schema: z.ZodType) =>
+    z.toJSONSchema(schema, {
+      unrepresentable: 'any',
+      override: ({ zodSchema, jsonSchema }) => {
+        if (zodSchema instanceof z.ZodDate) {
+          jsonSchema.type = 'string';
+        }
+      },
+    });
+
   mcpServer.setRequestHandler(ListToolsRequestSchema, () => {
     return {
-      tools: tools.map((tool) => ({
-        name: tool.name,
-        description: tool.description,
-        inputSchema: z.toJSONSchema(tool.inputSchema, {
-          unrepresentable: 'any',
-          override: ({ zodSchema, jsonSchema }) => {
-            if (zodSchema instanceof z.ZodDate) {
-              jsonSchema.type = 'string';
-            }
-          },
-        }),
-      })),
+      tools: tools.map((tool) => {
+        let outputSchema: Record<string, unknown> | undefined;
+        if (tool.outputSchema) {
+          const json = toJsonSchema(tool.outputSchema);
+          // MCP protocol requires outputSchema to have type "object"
+          if (json.type === 'object') {
+            outputSchema = json;
+          }
+        }
+        return {
+          name: tool.name,
+          description: tool.description,
+          inputSchema: toJsonSchema(tool.inputSchema),
+          ...(outputSchema ? { outputSchema } : {}),
+        };
+      }),
     };
   });
 
