@@ -77,7 +77,9 @@ export const UpdateUser = {
 };
 
 export const GetNewContent = {
-  input: z.object({}),
+  input: z
+    .object({})
+    .describe('Check which joined communities have new content'),
   output: z.object({
     joinedCommunityIdsWithNewContent: z.array(z.string()),
   }),
