@@ -1,6 +1,6 @@
-import { SupportedCryptoCurrencies } from 'helpers/currency';
 import React from 'react';
 import useBeforeUnload from 'shared/hooks/useBeforeUnload';
+import { SupportedCryptoCurrencies } from 'shared/utils/currency';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CommonTradeTokenForm, {
   useCommonTradeTokenForm,

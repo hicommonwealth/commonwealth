@@ -63,7 +63,9 @@ export const GetUserProfile = {
 };
 
 export const GetUser = {
-  input: z.object({}),
+  input: z
+    .object({})
+    .describe("Get the authenticated user's profile information"),
   output: z.union([User, z.object({})]),
 };
 

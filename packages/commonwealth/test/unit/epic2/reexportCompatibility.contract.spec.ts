@@ -28,6 +28,197 @@ const contracts: ModuleContract[] = [
     requiredExports: ['isLinkValid', 'getLinkType', 'categorizeSocialLinks'],
   },
   {
+    legacySpecifier: '../../../client/scripts/helpers/currency.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/currency.ts'],
+    requiredExports: [
+      'SupportedFiatCurrencies',
+      'SupportedCryptoCurrencies',
+      'getAmountWithCurrencySymbol',
+    ],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/typeGuards.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/typeGuards.ts'],
+    requiredExports: ['isUndefined', 'isNotUndefined', 'isNonEmptyString'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/rateLimit.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/rateLimit.ts'],
+    requiredExports: ['RATE_LIMIT_MESSAGE', 'isRateLimitError'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/localStorage.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/localStorage.ts'],
+    requiredExports: [
+      'LocalStorageKeys',
+      'getLocalStorageItem',
+      'setLocalStorageItem',
+    ],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/string.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/string.ts'],
+    requiredExports: ['splitCamelOrPascalCase'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/number.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/number.ts'],
+    requiredExports: [
+      'calculateRemainingPercentageChangeFractional',
+      'roundDecimalsOrReturnWhole',
+    ],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/tooltipTexts.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/tooltipTexts.ts'],
+    requiredExports: ['disabledStakeButtonTooltipText'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/truncate.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/truncate.ts'],
+    requiredExports: ['truncate'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/browser.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/browser.ts'],
+    requiredExports: ['getBrowserInfo', 'getBrowserType'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/awsHelpers.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/awsHelpers.ts'],
+    requiredExports: ['isS3URL'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/dom.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/dom.ts'],
+    requiredExports: ['listenForDOMNodeApperance'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/image.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/image.ts'],
+    requiredExports: ['generateBlobImageFromAlphabet'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/utils/Permissions.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/Permissions.ts'],
+    requiredExports: ['default'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/utils/clipboard.ts',
+    futureSpecifiers: ['../../../client/scripts/shared/utils/clipboard.ts'],
+    requiredExports: ['saveToClipboard'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/utils/downloadDataAsFile.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/shared/utils/downloadDataAsFile.ts',
+    ],
+    requiredExports: ['downloadDataAsFile'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/quest.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/quests/utils/quest.ts',
+    ],
+    requiredExports: ['calculateQuestTimelineLabel', 'resetXPCacheForUser'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/snapshot_utils.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/governance/utils/snapshot_utils.ts',
+    ],
+    requiredExports: ['createProposal', 'getScore', 'loadMultipleSpacesData'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/launchpad.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/tokens/utils/launchpad.ts',
+    ],
+    requiredExports: ['calculateTokenPricing'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/findDenomination.tsx',
+    futureSpecifiers: [
+      '../../../client/scripts/features/tokens/utils/findDenomination.tsx',
+    ],
+    requiredExports: ['findDenominationIcon', 'findDenominationString'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/feed.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/explore/utils/feed.ts',
+    ],
+    requiredExports: ['extractImages'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/wallet.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/wallet/utils/wallet.ts',
+    ],
+    requiredExports: ['getAddressFromWallet'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/threads.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/discussions/utils/threads.ts',
+    ],
+    requiredExports: ['detectURL', 'filterLinks', 'getAddedAndDeleted'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/helpers/user.ts',
+    futureSpecifiers: ['../../../client/scripts/features/auth/utils/user.ts'],
+    requiredExports: ['getUniqueUserAddresses'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useCommunityCardPrice.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/communities/hooks/useCommunityCardPrice.ts',
+    ],
+    requiredExports: ['useCommunityCardPrice'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useTopicGating.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/communities/hooks/useTopicGating.ts',
+    ],
+    requiredExports: ['default'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useJoinCommunityBanner.tsx',
+    futureSpecifiers: [
+      '../../../client/scripts/features/communities/hooks/useJoinCommunityBanner.tsx',
+    ],
+    requiredExports: ['default'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useMentionExtractor.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/discussions/hooks/useMentionExtractor.ts',
+    ],
+    requiredExports: ['useMentionExtractor'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useShowImage.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/discussions/hooks/useShowImage.ts',
+    ],
+    requiredExports: ['useShowImage'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useNetworkSwitching.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/wallet/hooks/useNetworkSwitching.ts',
+    ],
+    requiredExports: ['useNetworkSwitching'],
+  },
+  {
+    legacySpecifier: '../../../client/scripts/hooks/useInitChainIfNeeded.ts',
+    futureSpecifiers: [
+      '../../../client/scripts/features/governance/hooks/useInitChainIfNeeded.ts',
+    ],
+    requiredExports: ['useInitChainIfNeeded'],
+  },
+  {
     legacySpecifier: '../../../client/scripts/hooks/useDraft.tsx',
     futureSpecifiers: [
       '../../../client/scripts/shared/hooks/useDraft.tsx',

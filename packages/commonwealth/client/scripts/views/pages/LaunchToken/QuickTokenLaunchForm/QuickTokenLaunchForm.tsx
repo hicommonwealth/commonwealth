@@ -2,11 +2,11 @@ import { ChainBase, DefaultPage } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
-import { isS3URL } from 'helpers/awsHelpers';
 import React, { useRef, useState } from 'react';
 import useBeforeUnload from 'shared/hooks/useBeforeUnload';
 import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { slugifyPreserveDashes } from 'shared/utils';
+import { isS3URL } from 'shared/utils/awsHelpers';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import useCreateCommunityMutation, {
   buildCreateCommunityInput,

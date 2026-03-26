@@ -2,7 +2,14 @@ import z from 'zod';
 import { PG_INT } from '../utils';
 
 export const PaginationParamsSchema = z.object({
-  limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(50)
+    .optional()
+    .default(10)
+    .describe('Number of results per page (1-50, default 10)'),
   cursor: z.coerce
     .number()
     .int()

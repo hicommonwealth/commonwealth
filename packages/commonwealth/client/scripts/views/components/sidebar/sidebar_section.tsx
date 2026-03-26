@@ -3,7 +3,7 @@ import React from 'react';
 
 import './sidebar_section.scss';
 
-import { isNotUndefined } from 'helpers/typeGuards';
+import { isNotUndefined } from 'shared/utils/typeGuards';
 import useSidebarStore from 'state/ui/sidebar';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';

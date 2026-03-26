@@ -34,6 +34,12 @@ type NewSnapshotProposalFormProps = {
   onModalClose?: () => void;
 };
 
+type SnapshotPublishError = {
+  code?: string;
+  error_description?: string;
+  message?: string;
+};
+
 export const NewSnapshotProposalForm = ({
   snapshotId,
   thread,
@@ -83,12 +89,20 @@ export const NewSnapshotProposalForm = ({
       navigate(`/snapshot/${space.id}`);
 
       if (onSave) {
-        onSave({ id: response.id, snapshot_title: response.title }); // Pass relevant information
+        onSave({
+          id: response.id,
+          snapshot_title: response.title || form?.name || '',
+        });
       }
     } catch (err) {
-      err.code === 'ACTION_REJECTED'
+      const publishError = err as SnapshotPublishError;
+      publishError.code === 'ACTION_REJECTED'
         ? notifyError('User rejected signing')
-        : notifyError(_.capitalize(err.error_description) || err.message);
+        : notifyError(
+            _.capitalize(publishError.error_description || '') ||
+              publishError.message ||
+              'Failed to create Snapshot proposal',
+          );
     } finally {
       setIsSaving(false);
     }

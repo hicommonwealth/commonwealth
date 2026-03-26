@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { useRef } from 'react';
 import { describe, expect, test } from 'vitest';
-import useForceRerender from '../../../client/scripts/hooks/useForceRerender';
+import useForceRerender from '../../../client/scripts/shared/hooks/useForceRerender';
 
 describe('useForceRerender', () => {
   test('returns stable callback and forces rerender', () => {

@@ -1,7 +1,7 @@
 import { formatAddressShort } from 'helpers';
-import { APIOrderDirection } from 'helpers/constants';
-import { getRelativeTimestamp } from 'helpers/dates';
 import React from 'react';
+import { APIOrderDirection } from 'shared/utils/constants';
+import { getRelativeTimestamp } from 'shared/utils/dates';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';

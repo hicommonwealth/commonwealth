@@ -21,14 +21,16 @@ export const ContestResults = ContestManager.extend({
 });
 
 export const GetAllContests = {
-  input: z.object({
-    community_id: z.string().optional(),
-    contest_address: z.string().optional(),
-    contest_id: z.number().int().optional(),
-    running: z.boolean().optional().describe('Only active contests'),
-    with_chain_node: z.string().optional(),
-    search: z.string().optional().describe('Search contests by name'),
-  }),
+  input: z
+    .object({
+      community_id: z.string().optional(),
+      contest_address: z.string().optional(),
+      contest_id: z.number().int().optional(),
+      running: z.boolean().optional().describe('Only active contests'),
+      with_chain_node: z.string().optional(),
+      search: z.string().optional().describe('Search contests by name'),
+    })
+    .describe('Get contests, optionally filtered by community or status'),
   output: z.array(ContestResults),
 };
 

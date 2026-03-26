@@ -1,8 +1,8 @@
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { MagnifyingGlass } from '@phosphor-icons/react';
-import { APIOrderDirection } from 'helpers/constants';
 import useTopicGating from 'hooks/useTopicGating';
 import React, { useMemo, useState } from 'react';
+import { APIOrderDirection } from 'shared/utils/constants';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
