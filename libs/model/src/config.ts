@@ -87,6 +87,7 @@ const {
   MCP_DEMO_CLIENT_SERVER_URL,
   EVM_CHAINS_WHITELIST,
   MCP_KEY_BYPASS,
+  MCP_AUTH_TOKEN,
   LOG_XP_LAUNCHPAD,
   XP_REFERRER_FEE_RATIO,
   KNOCK_PUBLIC_API_KEY,
@@ -323,6 +324,7 @@ export const config = configure(
     MCP: {
       MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
       MCP_KEY_BYPASS: MCP_KEY_BYPASS,
+      MCP_AUTH_TOKEN: MCP_AUTH_TOKEN,
     },
     XP: {
       REFERRER_FEE_RATIO: parseFloat(
@@ -718,6 +720,7 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && data),
           'MCP_KEY_BYPASS cannot be set in production',
         ),
+      MCP_AUTH_TOKEN: z.string().optional(),
     }),
     XP: z.object({
       REFERRER_FEE_RATIO: z.number(),

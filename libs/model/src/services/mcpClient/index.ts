@@ -1,3 +1,4 @@
+import { logger } from '@hicommonwealth/core';
 import { MCPServer } from '@hicommonwealth/schemas';
 import {
   DEFAULT_COMPLETION_MODEL,
@@ -7,10 +8,48 @@ import {
 } from '@hicommonwealth/shared';
 import OpenAI from 'openai';
 import { z } from 'zod';
+import { config } from '../../config';
+
+const log = logger(import.meta);
 
 export type CommonMCPServerWithHeaders = z.infer<typeof MCPServer> & {
   headers?: Record<string, string>;
 };
+
+/**
+ * Applies production-ready server_url and auth headers for the common MCP
+ * server (id=1, handle='common').  All other servers are returned as-is
+ * with empty headers.
+ *
+ * Both the AI-completion handler and the demo CLI must call this so that
+ * local testing exercises the exact same code path as production.
+ */
+export function enrichCommonMCPServer(
+  server: CommonMCPServerWithHeaders,
+): CommonMCPServerWithHeaders {
+  if (server.id === 1 && server.handle === 'common') {
+    const authToken = config.MCP.MCP_AUTH_TOKEN;
+    if (!authToken) {
+      log.warn(
+        'MCP_AUTH_TOKEN not configured — common MCP server tools will lack auth',
+      );
+    }
+    const headers: Record<string, string> = {
+      // Bypass ngrok's browser interstitial for local/dev tunnels (no-op in prod)
+      'ngrok-skip-browser-warning': '1',
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+    };
+    const serverUrl = `${config.SERVER_URL}/mcp`;
+    log.debug(`Common MCP server URL resolved to: ${serverUrl}`);
+    return {
+      ...server,
+      server_url: serverUrl,
+      headers,
+    };
+  }
+
+  return { ...server, headers: server.headers ?? {} };
+}
 
 /**
  * Filters servers and their tools based on the tool whitelist.

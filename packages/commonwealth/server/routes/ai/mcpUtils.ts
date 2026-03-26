@@ -3,11 +3,27 @@ import { extractMCPMentions } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import {
   CommonMCPServerWithHeaders,
+  enrichCommonMCPServer,
   filterServersWithWhitelist,
   withMCPAuthUsername,
 } from '@hicommonwealth/model/services';
+import { buildMCPTools } from '../../api/mcp-server';
 
 const log = logger(import.meta);
+
+// Cache the common MCP server tool names (static at runtime)
+let commonMCPToolNames: Array<{ name: string; description: string }> | null =
+  null;
+
+function getCommonMCPToolNames() {
+  if (!commonMCPToolNames) {
+    commonMCPToolNames = buildMCPTools().map((t) => ({
+      name: t.name,
+      description: t.description,
+    }));
+  }
+  return commonMCPToolNames;
+}
 
 /**
  * Gets all community-enabled MCP servers for a community
@@ -31,10 +47,9 @@ export async function getAllMCPServers(
     ],
   });
 
-  return mcpServers.map((server) => ({
-    ...withMCPAuthUsername(server),
-    headers: {},
-  }));
+  return mcpServers.map((server) =>
+    enrichCommonMCPServer({ ...withMCPAuthUsername(server), headers: {} }),
+  );
 }
 
 /**
@@ -64,8 +79,19 @@ export async function getMentionedMCPServers(
     ),
   );
 
+  // Enrich the common server's tools from the adapter instead of the DB
+  const enrichedServers = mentionedServers.map((server) => {
+    if (server.handle === 'common' && server.id === 1) {
+      return {
+        ...server,
+        tools: getCommonMCPToolNames(),
+      };
+    }
+    return server;
+  });
+
   // Apply whitelist filtering so downstream callers don't need to
-  const filteredServers = filterServersWithWhitelist(mentionedServers);
+  const filteredServers = filterServersWithWhitelist(enrichedServers);
 
   if (filteredServers.length > 0) {
     log.info(

@@ -274,7 +274,11 @@ export const GetThreads = {
     contestAddress: z.string().optional(),
     status: GetThreadsStatus.optional(),
     withXRecentComments: z.number().optional(),
-  }),
+  }).describe(
+    'Search and list threads in a community with filtering and sorting. ' +
+      'Do not provide both "stage" and "status" — they are mutually exclusive. ' +
+      '"status" requires "contestAddress" to also be provided.',
+  ),
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),
   }),
@@ -332,11 +336,13 @@ export const SearchThreads = {
 };
 
 export const GetLinks = {
-  input: z.object({
-    thread_id: PG_INT.optional(),
-    link_source: z.enum(LinkSource).optional(),
-    link_identifier: z.string().optional(),
-  }),
+  input: z
+    .object({
+      thread_id: PG_INT.optional(),
+      link_source: z.enum(LinkSource).optional(),
+      link_identifier: z.string().optional(),
+    })
+    .describe('Get links associated with a thread'),
   output: z.object({
     links: z.array(Link).optional(),
     threads: z
