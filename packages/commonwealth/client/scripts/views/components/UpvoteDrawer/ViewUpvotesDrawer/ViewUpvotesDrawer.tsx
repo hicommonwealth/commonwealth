@@ -1,10 +1,10 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { APIOrderDirection } from 'helpers/constants';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import React, { Dispatch, SetStateAction } from 'react';
 import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
+import { APIOrderDirection } from 'shared/utils/constants';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';

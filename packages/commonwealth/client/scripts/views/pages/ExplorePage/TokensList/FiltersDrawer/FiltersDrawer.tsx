@@ -1,5 +1,5 @@
-import { useFlag } from 'hooks/useFlag';
 import React from 'react';
+import { useFlag } from 'shared/hooks/useFlag';
 import CWAccordion from 'views/components/CWAccordion';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer, {
@@ -25,7 +25,6 @@ export const FiltersDrawer = ({
   filters,
   onFiltersChange,
 }: FiltersDrawerProps) => {
-  const launchpadEnabled = useFlag('launchpad');
   const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
   const onTokenTypeChange = (tokenType: TokenTypes) => {
@@ -95,7 +94,7 @@ export const FiltersDrawer = ({
               />
             </div>
 
-            {launchpadEnabled && tokenizedThreadsEnabled && (
+            {tokenizedThreadsEnabled && (
               <CWAccordion
                 header="Token type"
                 content={
@@ -117,62 +116,57 @@ export const FiltersDrawer = ({
               />
             )}
 
-            {launchpadEnabled && (
-              <>
-                <CWAccordion
-                  header="Sort By"
-                  content={
-                    <div className="options-list">
-                      {Object.entries(tokenSortOptionsLabelToKeysMap).map(
-                        ([sortOption]) => (
-                          <CWRadioButton
-                            key={sortOption}
-                            groupName="token-sort-option"
-                            value={sortOption}
-                            label={sortOption}
-                            checked={filters.withTokenSortBy === sortOption}
-                            onChange={() =>
-                              onTokenSortOptionChange(
-                                sortOption as TokenSortOptions,
-                              )
-                            }
-                          />
-                        ),
-                      )}
-                    </div>
-                  }
-                />
+            <>
+              <CWAccordion
+                header="Sort By"
+                content={
+                  <div className="options-list">
+                    {Object.entries(tokenSortOptionsLabelToKeysMap).map(
+                      ([sortOption]) => (
+                        <CWRadioButton
+                          key={sortOption}
+                          groupName="token-sort-option"
+                          value={sortOption}
+                          label={sortOption}
+                          checked={filters.withTokenSortBy === sortOption}
+                          onChange={() =>
+                            onTokenSortOptionChange(
+                              sortOption as TokenSortOptions,
+                            )
+                          }
+                        />
+                      ),
+                    )}
+                  </div>
+                }
+              />
 
-                <CWAccordion
-                  header="Sort Order"
-                  content={
-                    <div className="options-list">
-                      {Object.entries(sortOrderLabelsToDirectionsMap).map(
-                        ([order]) => (
-                          <CWRadioButton
-                            key={order}
-                            groupName="token-sort-direction"
-                            value={order}
-                            label={order}
-                            checked={filters.withTokenSortOrder === order}
-                            onChange={() =>
-                              onCommunityOrderChange(
-                                order as TokenSortDirections,
-                              )
-                            }
-                            disabled={
-                              filters.withTokenSortBy ===
-                                TokenSortOptions.MostRecent ||
-                              !hasAppliedFilters
-                            }
-                          />
-                        ),
-                      )}
-                    </div>
-                  }
-                />
-              </>
-            )}
+              <CWAccordion
+                header="Sort Order"
+                content={
+                  <div className="options-list">
+                    {Object.entries(sortOrderLabelsToDirectionsMap).map(
+                      ([order]) => (
+                        <CWRadioButton
+                          key={order}
+                          groupName="token-sort-direction"
+                          value={order}
+                          label={order}
+                          checked={filters.withTokenSortOrder === order}
+                          onChange={() =>
+                            onCommunityOrderChange(order as TokenSortDirections)
+                          }
+                          disabled={
+                            filters.withTokenSortBy ===
+                              TokenSortOptions.MostRecent || !hasAppliedFilters
+                          }
+                        />
+                      ),
+                    )}
+                  </div>
+                }
+              />
+            </>
           </div>
         </div>
       </CWDrawer>

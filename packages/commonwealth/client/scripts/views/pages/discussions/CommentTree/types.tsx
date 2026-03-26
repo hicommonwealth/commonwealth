@@ -2,7 +2,7 @@ import { GatedActionEnum } from '@hicommonwealth/shared';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
-import Permissions from 'utils/Permissions';
+import Permissions from 'shared/utils/Permissions';
 import Thread from '../../../../models/Thread';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import './CommentTree.scss';

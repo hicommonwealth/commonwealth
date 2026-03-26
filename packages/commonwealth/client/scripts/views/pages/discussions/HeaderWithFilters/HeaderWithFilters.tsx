@@ -1,17 +1,17 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { parseCustomStages, threadStageToLabel } from 'helpers';
-import { isUndefined } from 'helpers/typeGuards';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import moment from 'moment/moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation, useSearchParams } from 'react-router-dom';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
+import { saveToClipboard } from 'shared/utils/clipboard';
+import Permissions from 'shared/utils/Permissions';
+import { isUndefined } from 'shared/utils/typeGuards';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
-import { saveToClipboard } from 'utils/clipboard';
-import Permissions from 'utils/Permissions';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -21,7 +21,7 @@ import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import ContestCard from 'views/components/ContestCard';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
+import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
 import { Select } from 'views/components/Select';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
@@ -455,7 +455,7 @@ export const HeaderWithFilters = ({
         {selectedTopic?.description &&
           views &&
           views[1].value !== selectedView && (
-            <MarkdownViewerUsingQuillOrNewEditor
+            <MarkdownViewerWithFallback
               markdown={selectedTopic.description}
               className="subheader-text"
             />

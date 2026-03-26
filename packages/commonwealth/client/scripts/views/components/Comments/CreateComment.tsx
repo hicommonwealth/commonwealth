@@ -3,16 +3,16 @@ import { buildCreateCommentInput } from 'client/scripts/state/api/comments/creat
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import {
-  isRateLimitError,
-  isTierRateLimitError,
-  RATE_LIMIT_MESSAGE,
-} from 'helpers/rateLimit';
-import { useDraft } from 'hooks/useDraft';
 import { useMentionExtractor } from 'hooks/useMentionExtractor';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useDraft } from 'shared/hooks/useDraft';
+import {
+  isRateLimitError,
+  isTierRateLimitError,
+  RATE_LIMIT_MESSAGE,
+} from 'shared/utils/rateLimit';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
@@ -109,12 +109,16 @@ export const CreateComment = ({
 
     try {
       const communityId = app.activeChainId() || '';
+      const bodyText = serializeDelta(contentDelta);
+      if (!bodyText.trim()) {
+        throw new Error('Comment body cannot be empty');
+      }
       const input = await buildCreateCommentInput({
         communityId,
         address: user.activeAccount!.address,
         threadId: rootThread.id,
         threadMsgId: rootThread.canvasMsgId ?? null,
-        unescapedText: serializeDelta(contentDelta),
+        unescapedText: bodyText,
         parentCommentId: parentCommentId ?? null,
         parentCommentMsgId: parentCommentMsgId ?? null,
         existingNumberOfComments: rootThread.numberOfComments || 0,
@@ -212,7 +216,6 @@ export const CreateComment = ({
       handleIsReplying={handleIsReplying}
       replyingToAuthor={replyingToAuthor}
       thread={rootThread}
-      parentCommentText={parentCommentText}
       communityId={app.activeChainId() || ''}
     />
   ) : (

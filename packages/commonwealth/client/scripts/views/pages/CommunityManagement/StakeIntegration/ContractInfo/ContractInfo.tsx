@@ -1,6 +1,6 @@
 import { formatAddressShort } from 'helpers';
 import React from 'react';
-import { saveToClipboard } from 'utils/clipboard';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';

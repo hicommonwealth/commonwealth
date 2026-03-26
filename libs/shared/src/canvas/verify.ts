@@ -9,9 +9,9 @@ import { CanvasSignedData, CanvasSignedDataOption } from './types';
 import { assertMatches } from './utils';
 
 export const verifySession = async (session: Session) => {
-  // Skip verification for Sui DIDs since we don't have a proper Canvas.js signer implementation yet
+  // Sui wallet sessions should never reach this path
   if (session.did?.startsWith('did:pkh:sui:')) {
-    return;
+    throw new Error('Sui sessions cannot produce canvas signed data');
   }
 
   const signer = getSessionSignerForDid(session.did);

@@ -1,7 +1,7 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
-import { SupportedCryptoCurrencies } from 'helpers/currency';
 import NodeInfo from 'models/NodeInfo';
+import { SupportedCryptoCurrencies } from 'shared/utils/currency';
 import { z } from 'zod';
 import { CommonTradingConfig } from '../types';
 import useCommonTradeTokenFormProps from './useCommonTradeTokenForm';

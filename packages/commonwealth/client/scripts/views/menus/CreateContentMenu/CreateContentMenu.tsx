@@ -3,11 +3,11 @@ import {
   ChainNetwork,
   PRODUCTION_DOMAIN,
 } from '@hicommonwealth/shared';
-import { useFlag } from 'hooks/useFlag';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import type { NavigateOptions, To } from 'react-router-dom';
+import Permissions from 'shared/utils/Permissions';
 import app from 'state';
 import {
   fetchCachedCustomDomain,
@@ -16,7 +16,6 @@ import {
 import { useCreateDiscordBotConfigMutation } from 'state/api/discord';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import useUserStore, { userStore } from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
@@ -43,7 +42,6 @@ const getCreateContentMenuItems = (
     options?: NavigateOptions & { action?: string },
     prefix?: null | string,
   ) => void,
-  launchpadEnabled: boolean,
   createDiscordBotConfig?: ReturnType<
     typeof useCreateDiscordBotConfigMutation
   >['mutateAsync'],
@@ -91,18 +89,14 @@ const getCreateContentMenuItems = (
       : [];
 
   const getUniversalCreateItems = (): PopoverMenuItem[] => [
-    ...(launchpadEnabled
-      ? [
-          {
-            type: 'element',
-            element: (
-              <div onClick={resetSidebarState} key="token-launch-wrapper">
-                <TokenLaunchButton key={2} buttonHeight="sm" />
-              </div>
-            ),
-          } as PopoverMenuItem,
-        ]
-      : []),
+    {
+      type: 'element',
+      element: (
+        <div onClick={resetSidebarState} key="token-launch-wrapper">
+          <TokenLaunchButton key={2} buttonHeight="sm" />
+        </div>
+      ),
+    } as PopoverMenuItem,
     {
       type: 'element',
       element: (
@@ -201,8 +195,6 @@ export const CreateContentSidebar = ({
   const { mutateAsync: createDiscordBotConfig } =
     useCreateDiscordBotConfigMutation();
 
-  const launchpadEnabled = useFlag('launchpad');
-
   return (
     <CWSidebarMenu
       className={getClasses<{
@@ -227,11 +219,7 @@ export const CreateContentSidebar = ({
           }, 200);
         },
       }}
-      menuItems={getCreateContentMenuItems(
-        navigate,
-        launchpadEnabled,
-        createDiscordBotConfig,
-      )}
+      menuItems={getCreateContentMenuItems(navigate, createDiscordBotConfig)}
     />
   );
 };
@@ -240,8 +228,6 @@ export const CreateContentSidebar = ({
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
-
-  const launchpadEnabled = useFlag('launchpad');
 
   if (
     !user.isLoggedIn ||
@@ -254,7 +240,7 @@ export const CreateContentPopover = () => {
 
   return (
     <PopoverMenu
-      menuItems={getCreateContentMenuItems(navigate, launchpadEnabled)}
+      menuItems={getCreateContentMenuItems(navigate)}
       className="create-content-popover"
       renderTrigger={(onClick, isMenuOpen) => (
         <CWTooltip

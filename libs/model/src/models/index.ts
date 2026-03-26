@@ -99,6 +99,7 @@ export * from './mcp_server_community';
 export * from './membership';
 export * from './outbox';
 export * from './poll';
+export * from './prediction_market';
 export * from './profile_tags';
 export * from './proposal_votes';
 export * from './reaction';

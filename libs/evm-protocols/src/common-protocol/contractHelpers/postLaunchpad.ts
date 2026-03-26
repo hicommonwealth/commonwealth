@@ -6,10 +6,8 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
 
-function bigIntFromSci(str: string) {
-  if (!str.includes('e')) return BigInt(str);
-  const [base, exp] = str.split('e');
-  return BigInt(base) * 10n ** BigInt(exp);
+function bigIntFromSci(str: string): bigint {
+  return BigInt(Math.trunc(Number(str)));
 }
 
 export const approveTokenTransfer = async (
@@ -50,7 +48,7 @@ export const launchPostToken = async (
   bondingCurveAddress: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tokenContract: any,
-  curveId: number = 1,
+  curveId: number = 0,
   scalar: number = 0,
 ) => {
   try {
@@ -61,7 +59,7 @@ export const launchPostToken = async (
       walletAddress,
     );
     const txReceipt = await contract.methods
-      .launchTokenWithLiquidity(
+      .launchTokenWithLiquidity([
         name,
         symbol,
         shares,
@@ -75,8 +73,9 @@ export const launchPostToken = async (
         threadId,
         exchangeToken,
         initPurchaseAmount,
-      )
-      .send({ from: walletAddress, value: 1e15 });
+        initPurchaseAmount,
+      ])
+      .send({ from: walletAddress, value: 1e16 });
     return txReceipt;
   } catch (error) {
     console.error('Error launching token:', error);
@@ -104,9 +103,10 @@ export const buyPostToken = async (
       safeAmountIn,
       walletAddress,
     );
-    const feeAmount = await contract.methods
+    const feeAmountRaw = await contract.methods
       .getETHFeeAmount(tokenAddress, safeAmountIn, true)
       .call();
+    const feeAmount = feeAmountRaw[0].toString();
     const txReceipt = await contract.methods
       .buyToken(tokenAddress, safeAmountIn, safMinAmountOut)
       .send({ from: walletAddress, value: feeAmount });
@@ -136,9 +136,10 @@ export const sellPostToken = async (
       safeAmountIn,
       walletAddress,
     );
-    const feeAmount = await contract.methods
+    const feeAmountRaw = await contract.methods
       .getETHFeeAmount(tokenAddress, safeAmountIn, false)
       .call();
+    const feeAmount = feeAmountRaw[0].toString();
     const txReceipt = await contract.methods
       .sellToken(tokenAddress, safeAmountIn, safeMinAmountOut)
       .send({ from: walletAddress, value: feeAmount });
@@ -246,5 +247,6 @@ export const getPostPrice = async (
   isBuy: boolean,
 ) => {
   const price = await contract.methods.getPrice(tokenAddress, amountIn, isBuy);
-  return price.call();
+  const returnPrice = await price.call();
+  return returnPrice;
 };

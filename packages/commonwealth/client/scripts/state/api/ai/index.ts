@@ -1,3 +1,3 @@
-import { useAiCompletion } from './useAiCompletion';
+import { AICompletionType, useAiCompletion } from './useAiCompletion';
 
-export { useAiCompletion };
+export { AICompletionType, useAiCompletion };

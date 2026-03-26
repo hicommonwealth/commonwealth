@@ -8,11 +8,11 @@ import {
   QuestAction as QuestActionType,
   XPLog,
 } from 'helpers/quest';
-import { useFlag } from 'hooks/useFlag';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
+import Permissions from 'shared/utils/Permissions';
 import app from 'state';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { useGetQuestByIdQuery } from 'state/api/quest';
@@ -22,7 +22,6 @@ import {
 } from 'state/api/quests';
 import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -50,17 +49,15 @@ const QuestDetails = ({ id }: { id: number }) => {
   const questId = parseInt(`${id}`) || 0;
   const navigate = useCommonNavigate();
   const user = useUserStore();
-  const xpEnabled = useFlag('xp');
-
   const { data: quest, isLoading } = useGetQuestByIdQuery({
     quest_id: questId,
-    enabled: !!(xpEnabled && questId),
+    enabled: !!questId,
   });
 
   const { data: xpProgressions = [] } = useGetXPs({
     user_id: user.id,
     quest_id: questId,
-    enabled: user.isLoggedIn && xpEnabled,
+    enabled: user.isLoggedIn,
   });
 
   const [authModalConfig, setAuthModalConfig] = useState<{
@@ -105,7 +102,7 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const popoverProps = usePopover();
 
-  if (!xpEnabled || !questId) {
+  if (!questId) {
     return <PageNotFound />;
   }
 

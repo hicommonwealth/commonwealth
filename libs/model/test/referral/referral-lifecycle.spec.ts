@@ -8,6 +8,7 @@ import {
   CreateCommunity,
   UpdateCommunity,
 } from '../../src/aggregates/community';
+import { ChainEventProjection } from '../../src/aggregates/community/ChainEventCreated.projection';
 import {
   GetUserReferralFees,
   GetUserReferrals,
@@ -200,7 +201,11 @@ describe('Referral lifecycle', () => {
     ]);
 
     // syncs referral fees
-    await drainOutbox(['ReferralFeeDistributed'], ChainEventPolicy, checkpoint);
+    await drainOutbox(
+      ['ReferralFeeDistributed'],
+      ChainEventProjection,
+      checkpoint,
+    );
 
     expectedReferrals[0].referrer_received_eth_amount = fee.toString();
 

@@ -22,7 +22,7 @@ export interface Wallet {
       signPersonalMessage(params: {
         message: Uint8Array;
         account: WalletAccount;
-      }): Promise<{ signature: Uint8Array }>;
+      }): Promise<{ signature: string }>;
     };
     [key: string]: unknown;
   };
@@ -160,7 +160,7 @@ class SuiWebWalletController implements IWebWallet<string> {
    */
   public async signPersonalMessage(
     message: Uint8Array | string,
-  ): Promise<{ signature: Uint8Array }> {
+  ): Promise<{ signature: string }> {
     if (!this._wallet || !this._wallet.accounts.length) {
       throw new Error('Wallet not connected');
     }

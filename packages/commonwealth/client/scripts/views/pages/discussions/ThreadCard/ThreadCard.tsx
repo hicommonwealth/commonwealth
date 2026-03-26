@@ -1,5 +1,10 @@
-import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
+import {
+  ActionGroups,
+  GatedActionEnum,
+  isValidImageUrl,
+} from '@hicommonwealth/shared';
 import { useShowImage } from 'client/scripts/hooks/useShowImage';
+import { ThreadPredictionMarketTagContainer } from 'client/scripts/views/components/ThreadPredictionMarketTag';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -10,10 +15,7 @@ import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useGetThreadToken from 'state/api/tokens/getThreadToken';
 import useUserStore from 'state/ui/user';
-import {
-  default as MarkdownViewerUsingQuillOrNewEditor,
-  default as MarkdownViewerWithFallback,
-} from 'views/components/MarkdownViewerWithFallback';
+import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { ThreadTokenDrawer } from 'views/components/ThreadTokenDrawer';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
@@ -255,6 +257,8 @@ export const ThreadCard = ({
             <div className="content-top-tags">
               {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
+              <ThreadPredictionMarketTagContainer thread={thread} />
+
               {linkedSnapshots.length > 0 && (
                 <CWTag
                   type="active"
@@ -274,7 +278,7 @@ export const ThreadCard = ({
               })}
             >
               {!isCardView ? (
-                <MarkdownViewerUsingQuillOrNewEditor
+                <MarkdownViewerWithFallback
                   markdown={
                     !removeImagesFromMarkDown
                       ? thread.body
@@ -296,7 +300,7 @@ export const ThreadCard = ({
                   cutoffLines={cutoffLines}
                 />
               )}
-              {threadImage && (
+              {threadImage && isValidImageUrl(threadImage) && (
                 <div className="card-image-container">
                   <img src={threadImage} alt="Thread content" />
                 </div>

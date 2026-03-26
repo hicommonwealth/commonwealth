@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { handleRedirectClicks } from 'helpers';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
+import { useFlag } from 'shared/hooks/useFlag';
 import app from 'state';
 import { SidebarSectionGroup } from '../sidebar_section';
 import type { SectionGroupAttrs, SidebarSectionAttrs } from '../types';

@@ -1,5 +1,5 @@
-import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { describe, expect, test } from 'vitest';
+import { S3_ASSET_BUCKET_CDN } from '../src/constants';
 import { getFileSizeBytes } from '../src/utils';
 
 describe('checkIconSize', () => {

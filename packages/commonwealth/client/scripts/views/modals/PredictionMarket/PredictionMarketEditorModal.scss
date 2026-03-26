@@ -1,0 +1,100 @@
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
+
+.PredictionMarketEditorModal {
+  .CWModalBody {
+    overflow: scroll !important;
+  }
+
+  .prompt-row {
+    margin-bottom: 16px;
+  }
+
+  .prompt-input-with-ai {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px;
+
+    .CWTextArea {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .prompt-ai-button {
+      flex: 0 0 auto;
+      margin-left: auto;
+    }
+
+    .prompt-ai-button--compact {
+      padding: 4px 10px;
+      min-height: 28px;
+
+      .button-text {
+        font-size: 12px;
+      }
+    }
+
+    .prompt-ai-spinner {
+      flex: 0 0 auto;
+      align-self: center;
+    }
+  }
+
+  .duration-threshold-row {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .duration-input-row,
+  .threshold-row {
+    background-color: colors.$neutral-50;
+    border-radius: border_radius.$border-radius-corners;
+    border: 1px solid colors.$neutral-100;
+    padding: 16px;
+    width: 100%;
+  }
+
+  .threshold-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .threshold-value {
+      font-weight: 600;
+    }
+  }
+
+  .liquidity-row {
+    margin-bottom: 16px;
+  }
+
+  .help-text {
+    color: colors.$neutral-600;
+    margin-top: 4px;
+  }
+
+  .error-message {
+    color: colors.$rorange-500;
+    margin-top: 8px;
+  }
+
+  .collateral-select-row {
+    margin-bottom: 16px;
+  }
+
+  .custom-address-row {
+    margin-top: 8px;
+  }
+
+  .modal-footer-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+}

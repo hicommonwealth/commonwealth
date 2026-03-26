@@ -340,6 +340,17 @@ const jwtSecret = config.AUTH.JWT_SECRET;
 - Foreign keys maintain referential integrity
 - Partitioned tables for large datasets
 
+**PostgreSQL type serialization in query schemas:**
+
+PostgreSQL returns `DECIMAL(78,0)` and `DATE`/`TIMESTAMP` columns as **strings**, not native JS types. This affects both raw SQL queries (`QueryTypes.SELECT`) and Sequelize ORM results for DECIMAL columns. Additionally, `BigInt` cannot be JSON-serialized for API responses.
+
+- **Entity schemas** (`libs/schemas/src/entities/`) use strict types (`PG_ETH = z.coerce.bigint()`, `z.coerce.date()`) — correct for in-memory use in commands, events, and projections
+- **Query output schemas** (`libs/schemas/src/queries/`) must create **View** types that `.extend()` the entity and override:
+  - `PG_ETH` fields → `z.string()`
+  - Date fields → `z.coerce.date().or(z.string())`
+- **Never use entity schemas with `PG_ETH` directly in query outputs** — always create a View type
+- See `LaunchpadTradeView` in `libs/schemas/src/queries/token.schemas.ts` for the established pattern
+
 ### Testing Strategy
 
 - **Unit tests**: Service/model libraries in `test/unit/`
@@ -382,6 +393,31 @@ Express middleware orchestrates concerns (auth, rate limiting, logging, error ha
 ### Event-Driven Processing
 
 Services publish events to RabbitMQ. Workers consume messages and process async jobs. Enables service isolation and horizontal scaling.
+
+### Policies vs Projections
+
+Both policies and projections are event handlers, but serve fundamentally different purposes:
+
+**Policies** (`libs/model/src/policies/*.policy.ts`):
+- Orchestrators that connect flows: event → `command()`
+- React to events and invoke commands defined by aggregates
+- May read from models (ideally via queries) for context needed to decide which command to invoke
+- **Cannot** mutate the database directly via Sequelize
+- Use the `Policy` type from `@hicommonwealth/core`
+- Side-effect-only handlers (Redis, notifications, external services) are also policies
+
+**Projections** (`libs/model/src/aggregates/<aggregate>/*.projection.ts`):
+- Read model builders that materialize state: event → Sequelize mutation
+- React to events and mutate database models directly
+- **Cannot** call `command()`
+- Use the `Projection` type from `@hicommonwealth/core`
+- Live inside their respective aggregate directory, not in `policies/`
+
+**Rules:**
+- `.policy.ts` files must NOT contain direct DB mutations (`models.*.create/update/destroy/save/upsert/bulkCreate/increment/findOrCreate`)
+- `.projection.ts` files must NOT call `command()`
+- "Project..." prefixed commands are a code smell — projection logic should not be wrapped in command indirection
+- When an event needs both a command call AND a DB mutation, split into separate policy and projection files
 
 ### Configuration Management
 
