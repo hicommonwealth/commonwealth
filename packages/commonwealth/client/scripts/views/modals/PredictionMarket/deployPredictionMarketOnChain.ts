@@ -4,12 +4,15 @@
  * deployPredictionMarket mutation.
  */
 
-import MagicWebWalletController from 'client/scripts/controllers/app/webWallets/MagicWebWallet';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import PredictionMarket, {
   type DeployPredictionMarketPayload,
 } from 'client/scripts/helpers/ContractHelpers/predictionMarket';
-import { fetchNodes } from 'state/api/nodes';
-import { userStore } from 'state/ui/user';
+import {
+  getCollateralBalanceAndSymbol,
+  parseTokenAmount,
+} from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
+import { getEthereumProviderForAddress } from 'client/scripts/helpers/getEthereumProviderForAddress';
 
 export type { DeployPredictionMarketPayload };
 
@@ -21,10 +24,12 @@ export type DeployPredictionMarketOnChainParams = {
   collateral_address: `0x${string}`;
   duration_days: number;
   resolution_threshold: number;
-  initial_liquidity: string;
+  initial_liquidity?: string;
+  initial_liquidity_wei?: string;
 };
 
 const EVM_ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/;
+const POSITIVE_DECIMAL_REGEX = /^\d+(\.\d+)?$/;
 
 function assertValidEthereumAddress(
   value: unknown,
@@ -41,6 +46,28 @@ function assertValidEthereumAddress(
       `Invalid parameters: ${fieldName} must be a valid Ethereum address (0x + 40 hex chars)`,
     );
   }
+}
+
+export async function convertInitialLiquidityToWei(params: {
+  chain_rpc: string;
+  collateral_address: `0x${string}`;
+  initial_liquidity: string;
+  user_address?: string;
+}): Promise<bigint> {
+  const initialLiquidity = params.initial_liquidity.trim();
+  if (!POSITIVE_DECIMAL_REGEX.test(initialLiquidity)) {
+    throw new Error('Initial liquidity must be a valid decimal number.');
+  }
+  const readAddress =
+    params.user_address && EVM_ADDRESS_REGEX.test(params.user_address)
+      ? params.user_address
+      : ZERO_ADDRESS;
+  const { decimals } = await getCollateralBalanceAndSymbol(
+    params.chain_rpc,
+    readAddress,
+    params.collateral_address,
+  );
+  return parseTokenAmount(initialLiquidity, decimals);
 }
 
 /**
@@ -61,21 +88,15 @@ export async function deployPredictionMarketOnChain(
     throw new Error('On-chain deployment is not configured for this chain.');
   }
 
-  const userAddresses = userStore.getState().addresses;
-  const isMagicAddress = userAddresses.some(
-    (addr) =>
-      addr.address.toLowerCase() === params.user_address.toLowerCase() &&
-      addr.walletId?.toLowerCase().includes('magic'),
+  // Use the wallet that owns user_address so deploy works with multiple wallets (e.g. MetaMask + OKX).
+  const provider = await getEthereumProviderForAddress(
+    params.user_address,
+    params.eth_chain_id,
   );
-
-  // Use wallet provider for signing (required for eth_sendTransaction).
-  // RPC URLs don't support signing; only Magic needs explicit provider.
-  let provider: string | unknown = undefined;
-  if (isMagicAddress) {
-    await fetchNodes();
-    const controller = new MagicWebWalletController();
-    await controller.enable(String(params.eth_chain_id));
-    provider = (controller as { provider?: unknown }).provider;
+  if (!provider) {
+    throw new Error(
+      'Could not find the wallet for this address. Ensure the wallet is connected.',
+    );
   }
 
   const pm = new PredictionMarket(governorAddress, params.chain_rpc);
@@ -86,6 +107,7 @@ export async function deployPredictionMarketOnChain(
     collateral_address: params.collateral_address,
     duration_days: params.duration_days,
     resolution_threshold: params.resolution_threshold,
-    initial_liquidity: params.initial_liquidity,
+    initial_liquidity: params.initial_liquidity ?? '0',
+    initial_liquidity_wei: params.initial_liquidity_wei,
   });
 }

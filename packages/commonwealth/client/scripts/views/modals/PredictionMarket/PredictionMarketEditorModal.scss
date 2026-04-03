@@ -26,6 +26,7 @@
     .prompt-ai-button {
       flex: 0 0 auto;
       margin-left: auto;
+      width: fit-content;
     }
 
     .prompt-ai-button--compact {
@@ -43,20 +44,31 @@
     }
   }
 
-  .duration-threshold-row {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 16px;
+  .collateral-select-row,
+  .duration-liquidity-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: flex-start;
+
+    @include media_queries.small {
+      grid-template-columns: 1fr;
+    }
   }
 
-  .duration-input-row,
+  .collateral-select-row {
+    &.fullRow {
+      grid-template-columns: 1fr;
+    }
+  }
+
   .threshold-row {
     background-color: colors.$neutral-50;
     border-radius: border_radius.$border-radius-corners;
     border: 1px solid colors.$neutral-100;
     padding: 16px;
     width: 100%;
+    margin-bottom: 16px;
   }
 
   .threshold-label-row {
@@ -68,10 +80,6 @@
     .threshold-value {
       font-weight: 600;
     }
-  }
-
-  .liquidity-row {
-    margin-bottom: 16px;
   }
 
   .help-text {

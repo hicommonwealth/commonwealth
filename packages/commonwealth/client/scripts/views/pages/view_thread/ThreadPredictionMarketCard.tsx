@@ -1,23 +1,30 @@
 import { PredictionMarketStatus } from '@hicommonwealth/schemas';
+import { ChainBase, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import {
   getCollateralBalanceAndSymbol,
+  getMarketCollateralBalanceFromLogs,
   getPredictionMarketBalancesFromChain,
 } from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
 import { resolveEvmWalletAddress } from 'client/scripts/helpers/resolveEvmWalletAddress';
+import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import type Thread from 'client/scripts/models/Thread';
 import useGetCommunityByIdQuery from 'client/scripts/state/api/communities/getCommuityById';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import {
+  useCancelPredictionMarketMutation,
   useGetPredictionMarketPositionsQuery,
+  useGetPredictionMarketsQuery,
   useGetPredictionMarketTradesQuery,
 } from 'client/scripts/state/api/predictionMarket';
 import { openConfirmation } from 'client/scripts/views/modals/confirmation_modal';
+import {
+  CustomAddressOption,
+  CustomAddressOptionElement,
+} from 'client/scripts/views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+// eslint-disable-next-line max-len
+import { convertAddressToDropdownOption } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  useCancelPredictionMarketMutation,
-  useGetPredictionMarketsQuery,
-} from 'state/api/prediction-markets';
 import useUserStore from 'state/ui/user';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWDivider } from '../../components/component_kit/cw_divider';
@@ -27,12 +34,14 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { PopoverMenu } from '../../components/component_kit/CWPopoverMenu';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
+import FractionalValue from '../../components/FractionalValue';
 import { DeployDraftPredictionMarketModal } from '../../modals/PredictionMarket/DeployDraftPredictionMarketModal';
 import { PredictionMarketResolveModal } from '../../modals/PredictionMarket/PredictionMarketResolveModal';
 import { PredictionMarketTradeModal } from '../../modals/PredictionMarketTradeModal';
 import './poll_cards.scss';
-import { formatCollateral } from './predictionMarketUtils';
+import { weiToDisplayNumber } from './predictionMarketUtils';
 import './ThreadPredictionMarketCard.scss';
 
 function formatCollateralBalance(wei: bigint, decimals: number): string {
@@ -41,6 +50,14 @@ function formatCollateralBalance(wei: bigint, decimals: number): string {
   const whole = wei / divisor;
   const frac = ((wei % divisor) * 100n) / divisor;
   return `${whole}.${frac.toString().padStart(2, '0').slice(0, 2)}`;
+}
+
+function parseWeiString(value?: string | null): bigint {
+  try {
+    return BigInt(value ?? '0');
+  } catch {
+    return 0n;
+  }
 }
 
 export type PredictionMarketResult = {
@@ -131,8 +148,6 @@ const getTimeRemaining = (m: PredictionMarketResult) => {
   return `${minutes}m ${seconds}s`;
 };
 
-const ZERO_ADDR = '0x0000000000000000000000000000000000000000';
-
 export const ThreadPredictionMarketCard = ({
   thread,
   market: marketProp,
@@ -142,12 +157,22 @@ export const ThreadPredictionMarketCard = ({
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [isResolveModalOpen, setIsResolveModalOpen] = useState(false);
   const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
+  const [tradeRefreshNonce, setTradeRefreshNonce] = useState(0);
   const [timeDisplay, setTimeDisplay] = useState<string | null>(null);
   const [onChainPassFailBalances, setOnChainPassFailBalances] = useState<{
     p: bigint;
     f: bigint;
   } | null>(null);
   const user = useUserStore();
+  const uniqueAddresses =
+    getUniqueUserAddresses({ forChain: ChainBase.Ethereum }) ?? [];
+  const [selectedAddress, setSelectedAddress] = useState<string>(() => {
+    const initial =
+      user.activeAccount?.address ??
+      user.addressSelectorSelectedAddress ??
+      uniqueAddresses[0];
+    return initial ?? '';
+  });
 
   const evmWalletAddress = useMemo(
     () =>
@@ -167,46 +192,67 @@ export const ThreadPredictionMarketCard = ({
   );
 
   const { data: marketsData, isLoading } = useGetPredictionMarketsQuery({
-    threadId: thread.id!,
-    apiCallEnabled: !marketProp,
+    thread_id: thread.id!,
+    apiCallEnabled: marketProp === undefined,
   });
 
   const { mutateAsync: cancelMarket } = useCancelPredictionMarketMutation({
-    threadId: thread.id!,
+    thread_id: thread.id!,
   });
 
   const market =
     marketProp ??
     (marketsData?.results?.[0] as PredictionMarketResult | undefined);
 
-  const { data: positions = [] } = useGetPredictionMarketPositionsQuery({
-    prediction_market_id: market?.id ?? 0,
-  });
+  const { data: positions = [], refetch: refetchPositions } =
+    useGetPredictionMarketPositionsQuery({
+      prediction_market_id: market?.id ?? 0,
+    });
   const userPosition = Array.isArray(positions)
     ? positions.find(
         (p: { user_address: string }) =>
-          evmWalletAddress &&
-          p.user_address?.toLowerCase() === evmWalletAddress.toLowerCase(),
+          !!selectedAddress &&
+          p.user_address?.toLowerCase() === selectedAddress.toLowerCase(),
       )
     : undefined;
 
-  const { data: tradesData } = useGetPredictionMarketTradesQuery({
-    prediction_market_id: market?.id ?? 0,
-  });
+  const { data: tradesData, refetch: refetchTrades } =
+    useGetPredictionMarketTradesQuery({
+      prediction_market_id: market?.id ?? 0,
+    });
   const trades =
-    (tradesData as { results?: { collateral_amount: string }[] })?.results ??
-    [];
-  const marketVolume = trades.reduce(
-    (sum, t) => sum + BigInt(t.collateral_amount || '0'),
-    0n,
-  );
+    (
+      tradesData as {
+        results?: {
+          collateral_amount: string;
+          p_token_amount: string;
+          f_token_amount: string;
+        }[];
+      }
+    )?.results ?? [];
+  const latestTradeFingerprint = JSON.stringify(tradesData ?? null);
+  const marketVolume = trades.reduce((sum, t) => {
+    const collateral = BigInt(t.collateral_amount || '0');
+    if (collateral > 0n) return sum + collateral;
+    const p = BigInt(t.p_token_amount || '0');
+    const f = BigInt(t.f_token_amount || '0');
+    return sum + (p > f ? p : f);
+  }, 0n);
 
   const [collateralDisplay, setCollateralDisplay] = useState<{
     symbol: string;
     balance: string;
     decimals: number;
   } | null>(null);
+  const [onChainPassFail, setOnChainPassFail] = useState<{
+    p: bigint;
+    f: bigint;
+  } | null>(null);
+  const [marketCollateralOnChain, setMarketCollateralOnChain] = useState<
+    bigint | null
+  >(null);
 
+  const activeAddress = selectedAddress;
   const { data: community } = useGetCommunityByIdQuery({
     id: thread?.communityId ?? '',
     includeNodeInfo: true,
@@ -221,7 +267,7 @@ export const ThreadPredictionMarketCard = ({
 
   const isCollateralZero =
     !market?.collateral_address ||
-    market?.collateral_address.toLowerCase() === ZERO_ADDR.toLowerCase();
+    market?.collateral_address.toLowerCase() === ZERO_ADDRESS.toLowerCase();
   const { data: ethBalance = '' } = useGetUserEthBalanceQuery({
     chainRpc,
     walletAddress: evmWalletAddress,
@@ -254,7 +300,7 @@ export const ThreadPredictionMarketCard = ({
     }
     if (
       !chainRpc ||
-      !evmWalletAddress ||
+      !selectedAddress ||
       !market?.p_token_address ||
       !market?.f_token_address
     ) {
@@ -263,7 +309,7 @@ export const ThreadPredictionMarketCard = ({
     let cancelled = false;
     getPredictionMarketBalancesFromChain(
       chainRpc,
-      evmWalletAddress,
+      selectedAddress,
       market.p_token_address,
       market.f_token_address,
     )
@@ -282,7 +328,7 @@ export const ThreadPredictionMarketCard = ({
     };
   }, [
     chainRpc,
-    evmWalletAddress,
+    selectedAddress,
     market?.p_token_address,
     market?.f_token_address,
     userPosition,
@@ -290,7 +336,7 @@ export const ThreadPredictionMarketCard = ({
 
   useEffect(() => {
     const addr = market?.collateral_address;
-    const isZero = !addr || addr.toLowerCase() === ZERO_ADDR.toLowerCase();
+    const isZero = !addr || addr.toLowerCase() === ZERO_ADDRESS.toLowerCase();
     if (isZero) {
       const bal = ethBalance === '0.' ? '0' : ethBalance || '—';
       setCollateralDisplay({ symbol: 'ETH', balance: bal, decimals: 18 });
@@ -317,6 +363,89 @@ export const ThreadPredictionMarketCard = ({
       cancelled = true;
     };
   }, [chainRpc, evmWalletAddress, market?.collateral_address, ethBalance]);
+
+  // Fetch PASS/FAIL balances from chain and prefer them for immediate UI freshness.
+  useEffect(() => {
+    if (
+      !chainRpc ||
+      !activeAddress ||
+      !market?.p_token_address ||
+      !market?.f_token_address
+    ) {
+      setOnChainPassFail(null);
+      return;
+    }
+    let cancelled = false;
+    getPredictionMarketBalancesFromChain(
+      chainRpc,
+      activeAddress,
+      market.p_token_address,
+      market.f_token_address,
+    )
+      .then(({ pTokenBalanceWei, fTokenBalanceWei }) => {
+        if (!cancelled)
+          setOnChainPassFail({ p: pTokenBalanceWei, f: fTokenBalanceWei });
+      })
+      .catch(() => {
+        if (!cancelled) setOnChainPassFail(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    chainRpc,
+    activeAddress,
+    market?.p_token_address,
+    market?.f_token_address,
+    latestTradeFingerprint,
+    tradeRefreshNonce,
+  ]);
+
+  // Prefer on-chain market-specific collateral over DB total_collateral
+  useEffect(() => {
+    const vaultAddr = market?.vault_address;
+    const marketId = market?.market_id;
+    if (!chainRpc || !vaultAddr || !marketId) {
+      setMarketCollateralOnChain(null);
+      return;
+    }
+    let cancelled = false;
+    getMarketCollateralBalanceFromLogs(chainRpc, vaultAddr, marketId)
+      .then((balance) => {
+        if (!cancelled) setMarketCollateralOnChain(balance);
+      })
+      .catch(() => {
+        if (!cancelled) setMarketCollateralOnChain(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    chainRpc,
+    market?.vault_address,
+    market?.market_id,
+    latestTradeFingerprint,
+    tradeRefreshNonce,
+  ]);
+
+  const refreshTradeData = async () => {
+    await Promise.allSettled([refetchPositions(), refetchTrades()]);
+    setTradeRefreshNonce((prev) => prev + 1);
+  };
+
+  const handleTradeModalSuccess = () => {
+    void (async () => {
+      await refreshTradeData();
+      setIsTradeModalOpen(false);
+    })();
+  };
+
+  const handleTradeModalClose = () => {
+    void (async () => {
+      setIsTradeModalOpen(false);
+      await refreshTradeData();
+    })();
+  };
 
   const handleCancelMarket = () => {
     if (!market) return;
@@ -374,6 +503,18 @@ export const ThreadPredictionMarketCard = ({
 
   const decimals = collateralDisplay?.decimals ?? 18;
   const symbol = collateralDisplay?.symbol ?? 'ETH';
+  const pBalanceWei =
+    onChainPassFail?.p ??
+    (userPosition?.p_token_balance
+      ? BigInt(String(userPosition.p_token_balance))
+      : 0n);
+  const fBalanceWei =
+    onChainPassFail?.f ??
+    (userPosition?.f_token_balance
+      ? BigInt(String(userPosition.f_token_balance))
+      : 0n);
+  const pBalanceDisplay = weiToDisplayNumber(pBalanceWei, decimals);
+  const fBalanceDisplay = weiToDisplayNumber(fBalanceWei, decimals);
   const pWei = userPosition
     ? BigInt(
         String(
@@ -393,6 +534,10 @@ export const ThreadPredictionMarketCard = ({
 
   const passProbability = market?.current_probability ?? 0.5;
   const failProbability = 1 - passProbability;
+  const totalMintedWei =
+    marketCollateralOnChain ?? parseWeiString(market?.total_collateral);
+  const totalMintedDisplay = weiToDisplayNumber(totalMintedWei, decimals);
+  const marketVolumeDisplay = weiToDisplayNumber(marketVolume, decimals);
 
   if (marketProp === undefined && isLoading) {
     return (
@@ -425,6 +570,32 @@ export const ThreadPredictionMarketCard = ({
   return (
     <>
       <CWCard className="ThreadPredictionMarketCard">
+        <div className="address-selector-row">
+          <CWSelectList
+            components={{
+              Option: (originalProps) =>
+                CustomAddressOption({
+                  originalProps,
+                  selectedAddressValue: activeAddress,
+                }),
+            }}
+            noOptionsMessage={() => 'No available address'}
+            value={convertAddressToDropdownOption(activeAddress)}
+            formatOptionLabel={(option) => (
+              <CustomAddressOptionElement
+                value={option.value}
+                label={option.label}
+                selectedAddressValue={activeAddress}
+              />
+            )}
+            isClearable={false}
+            isSearchable={false}
+            options={uniqueAddresses.map(convertAddressToDropdownOption)}
+            onChange={(option) =>
+              option?.value && setSelectedAddress(option.value)
+            }
+          />
+        </div>
         <div className="prediction-market-header">
           <div className="market-prompt-row">
             <CWText type="b2" className="market-prompt">
@@ -506,12 +677,13 @@ export const ThreadPredictionMarketCard = ({
               <CWText type="caption" className="metric-label">
                 TOTAL MINTED
               </CWText>
-              <CWText type="b1" className="metric-value">
-                {formatCollateral(market.total_collateral ?? '0')}&nbsp;
-                <CWText type="b2">
-                  <span className="metric-symbol">{symbol}</span>
-                </CWText>
-              </CWText>
+              <FractionalValue
+                type="b1"
+                className="metric-value"
+                value={totalMintedDisplay}
+                currencySymbol={` ${symbol}`}
+                symbolLast
+              />
             </div>
           </div>
           <div className="metric-card">
@@ -519,12 +691,13 @@ export const ThreadPredictionMarketCard = ({
               <CWText type="caption" className="metric-label">
                 MARKET VOL.
               </CWText>
-              <CWText type="b1" className="metric-value">
-                {formatCollateral(marketVolume.toString())}&nbsp;
-                <CWText type="b2">
-                  <span className="metric-symbol">{symbol}</span>
-                </CWText>
-              </CWText>
+              <FractionalValue
+                type="b1"
+                className="metric-value"
+                value={marketVolumeDisplay}
+                currencySymbol={` ${symbol}`}
+                symbolLast
+              />
             </div>
           </div>
         </div>
@@ -554,17 +727,25 @@ export const ThreadPredictionMarketCard = ({
               <CWText type="caption" className="pass-label">
                 PASS BALANCE
               </CWText>
-              <CWText type="b2" className="pass-value">
-                {pBalance}&nbsp;
-              </CWText>
+              <FractionalValue
+                type="b2"
+                className="pass-value"
+                value={pBalanceDisplay}
+                currencySymbol={` ${symbol}`}
+                symbolLast
+              />
             </div>
             <div className="balance-label end">
               <CWText type="caption" className="fail-label">
                 FAIL BALANCE
               </CWText>
-              <CWText type="b2" className="fail-value">
-                {fBalance}&nbsp;
-              </CWText>
+              <FractionalValue
+                type="b2"
+                className="fail-value"
+                value={fBalanceDisplay}
+                currencySymbol={` ${symbol}`}
+                symbolLast
+              />
             </div>
           </div>
           <div className="probability-bar">
@@ -629,11 +810,13 @@ export const ThreadPredictionMarketCard = ({
           <PredictionMarketTradeModal
             market={market}
             threadCommunityId={thread?.communityId ?? ''}
-            onClose={() => setIsTradeModalOpen(false)}
-            onSuccess={() => setIsTradeModalOpen(false)}
+            initialAddress={selectedAddress}
+            open={isTradeModalOpen}
+            onClose={handleTradeModalClose}
+            onSuccess={handleTradeModalSuccess}
           />
         }
-        onClose={() => setIsTradeModalOpen(false)}
+        onClose={handleTradeModalClose}
         open={isTradeModalOpen}
       />
     </>

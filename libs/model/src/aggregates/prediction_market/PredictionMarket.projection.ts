@@ -53,7 +53,11 @@ export function PredictionMarketProjection(): Projection<typeof inputs> {
         } = payload;
 
         const market = await models.PredictionMarket.findOne({
-          where: { market_id, status: PredictionMarketStatus.Active },
+          where: {
+            market_id,
+            eth_chain_id,
+            status: PredictionMarketStatus.Active,
+          },
         });
         if (!market) {
           log.warn(
@@ -142,7 +146,11 @@ export function PredictionMarketProjection(): Projection<typeof inputs> {
         } = payload;
 
         const market = await models.PredictionMarket.findOne({
-          where: { market_id, status: PredictionMarketStatus.Active },
+          where: {
+            market_id,
+            eth_chain_id,
+            status: PredictionMarketStatus.Active,
+          },
         });
         if (!market) {
           log.warn(
@@ -228,7 +236,11 @@ export function PredictionMarketProjection(): Projection<typeof inputs> {
         } = payload;
 
         const market = await models.PredictionMarket.findOne({
-          where: { market_id, status: PredictionMarketStatus.Active },
+          where: {
+            market_id,
+            eth_chain_id,
+            status: PredictionMarketStatus.Active,
+          },
         });
         if (!market) {
           log.warn(
@@ -341,7 +353,11 @@ export function PredictionMarketProjection(): Projection<typeof inputs> {
         } = payload;
 
         const market = await models.PredictionMarket.findOne({
-          where: { market_id, status: PredictionMarketStatus.Active },
+          where: {
+            market_id,
+            eth_chain_id,
+            status: PredictionMarketStatus.Active,
+          },
         });
         if (!market) {
           log.warn(
@@ -411,10 +427,14 @@ export function PredictionMarketProjection(): Projection<typeof inputs> {
         });
       },
       PredictionMarketProposalResolved: async ({ payload }) => {
-        const { market_id, winner } = payload;
+        const { market_id, eth_chain_id, winner } = payload;
 
         const market = await models.PredictionMarket.findOne({
-          where: { market_id, status: PredictionMarketStatus.Active },
+          where: {
+            market_id,
+            eth_chain_id,
+            status: PredictionMarketStatus.Active,
+          },
         });
         if (!market) {
           log.warn(
@@ -433,10 +453,14 @@ export function PredictionMarketProjection(): Projection<typeof inputs> {
         });
       },
       PredictionMarketMarketResolved: async ({ payload }) => {
-        const { market_id, winner } = payload;
+        const { market_id, eth_chain_id, winner } = payload;
 
         const market = await models.PredictionMarket.findOne({
-          where: { market_id, status: PredictionMarketStatus.Active },
+          where: {
+            market_id,
+            eth_chain_id,
+            status: PredictionMarketStatus.Active,
+          },
         });
         if (!market) {
           log.warn(

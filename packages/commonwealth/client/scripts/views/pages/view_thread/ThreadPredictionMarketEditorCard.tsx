@@ -95,15 +95,21 @@ export const ThreadPredictionMarketEditorCard = ({
   if (activeMarket) {
     return (
       <>
-        {markets.map((market) => (
-          <ThreadPredictionMarketCard
-            key={(market as PredictionMarketResult).id}
-            thread={thread}
-            market={market as PredictionMarketResult}
-            isAuthor={isAuthor}
-            canResolveMarket={canResolveMarket}
-          />
-        ))}
+        {markets
+          .filter(
+            (market) =>
+              (market as unknown as PredictionMarketResult).status !==
+              PredictionMarketStatus.Cancelled,
+          )
+          .map((market) => (
+            <ThreadPredictionMarketCard
+              key={(market as PredictionMarketResult).id}
+              thread={thread}
+              market={market as PredictionMarketResult}
+              isAuthor={isAuthor}
+              canResolveMarket={canResolveMarket}
+            />
+          ))}
       </>
     );
   }

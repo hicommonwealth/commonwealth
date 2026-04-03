@@ -9,7 +9,7 @@ import {
 } from '@commonxyz/common-protocol-abis';
 import { erc20Abi, factoryContracts } from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
-import { decodeEventLog, type Address } from 'viem';
+import { decodeErrorResult, decodeEventLog, type Address } from 'viem';
 import type { AbiItem } from 'web3-utils';
 import ContractBase from './ContractBase';
 
@@ -32,6 +32,7 @@ export type DeployParams = {
   duration_days: number;
   resolution_threshold: number;
   initial_liquidity: string;
+  initial_liquidity_wei?: string | bigint;
 };
 
 function randomBytes32(): `0x${string}` {
@@ -55,6 +56,47 @@ function parseTokenAmount(value: string, decimals: number): bigint {
   const frac = dot === -1 ? '' : trimmed.slice(dot + 1).slice(0, decimals);
   const combined = whole + frac.padEnd(decimals, '0').slice(0, decimals);
   return BigInt(combined || '0');
+}
+
+function extractHexRevertData(input: unknown): `0x${string}` | null {
+  if (typeof input === 'string' && /^0x[0-9a-fA-F]+$/.test(input)) {
+    return input as `0x${string}`;
+  }
+  if (!input || typeof input !== 'object') return null;
+  const candidate = input as {
+    data?: unknown;
+    cause?: unknown;
+    error?: unknown;
+    originalError?: unknown;
+  };
+  return (
+    extractHexRevertData(candidate.data) ??
+    extractHexRevertData(candidate.cause) ??
+    extractHexRevertData(candidate.error) ??
+    extractHexRevertData(candidate.originalError)
+  );
+}
+
+function formatRevertReason(err: unknown): string | null {
+  const revertData = extractHexRevertData(err);
+  if (!revertData || revertData === '0x') return null;
+  try {
+    const decoded = decodeErrorResult({
+      abi: FutarchyGovernorAbi,
+      data: revertData,
+    });
+    const args =
+      Array.isArray(decoded.args) && decoded.args.length > 0
+        ? ` (${decoded.args.map((a) => String(a)).join(', ')})`
+        : '';
+    return `Transaction reverted: ${decoded.errorName}${args}.`;
+  } catch {
+    const selector = revertData.slice(0, 10);
+    return (
+      `Transaction reverted (error selector ${selector}). ` +
+      'Check collateral support, initial liquidity (> 0), duration, and threshold settings.'
+    );
+  }
 }
 
 class PredictionMarket extends ContractBase {
@@ -139,6 +181,16 @@ class PredictionMarket extends ContractBase {
           throw err;
         }
       }
+      const currentBalance = BigInt(
+        (await collateralToken.methods.balanceOf(fromAddress).call()) as string,
+      );
+      console.log('currentBalance', currentBalance);
+      console.log('initialLiquidityWei', initialLiquidityWei);
+      if (currentBalance < initialLiquidityWei) {
+        throw new Error(
+          'Insufficient collateral balance for initial liquidity.',
+        );
+      }
     }
 
     const tx = this.contract.methods.propose(
@@ -163,6 +215,10 @@ class PredictionMarket extends ContractBase {
       if (/insufficient funds|not enough balance/i.test(msg)) {
         throw new Error('Insufficient funds for gas.');
       }
+      const revertReason = formatRevertReason(err);
+      if (revertReason) {
+        throw new Error(revertReason);
+      }
       throw err;
     }
   }
@@ -171,29 +227,53 @@ class PredictionMarket extends ContractBase {
    * Propose a new market, decode events, and return the payload for deployPredictionMarket mutation.
    */
   async deploy(params: DeployParams): Promise<DeployPredictionMarketPayload> {
+    console.log('params => ', params);
     this.isInitialized();
     const proposalId = randomBytes32();
     const marketId = randomBytes32();
-    const durationSeconds = BigInt(params.duration_days * 86400);
+    const durationDays = Math.max(1, Math.floor(params.duration_days || 1));
+    const durationSeconds = BigInt(durationDays) * 86400n;
     // Contract expects resolution threshold in 1e18 scale
-    const resolutionThresholdWei = BigInt(
-      Math.round(params.resolution_threshold * 1e18),
+    if (
+      !Number.isFinite(params.resolution_threshold) ||
+      params.resolution_threshold <= 0 ||
+      params.resolution_threshold >= 1
+    ) {
+      throw new Error('Resolution threshold must be between 0 and 1.');
+    }
+    const resolutionThresholdWei = parseTokenAmount(
+      params.resolution_threshold.toString(),
+      18,
     );
 
-    // Use collateral token decimals so amount matches balance
     let initialLiquidityWei = 0n;
-    const liquidityInput = params.initial_liquidity?.trim();
-    if (liquidityInput && liquidityInput !== '0') {
-      const collateralToken = new this.web3.eth.Contract(
-        erc20Abi as unknown as AbiItem[],
-        params.collateral_address,
+    if (
+      params.initial_liquidity_wei !== undefined &&
+      params.initial_liquidity_wei !== null
+    ) {
+      initialLiquidityWei = BigInt(params.initial_liquidity_wei);
+    } else {
+      // Use collateral token decimals so amount matches balance
+      const liquidityInput = params.initial_liquidity?.trim();
+      if (liquidityInput && liquidityInput !== '0') {
+        const collateralToken = new this.web3.eth.Contract(
+          erc20Abi as unknown as AbiItem[],
+          params.collateral_address,
+        );
+        const decimals = Number(
+          (await collateralToken.methods.decimals().call()) as string | number,
+        );
+        const decimalsNum =
+          typeof decimals === 'number' && !Number.isNaN(decimals)
+            ? decimals
+            : 18;
+        initialLiquidityWei = parseTokenAmount(liquidityInput, decimalsNum);
+      }
+    }
+    if (initialLiquidityWei <= 0n) {
+      throw new Error(
+        'Initial liquidity must be greater than 0 for on-chain deployment.',
       );
-      const decimals = Number(
-        (await collateralToken.methods.decimals().call()) as string | number,
-      );
-      const decimalsNum =
-        typeof decimals === 'number' && !Number.isNaN(decimals) ? decimals : 18;
-      initialLiquidityWei = parseTokenAmount(liquidityInput, decimalsNum);
     }
 
     const rawReceipt = await this.propose(

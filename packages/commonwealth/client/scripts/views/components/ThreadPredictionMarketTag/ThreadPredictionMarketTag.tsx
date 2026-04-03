@@ -1,23 +1,19 @@
 import moment from 'moment';
 import React from 'react';
 
+import FractionalValue from 'client/scripts/views/components/FractionalValue';
+import { useCollateralMeta } from 'client/scripts/views/components/PredictionMarket/useCollateralMeta';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import CWPopover, {
   usePopover,
 } from 'client/scripts/views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
+import {
+  sumWeiValues,
+  weiToDisplayNumber,
+} from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
 
 import './ThreadPredictionMarketTag.scss';
-
-function formatVolume(weiStr: string | undefined, decimals = 18): string {
-  if (!weiStr) return '0';
-  const wei = BigInt(weiStr);
-  if (wei === 0n) return '0.00';
-  const divisor = 10n ** BigInt(decimals);
-  const whole = wei / divisor;
-  const frac = ((wei % divisor) * 100n) / divisor;
-  return `${whole.toLocaleString()}.${frac.toString().padStart(2, '0').slice(0, 2)}`;
-}
 
 function timeRemaining(endTime: string | null | undefined): string {
   if (!endTime) return '—';
@@ -34,21 +30,34 @@ export type ThreadPredictionMarketTagMarket = {
   current_probability?: number | null;
   end_time?: string | null;
   total_collateral?: string | null;
+  initial_liquidity?: string | null;
+  collateral_address?: string | null;
 };
 
 interface ThreadPredictionMarketTagProps {
   market: ThreadPredictionMarketTagMarket;
+  communityId?: string;
 }
 
 const ThreadPredictionMarketTag = ({
   market,
+  communityId,
 }: ThreadPredictionMarketTagProps) => {
   const popoverProps = usePopover();
+  const collateralMeta = useCollateralMeta({
+    communityId,
+    collateralAddress: market.collateral_address,
+  });
+
   const passPct = Math.round((market.current_probability ?? 0.5) * 100);
   const failPct = 100 - passPct;
   const isPassLeading = passPct >= 50;
   const label = isPassLeading ? `PASS ${passPct}%` : `FAIL ${failPct}%`;
   const tagType = isPassLeading ? 'passed' : 'failed';
+  const lockedDisplay = weiToDisplayNumber(
+    sumWeiValues(market.total_collateral, market.initial_liquidity),
+    collateralMeta.decimals,
+  );
 
   return (
     <div className="ThreadPredictionMarketTag">
@@ -77,9 +86,15 @@ const ThreadPredictionMarketTag = ({
               <CWText type="caption">FAIL {failPct}%</CWText>
             </div>
             <CWText type="caption">{timeRemaining(market.end_time)}</CWText>
-            <CWText type="caption">
-              {formatVolume(market.total_collateral ?? '0')} USDC locked
-            </CWText>
+            <div>
+              <FractionalValue
+                type="caption"
+                value={lockedDisplay}
+                currencySymbol={` ${collateralMeta.symbol}`}
+                symbolLast
+              />
+              <CWText type="caption">&nbsp;locked</CWText>
+            </div>
           </div>
         }
         {...popoverProps}
