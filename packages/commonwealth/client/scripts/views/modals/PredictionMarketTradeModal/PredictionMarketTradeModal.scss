@@ -603,75 +603,10 @@
     }
   }
 
-  .slippage-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-
-    .slippage-label-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-
-      .slippage-info-icon {
-        color: colors.$neutral-500;
-      }
-    }
-
-    .slippage-hint {
-      width: 100%;
-      margin-top: 4px;
-      color: colors.$neutral-500;
-    }
-
-    .slippage-presets {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-
-      .slippage-btn {
-        background: colors.$neutral-75;
-        border: 1px solid colors.$neutral-200;
-        border-radius: 6px;
-        padding: 4px 10px;
-        font-size: 12px;
-        cursor: pointer;
-        color: inherit;
-        transition:
-          background 0.15s,
-          border-color 0.15s;
-
-        &.active {
-          background: colors.$primary-500;
-          border-color: colors.$primary-500;
-          color: white;
-        }
-
-        &:hover:not(.active) {
-          background: colors.$neutral-150;
-        }
-      }
-
-      .slippage-custom-input {
-        width: 46px;
-        background: colors.$neutral-75;
-        border: 1px solid colors.$neutral-200;
-        border-radius: 6px;
-        padding: 4px 6px;
-        font-size: 12px;
-        text-align: center;
-        color: inherit;
-        outline: none;
-        transition: border-color 0.15s;
-
-        &.active,
-        &:focus {
-          border-color: colors.$primary-500;
-        }
-      }
-    }
+  .swap-quote-caption {
+    display: block;
+    margin-top: 12px;
+    color: colors.$neutral-500;
   }
 
   .swap-summary {
