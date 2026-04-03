@@ -1,5 +1,9 @@
 import { PredictionMarketStatus } from '@hicommonwealth/schemas';
-import { getCollateralBalanceAndSymbol } from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
+import {
+  getCollateralBalanceAndSymbol,
+  getPredictionMarketBalancesFromChain,
+} from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
+import { resolveEvmWalletAddress } from 'client/scripts/helpers/resolveEvmWalletAddress';
 import type Thread from 'client/scripts/models/Thread';
 import useGetCommunityByIdQuery from 'client/scripts/state/api/communities/getCommuityById';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
@@ -9,7 +13,7 @@ import {
 } from 'client/scripts/state/api/predictionMarket';
 import { openConfirmation } from 'client/scripts/views/modals/confirmation_modal';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   useCancelPredictionMarketMutation,
   useGetPredictionMarketsQuery,
@@ -139,7 +143,28 @@ export const ThreadPredictionMarketCard = ({
   const [isResolveModalOpen, setIsResolveModalOpen] = useState(false);
   const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
   const [timeDisplay, setTimeDisplay] = useState<string | null>(null);
+  const [onChainPassFailBalances, setOnChainPassFailBalances] = useState<{
+    p: bigint;
+    f: bigint;
+  } | null>(null);
   const user = useUserStore();
+
+  const evmWalletAddress = useMemo(
+    () =>
+      resolveEvmWalletAddress(thread?.communityId ?? '', {
+        addressSelectorSelectedAddress: user.addressSelectorSelectedAddress,
+        activeAccount: user.activeAccount,
+        accounts: user.accounts,
+        addresses: user.addresses,
+      }),
+    [
+      thread?.communityId,
+      user.addressSelectorSelectedAddress,
+      user.activeAccount,
+      user.accounts,
+      user.addresses,
+    ],
+  );
 
   const { data: marketsData, isLoading } = useGetPredictionMarketsQuery({
     threadId: thread.id!,
@@ -160,8 +185,8 @@ export const ThreadPredictionMarketCard = ({
   const userPosition = Array.isArray(positions)
     ? positions.find(
         (p: { user_address: string }) =>
-          p.user_address?.toLowerCase() ===
-          user.activeAccount?.address?.toLowerCase(),
+          evmWalletAddress &&
+          p.user_address?.toLowerCase() === evmWalletAddress.toLowerCase(),
       )
     : undefined;
 
@@ -182,7 +207,6 @@ export const ThreadPredictionMarketCard = ({
     decimals: number;
   } | null>(null);
 
-  const activeAddress = user.activeAccount?.address ?? '';
   const { data: community } = useGetCommunityByIdQuery({
     id: thread?.communityId ?? '',
     includeNodeInfo: true,
@@ -200,10 +224,10 @@ export const ThreadPredictionMarketCard = ({
     market?.collateral_address.toLowerCase() === ZERO_ADDR.toLowerCase();
   const { data: ethBalance = '' } = useGetUserEthBalanceQuery({
     chainRpc,
-    walletAddress: activeAddress,
+    walletAddress: evmWalletAddress,
     ethChainId,
     apiEnabled:
-      !!chainRpc && !!activeAddress && ethChainId > 0 && isCollateralZero,
+      !!chainRpc && !!evmWalletAddress && ethChainId > 0 && isCollateralZero,
   });
 
   useEffect(() => {
@@ -222,6 +246,48 @@ export const ThreadPredictionMarketCard = ({
     return () => clearInterval(interval);
   }, [market?.end_time, market]);
 
+  // Match trade modal: if API has no position row, read PASS/FAIL balances from chain
+  useEffect(() => {
+    if (userPosition) {
+      setOnChainPassFailBalances(null);
+      return;
+    }
+    if (
+      !chainRpc ||
+      !evmWalletAddress ||
+      !market?.p_token_address ||
+      !market?.f_token_address
+    ) {
+      return;
+    }
+    let cancelled = false;
+    getPredictionMarketBalancesFromChain(
+      chainRpc,
+      evmWalletAddress,
+      market.p_token_address,
+      market.f_token_address,
+    )
+      .then(({ pTokenBalanceWei, fTokenBalanceWei }) => {
+        if (!cancelled)
+          setOnChainPassFailBalances({
+            p: pTokenBalanceWei,
+            f: fTokenBalanceWei,
+          });
+      })
+      .catch(() => {
+        if (!cancelled) setOnChainPassFailBalances(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    chainRpc,
+    evmWalletAddress,
+    market?.p_token_address,
+    market?.f_token_address,
+    userPosition,
+  ]);
+
   useEffect(() => {
     const addr = market?.collateral_address;
     const isZero = !addr || addr.toLowerCase() === ZERO_ADDR.toLowerCase();
@@ -230,12 +296,12 @@ export const ThreadPredictionMarketCard = ({
       setCollateralDisplay({ symbol: 'ETH', balance: bal, decimals: 18 });
       return;
     }
-    if (!chainRpc || !activeAddress) {
+    if (!chainRpc || !evmWalletAddress) {
       setCollateralDisplay(null);
       return;
     }
     let cancelled = false;
-    getCollateralBalanceAndSymbol(chainRpc, activeAddress, addr)
+    getCollateralBalanceAndSymbol(chainRpc, evmWalletAddress, addr)
       .then(({ balanceWei, symbol, decimals }) => {
         if (!cancelled)
           setCollateralDisplay({
@@ -250,7 +316,7 @@ export const ThreadPredictionMarketCard = ({
     return () => {
       cancelled = true;
     };
-  }, [chainRpc, activeAddress, market?.collateral_address, ethBalance]);
+  }, [chainRpc, evmWalletAddress, market?.collateral_address, ethBalance]);
 
   const handleCancelMarket = () => {
     if (!market) return;
@@ -308,18 +374,22 @@ export const ThreadPredictionMarketCard = ({
 
   const decimals = collateralDisplay?.decimals ?? 18;
   const symbol = collateralDisplay?.symbol ?? 'ETH';
-  const pBalance = userPosition?.p_token_balance
-    ? formatCollateralBalance(
-        BigInt(String(userPosition.p_token_balance)),
-        decimals,
+  const pWei = userPosition
+    ? BigInt(
+        String(
+          (userPosition as { p_token_balance: string }).p_token_balance ?? '0',
+        ),
       )
-    : '0.00';
-  const fBalance = userPosition?.f_token_balance
-    ? formatCollateralBalance(
-        BigInt(String(userPosition.f_token_balance)),
-        decimals,
+    : (onChainPassFailBalances?.p ?? 0n);
+  const fWei = userPosition
+    ? BigInt(
+        String(
+          (userPosition as { f_token_balance: string }).f_token_balance ?? '0',
+        ),
       )
-    : '0.00';
+    : (onChainPassFailBalances?.f ?? 0n);
+  const pBalance = formatCollateralBalance(pWei, decimals);
+  const fBalance = formatCollateralBalance(fWei, decimals);
 
   const passProbability = market?.current_probability ?? 0.5;
   const failProbability = 1 - passProbability;

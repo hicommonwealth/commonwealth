@@ -14,17 +14,25 @@ import {
   mergeTokens,
   mintTokens,
   parseTokenAmount,
+  quoteSwapAmountOut,
   redeemTokens,
   swapTokens,
   type TradeParams,
 } from 'client/scripts/helpers/ContractHelpers/predictionMarketTrade';
+import { resolveEvmWalletAddress } from 'client/scripts/helpers/resolveEvmWalletAddress';
 import useGetCommunityByIdQuery from 'client/scripts/state/api/communities/getCommuityById';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import { fetchNodes } from 'client/scripts/state/api/nodes';
 import { useGetPredictionMarketPositionsQuery } from 'client/scripts/state/api/predictionMarket';
 import useUserStore from 'client/scripts/state/ui/user';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -90,6 +98,8 @@ function getTradeParams(
   chainRpc: string,
   userAddress: string,
   provider?: unknown,
+  /** Community chain node id when `market.eth_chain_id` is unset (wallet/network switch). */
+  fallbackEthChainId?: number,
 ): TradeParams {
   return {
     vault_address: market.vault_address ?? '',
@@ -99,7 +109,7 @@ function getTradeParams(
     f_token_address: market.f_token_address ?? '',
     market_id: market.market_id ?? '',
     chain_rpc: chainRpc,
-    eth_chain_id: market.eth_chain_id ?? 0,
+    eth_chain_id: market.eth_chain_id ?? fallbackEthChainId ?? 0,
     user_address: userAddress,
     provider,
   };
@@ -112,17 +122,28 @@ export const PredictionMarketTradeModal = ({
   onSuccess,
 }: PredictionMarketTradeModalProps) => {
   const user = useUserStore();
-  const activeAddress = user.activeAccount?.address ?? '';
+  const evmWalletAddress = useMemo(
+    () =>
+      resolveEvmWalletAddress(threadCommunityId, {
+        addressSelectorSelectedAddress: user.addressSelectorSelectedAddress,
+        activeAccount: user.activeAccount,
+        accounts: user.accounts,
+        addresses: user.addresses,
+      }),
+    [
+      threadCommunityId,
+      user.addressSelectorSelectedAddress,
+      user.activeAccount,
+      user.accounts,
+      user.addresses,
+    ],
+  );
   const [activeTab, setActiveTab] = useState<TabId>(() =>
     market.status === 'resolved' ? 'redeem' : 'mint',
   );
   const [mintAmount, setMintAmount] = useState('');
   const [swapAmount, setSwapAmount] = useState('');
   const [swapBuyPass, setSwapBuyPass] = useState(true);
-  const [slippageBps, setSlippageBps] = useState(DEFAULT_SLIPPAGE_BPS);
-  const [slippagePreset, setSlippagePreset] = useState<
-    'auto' | '0.5%' | '1.0%' | '2.0%' | '5.0%' | 'no-min' | 'custom'
-  >('auto');
   const [mergeAmount, setMergeAmount] = useState('');
   const [redeemAmount, setRedeemAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -144,6 +165,12 @@ export const PredictionMarketTradeModal = ({
     decimals: number;
   } | null>(null);
   const [detailsCollapsed, setDetailsCollapsed] = useState(true);
+  const [swapQuoteOutWei, setSwapQuoteOutWei] = useState<bigint | null>(null);
+  const [swapQuoteError, setSwapQuoteError] = useState<string | null>(null);
+  const [swapQuoteLoading, setSwapQuoteLoading] = useState(false);
+  const swapQuoteDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const { data: community } = useGetCommunityByIdQuery({
     id: threadCommunityId,
@@ -163,7 +190,7 @@ export const PredictionMarketTradeModal = ({
     });
   const userPosition = positions.find(
     (p: { user_address: string }) =>
-      p.user_address?.toLowerCase() === activeAddress?.toLowerCase(),
+      p.user_address?.toLowerCase() === evmWalletAddress?.toLowerCase(),
   );
   const pTokenBalance = userPosition
     ? BigInt(
@@ -184,9 +211,9 @@ export const PredictionMarketTradeModal = ({
     refetch: refetchEthBalance,
   } = useGetUserEthBalanceQuery({
     chainRpc,
-    walletAddress: activeAddress,
+    walletAddress: evmWalletAddress,
     ethChainId,
-    apiEnabled: !!chainRpc && !!activeAddress && ethChainId > 0,
+    apiEnabled: !!chainRpc && !!evmWalletAddress && ethChainId > 0,
   });
   const availableEthDisplay = isEthBalanceLoading
     ? '—'
@@ -239,7 +266,7 @@ export const PredictionMarketTradeModal = ({
     }
     if (
       !chainRpc ||
-      !activeAddress ||
+      !evmWalletAddress ||
       !market.p_token_address ||
       !market.f_token_address
     ) {
@@ -248,7 +275,7 @@ export const PredictionMarketTradeModal = ({
     let cancelled = false;
     getPredictionMarketBalancesFromChain(
       chainRpc,
-      activeAddress,
+      evmWalletAddress,
       market.p_token_address,
       market.f_token_address,
     )
@@ -264,7 +291,7 @@ export const PredictionMarketTradeModal = ({
     };
   }, [
     chainRpc,
-    activeAddress,
+    evmWalletAddress,
     market.p_token_address,
     market.f_token_address,
     userPosition,
@@ -276,12 +303,12 @@ export const PredictionMarketTradeModal = ({
     const isZero =
       !addr ||
       addr.toLowerCase() === '0x0000000000000000000000000000000000000000';
-    if (isZero || !chainRpc || !activeAddress) {
+    if (isZero || !chainRpc || !evmWalletAddress) {
       setCollateralInfo(null);
       return;
     }
     let cancelled = false;
-    getCollateralBalanceAndSymbol(chainRpc, activeAddress, addr)
+    getCollateralBalanceAndSymbol(chainRpc, evmWalletAddress, addr)
       .then((info) => {
         if (!cancelled) setCollateralInfo(info);
       })
@@ -291,7 +318,7 @@ export const PredictionMarketTradeModal = ({
     return () => {
       cancelled = true;
     };
-  }, [chainRpc, activeAddress, market.collateral_address]);
+  }, [chainRpc, evmWalletAddress, market.collateral_address]);
 
   // Fetch vault's collateral balance on-chain so user can verify even if app DB is stale
   useEffect(() => {
@@ -320,6 +347,91 @@ export const PredictionMarketTradeModal = ({
     };
   }, [chainRpc, effectiveMarket.vault_address, market.collateral_address]);
 
+  // Uniswap V3 quoter: expected output for swap UX (minOut on submit uses a fresh quote in handleSwap).
+  useEffect(() => {
+    if (activeTab !== 'swap') {
+      setSwapQuoteOutWei(null);
+      setSwapQuoteError(null);
+      setSwapQuoteLoading(false);
+      return;
+    }
+    const swapDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
+    const amountInWei = parseTokenAmount(swapAmount, swapDecimals);
+    const chainIdForQuote = effectiveMarket.eth_chain_id ?? ethChainId;
+    if (
+      amountInWei <= 0n ||
+      !chainRpc ||
+      !effectiveMarketId ||
+      !effectiveMarket.router_address ||
+      !effectiveMarket.p_token_address ||
+      !effectiveMarket.f_token_address ||
+      chainIdForQuote <= 0
+    ) {
+      setSwapQuoteOutWei(null);
+      setSwapQuoteError(null);
+      setSwapQuoteLoading(false);
+      return;
+    }
+
+    if (swapQuoteDebounceRef.current) {
+      clearTimeout(swapQuoteDebounceRef.current);
+      swapQuoteDebounceRef.current = null;
+    }
+
+    let cancelled = false;
+    swapQuoteDebounceRef.current = setTimeout(() => {
+      swapQuoteDebounceRef.current = null;
+      setSwapQuoteLoading(true);
+      void quoteSwapAmountOut({
+        chain_rpc: chainRpc,
+        eth_chain_id: chainIdForQuote,
+        router_address: effectiveMarket.router_address ?? '',
+        market_id: effectiveMarketId,
+        buy_pass: swapBuyPass,
+        amount_in_wei: amountInWei,
+        p_token_address: effectiveMarket.p_token_address ?? '',
+        f_token_address: effectiveMarket.f_token_address ?? '',
+      })
+        .then((out) => {
+          if (!cancelled) {
+            setSwapQuoteOutWei(out);
+            setSwapQuoteError(null);
+          }
+        })
+        .catch((err: unknown) => {
+          if (!cancelled) {
+            setSwapQuoteOutWei(null);
+            setSwapQuoteError(
+              err instanceof Error ? err.message : 'Quote failed',
+            );
+          }
+        })
+        .finally(() => {
+          if (!cancelled) setSwapQuoteLoading(false);
+        });
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      if (swapQuoteDebounceRef.current) {
+        clearTimeout(swapQuoteDebounceRef.current);
+        swapQuoteDebounceRef.current = null;
+      }
+    };
+  }, [
+    activeTab,
+    swapAmount,
+    swapBuyPass,
+    chainRpc,
+    effectiveMarketId,
+    effectiveMarket.router_address,
+    effectiveMarket.p_token_address,
+    effectiveMarket.f_token_address,
+    effectiveMarket.eth_chain_id,
+    ethChainId,
+    collateralInfo?.decimals,
+  ]);
+
   const isResolved = market.status === 'resolved';
   const swapDisabled = isResolved;
   const winner = market.winner ?? 0;
@@ -329,7 +441,7 @@ export const PredictionMarketTradeModal = ({
     const addresses = store.getState().addresses ?? [];
     const isMagic = addresses.some(
       (addr: { address: string; walletId?: string }) =>
-        addr.address?.toLowerCase() === activeAddress?.toLowerCase() &&
+        addr.address?.toLowerCase() === evmWalletAddress?.toLowerCase() &&
         addr.walletId?.toLowerCase()?.includes('magic'),
     );
     if (!isMagic) return undefined;
@@ -337,7 +449,7 @@ export const PredictionMarketTradeModal = ({
     const controller = new MagicWebWalletController();
     await controller.enable(String(ethChainId));
     return (controller as { provider?: unknown }).provider;
-  }, [activeAddress, ethChainId]);
+  }, [evmWalletAddress, ethChainId]);
 
   const mintDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
 
@@ -362,7 +474,13 @@ export const PredictionMarketTradeModal = ({
     try {
       const provider = await getProvider();
       await mintTokens({
-        ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
+        ...getTradeParams(
+          effectiveMarket,
+          chainRpc,
+          evmWalletAddress,
+          provider,
+          ethChainId,
+        ),
         collateral_amount_wei: amountWei,
       });
       notifySuccess('Mint successful.');
@@ -371,7 +489,7 @@ export const PredictionMarketTradeModal = ({
       if (market.collateral_address) {
         getCollateralBalanceAndSymbol(
           chainRpc,
-          activeAddress,
+          evmWalletAddress,
           market.collateral_address,
         ).then((info) => setCollateralInfo(info));
       }
@@ -387,6 +505,10 @@ export const PredictionMarketTradeModal = ({
   };
 
   const handleSwap = async () => {
+    if (!evmWalletAddress?.trim()) {
+      setErrorMessage('Connect a wallet to swap.');
+      return;
+    }
     const swapDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
     const amountInWei = parseTokenAmount(swapAmount, swapDecimals);
     if (amountInWei <= 0n) {
@@ -401,16 +523,43 @@ export const PredictionMarketTradeModal = ({
       );
       return;
     }
-    const minAmountOutWei =
-      slippagePreset === 'no-min'
-        ? 0n
-        : applySlippage(amountInWei, slippageBps);
     setErrorMessage(null);
     setIsLoading(true);
     try {
+      const chainIdForQuote = effectiveMarket.eth_chain_id ?? ethChainId;
+      let minAmountOutWei: bigint;
+      try {
+        const quotedOut = await quoteSwapAmountOut({
+          chain_rpc: chainRpc,
+          eth_chain_id: chainIdForQuote,
+          router_address: effectiveMarket.router_address ?? '',
+          market_id: effectiveMarketId ?? '',
+          buy_pass: swapBuyPass,
+          amount_in_wei: amountInWei,
+          p_token_address: effectiveMarket.p_token_address ?? '',
+          f_token_address: effectiveMarket.f_token_address ?? '',
+        });
+        minAmountOutWei = applySlippage(quotedOut, DEFAULT_SLIPPAGE_BPS);
+      } catch (quoteErr) {
+        const qMsg =
+          quoteErr instanceof Error
+            ? quoteErr.message
+            : 'Could not estimate swap output.';
+        setErrorMessage(
+          `${qMsg} Check your network or RPC (Quoter must be configured for this chain).`,
+        );
+        notifyError(qMsg);
+        return;
+      }
       const provider = await getProvider();
       await swapTokens({
-        ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
+        ...getTradeParams(
+          effectiveMarket,
+          chainRpc,
+          evmWalletAddress,
+          provider,
+          ethChainId,
+        ),
         buy_pass: swapBuyPass,
         amount_in_wei: amountInWei,
         min_amount_out_wei: minAmountOutWei,
@@ -420,7 +569,7 @@ export const PredictionMarketTradeModal = ({
       if (!userPosition) {
         getPredictionMarketBalancesFromChain(
           chainRpc,
-          activeAddress,
+          evmWalletAddress,
           effectiveMarket.p_token_address ?? '',
           effectiveMarket.f_token_address ?? '',
         ).then(({ pTokenBalanceWei, fTokenBalanceWei }) =>
@@ -457,7 +606,13 @@ export const PredictionMarketTradeModal = ({
     try {
       const provider = await getProvider();
       await mergeTokens({
-        ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
+        ...getTradeParams(
+          effectiveMarket,
+          chainRpc,
+          evmWalletAddress,
+          provider,
+          ethChainId,
+        ),
         amount_wei: amountWei,
       });
       notifySuccess('Merge successful.');
@@ -466,14 +621,14 @@ export const PredictionMarketTradeModal = ({
       if (market.collateral_address) {
         getCollateralBalanceAndSymbol(
           chainRpc,
-          activeAddress,
+          evmWalletAddress,
           market.collateral_address,
         ).then((info) => setCollateralInfo(info));
       }
       if (!userPosition) {
         getPredictionMarketBalancesFromChain(
           chainRpc,
-          activeAddress,
+          evmWalletAddress,
           effectiveMarket.p_token_address ?? '',
           effectiveMarket.f_token_address ?? '',
         ).then(({ pTokenBalanceWei, fTokenBalanceWei }) =>
@@ -508,7 +663,13 @@ export const PredictionMarketTradeModal = ({
     try {
       const provider = await getProvider();
       await redeemTokens({
-        ...getTradeParams(effectiveMarket, chainRpc, activeAddress, provider),
+        ...getTradeParams(
+          effectiveMarket,
+          chainRpc,
+          evmWalletAddress,
+          provider,
+          ethChainId,
+        ),
         amount_wei: amountWei,
         winner: winner as 1 | 2,
       });
@@ -585,27 +746,14 @@ export const PredictionMarketTradeModal = ({
     if (activeTab === 'swap') {
       const swapDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
       const amountInWei = parseTokenAmount(swapAmount, swapDecimals);
-      const minOutWei =
-        slippagePreset === 'no-min'
+      const minOutAfterSlippageWei =
+        swapQuoteOutWei === null
           ? 0n
-          : applySlippage(amountInWei, slippageBps);
+          : applySlippage(swapQuoteOutWei, DEFAULT_SLIPPAGE_BPS);
       const sellToken = swapBuyPass ? 'FAIL' : 'PASS';
       const buyToken = swapBuyPass ? 'PASS' : 'FAIL';
       const sellBalance = swapBuyPass ? fTokenBalance : pTokenBalance;
       const buyBalance = swapBuyPass ? pTokenBalance : fTokenBalance;
-
-      const slippageOptions: Array<{
-        label: string;
-        preset: 'auto' | '0.5%' | '1.0%' | '2.0%' | '5.0%' | 'no-min';
-        bps: number;
-      }> = [
-        { label: 'Auto', preset: 'auto', bps: DEFAULT_SLIPPAGE_BPS },
-        { label: '0.5%', preset: '0.5%', bps: 50 },
-        { label: '1.0%', preset: '1.0%', bps: 100 },
-        { label: '2.0%', preset: '2.0%', bps: 200 },
-        { label: '5.0%', preset: '5.0%', bps: 500 },
-        { label: 'No min', preset: 'no-min', bps: 0 },
-      ];
 
       const sellBalanceZero = sellBalance === 0n;
 
@@ -694,15 +842,23 @@ export const PredictionMarketTradeModal = ({
                 </div>
                 <div className="panel-amount">
                   <CWText type="h4" fontWeight="bold" className="estimated-out">
-                    {slippagePreset === 'no-min'
-                      ? 'Any'
-                      : minOutWei > 0n
-                        ? formatTokenDisplay(minOutWei, swapDecimals)
-                        : '—'}
+                    {swapQuoteLoading
+                      ? '…'
+                      : swapQuoteError
+                        ? '—'
+                        : swapQuoteOutWei !== null && amountInWei > 0n
+                          ? formatTokenDisplay(swapQuoteOutWei, swapDecimals)
+                          : '—'}
                   </CWText>
-                  {slippagePreset !== 'no-min' && minOutWei > 0n && (
+                  {minOutAfterSlippageWei > 0n && swapQuoteOutWei !== null && (
                     <CWText type="caption" className="min-out-hint">
-                      ~ {formatTokenDisplay(minOutWei, swapDecimals)}
+                      Min. received (≤{DEFAULT_SLIPPAGE_BPS / 100}% slippage):{' '}
+                      {formatTokenDisplay(minOutAfterSlippageWei, swapDecimals)}
+                    </CWText>
+                  )}
+                  {swapQuoteError && (
+                    <CWText type="caption" className="min-out-hint">
+                      {swapQuoteError}
                     </CWText>
                   )}
                 </div>
@@ -710,48 +866,11 @@ export const PredictionMarketTradeModal = ({
             </div>
           </div>
 
-          {/* Slippage */}
-          <div className="slippage-row">
-            <div className="slippage-label-group">
-              <CWText type="b2">Max Slippage</CWText>
-              <CWIcon
-                iconName="infoEmpty"
-                iconSize="small"
-                className="slippage-info-icon"
-              />
-            </div>
-            <div className="slippage-presets">
-              {slippageOptions.map(({ label, preset, bps }) => (
-                <button
-                  key={preset}
-                  className={`slippage-btn${slippagePreset === preset ? ' active' : ''}`}
-                  onClick={() => {
-                    setSlippagePreset(preset);
-                    setSlippageBps(bps);
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-              <input
-                className={`slippage-custom-input${slippagePreset === 'custom' ? ' active' : ''}`}
-                type="text"
-                placeholder="0.1"
-                value={
-                  slippagePreset === 'custom' ? String(slippageBps / 100) : ''
-                }
-                onChange={(e) => {
-                  const v = parseFloat(e.target.value);
-                  setSlippagePreset('custom');
-                  if (!Number.isNaN(v)) setSlippageBps(Math.round(v * 100));
-                }}
-              />
-            </div>
-            <CWText type="caption" className="slippage-hint">
-              If you get &quot;Slippage exceeded&quot;, try 2% or 5%, or use
-              &quot;No min&quot; to accept any amount (swap always succeeds).
-            </CWText>
-          </div>
+          <CWText type="caption" className="swap-quote-caption">
+            Estimates use a live Uniswap quote. Max slippage is fixed at{' '}
+            {DEFAULT_SLIPPAGE_BPS / 100}%: the transaction reverts if the pool
+            would give you less than that vs. the quote at send time.
+          </CWText>
         </div>
       );
     }
@@ -958,7 +1077,8 @@ export const PredictionMarketTradeModal = ({
   };
   const primaryDisabled =
     activeTab === 'mint'
-      ? !mintAmount ||
+      ? !evmWalletAddress ||
+        !mintAmount ||
         parseTokenAmount(mintAmount, mintDecimals) <= 0n ||
         (!!collateralInfo &&
           parseTokenAmount(mintAmount, mintDecimals) >
@@ -972,13 +1092,15 @@ export const PredictionMarketTradeModal = ({
             const hasBalanceData =
               userPosition != null || onChainBalances != null;
             return (
+              !evmWalletAddress ||
               !swapAmount ||
               amountWei <= 0n ||
               (hasBalanceData && sellBalance > 0n && amountWei > sellBalance)
             );
           })()
         : activeTab === 'merge'
-          ? !mergeAmount ||
+          ? !evmWalletAddress ||
+            !mergeAmount ||
             parseTokenAmount(
               mergeAmount,
               collateralInfo?.decimals ?? COLLATERAL_DECIMALS,
@@ -987,7 +1109,8 @@ export const PredictionMarketTradeModal = ({
               mergeAmount,
               collateralInfo?.decimals ?? COLLATERAL_DECIMALS,
             ) > minBalanceForMerge
-          : (winner !== 1 && winner !== 2) ||
+          : !evmWalletAddress ||
+            (winner !== 1 && winner !== 2) ||
             !redeemAmount ||
             parseTokenAmount(
               redeemAmount,
@@ -1395,7 +1518,7 @@ export const PredictionMarketTradeModal = ({
           label={primaryButtonLabel}
           buttonType="primary"
           buttonHeight="sm"
-          disabled={primaryDisabled || isLoading || !activeAddress}
+          disabled={primaryDisabled || isLoading || !evmWalletAddress}
           onClick={onPrimaryAction}
         />
       </CWModalFooter>
