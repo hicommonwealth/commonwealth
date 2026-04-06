@@ -1,24 +1,21 @@
 // run with `pnpm run start-mcp-demo-client`
+//
+// Required env vars (same as production):
+//   SERVER_URL       – public URL of the MCP server (e.g. https://<ngrok>.ngrok.io)
+//   MCP_AUTH_TOKEN   – <verified_address>:<secret>
 
 import { config } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import {
   buildMCPClientOptions,
+  enrichCommonMCPServer,
+  filterServersWithWhitelist,
   withMCPAuthUsername,
   type CommonMCPServerWithHeaders,
 } from '@hicommonwealth/model/services';
 import OpenAI from 'openai';
 import { exit } from 'process';
 import * as readline from 'readline';
-
-const demoHelp = `
-MCP_DEMO_CLIENT_SERVER_URL must be set to the (ngrok) URL of the MCP server, just the domain.
-MCP_KEY_BYPASS must be set to the key of the MCP server in format <address>:<api-key>.
-
-Example:
-MCP_DEMO_CLIENT_SERVER_URL=my-mcp-server.ngrok.io
-MCP_KEY_BYPASS=0x1234567890:myApiKey
-`;
 
 let rl: readline.Interface | undefined;
 
@@ -36,8 +33,6 @@ function getUserInput(prompt: string): Promise<string> {
   });
 }
 
-const { MCP_DEMO_CLIENT_SERVER_URL, MCP_KEY_BYPASS } = config.MCP;
-
 const client = new OpenAI({
   apiKey: config.OPENAI.API_KEY,
 });
@@ -54,47 +49,29 @@ async function getAllServers(): Promise<CommonMCPServerWithHeaders[]> {
     ],
   });
 
-  const dbServers = mcpServers.map((server) => {
-    const serverJson = withMCPAuthUsername(server);
-
-    return {
-      ...serverJson,
-      server_url:
-        server.id === 1
-          ? `https://${MCP_DEMO_CLIENT_SERVER_URL}/mcp`
-          : serverJson.server_url,
-      headers:
-        server.id === 1
-          ? {
-              Authorization: `Bearer ${MCP_KEY_BYPASS}`,
-            }
-          : undefined,
-    };
-  });
+  const dbServers = mcpServers.map((server) =>
+    enrichCommonMCPServer({ ...withMCPAuthUsername(server), headers: {} }),
+  );
 
   // Handle duplicate handles by adding number suffixes
   const handleCounts: Map<string, number> = new Map();
-  const processedServers = dbServers.map((server) => {
+  return dbServers.map((server) => {
     const originalHandle = server.handle;
     const count = handleCounts.get(originalHandle) || 0;
     handleCounts.set(originalHandle, count + 1);
-
-    // Add suffix starting from 1 for duplicates
     const finalHandle =
       count > 0 ? `${originalHandle}${count}` : originalHandle;
-
-    return {
-      ...server,
-      handle: finalHandle,
-    };
+    return { ...server, handle: finalHandle };
   });
-
-  return processedServers;
 }
 
 async function startChatBot() {
-  if (!config.MCP.MCP_DEMO_CLIENT_SERVER_URL || !config.MCP.MCP_KEY_BYPASS) {
-    throw new Error(demoHelp);
+  if (!config.MCP.MCP_AUTH_TOKEN) {
+    throw new Error(
+      'MCP_AUTH_TOKEN must be set (format: <verified_address>:<api_key>).\n' +
+        'The api_key must be a real key from CreateApiKey (not an arbitrary secret).\n' +
+        'SERVER_URL must point to the MCP server (e.g. https://<ngrok>.ngrok.io).',
+    );
   }
 
   console.clear();
@@ -102,7 +79,7 @@ async function startChatBot() {
     '\n👋 Ask me anything about Common communities, threads, or users!',
   );
 
-  const allServers = await getAllServers();
+  const allServers = filterServersWithWhitelist(await getAllServers());
   console.log(`\nAvailable servers:`);
   allServers.forEach((server) => {
     console.log(

@@ -6,7 +6,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
-import { prettyVoteWeight } from 'shared/adapters/currency';
+import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
 import app from 'state';
 import {
   useCreateThreadReactionMutation,
@@ -143,15 +143,19 @@ export const ReactionButton = ({
     }
   };
 
-  const formattedVoteCount = prettyVoteWeight(
-    thread.topic!.weighted_voting
-      ? reactionWeightsSum
-      : thread.reactionCount.toString(),
-    thread.topic!.token_decimals,
+  const formattedVoteCount = prettyCompoundVoteWeight(
+    [
+      {
+        wei: thread.topic!.weighted_voting
+          ? reactionWeightsSum
+          : thread.reactionCount.toString(),
+        tokenNumDecimals: thread.topic!.token_decimals,
+        multiplier: 1,
+        tokenSymbol: thread.topic?.token_symbol || undefined,
+      },
+    ],
     thread.topic!.weighted_voting as TopicWeightedVoting,
-    1,
     size === 'big' ? 1 : 6,
-    thread.topic?.token_symbol || undefined,
   );
 
   return (

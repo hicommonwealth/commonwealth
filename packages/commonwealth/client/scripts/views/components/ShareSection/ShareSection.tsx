@@ -1,10 +1,9 @@
 import { formatAddressShort } from 'helpers';
-import { useFlag } from 'hooks/useFlag';
 import { uniqBy } from 'lodash';
 import React, { useEffect, useState } from 'react';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import app from 'state';
 import useUserStore from 'state/ui/user';
-import { saveToClipboard } from 'utils/clipboard';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
@@ -33,8 +32,6 @@ export type ShareSectionProps = {
  */
 export const ShareSection = (props: ShareSectionProps) => {
   const { title, onCommunityChange, text } = props;
-
-  const referralsEnabled = useFlag('referrals');
 
   const user = useUserStore();
   const hasJoinedCommunity = !!user.activeAccount;
@@ -70,30 +67,28 @@ export const ShareSection = (props: ShareSectionProps) => {
 
   return (
     <>
-      {referralsEnabled && (
-        <>
-          <CWSelectList
-            label="Select Address"
-            placeholder="Select a wallet"
-            isClearable={false}
-            isSearchable={false}
-            value={addressOptions.find((option) => option.value === refCode)}
-            defaultValue={addressOptions[0]}
-            options={addressOptions}
-            onChange={(option) => setRefCode(option?.value)}
-          />
+      <>
+        <CWSelectList
+          label="Select Address"
+          placeholder="Select a wallet"
+          isClearable={false}
+          isSearchable={false}
+          value={addressOptions.find((option) => option.value === refCode)}
+          defaultValue={addressOptions[0]}
+          options={addressOptions}
+          onChange={(option) => setRefCode(option?.value)}
+        />
 
-          <CWTextInput
-            inputClassName="invite-link-input"
-            fullWidth
-            type="text"
-            value={url}
-            readOnly
-            onClick={handleCopy}
-            iconRight={<CWIcon iconName="copy" />}
-          />
-        </>
-      )}
+        <CWTextInput
+          inputClassName="invite-link-input"
+          fullWidth
+          type="text"
+          value={url}
+          readOnly
+          onClick={handleCopy}
+          iconRight={<CWIcon iconName="copy" />}
+        />
+      </>
 
       <div className="ShareSection">
         <CWText fontWeight="bold">Share to</CWText>

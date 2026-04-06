@@ -12,8 +12,8 @@ import {
   numberNonDecimalValidationSchema,
   numberValidationSchema,
   stringHasNumbersOnlyValidationSchema,
-} from 'helpers/formValidations/common';
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
+} from 'shared/utils/formValidations/common';
+import { VALIDATION_MESSAGES } from 'shared/utils/formValidations/messages';
 import { parseAbiItem } from 'viem';
 import { z } from 'zod';
 import { QuestActionSubFormConfig } from './types';

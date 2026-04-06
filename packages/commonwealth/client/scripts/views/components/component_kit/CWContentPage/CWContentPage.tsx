@@ -1,11 +1,11 @@
 import { GetThreadToken } from '@hicommonwealth/schemas';
-import { truncate } from 'helpers/truncate';
 import useTopicGating from 'hooks/useTopicGating';
 import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import React, { ReactNode, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
+import { truncate } from 'shared/utils/truncate';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
@@ -18,6 +18,7 @@ import { Thread } from '../../../../models/Thread';
 import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
+import { ThreadPredictionMarketTagContainer } from '../../ThreadPredictionMarketTag';
 import { ThreadTokenDrawer } from '../../ThreadTokenDrawer';
 import { ViewThreadUpvotesDrawer } from '../../UpvoteDrawer';
 import { CWIcon } from '../cw_icons/cw_icon';
@@ -237,6 +238,7 @@ export const CWContentPage = ({
             <ThreadContestTagContainer
               associatedContests={thread?.associatedContests}
             />
+            {thread && <ThreadPredictionMarketTagContainer thread={thread} />}
             {truncate(title)}
           </h1>
         ) : (

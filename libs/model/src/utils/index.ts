@@ -13,6 +13,7 @@ export * from './outbox';
 export * from './parseUserMentions';
 export * from './pgMultiRowUpdate';
 export * from './quests';
+export * from './sanitizeBannerText';
 export * from './sanitizeDeletedComment';
 export * from './sanitizeQuillText';
 export * from './testChainNodeUtils';

@@ -4,6 +4,7 @@ import { useCreateGoalMetaMutation } from './createGoalMeta';
 import useEnableDigestEmail from './enableDigestEmail';
 import useGetGoalMetasQuery from './getGoalMetas';
 import useTriggerNotificationsWorkflowMutation from './triggerNotificationsWorkflow';
+import useUpdateMarketMutation from './updateMarketMutation';
 import useUpdateResourceTimestamps from './updateResourceTimestamps';
 
 export {
@@ -13,5 +14,6 @@ export {
   useGetGoalMetasQuery,
   useRerankThreadsMutation,
   useTriggerNotificationsWorkflowMutation,
+  useUpdateMarketMutation,
   useUpdateResourceTimestamps,
 };

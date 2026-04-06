@@ -14,6 +14,10 @@ export type TokenAllocationSyncArgs = {
   user_name: string;
   wallet_address: string;
   token_allocation: number;
+  contract_id: string;
+  token_id: string;
+  schedule_id: string;
+  unlock_start_at: Date;
 };
 
 async function sendToSlack(created: number) {
@@ -58,37 +62,26 @@ export async function magnaSync(
     while (found && errors < 3) {
       // Load next batch of allocations to sync with Magna
       const batch = await models.sequelize.query<TokenAllocationSyncArgs>(
-        `
-          WITH nft_data AS (
-            SELECT user_id, SUM(total_token_allocation) as total_token_allocation
-            FROM "NftSnapshot"
-            WHERE user_id IS NOT NULL
-            GROUP BY user_id
-          )
-          SELECT
-            :category || '-' || A.user_id as key,
-            :category as category,
-            :description || ' for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
+        `SELECT
+            CE.id || '-' || A.user_id as key,
+            CE.id as category,
+            CE.description || ' for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
+            CE.contract_id,
+            CE.token_id,
+            CE.unlock_schedule_id as schedule_id,
+            CE.unlock_start_at,
             A.user_id,
             A.address as wallet_address,
             COALESCE(U.profile->>'name', 'Anonymous-' || A.user_id) as user_name,
-            COALESCE(HA.token_allocation, 0)::double precision 
-            + COALESCE(AA.token_allocation, 0)::double precision
-            + COALESCE(N.total_token_allocation, 0)::double precision as token_allocation
+            (A.aura + A.historic + A.nft)::double precision as token_allocation
           FROM
             "ClaimAddresses" A -- this is the driving table with sync watermarks
             JOIN "Users" U ON A.user_id = U.id
-            LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
-            LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
-            LEFT JOIN nft_data N ON A.user_id = N.user_id
+            JOIN "ClaimEvents" CE ON A.event_id = CE.id
           WHERE
             A.address IS NOT NULL -- there is an address to sync
             AND A.magna_synced_at IS NULL -- and it hasn't been synced yet
-            AND ( 
-              COALESCE(HA.token_allocation, 0)::double precision +
-              COALESCE(AA.token_allocation, 0)::double precision +
-              COALESCE(N.total_token_allocation, 0)::double precision
-            ) > 0
+            AND (A.aura + A.historic + A.nft) > 0
           ORDER BY
             A.user_id ASC
           LIMIT :limit
@@ -96,8 +89,6 @@ export async function magnaSync(
         {
           type: QueryTypes.SELECT,
           replacements: {
-            category: config.MAGNA.EVENT,
-            description: config.MAGNA.EVENT_DESC,
             limit: batchSize,
           },
         },
@@ -116,13 +107,15 @@ export async function magnaSync(
               magna_allocation_id: allocationId,
               magna_synced_at: new Date(),
             },
-            { where: { user_id: args.user_id } },
+            { where: { event_id: args.category, user_id: args.user_id } },
           );
-          log.info(`Synced allocation for user ${args.user_id}`);
+          log.info(
+            `Synced allocation ${args.category} for user ${args.user_id}`,
+          );
           created++;
         } catch (err) {
           log.error(
-            `Failed to sync allocation for user ${args.user_id}:`,
+            `Failed to sync allocation ${args.category} for user ${args.user_id}:`,
             err as Error,
           );
         }

@@ -1,7 +1,6 @@
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { getUniqueUserAddresses } from 'helpers/user';
-import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React, { useEffect, useState } from 'react';
 import { useAuthModalStore, useWelcomeOnboardModal } from 'state/ui/modals';
 import { AuthTypes } from 'views/components/AuthButton/types';
@@ -11,8 +10,6 @@ import { CreateAccountModal } from './CreateAccountModal';
 import { RevalidateSessionModal } from './RevalidateSessionModal';
 import { SignInModal } from './SignInModal';
 import { AuthModalProps, AuthModalType, AuthOptionTypes } from './types';
-
-const mobileApp = isMobileApp();
 
 const AuthModal = ({
   type = AuthModalType.SignIn,
@@ -62,9 +59,7 @@ const AuthModal = ({
       showAuthOptionFor,
       showAuthOptionTypesFor: (showAuthOptionTypesFor
         ? showAuthOptionTypesFor
-        : mobileApp
-          ? ['sso']
-          : ['wallets', 'sso']) as AuthOptionTypes[],
+        : ['wallets', 'sso']) as AuthOptionTypes[],
       onSignInClick: handleOnSignInClick,
       triggerOpenEVMWalletsSubModal,
       isUserFromWebView,
@@ -105,6 +100,7 @@ const AuthModal = ({
       className="AuthModal"
       content={getActiveModalComponent()}
       isFullScreen={isWindowSmallInclusive}
+      data-testid="auth-modal"
     />
   );
 };

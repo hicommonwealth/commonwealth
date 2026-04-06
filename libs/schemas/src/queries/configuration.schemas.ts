@@ -14,7 +14,6 @@ export const GetPublicEnvVar = {
     LAUNCHPAD_CHAIN_ID: z.number(),
     LAUNCHPAD_CONNECTOR_WEIGHT: z.number(),
     LAUNCHPAD_INITIAL_PRICE: z.number(),
-    PRIVY_APP_ID: z.string().optional(),
     DISCORD_CLIENT_ID: z.string().optional(),
     UNLEASH_FRONTEND_API_TOKEN: z.string().optional(),
     CF_TURNSTILE_CREATE_THREAD_SITE_KEY: z.string().optional(),

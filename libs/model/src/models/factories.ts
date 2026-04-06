@@ -29,12 +29,18 @@ import GroupGatedAction from './groupGatedAction';
 import GroupSnapshot from './groupSnapshot';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LaunchpadTrade from './launchpad_trade';
+import { CommunityMarket, Market } from './market';
 import MCPServer from './mcp_server';
 import MCPServerCommunity from './mcp_server_community';
 import Membership from './membership';
 import Outbox from './outbox';
 import PinnedToken from './pinned_token';
 import Poll from './poll';
+import {
+  PredictionMarket,
+  PredictionMarketPosition,
+  PredictionMarketTrade,
+} from './prediction_market';
 import ProfileTags from './profile_tags';
 import ProposalVote from './proposal_votes';
 import { Quest, QuestActionMeta } from './quest';
@@ -57,6 +63,7 @@ import LaunchpadToken from './token';
 import {
   AuraAllocations,
   ClaimAddresses,
+  ClaimEvents,
   HistoricalAllocations,
   NftSnapshot,
 } from './token-allocation';
@@ -76,6 +83,7 @@ export const Factories = {
   AuraAllocations,
   ChainNode,
   ClaimAddresses,
+  ClaimEvents,
   Collaboration,
   Comment,
   CommentVersionHistory,
@@ -84,6 +92,7 @@ export const Factories = {
   CommunityAlert,
   CommunityGoalMeta,
   CommunityGoalReached,
+  CommunityMarket,
   CommunityStake,
   CommunityTags,
   CommunityDirectoryTags,
@@ -102,6 +111,7 @@ export const Factories = {
   HistoricalAllocations,
   LastProcessedEvmBlock,
   LaunchpadTrade,
+  Market,
   MCPServer,
   MCPServerCommunity,
   Membership,
@@ -110,6 +120,9 @@ export const Factories = {
   Poll,
   ProfileTags,
   ProposalVote,
+  PredictionMarket,
+  PredictionMarketPosition,
+  PredictionMarketTrade,
   Quest,
   QuestActionMeta,
   QuestTweets,

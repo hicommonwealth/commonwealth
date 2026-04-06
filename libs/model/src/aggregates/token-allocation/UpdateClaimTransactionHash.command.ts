@@ -1,4 +1,4 @@
-import { type Command, InvalidState, logger } from '@hicommonwealth/core';
+import { InvalidState, logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
@@ -14,10 +14,11 @@ export function UpdateClaimTransactionHash(): Command<
     auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
-      const { transaction_hash } = payload;
+      const { event_id, transaction_hash } = payload;
 
       const claimAddress = await models.ClaimAddresses.findOne({
         where: {
+          event_id,
           user_id: actor.user.id,
         },
       });
@@ -51,7 +52,8 @@ export function UpdateClaimTransactionHash(): Command<
             magna_claim_tx_hash = :transaction_hash,
             magna_claim_tx_at = :transaction_at
           WHERE
-            user_id = :user_id
+            event_id = :event_id
+            AND user_id = :user_id
             AND magna_claimed_at IS NOT NULL
             AND magna_claim_data IS NOT NULL
             AND magna_claim_tx_hash IS NULL;
@@ -59,6 +61,7 @@ export function UpdateClaimTransactionHash(): Command<
         {
           type: QueryTypes.UPDATE,
           replacements: {
+            event_id,
             user_id: actor.user.id,
             transaction_hash,
             transaction_at: txnAt,

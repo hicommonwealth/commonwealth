@@ -1,0 +1,201 @@
+# AI Workflow Progress Log
+
+This file tracks AI-assisted development work on Commonwealth.
+Each AI run should append an entry with:
+- Date and feature description
+- GitHub issue reference
+- Key implementation decisions
+- Files changed
+- Tests added/updated
+- Concerns for reviewers
+- Commit hash
+
+---
+
+[2026-01-06] Initial Setup: GitHub-First AI Workflow with Automatic Branching
+- Migrated from prd.json to GitHub Issues as single source of truth
+- Created .ai/run.sh with automatic branch creation and management
+- Implemented branch naming convention: <author>/<type>-<issue-number>-<title-slug>
+- Author determination: AI_AUTHOR_INITIALS env var > git config user.initials > derived from git user.name
+- Created .ai/setup-labels.sh for label setup (includes type:* labels)
+- Created .github/ISSUE_TEMPLATE/ai-task.md template with type labels
+- Created .ai/create-ticket.sh - AI-powered ticket generator from descriptions
+- Created .ai/quickstart.md - Quick start guide for new developers
+- Updated readme with comprehensive workflow guide and branching strategy
+- Branch creation logic: detects author, type from labels, generates slug from title
+- Handles edge cases: existing branches, non-master starting point, manual branches
+- Ticket generator: analyzes description, infers metadata, generates compliant issues
+- Example branches: ro/feature-1234-add-user-auth, ro/fix-5678-button-alignment
+- Commit: (to be added by next commit)
+
+---
+
+[2026-01-07] Feature Flag: FLAG_MARKETS for Prediction Markets Visibility Control
+- Completed GitHub issue #13265
+- Added FLAG_MARKETS feature flag to control visibility of prediction markets functionality across the application
+- Key implementation decisions:
+  * FLAG_MARKETS already defined in feature-flags.ts using buildFlag helper (line 52)
+  * FLAG_MARKETS already exposed in vite.config.ts (line 73)
+  * Routes already conditionally rendered in navigation files using spread operator pattern
+  * Updated governance_section.tsx to use marketsEnabled flag for Markets menu item visibility
+  * Updated AdminSection.tsx to use marketsEnabled flag for Market Integrations menu visibility
+  * Added FLAG_MARKETS to .env.example with default value of false for safe rollout
+- Files changed:
+  * packages/commonwealth/client/scripts/views/components/sidebar/governance_section.tsx - Added useFlag('markets') and set isVisible: marketsEnabled for Markets menu
+  * packages/commonwealth/client/scripts/views/components/sidebar/AdminSection/AdminSection.tsx - Added useFlag('markets') import and set isVisible: marketsEnabled for Market Integrations menu
+  * .env.example - Added FLAG_MARKETS documentation in Feature Flags section
+- Tests:
+  * Type checking shows pre-existing Soneium-related errors (not introduced by this change)
+  * Linting shows pre-existing warnings in market integration files (not introduced by this change)
+  * Unit tests require database connection (not available in current environment)
+  * Manual verification required: test with FLAG_MARKETS=true and FLAG_MARKETS=false
+- Concerns for reviewers:
+  * Verify Markets menu in Apps section hides when FLAG_MARKETS=false
+  * Verify Market Integrations in Admin Capabilities section hides when FLAG_MARKETS=false
+  * Test direct URL access to /markets-app and /:scope/manage/markets when flag is disabled
+  * Confirm routes properly return 404 or redirect when flag is off
+- Commit: 14779d72899558242378b4e6006a004d7e9ed438
+- Follow-up fix for React Hooks error:
+  * Converted Router from a function to a React component
+  * Router now returns <RouterProvider> directly instead of router config object
+  * Moved useFlag('markets') call to Router component where hooks are properly called
+  * Updated App.tsx to use <Router /> as component instead of router()
+  * Passed marketsEnabled as parameter to CommonDomainRoutes/CustomDomainRoutes
+  * Fixed "Rendered more hooks than during the previous render" error
+  * Commit: f3910b09be
+- Backend API validation:
+  * Added FLAG_MARKETS to backend config (libs/model/src/config.ts)
+  * Added validation to GetMarkets query - throws InvalidState when flag disabled
+  * Added validation to SubscribeMarket command - throws InvalidState when flag disabled
+  * Added validation to UnsubscribeMarket command - throws InvalidState when flag disabled
+  * Ensures markets API cannot be accessed by bypassing frontend controls
+  * Commit: c3b3dfafe8
+  * Fix: Added MARKETS to Zod schema validation to resolve undefined config error
+  * Commit: 3e54e37d98
+
+---
+
+[2026-01-08] Refactor: Refactored betting markets admin components to align with community market design patterns
+- Completed GitHub issue #13274
+- Key implementation decisions:
+  * Aligned admin components with MarketsAppPage styling and component patterns (light theme)
+  * Used CW component kit components (CWText, CWButton, CWTag, CWTextInput, CWSelectList, CWCircleMultiplySpinner)
+  * Applied light theme styling matching MarketsAppPage: white backgrounds (#ffffff), dark text (#1a1a1a, #212529), light borders (#e9ecef)
+  * Maintained consistent card styling with hover effects, rounded corners, and gradient provider badges
+  * Implemented proper empty state handling with descriptive messages
+  * Used responsive grid layout (2 columns on desktop, 1 on mobile)
+  * Applied proper status tag color coding (active, new, info)
+  * Added proper date formatting matching MarketsAppPage patterns
+  * Replaced inline styles and native HTML elements with CW component kit
+- Files changed:
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketSelector.tsx (refactored to use CW components and proper layout)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketSelector.scss (created new styles matching MarketsAppPage light theme)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketFilters.tsx (refactored to use CWTextInput and CWSelectList with react-select API)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketFilters.scss (created responsive filter layout)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketCard.tsx (refactored to match MarketsAppPage card design with tags, badges, and CWButton)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketCard.scss (completely rewritten to match MarketsAppPage light theme styling)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketList.tsx (added proper empty state with CWText)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketList.scss (updated grid layout and added empty state styles with light theme)
+  * packages/commonwealth/client/scripts/views/pages/CommunityManagement/Markets/MarketsPage.scss (simplified to match overall structure)
+- Tests: All unit tests pass (70 tests in commonwealth package)
+- Type checking: No type errors in modified files (pre-existing unrelated errors in model package about Soneium property)
+- Linting: All checks pass
+- Concerns for reviewers:
+  * Verify visual consistency between admin and community market views
+  * Test responsive behavior on mobile devices
+  * Confirm light theme colors match design system and are consistent
+  * Validate that status tag colors align with UX expectations
+  * Check that CWSelectList dropdowns work correctly with react-select API
+
+---
+
+[2026-01-09] Refactor: Market discovery APIs to state/api/markets pattern
+- Completed GitHub issue #13288
+- Key implementation decisions:
+  * Moved market discovery functions from client/scripts/services/ to client/scripts/state/api/markets/
+  * Created React Query hooks (useDiscoverKalshiMarketsQuery, useDiscoverPolymarketMarketsQuery) following existing patterns from communities/, snapshots/, communityStake/
+  * Added Kalshi and Polymarket API endpoints to ExternalEndpoints in config.ts
+  * Added proper TypeScript interfaces for API responses (KalshiEvent, PolymarketMarketResponse)
+  * Improved Polymarket error handling with array validation and proper error logging
+  * Added limit parameter (200) to Polymarket API to match Kalshi behavior
+  * Each hook exports both the raw fetch function (discoverKalshiMarkets, discoverPolymarketMarkets) and the hook (useDiscoverKalshiMarketsQuery, useDiscoverPolymarketMarketsQuery)
+  * Set 5-minute stale time for both APIs to balance freshness with performance
+  * Removed the now-empty client/scripts/services/ directory
+- Files changed:
+  * packages/commonwealth/client/scripts/state/api/config.ts - Added kalshi and polymarket to ExternalEndpoints
+  * packages/commonwealth/client/scripts/state/api/markets/discoverKalshiMarkets.ts - New file with typed Kalshi API hook
+  * packages/commonwealth/client/scripts/state/api/markets/discoverPolymarketMarkets.ts - New file with typed Polymarket API hook
+  * packages/commonwealth/client/scripts/state/api/markets/index.ts - Barrel export for markets module
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/useMarketData.ts - Updated imports to use new hooks
+  * packages/commonwealth/client/scripts/services/kalshiApi.ts - Deleted
+  * packages/commonwealth/client/scripts/services/polymarketApi.ts - Deleted
+- Tests: No unit tests added (external API integrations, manual verification required)
+- Type checking: No market-related type errors (pre-existing Soneium errors unrelated to changes)
+- Linting: All checks pass
+- Concerns for reviewers:
+  * Verify Kalshi markets load correctly in the Markets page UI
+  * Verify Polymarket markets load correctly (improved error handling should help debug issues)
+  * Test search filtering across both providers
+  * Check browser console for any API errors or CORS issues
+- Commit: 5a6a55cef6
+- Follow-up fix for Polymarket CORS issue:
+  * Polymarket API (gamma-api.polymarket.com) does not include CORS headers, blocking browser requests
+  * Kalshi API works fine in browser (has Access-Control-Allow-Origin header)
+  * Solution: Created backend proxy endpoint for Polymarket API calls
+  * Added DiscoverExternalMarkets schema and ExternalMarket type to @hicommonwealth/schemas
+  * Created DiscoverExternalMarkets.query.ts in model package to proxy Polymarket API
+  * Added discoverExternalMarkets endpoint to community tRPC router
+  * Updated frontend useDiscoverPolymarketMarketsQuery to use tRPC proxy instead of direct fetch
+  * Commit: d75672d776
+- Unified all market providers through backend proxy:
+  * Extended DiscoverExternalMarkets to support all providers (kalshi, polymarket, all)
+  * Added filters (search, category) and limit parameter to API
+  * Server-side filtering applied after fetching from external APIs
+  * Created single useDiscoverExternalMarketsQuery hook replacing separate Kalshi/Polymarket hooks
+  * Removed client-side discoverKalshiMarkets.ts and discoverPolymarketMarkets.ts
+  * Removed kalshi/polymarket endpoints from client config.ts (now only on backend)
+  * Simplified useMarketData.ts - no more client-side filtering needed
+  * Commit: b10692a4ae
+- Fixed Polymarket API to use /events endpoint (not /markets):
+  * /markets returns individual outcomes (e.g., 10 deportation buckets as separate items)
+  * /events returns grouped events (single "How many will Trump deport?" event)
+  * Added active=true filter to only return active events
+  * Both APIs now return unique, open events without duplicates
+  * Commit: 052c07c9c9
+
+[2026-01-09] Feature: Automated PR creation script
+- Completed GitHub issue #13290
+- Created .ai/create-pr.sh script that automates GitHub PR creation from current branch
+- Key implementation decisions:
+  * Followed existing .ai/ script patterns (colors, gh CLI checks, error handling)
+  * Used grep for ticket extraction instead of bash regex for macOS compatibility (bash 3.2)
+  * Supports multiple branch naming conventions: author/type-number-desc, type/number-desc, number-desc
+  * Uses GitHub CLI (gh) for all GitHub operations (PR creation, issue lookup, assignments)
+  * Generates PR body with "Closes #ticket" reference following GitHub conventions
+  * Auto-assigns PR and referenced issue to executing user (@me)
+  * Includes comprehensive error handling: gh not installed, not authenticated, detached HEAD, existing PR, uncommitted changes
+- Files changed:
+  * .ai/create-pr.sh (new file - 310 lines)
+  * .ai/progress.txt (updated with progress notes)
+- Tests: Script tested with --help flag, dry-run mode, and branch extraction verification
+- Concerns for reviewers:
+  * Script requires gh CLI to be installed and authenticated
+  * PR title defaults to issue title if available, otherwise derived from branch name
+  * The script is interactive and requires user confirmation before creating PR
+- Commit: 979ff661dc
+
+---
+
+[2026-01-12] #13294 feat: add external links to betting market cards
+- Files: types.ts, MarketCard.tsx, MarketCard.scss, MarketsAppPage.tsx, MarketsAppPage.scss, getExternalMarketUrl.spec.ts
+- Changes: Added clickable external links to provider pills on both admin MarketCard and MarketsAppPage. Users can navigate to Polymarket/Kalshi pages.
+- Decisions: URL format: Polymarket `/event/{slug}`, Kalshi `/markets/{base_ticker}/{title_slug}/{full_ticker}` (extracts base ticker, slugifies title)
+- Issues: None
+
+---
+
+[2026-01-23] #13307 chore: migrate Alchemy endpoints from alchemyapi.io to g.alchemy.com
+- Files: libs/model/src/tester/seedDb.ts, libs/model/migrations/20260123111500-migrate-alchemy-endpoints.js
+- Changes: Updated test seed database URLs from deprecated alchemyapi.io to new g.alchemy.com domain. Added database migration to update existing ChainNodes with old Alchemy URLs.
+- Decisions: Migration handles both HTTPS and WSS URL format changes. ethers 5.7.2 compatible with new endpoints (6.x upgrade out of scope)
+- Issues: Review migration carefully - WSS URL transformation is complex (removes .ws. prefix, adds /ws before API key)

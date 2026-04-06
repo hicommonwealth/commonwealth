@@ -11,7 +11,6 @@ import CWGrid from '../../components/component_kit/new_designs/CWGrid';
 import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobileTab';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
-import { MobileTabType } from './ContestPage';
 import useTokenData from './hooks/useTokenData';
 import type { EntriesTabProps } from './tabs/Entries';
 import EntriesTab from './tabs/Entries';
@@ -25,6 +24,14 @@ import './NewContestPage.scss';
 interface NewContestPageProps {
   contestAddress: string;
 }
+
+enum MobileTabType {
+  Entries = 'Entries',
+  PriceChart = 'Price Chart',
+  TokenSwap = 'Token Swap',
+  Judges = 'Judges',
+}
+
 const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
   const [selectedMobileTab, setSelectedMobileTab] = useState<MobileTabType>(
     MobileTabType.Entries,

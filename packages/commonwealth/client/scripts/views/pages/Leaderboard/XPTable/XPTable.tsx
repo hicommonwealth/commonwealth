@@ -1,7 +1,6 @@
-import { APIOrderDirection } from 'helpers/constants';
-import { useFlag } from 'hooks/useFlag';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { APIOrderDirection } from 'shared/utils/constants';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import useGetXPsRanked from 'state/api/user/getXPsRanked';
 import { Avatar } from 'views/components/Avatar';
@@ -55,8 +54,6 @@ const XPTable = ({
     label: string;
   } | null>(null);
 
-  const xpEnabled = useFlag('xp');
-
   const tableState = useCWTableState({
     columns,
     initialSortColumn: 'rank',
@@ -67,7 +64,6 @@ const XPTable = ({
     limit: 50,
     include_system_quests: true,
     cursor: 1,
-    enabled: xpEnabled,
   });
 
   const quests = (questsList?.pages || []).flatMap((page) => page.results);

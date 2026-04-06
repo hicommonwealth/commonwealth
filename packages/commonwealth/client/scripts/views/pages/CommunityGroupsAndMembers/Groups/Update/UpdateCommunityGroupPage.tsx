@@ -1,14 +1,14 @@
 import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import { buildUpdateGroupInput } from 'client/scripts/state/api/groups/editGroup';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo, useState } from 'react';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import Permissions from 'shared/utils/Permissions';
 import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
 import useAppStatus from '../../../../../hooks/useAppStatus';
 import { LoadingIndicator } from '../../../../components/LoadingIndicator/LoadingIndicator';

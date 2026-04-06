@@ -44,6 +44,7 @@ const {
   RAILWAY_PUBLIC_DOMAIN,
   OPENSEA_API_KEY,
   TOKEN_ALLOCATION_CONFIG,
+  AURA_RETRO_DROP_CONFIG,
   MAINTENANCE_MODE_POLLING,
 } = process.env;
 
@@ -177,6 +178,9 @@ export const config = configure(
     OPENSEA_API_KEY,
     TOKEN_ALLOCATION: TOKEN_ALLOCATION_CONFIG
       ? JSON.parse(TOKEN_ALLOCATION_CONFIG)
+      : undefined,
+    AURA_RETRO_DROP: AURA_RETRO_DROP_CONFIG
+      ? JSON.parse(AURA_RETRO_DROP_CONFIG)
       : undefined,
     MAINTENANCE_MODE_POLLING: MAINTENANCE_MODE_POLLING === 'true',
   },
@@ -376,5 +380,11 @@ export const config = configure(
       })
       .optional(),
     MAINTENANCE_MODE_POLLING: z.boolean(),
+    AURA_RETRO_DROP: z
+      .object({
+        userTierWeights: z.record(z.string(), z.number()),
+        totalSupply: z.number().positive(),
+      })
+      .optional(),
   }),
 );

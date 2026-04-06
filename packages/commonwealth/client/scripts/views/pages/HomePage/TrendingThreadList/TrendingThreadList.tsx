@@ -91,7 +91,9 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
       onStageTagClick={() => {
         const path = `${
-          isSameCommunity || domain?.isCustomDomain ? '' : `/${thread.communityId}`
+          isSameCommunity || domain?.isCustomDomain
+            ? ''
+            : `/${thread.communityId}`
         }/discussions?stage=${thread.stage}`;
         navigate(path, {}, domain?.isCustomDomain ? null : undefined);
       }}

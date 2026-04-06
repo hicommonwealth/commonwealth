@@ -1,8 +1,8 @@
+import React from 'react';
 import {
   currencyNameToSymbolMap,
   SupportedFiatCurrencies,
-} from 'helpers/currency';
-import React from 'react';
+} from 'shared/utils/currency';
 import { useGetTokenStatsQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
 import FormattedDisplayNumber from '../FormattedDisplayNumber/FormattedDisplayNumber';

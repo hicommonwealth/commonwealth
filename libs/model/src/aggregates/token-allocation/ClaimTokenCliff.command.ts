@@ -75,11 +75,13 @@ export function ClaimTokenCliff(): Command<typeof schemas.ClaimToken> {
             magna_cliff_claimed_at = NOW(),
             magna_cliff_claim_data = :claim_data
           WHERE
-            user_id = :user_id`,
+            user_id = :user_id
+            AND magna_allocation_id = :allocation_id`,
             {
               type: QueryTypes.UPDATE,
               replacements: {
                 user_id: actor.user.id,
+                allocation_id,
                 claim_data: JSON.stringify(claim_data),
               },
             },
