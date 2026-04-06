@@ -70,6 +70,13 @@ const CWForm = forwardRef<UseFormReturn, FormProps>(
         })
         .catch((e) => {
           console.error(`CWForm submit error => `, e);
+          if (onErrors && e.name === 'ZodError') {
+            const formErrors = {};
+            e.issues?.forEach((issue) => {
+              formErrors[issue.path.join('.')] = { message: issue.message };
+            });
+            onErrors(formErrors);
+          }
         });
     };
 

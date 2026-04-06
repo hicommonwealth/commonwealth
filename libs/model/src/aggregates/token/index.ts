@@ -7,5 +7,5 @@ export * from './GetToken.query';
 export * from './GetTokenInfoAlchemy.query';
 export * from './GetTokens.query';
 export * from './GetTokenStats.query';
+export * from './LaunchpadTrade.projection';
 export * from './LinkGovernanceAddress.command';
-export * from './ProjectLaunchpadTrade.command';

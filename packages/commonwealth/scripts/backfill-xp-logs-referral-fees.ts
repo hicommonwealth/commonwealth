@@ -57,7 +57,7 @@ FROM
       JOIN "Users" r ON a.user_id = r.id
     WHERE
       a.address = u.referred_by_address -- TODO: do we need case-insensitive matching?
-      AND r.tier > 1 AND a.is_banned = FALSE -- make sure referrer is not a banned user
+      AND r.tier > 3 AND a.is_banned = FALSE -- make sure referrer is not a banned user
     ORDER BY
       a.address, r.id -- pick "first" match by r.id
   ) AS ref_user ON true

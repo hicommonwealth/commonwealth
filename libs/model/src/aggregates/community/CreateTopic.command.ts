@@ -7,17 +7,26 @@ import { sanitizeQuillText } from '../../utils';
 
 /**
  * Extracts token symbol from a Sui contract address
- * Contract addresses are in format: package_id::module_name::SYMBOL
- * This function returns the 3rd segment (SYMBOL)
+ * Handles both simple and complex formats:
+ * Simple: "0x123::mock_navx_token::MOCK_NAVX_TOKEN"
+ * Complex: "0x123::vault::VoteEscrowedToken<0x456::mock_navx_token::MOCK_NAVX_TOKEN>"
  */
-function extractTokenSymbolFromAddress(
+export function extractTokenSymbolFromAddress(
   tokenAddress: string,
 ): string | undefined {
   if (!tokenAddress) return undefined;
 
-  const segments = tokenAddress.split('::');
-  if (segments.length >= 3) {
-    return segments[2];
+  // Try complex format with angle brackets first
+  const angleMatch = tokenAddress.match(/<[^>]*::([^:>]+)>/);
+  if (angleMatch) {
+    return angleMatch[1];
+  }
+
+  // Try simple format (last segment after final ::)
+  // Only match if there are at least 2 :: separators (3 segments total)
+  const simpleMatch = tokenAddress.match(/^[^:]+::[^:]+::([^:]+)$/);
+  if (simpleMatch) {
+    return simpleMatch[1];
   }
 
   return undefined;
@@ -27,6 +36,8 @@ const Errors = {
   DefaultTemplateRequired: 'Default Template required',
   StakeNotAllowed:
     'Cannot create a staked topic if community has not enabled stake',
+  SuiTokenRequiredForSecondaryTokens:
+    'Sui token is required for secondary tokens',
 };
 
 export function CreateTopic(): Command<typeof schemas.CreateTopic> {
@@ -77,9 +88,12 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
       if (payload.weighted_voting) {
         let tokenSymbol = payload.token_symbol;
 
-        // For Sui coin type token, extract token symbol from contract address
+        // For Sui coin type token or NFT, extract token symbol from contract address
         if (
-          payload.weighted_voting === schemas.TopicWeightedVoting.SuiToken &&
+          [
+            schemas.TopicWeightedVoting.SuiToken,
+            schemas.TopicWeightedVoting.SuiNFT,
+          ].includes(payload.weighted_voting) &&
           payload.token_address
         ) {
           tokenSymbol = extractTokenSymbolFromAddress(payload.token_address);
@@ -91,6 +105,31 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
             ? 9
             : payload.token_decimals;
 
+        // Must be sui token type to have secondary tokens
+        if (
+          payload.weighted_voting !== schemas.TopicWeightedVoting.SuiToken &&
+          payload.secondary_tokens &&
+          payload.secondary_tokens.length > 0
+        ) {
+          throw new InvalidInput(Errors.SuiTokenRequiredForSecondaryTokens);
+        }
+
+        // Handle secondary tokens - extract symbols for Sui tokens only (not NFTs)
+        let processedSecondaryTokens = payload.secondary_tokens;
+        if (
+          processedSecondaryTokens &&
+          processedSecondaryTokens.length > 0 &&
+          payload.weighted_voting === schemas.TopicWeightedVoting.SuiToken
+        ) {
+          processedSecondaryTokens = processedSecondaryTokens.map((token) => ({
+            ...token,
+            token_symbol:
+              token.token_symbol ||
+              extractTokenSymbolFromAddress(token.token_address) ||
+              '',
+          }));
+        }
+
         options = {
           ...options,
           weighted_voting: payload.weighted_voting,
@@ -99,6 +138,7 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
           token_decimals: tokenDecimals || undefined,
           vote_weight_multiplier: payload.vote_weight_multiplier || undefined,
           chain_node_id: payload.chain_node_id || undefined,
+          secondary_tokens: processedSecondaryTokens || undefined,
         };
       }
 

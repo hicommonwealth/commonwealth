@@ -3,7 +3,7 @@ import React from 'react';
 import type Thread from '../../models/Thread';
 
 import { Link } from 'models/Thread';
-import { ProposalState } from '../components/NewThreadFormModern/NewThreadForm';
+import { ProposalState } from '../components/NewThreadForm/types';
 import { NoThreadUpdateProposalStatusModal } from './NoThreadUpdateProposalStatusModal';
 import { ThreadUpdateProposalStatusModal } from './ThreadUpdateProposalStatusModal';
 import './UpdateProposalStatusModal.scss';

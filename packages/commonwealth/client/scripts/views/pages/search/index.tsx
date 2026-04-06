@@ -9,12 +9,16 @@ import {
 import useSidebarStore from 'state/ui/sidebar';
 import './index.scss';
 
-import useWindowResize from 'hooks/useWindowResize';
+import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
+import clsx from 'clsx';
 import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useFlag } from 'shared/hooks/useFlag';
+import useWindowResize from 'shared/hooks/useWindowResize';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import { useFetchTokensQuery } from 'state/api/tokens';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import {
@@ -134,7 +138,9 @@ const SearchPage = () => {
     order_direction,
     thread_title_only: true,
     include_count: true,
-    enabled: activeTab === SearchScope.Threads && search_term?.length > 3,
+    enabled:
+      activeTab === SearchScope.Threads &&
+      search_term?.length >= MIN_SEARCH_LENGTH,
   });
 
   const {
@@ -149,7 +155,9 @@ const SearchPage = () => {
     limit: 20,
     order_by,
     order_direction,
-    enabled: activeTab === SearchScope.Replies && search_term.length > 3,
+    enabled:
+      activeTab === SearchScope.Replies &&
+      search_term.length >= MIN_SEARCH_LENGTH,
   });
 
   const {
@@ -163,7 +171,9 @@ const SearchPage = () => {
     limit: 20,
     order_by: 'tier',
     order_direction: 'DESC',
-    enabled: activeTab === SearchScope.Communities && search_term.length > 0,
+    enabled:
+      activeTab === SearchScope.Communities &&
+      search_term.length >= MIN_SEARCH_LENGTH,
   });
 
   const {
@@ -178,6 +188,24 @@ const SearchPage = () => {
     orderBy,
     orderDirection,
     enabled: activeTab === SearchScope.Members && search_term.length > 0,
+  });
+
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+
+  const {
+    data: tokensData,
+    error: tokensError,
+    isLoading: tokensIsLoading,
+    fetchNextPage: tokensFetchNextPage,
+  } = useFetchTokensQuery({
+    search: search_term,
+    cursor: 1,
+    limit: 20,
+    with_stats: true,
+    token_type: !tokenizedThreadsEnabled ? 'launchpad' : undefined,
+    order_by: APIOrderBy.CreatedAt,
+    order_direction: APIOrderDirection.Desc,
+    enabled: activeTab === SearchScope.Tokens && search_term.length > 0,
   });
 
   const results = useMemo(() => {
@@ -204,10 +232,19 @@ const SearchPage = () => {
           profilesData?.pages?.reduce((acc, p) => [...acc, ...p.results], []) ||
           []
         );
+      case SearchScope.Tokens:
+        return (tokensData?.pages || []).flatMap((page) => page.results) || [];
       default:
         return [];
     }
-  }, [activeTab, communityData, commentsData, profilesData, threadsData]);
+  }, [
+    activeTab,
+    communityData,
+    commentsData,
+    profilesData,
+    threadsData,
+    tokensData,
+  ]);
 
   const totalResults = useMemo(() => {
     switch (activeTab) {
@@ -219,10 +256,19 @@ const SearchPage = () => {
         return communityData?.pages?.[0]?.totalResults || 0;
       case SearchScope.Members:
         return profilesData?.pages?.[0]?.totalResults || 0;
+      case SearchScope.Tokens:
+        return tokensData?.pages?.[0]?.totalResults || 0;
       default:
         return 0;
     }
-  }, [activeTab, communityData, commentsData, profilesData, threadsData]);
+  }, [
+    activeTab,
+    communityData,
+    commentsData,
+    profilesData,
+    threadsData,
+    tokensData,
+  ]);
 
   const totalResultsText = pluralize(totalResults, activeTab.toLowerCase());
   const scopeText = useMemo(() => {
@@ -240,11 +286,15 @@ const SearchPage = () => {
   // when error, notify
   useEffect(() => {
     const err =
-      threadsError || commentsError || communityError || profilesError;
+      threadsError ||
+      commentsError ||
+      communityError ||
+      profilesError ||
+      tokensError;
     if (err) {
       notifyError(err.message);
     }
-  }, [communityError, commentsError, profilesError, threadsError]);
+  }, [communityError, commentsError, profilesError, threadsError, tokensError]);
 
   // when scroll to bottom, fetch next page
   useEffect(() => {
@@ -262,6 +312,9 @@ const SearchPage = () => {
         case SearchScope.Members:
           profilesFetchNextPage();
           break;
+        case SearchScope.Tokens:
+          tokensFetchNextPage();
+          break;
       }
     }
   }, [
@@ -271,6 +324,7 @@ const SearchPage = () => {
     commentsFetchNextPage,
     chainsFetchNextPage,
     profilesFetchNextPage,
+    tokensFetchNextPage,
   ]);
 
   const isLoading = useMemo(() => {
@@ -283,6 +337,8 @@ const SearchPage = () => {
         return communityIsLoading;
       case SearchScope.Members:
         return profilesIsLoading;
+      case SearchScope.Tokens:
+        return tokensIsLoading;
       default:
         return false;
     }
@@ -292,6 +348,7 @@ const SearchPage = () => {
     commentsIsLoading,
     profilesIsLoading,
     threadsIsLoading,
+    tokensIsLoading,
   ]);
 
   return (
@@ -356,7 +413,11 @@ const SearchPage = () => {
                           />
                         </div>
                       )}
-                    <div className="search-results-list">
+                    <div
+                      className={clsx('search-results-list', {
+                        grid: activeTab === SearchScope.Tokens,
+                      })}
+                    >
                       {renderSearchResults(
                         results,
                         // @ts-expect-error <StrictNullChecks/>

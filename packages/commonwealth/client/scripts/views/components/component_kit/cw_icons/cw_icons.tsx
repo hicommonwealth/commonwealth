@@ -3973,6 +3973,139 @@ export const CWStarGolden = (props: IconProps) => {
 };
 
 // eslint-disable-next-line react/no-multi-comp
+export const CWDiamond = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 106 106"
+      width="32"
+      height="32"
+      fill="none"
+      {...props}
+    >
+      <defs>
+        <linearGradient id="grad1">
+          <stop stopColor="#fffffe" offset="0" />
+          <stop stopColor="#74dafe" stopOpacity="0" offset="1" />
+        </linearGradient>
+        <linearGradient id="grad2">
+          <stop stopColor="#fffffe" offset="0" />
+          <stop stopColor="#74dafe" stopOpacity="0.3" offset="1" />
+        </linearGradient>
+        <linearGradient id="grad3">
+          <stop stopColor="#ffffff" offset="0" />
+          <stop stopColor="#ffffff" stopOpacity="0" offset="1" />
+        </linearGradient>
+        <linearGradient id="grad4">
+          <stop stopColor="#ffffff" offset="0" />
+          <stop stopColor="#ffffff" stopOpacity="0.2" offset="1" />
+        </linearGradient>
+        <linearGradient id="grad5">
+          <stop stopColor="#ffffff" offset="0" />
+          <stop stopColor="#ffffff" stopOpacity="0.33" offset="1" />
+        </linearGradient>
+      </defs>
+
+      <g transform="translate(-37.51,-39.2)">
+        <g fill="#00bfff" transform="matrix(0.6321,0,0,0.6859,20.98,0.698)">
+          <path d="M57.68,83.39h52.42v23.41H32.27Z" />
+          <path d="M162.53,83.39h-52.42v23.41h77.83Z" />
+          <path d="M110.18,198.38l-0.08-68.17v-23.41H32.27Z" />
+          <path d="M110.18,198.38l-0.08-68.17v-23.41h77.83Z" />
+        </g>
+
+        <g fill="#00aafe" transform="matrix(0.6321,0,0,0.6859,20.98,0.698)">
+          <path d="M57.68,76.97h52.42v29.93H32.27Z" />
+          <path d="M162.53,76.97h-52.42v29.93h77.83Z" />
+          <path d="M110.18,198.38l-0.08-68.17v-23.41H32.27Z" />
+          <path d="M110.18,198.38l-0.08-68.17v-23.41h77.83Z" />
+        </g>
+
+        <g fill="#00b6fe" transform="matrix(0.4741,0,0,0.6859,38.38,0.698)">
+          <path d="M57.68,76.97h52.42v29.93H32.27Z" />
+          <path d="M162.53,76.97h-52.42v29.93h77.83Z" />
+          <path d="M110.18,198.38l-0.08-68.17v-23.41H32.27Z" />
+          <path d="M110.18,198.38l-0.08-68.17v-23.41h77.83Z" />
+        </g>
+
+        <g fill="#26cbff" transform="matrix(0.2667,0,0,0.6859,61.22,0.698)">
+          <path d="M57.68,76.97h52.42v29.93H32.27Z" />
+          <path d="M162.53,76.97h-52.42v29.93h77.83Z" />
+          <path d="M110.18,198.38l-0.08-68.17v-23.41H32.27Z" />
+          <path d="M110.18,198.38l-0.08-68.17v-23.41h77.83Z" />
+        </g>
+
+        {/* Diamond facets */}
+        <path
+          d="M75.86,55.72l14.6-2.23 14.79,2.18-14.79,18.4Z"
+          fill="url(#grad5)"
+          opacity="0.6"
+        />
+        <path
+          d="M53.68,73.95l14.68-20.52 7.5,2.29Z"
+          fill="url(#grad3)"
+          opacity="0.6"
+        />
+        <path
+          d="M127.48,73.95l-14.78-20.46-7.45,2.17Z"
+          fill="url(#grad4)"
+          opacity="0.6"
+        />
+        <path
+          d="M53.68,73.95l-0.81-14.73-6.88,8.68Z"
+          fill="url(#grad2)"
+          opacity="0.82"
+        />
+        <path
+          d="M127.48,74.01l0.81-14.73 6.88,8.68Z"
+          fill="url(#grad1)"
+          opacity="0.89"
+        />
+        <path d="M78.40,99.91L90.46,74.06H69.82Z" fill="#fff" opacity="0.6" />
+        <path d="M102.81,99.89L90.46,74.06h20.88Z" fill="#fff" opacity="0.6" />
+        <path
+          d="M78.40,99.91L69.82,74.01H53.68Z"
+          fill="#74dafe"
+          opacity="0.9"
+        />
+        <path d="M102.77,99.91l8.57-25.9h16.14Z" fill="#74dafe" opacity="0.9" />
+        <path
+          d="M41.38,74.01l29.4,28.86-17.1-28.86Z"
+          fill="#74dafe"
+          opacity="0.6"
+        />
+        <path
+          d="M139.78,74.01l-29.4,28.86 17.1-28.86Z"
+          fill="#74dafe"
+          opacity="0.6"
+        />
+      </g>
+
+      {/* Sparkles */}
+      <path
+        d="M21.55,51.46l-4.91-2.97-2.55,5.14 1.30-5.59-5.68-0.83 5.72-0.49-0.96-5.66 2.23,5.29 5.08-2.66-4.34,3.76Z"
+        fill="#fff"
+        transform="matrix(2.4,0,0,2.48,23.36,-42.6)"
+      />
+      <path
+        d="M21.55,51.46l-4.91-2.97-2.55,5.14 1.30-5.59-5.68-0.83 5.72-0.49-0.96-5.66 2.23,5.29 5.08-2.66-4.34,3.76Z"
+        fill="#fff"
+        transform="matrix(1.81,0,0,1.87,-6.19,-57.57)"
+      />
+    </svg>
+  );
+};
+
+// eslint-disable-next-line react/no-multi-comp
 export const CWSocialVerified = (props: IconProps) => {
   const {
     className,

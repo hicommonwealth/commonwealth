@@ -28,7 +28,7 @@ export const EmptyThreadCard = () => {
 
   return (
     <>
-      <CWCard className="EmptyThreadCard">
+      <CWCard className="EmptyThreadCard" elevation="elevation-1" interactive>
         <div className="content-wrapper">
           <CWIcon iconName="chats" iconSize="large" className="icon" />
           <CWText type="h2" fontWeight="bold" className="title">

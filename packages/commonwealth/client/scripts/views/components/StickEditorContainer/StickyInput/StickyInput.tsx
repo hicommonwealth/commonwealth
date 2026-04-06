@@ -1,7 +1,6 @@
 import { CompletionModel, ContentType } from '@hicommonwealth/shared';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { notifyError } from 'controllers/app/notifications';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useMentionExtractor } from 'hooks/useMentionExtractor';
 import { Thread } from 'models/Thread';
 import type { Topic } from 'models/Topic';
@@ -13,11 +12,8 @@ import React, {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { useAiCompletion } from 'state/api/ai';
-import {
-  generateCommentPrompt,
-  generateThreadPrompt,
-} from 'state/api/ai/prompts';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
+import { AICompletionType, useAiCompletion } from 'state/api/ai';
 import useSidebarStore from 'state/ui/sidebar';
 import { useAIFeatureEnabled, useUserAiSettingsStore } from 'state/ui/user';
 import { AIModelSelector } from 'views/components/AIModelSelector';
@@ -33,7 +29,7 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import {
   NewThreadForm,
   NewThreadFormHandles,
-} from 'views/components/NewThreadFormLegacy/NewThreadForm';
+} from 'views/components/NewThreadForm/NewThreadForm';
 import {
   createDeltaFromText,
   ReactQuillEditor,
@@ -73,9 +69,9 @@ const StickyInput = (props: StickyInputProps) => {
     setContentDelta,
     contentDelta,
     thread: originalThread,
-    parentCommentText,
     canComment,
     handleIsReplying,
+    disabled: isSubmitDisabledByParent,
   } = props;
   const { isWindowExtraSmall: isMobile } = useBrowserWindow({});
   const { menuVisible } = useSidebarStore();
@@ -87,6 +83,8 @@ const StickyInput = (props: StickyInputProps) => {
     setAICommentsToggleEnabled,
     selectedModels,
     setSelectedModels,
+    webSearchEnabled,
+    setWebSearchEnabled,
   } = useUserAiSettingsStore();
 
   const effectiveAiCommentsToggleEnabled =
@@ -100,7 +98,6 @@ const StickyInput = (props: StickyInputProps) => {
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [webSearchEnabled, setWebSearchEnabled] = useState(false);
   const [justClosedMentionDropdown, setJustClosedMentionDropdown] =
     useState(false);
 
@@ -161,61 +158,69 @@ const StickyInput = (props: StickyInputProps) => {
   const handleGenerateAIContent = useCallback(async () => {
     if (!effectiveAiCommentsToggleEnabled) return;
 
+    const communityId = props.communityId;
+    if (!communityId) {
+      notifyError('Community ID is required for AI content generation');
+      return;
+    }
+
     setIsGenerating(true);
     bodyAccumulatedRef.current = '';
     const modelToUse = getCompletionModelValue(selectedModels[0]);
 
     try {
       if (mode === 'thread') {
-        const { systemPrompt, userPrompt } = generateThreadPrompt('');
         let lastUpdateTime = Date.now();
 
-        await generateCompletion(userPrompt, {
-          model: modelToUse,
-          stream: true,
-          systemPrompt,
-          useWebSearch: webSearchEnabled,
-          includeContextualMentions: true,
-          communityId: props.communityId,
-          onError: (error) => {
-            console.error('Error generating AI thread:', error);
-            notifyError('Failed to generate AI thread content');
+        await generateCompletion(
+          {
+            communityId,
+            completionType: AICompletionType.Thread,
+            model: modelToUse,
+            stream: true,
+            webSearchEnabled: webSearchEnabled,
           },
-          onChunk: (chunk) => {
-            bodyAccumulatedRef.current += chunk;
+          {
+            onError: (error) => {
+              console.error('Error generating AI thread:', error);
+              notifyError('Failed to generate AI thread content');
+            },
+            onChunk: (chunk) => {
+              bodyAccumulatedRef.current += chunk;
 
-            const currentTime = Date.now();
-            if (currentTime - lastUpdateTime >= 500) {
-              setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
-              lastUpdateTime = currentTime;
-            }
+              const currentTime = Date.now();
+              if (currentTime - lastUpdateTime >= 500) {
+                setContentDelta(
+                  createDeltaFromText(bodyAccumulatedRef.current),
+                );
+                lastUpdateTime = currentTime;
+              }
+            },
           },
-        });
+        );
 
         setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
       } else {
-        const context = `
-          Thread: ${originalThread?.title || ''}
-          ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
-        `;
-
-        const { systemPrompt, userPrompt } = generateCommentPrompt(context);
-
-        await generateCompletion(userPrompt, {
-          model: modelToUse,
-          stream: true,
-          systemPrompt,
-          useWebSearch: webSearchEnabled,
-          includeContextualMentions: true,
-          communityId: props.communityId,
-          onError: (error) => {
-            console.error('Error generating AI comment:', error);
+        // For drafting a comment on a thread, pass threadId for root-level comments
+        await generateCompletion(
+          {
+            communityId,
+            completionType: AICompletionType.Comment,
+            threadId: originalThread?.id,
+            model: modelToUse,
+            stream: true,
+            webSearchEnabled: webSearchEnabled,
           },
-          onChunk: (chunk) => {
-            bodyAccumulatedRef.current += chunk;
-            setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
+          {
+            onError: (error) => {
+              console.error('Error generating AI comment:', error);
+            },
+            onChunk: (chunk) => {
+              bodyAccumulatedRef.current += chunk;
+              setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
+            },
           },
-        });
+        );
       }
     } catch (error) {
       console.error('Error generating AI content:', error);
@@ -227,7 +232,6 @@ const StickyInput = (props: StickyInputProps) => {
     generateCompletion,
     mode,
     originalThread,
-    parentCommentText,
     setContentDelta,
     webSearchEnabled,
     selectedModels,
@@ -275,14 +279,24 @@ const StickyInput = (props: StickyInputProps) => {
       }
 
       // Automatically trigger AI reply if MCP mentions are detected, regardless of AI toggle state
-      if (effectiveAiCommentsToggleEnabled || hasMCPMentions) {
+      const shouldTriggerAI =
+        effectiveAiCommentsToggleEnabled || hasMCPMentions;
+      // Use DEFAULT_MODEL when MCP mentions are present and no model is explicitly selected,
+      // or when MCP triggered the AI but the toggle is off.
+      const useDefaultModelOnly =
+        hasMCPMentions &&
+        (!effectiveAiCommentsToggleEnabled || selectedModels.length === 0);
+
+      if (shouldTriggerAI) {
         handleAiReply(commentId);
       }
 
       try {
         await listenForComment(
           commentId,
-          !!(effectiveAiCommentsToggleEnabled || hasMCPMentions),
+          shouldTriggerAI,
+          undefined,
+          useDefaultModelOnly,
         );
       } catch (error) {
         console.warn('StickyInput - Failed to jump to comment:', error);
@@ -307,6 +321,7 @@ const StickyInput = (props: StickyInputProps) => {
     resetTurnstile,
     extractMentionsFromDelta,
     contentDelta,
+    selectedModels,
   ]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -320,6 +335,7 @@ const StickyInput = (props: StickyInputProps) => {
       !event.shiftKey &&
       !isExpanded &&
       contentDelta?.ops?.length > 0 &&
+      !isSubmitDisabledByParent &&
       (!isTurnstileEnabled || turnstileToken) &&
       !justClosedMentionDropdown
     ) {
@@ -362,7 +378,7 @@ const StickyInput = (props: StickyInputProps) => {
 
   const handleToggleWebSearch = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setWebSearchEnabled((prev) => !prev);
+    setWebSearchEnabled(!webSearchEnabled);
   };
 
   const renderStickyInput = () => {
@@ -506,6 +522,7 @@ const StickyInput = (props: StickyInputProps) => {
               disabled={
                 !canComment ||
                 !contentDelta?.ops?.length ||
+                isSubmitDisabledByParent ||
                 isGenerating ||
                 (isTurnstileEnabled && !turnstileToken)
               }

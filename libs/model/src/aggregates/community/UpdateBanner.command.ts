@@ -2,6 +2,7 @@ import { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
+import { sanitizeBannerText } from '../../utils';
 
 export function UpdateBanner(): Command<typeof schemas.UpdateBanner> {
   return {
@@ -16,8 +17,10 @@ export function UpdateBanner(): Command<typeof schemas.UpdateBanner> {
       });
       mustExist('Community', community);
 
-      if (banner_text !== community.banner_text) {
-        community.banner_text = banner_text;
+      const sanitizedBannerText = sanitizeBannerText(banner_text);
+
+      if (sanitizedBannerText !== community.banner_text) {
+        community.banner_text = sanitizedBannerText;
         await community.save();
         return true;
       }

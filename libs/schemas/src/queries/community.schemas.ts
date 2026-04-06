@@ -5,6 +5,7 @@ import {
   GatedActionEnum,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
+  MIN_SEARCH_LENGTH,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext } from '../context';
@@ -15,6 +16,8 @@ import {
   ContestManager,
   ExtendedCommunity,
   Group,
+  Market,
+  Markets,
   Membership,
   MembershipRejectReason,
   PinnedTokenWithPrices,
@@ -69,24 +72,26 @@ export const GetCommunities = {
       ])
       .optional(),
     order_direction: z.enum(['ASC', 'DESC']).optional(),
-  }).refine(
-    (data) => {
-      // order_by can't be 'last_30_day_thread_count' if 'include_last_30_day_thread_count' is falsy
-      if (
-        !data.include_last_30_day_thread_count &&
-        data.order_by === 'last_30_day_thread_count'
-      ) {
-        return false; // fail validation
-      }
+  })
+    .refine(
+      (data) => {
+        // order_by can't be 'last_30_day_thread_count' if 'include_last_30_day_thread_count' is falsy
+        if (
+          !data.include_last_30_day_thread_count &&
+          data.order_by === 'last_30_day_thread_count'
+        ) {
+          return false; // fail validation
+        }
 
-      // pass validation
-      return true;
-    },
-    {
-      message:
-        "'order_by' cannot be 'last_30_day_thread_count' when 'include_last_30_day_thread_count' is not specified",
-    },
-  ),
+        // pass validation
+        return true;
+      },
+      {
+        message:
+          "'order_by' cannot be 'last_30_day_thread_count' when 'include_last_30_day_thread_count' is not specified",
+      },
+    )
+    .describe('Search and filter communities with pagination'),
   output: PaginatedResultSchema.extend({
     results: Community.extend({
       last_30_day_thread_count: PG_INT.optional().nullish(),
@@ -95,12 +100,14 @@ export const GetCommunities = {
 };
 
 export const GetCommunity = {
-  input: z.object({
-    id: z.string(),
-    include_node_info: z.boolean().optional(),
-    include_groups: z.boolean().optional(),
-    include_mcp_servers: z.boolean().optional(),
-  }),
+  input: z
+    .object({
+      id: z.string(),
+      include_node_info: z.boolean().optional(),
+      include_groups: z.boolean().optional(),
+      include_mcp_servers: z.boolean().optional(),
+    })
+    .describe('Get detailed information about a specific community'),
   output: z.union([ExtendedCommunity, z.undefined()]),
 };
 
@@ -146,7 +153,7 @@ export const GetCommunityStake = {
 
 export const GetCommunityMembers = {
   input: PaginationParamsSchema.extend({
-    search: z.string().optional(),
+    search: z.string().min(MIN_SEARCH_LENGTH).optional(),
     community_id: z.string(),
     include_roles: z.boolean().optional(),
     memberships: z
@@ -166,7 +173,7 @@ export const GetCommunityMembers = {
       .optional(),
     /** If true, search will match both profile name and address. */
     searchByNameAndAddress: z.boolean().optional().default(false),
-  }),
+  }).describe('Search and list members of a community'),
   output: PaginatedResultSchema.extend({
     results: CommunityMember.array(),
   }),
@@ -242,11 +249,13 @@ export const TopicView = Topic.extend({
 });
 
 export const GetTopics = {
-  input: z.object({
-    community_id: z.string(),
-    with_contest_managers: z.boolean().optional(),
-    with_archived_topics: z.boolean().optional(),
-  }),
+  input: z
+    .object({
+      community_id: z.string(),
+      with_contest_managers: z.boolean().optional(),
+      with_archived_topics: z.boolean().optional(),
+    })
+    .describe('Get topics for a community'),
   output: z.array(TopicView),
 };
 
@@ -456,4 +465,64 @@ export const GetNamespaceMetadata = {
 export const GetByDomain = {
   input: z.object({ custom_domain: z.string() }),
   output: z.object({ community_id: z.string().optional() }),
+};
+
+export const MarketView = Market.extend({
+  created_at: z.coerce.date().or(z.string()),
+  updated_at: z.coerce.date().or(z.string()),
+});
+
+export const GetMarkets = {
+  input: PaginationParamsSchema.extend({
+    community_id: z
+      .string()
+      .optional()
+      .describe('If provided, returns markets subscribed to that community.'),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(MarketView),
+  }),
+};
+
+export const ExternalMarket = z.object({
+  id: z.string(),
+  provider: z.enum(Markets),
+  slug: z.string(),
+  question: z.string(),
+  category: z.string(),
+  status: z.string(),
+  startTime: z.coerce.date().nullable(),
+  endTime: z.coerce.date().nullable(),
+  imageUrl: z.string().optional(),
+  subTitle: z.string().optional(),
+  is_subscribed: z
+    .boolean()
+    .describe(
+      'Whether this market is already subscribed (globally or to the specified community)',
+    ),
+});
+
+export const DiscoverExternalMarkets = {
+  input: PaginationParamsSchema.extend({
+    provider: z.enum([...Markets, 'all']),
+    search: z.string().optional(),
+    category: z.string().optional(),
+    status: z
+      .enum(['open', 'closed', 'settled', 'all'])
+      .optional()
+      .default('all'),
+    sortOrder: z
+      .enum(['newest', 'oldest', 'ending-soon', 'starting-soon'])
+      .optional()
+      .default('newest'),
+    community_id: z
+      .string()
+      .optional()
+      .describe(
+        'Community ID. If provided, checks subscription status for this community. If not provided (site admin), checks global subscription status.',
+      ),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(ExternalMarket),
+  }),
 };

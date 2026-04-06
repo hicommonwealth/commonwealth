@@ -1,4 +1,4 @@
-import { type Command, InvalidActor, InvalidState } from '@hicommonwealth/core';
+import { InvalidActor, InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
@@ -11,7 +11,7 @@ export function UpdateClaimAddress(): Command<
     auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
-      const { address } = payload;
+      const { event_id, address } = payload;
 
       const [addr] = await models.sequelize.query<{
         user_id: number;
@@ -20,8 +20,7 @@ export function UpdateClaimAddress(): Command<
       }>(
         `
           SELECT A.user_id, A.address, C.id as community_id
-          FROM "Addresses" A
-                 LEFT JOIN "Communities" C ON C.id = A.community_id
+          FROM "Addresses" A LEFT JOIN "Communities" C ON C.id = A.community_id
           WHERE A.address = :address
             AND C.network = 'ethereum'
             AND C.base = 'ethereum'
@@ -43,24 +42,21 @@ export function UpdateClaimAddress(): Command<
         );
 
       const result = await models.sequelize.query<{ address: string }>(
-        `
-          INSERT INTO "ClaimAddresses" (user_id, address, created_at, updated_at)
-          SELECT :user_id, :address, NOW(), NOW()
-          ON CONFLICT (user_id) DO
-          UPDATE SET address = EXCLUDED.address, updated_at = NOW()
-          WHERE "ClaimAddresses".magna_synced_at IS NULL
-          RETURNING address;
-        `,
+        ` UPDATE "ClaimAddresses"
+          SET address = :address, updated_at = NOW()
+          WHERE event_id = :event_id AND user_id = :user_id AND magna_synced_at IS NULL
+          RETURNING address;`,
         {
           type: QueryTypes.SELECT,
           replacements: {
+            event_id,
             user_id: addr.user_id,
             address: addr.address,
           },
         },
       );
 
-      if (result.length === 0)
+      if (!result || result.length === 0)
         throw new InvalidState(
           'Cannot update claim address after user has been synchronized with magna',
         );

@@ -23,10 +23,10 @@ function connect_sequelize() {
           ? { requestTimeout: 40000, ssl: false }
           : { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
     pool: {
-      max: 10,
-      min: 0,
-      acquire: 40000,
-      idle: 40000,
+      max: 50,
+      min: 10,
+      acquire: 60_000,
+      idle: 120_000,
     },
   });
   models = buildDb(sequelize);

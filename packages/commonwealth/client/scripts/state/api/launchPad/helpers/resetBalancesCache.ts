@@ -6,7 +6,9 @@ import { getTokenEthExchangeRateQueryKey } from '../tokenEthExchangeRate';
 
 export const resetBalancesCache = async (
   _: unknown,
-  variables: Omit<BuyTokenProps, 'amountEth'>,
+  variables: Omit<BuyTokenProps, 'amountEth'> & {
+    paymentTokenAddress?: string;
+  },
 ) => {
   await queryClient.invalidateQueries({
     queryKey: getUserEthBalanceQueryKey({
@@ -21,6 +23,28 @@ export const resetBalancesCache = async (
       userAddress: variables.walletAddress,
       nodeRpc: variables.chainRpc,
     }),
+  });
+
+  if (variables.paymentTokenAddress) {
+    await queryClient.invalidateQueries({
+      queryKey: getERC20BalanceQueryKey({
+        tokenAddress: variables.paymentTokenAddress,
+        userAddress: variables.walletAddress,
+        nodeRpc: variables.chainRpc,
+      }),
+    });
+  }
+
+  await queryClient.invalidateQueries({
+    predicate: (query) => {
+      const [key] = query.queryKey;
+      return (
+        Array.isArray(key) &&
+        key.length === 3 &&
+        key[0] === variables.walletAddress &&
+        key[2] === variables.chainRpc
+      );
+    },
   });
   await queryClient.invalidateQueries({
     queryKey: getTokenEthExchangeRateQueryKey({

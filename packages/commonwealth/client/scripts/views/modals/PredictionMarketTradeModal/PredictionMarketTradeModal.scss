@@ -1,0 +1,649 @@
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+
+.PredictionMarketTradeModal {
+  .CWModalHeader {
+    .Frame .title-text,
+    .Frame .title-text.Text {
+      font-size: 24px;
+      line-height: 32px;
+    }
+
+    .Subtitle,
+    .Subtitle.Text {
+      font-size: 14px;
+      line-height: 20px;
+    }
+  }
+
+  .CWModalBody {
+    overflow: scroll !important;
+    max-height: 420px !important;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .address-selector-row {
+    margin-bottom: 12px;
+  }
+
+  .collateral-row {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .collateral-row-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+      text-align: left;
+      color: inherit;
+
+      &:focus-visible {
+        outline: 2px solid colors.$primary-500;
+        outline-offset: 2px;
+      }
+    }
+
+    .collateral-row-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .collateral-chevron {
+      flex-shrink: 0;
+      color: colors.$neutral-500;
+    }
+
+    .collateral-row-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid colors.$neutral-150;
+    }
+
+    .copyable-address-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .copyable-address {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border: 1px solid colors.$neutral-200;
+      border-radius: 6px;
+      background: colors.$neutral-75;
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+      max-width: 100%;
+      min-width: 0;
+
+      .address-text {
+        font-size: 11px;
+        word-break: break-all;
+        opacity: 0.9;
+      }
+
+      .copy-icon {
+        flex-shrink: 0;
+        color: colors.$neutral-500;
+      }
+
+      &:hover {
+        background: colors.$neutral-150;
+        .copy-icon {
+          color: colors.$primary-500;
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid colors.$primary-500;
+        outline-offset: 2px;
+      }
+    }
+
+    .source-hint {
+      color: colors.$neutral-500;
+      font-size: 11px;
+    }
+
+    .collateral-label {
+      color: colors.$neutral-500;
+
+      &.total-minted {
+        display: flex;
+        gap: 2px;
+      }
+
+      &.total-minted,
+      &.vault-on-chain,
+      &.market-ends {
+        margin-top: 2px;
+      }
+
+      &.verify-addresses {
+        margin-top: 6px;
+        font-size: 11px;
+        word-break: break-all;
+        opacity: 0.85;
+      }
+    }
+  }
+
+  .balances-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .balance-address-row {
+      width: 100%;
+      margin-bottom: 4px;
+    }
+
+    .balance-address-label {
+      color: colors.$neutral-500;
+      font-size: 12px;
+    }
+
+    .balance-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 14px 16px;
+      background: colors.$neutral-75;
+      border-radius: 12px;
+      border: 1px solid colors.$neutral-150;
+
+      .balance-card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .balance-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+
+        .balance-address-copy {
+          display: inline-flex;
+          align-items: center;
+          gap: 2px;
+          margin-left: auto;
+          padding: 2px 5px;
+          border: 1px solid colors.$neutral-300;
+          border-radius: 4px;
+          background: colors.$neutral-100;
+
+          .balance-address {
+            color: colors.$neutral-600;
+            font-size: 10px;
+            line-height: 1.2;
+            margin: 0;
+          }
+
+          .balance-copy-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: colors.$neutral-500;
+
+            .copy-icon {
+              display: block;
+            }
+
+            &:hover {
+              color: colors.$primary-500;
+            }
+
+            &:focus-visible {
+              outline: 2px solid colors.$primary-500;
+              outline-offset: 1px;
+              border-radius: 3px;
+            }
+          }
+        }
+      }
+
+      &.pass .balance-dot {
+        background-color: colors.$green-500;
+      }
+
+      &.fail .balance-dot {
+        background-color: colors.$rorange-500;
+      }
+
+      .balance-label {
+        color: colors.$neutral-600;
+        margin: 0;
+      }
+
+      .balance-card-value {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+
+        .b1 {
+          font-size: 24px !important;
+        }
+
+        .b2 {
+          font-size: 16px !important;
+        }
+
+        .Text {
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .tabs-row {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid colors.$neutral-200;
+    padding: 0;
+    background: transparent;
+
+    .Tab {
+      flex: 1;
+      display: flex !important;
+      justify-content: center;
+      align-items: center;
+      padding: 12px 16px;
+      border: none;
+      border-bottom: 3px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      cursor: pointer;
+      transition:
+        color 0.15s,
+        background 0.15s,
+        border-color 0.15s;
+
+      .label,
+      .Text {
+        color: colors.$neutral-500;
+        text-align: center !important;
+        display: flex !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        justify-content: center !important;
+        -webkit-text-stroke: 0;
+      }
+
+      &:hover:not(.isDisabled) {
+        .label,
+        .Text {
+          color: colors.$neutral-700;
+        }
+      }
+
+      &.isSelected {
+        background: colors.$neutral-75;
+        border-bottom-color: colors.$primary-500;
+
+        .label,
+        .Text {
+          color: colors.$neutral-800;
+          font-weight: 600;
+          -webkit-text-stroke: 0;
+        }
+      }
+
+      &.isDisabled {
+        .label,
+        .Text {
+          color: colors.$neutral-400;
+        }
+      }
+    }
+  }
+
+  .alert-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    border: 1px solid colors.$rorange-500;
+    background-color: colors.$rorange-50;
+
+    .alert-icon {
+      flex-shrink: 0;
+      color: colors.$rorange-500;
+    }
+
+    .alert-icon + * {
+      color: colors.$rorange-700;
+    }
+  }
+
+  .loading-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .PredictionMarketTradeModal-tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .input-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .label {
+        margin: 0;
+      }
+
+      .available {
+        color: colors.$neutral-600;
+        margin: 0;
+      }
+    }
+
+    .amount-input-with-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid colors.$neutral-200;
+      border-radius: 6px;
+      padding: 4px;
+
+      .amount-input-wrap {
+        flex: 1;
+        min-width: 0;
+        border: none !important;
+        * {
+          border: none !important;
+        }
+      }
+
+      .unit {
+        margin: 0;
+        color: colors.$neutral-600;
+        min-width: 32px;
+      }
+
+      .Button {
+        padding: 4px 8px !important;
+        height: auto !important;
+        .Text {
+          font-weight: 600 !important;
+          font-size: 10px !important;
+          line-height: 12px !important;
+        }
+      }
+    }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 12px;
+
+      .info-icon {
+        color: colors.$neutral-600;
+        flex-shrink: 0;
+      }
+
+      .help {
+        color: colors.$neutral-600;
+        margin: 0;
+      }
+    }
+
+    .cost-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 16px;
+      background: colors.$neutral-75;
+      border: 1px solid colors.$neutral-150;
+      border-radius: 10px;
+
+      .cost-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .collateral-return,
+      .summary-value-highlight {
+        font-size: 16px;
+        font-weight: 700;
+        color: colors.$primary-500;
+      }
+
+      .summary-divider {
+        background-color: colors.$primary-500;
+      }
+    }
+
+    .label {
+      margin: 0;
+    }
+
+    .amount-input {
+      max-width: 200px;
+    }
+
+    .help {
+      color: colors.$neutral-600;
+    }
+
+    .summary {
+      margin: 4px 0 0;
+    }
+
+    .toggle-row {
+      display: flex;
+      gap: 8px;
+    }
+  }
+
+  // ── Swap tab ──────────────────────────────────────────────────────────────
+
+  .swap-panels {
+    display: flex;
+    flex-direction: column;
+
+    .token-panel {
+      background: colors.$neutral-75;
+      padding: 14px;
+      border-radius: 12px;
+
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+
+        .panel-side-label,
+        .panel-balance {
+          color: colors.$neutral-500;
+          margin: 0;
+        }
+      }
+
+      .panel-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+
+        .token-badge {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: colors.$neutral-150;
+          border-radius: 20px;
+          padding: 6px 10px 6px 6px;
+          flex-shrink: 0;
+
+          .token-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            flex-shrink: 0;
+          }
+
+          &.pass .token-dot {
+            background-color: colors.$green-500;
+          }
+
+          &.fail .token-dot {
+            background-color: colors.$rorange-500;
+          }
+        }
+
+        .panel-amount {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+
+          .swap-amount-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 26px;
+            font-weight: 700;
+            color: inherit;
+            text-align: right;
+            width: 150px;
+            padding: 0;
+
+            &::placeholder {
+              color: colors.$neutral-400;
+            }
+          }
+
+          .max-link {
+            background: none;
+            border: none;
+            padding: 0;
+            margin-top: 2px;
+            color: colors.$primary-500;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            line-height: 1;
+
+            &:hover {
+              color: colors.$primary-600;
+            }
+          }
+
+          .estimated-out {
+            color: colors.$primary-500;
+            margin: 0;
+          }
+
+          .min-out-hint {
+            color: colors.$neutral-500;
+            margin: 0;
+          }
+        }
+      }
+    }
+
+    .swap-direction-toggle {
+      align-self: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: colors.$primary-500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      // (34px button - 12px visible gap) / 2 = 11px overlap into each panel
+      margin: -11px 0;
+      z-index: 2;
+      position: relative;
+      color: white;
+      flex-shrink: 0;
+      transition: background 0.15s;
+
+      &:hover {
+        background: colors.$primary-600;
+      }
+    }
+  }
+
+  .swap-quote-caption {
+    display: block;
+    margin-top: 12px;
+    color: colors.$neutral-500;
+  }
+
+  .swap-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    background: colors.$neutral-75;
+    border: 1px solid colors.$neutral-150;
+    border-radius: 10px;
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .network-fee {
+      color: colors.$primary-500;
+    }
+
+    .summary-value-highlight {
+      font-size: 16px;
+      font-weight: 700;
+      color: colors.$primary-500;
+    }
+
+    .summary-divider {
+      background-color: colors.$primary-500;
+    }
+  }
+
+  .footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+}

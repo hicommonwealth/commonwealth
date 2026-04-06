@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
-import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import { useGetLaunchpadTradesQuery } from 'state/api/tokens';
 import {
   useGetUserReferralFeesQuery,
@@ -22,10 +21,9 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import { AuthModal } from '../../modals/AuthModal';
-import { PageNotFound } from '../404';
 import './WalletPage.scss';
 import { QuestSummaryCard, ReferralCard, WalletCard } from './cards';
-import TokenClaimBanner from './components/TokenClaimBanner';
+import AirdropClaims from './components/AirdropClaims/AirdropClaims';
 import { ReferralTable, TokenTXHistoryTable, XPEarningsTable } from './tables';
 import { MobileTabType, TableType } from './types';
 import {
@@ -41,8 +39,6 @@ type GetLaunchpadTradesOutput = z.infer<typeof GetLaunchpadTrades.output>;
 
 const WalletPage = () => {
   const user = useUserStore();
-  const rewardsEnabled = useFlag('rewardsPage');
-  const xpEnabled = useFlag('xp');
   const navigate = useCommonNavigate();
 
   const [mobileTab, setMobileTab] = useState<MobileTabType>(getInitialTab());
@@ -90,8 +86,14 @@ const WalletPage = () => {
 
   const { isWindowSmallInclusive } = useBrowserWindow({});
 
-  if (!user.isLoggedIn || !rewardsEnabled) {
-    return <PageNotFound />;
+  if (!user.isLoggedIn) {
+    return (
+      <CWPageLayout className="WalletPageLayout">
+        <section className="WalletPage">
+          <AirdropClaims onConnectNewAddress={() => setIsAuthModalOpen(true)} />
+        </section>
+      </CWPageLayout>
+    );
   }
 
   return (
@@ -101,10 +103,11 @@ const WalletPage = () => {
           Wallet
         </CWText>
 
+        <AirdropClaims onConnectNewAddress={() => setIsAuthModalOpen(true)} />
+
         {/* visible only on mobile */}
         <div className="wallet-button-tabs">
           {Object.values(MobileTabType).map((type) => {
-            if (type === MobileTabType.Quests && !xpEnabled) return null;
             return (
               <CWMobileTab
                 key={type}
@@ -116,11 +119,6 @@ const WalletPage = () => {
             );
           })}
         </div>
-
-        {/* Token claim banner - full width above cards */}
-        <TokenClaimBanner
-          onConnectNewAddress={() => setIsAuthModalOpen(true)}
-        />
 
         {/* on mobile show only one card */}
         <div className="wallet-card-container">
@@ -137,26 +135,23 @@ const WalletPage = () => {
             />
           )}
 
-          {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) &&
-            xpEnabled && <QuestSummaryCard />}
+          {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) && (
+            <QuestSummaryCard />
+          )}
         </div>
 
         <div className="wallet-tab-container">
           <CWTabsRow>
-            {Object.values(TableType).map((type) =>
-              type === TableType.XPEarnings && !xpEnabled ? (
-                <></>
-              ) : (
-                <CWTab
-                  key={type}
-                  label={type}
-                  isSelected={tableTab === type}
-                  onClick={() => {
-                    setTableTab(type);
-                  }}
-                />
-              ),
-            )}
+            {Object.values(TableType).map((type) => (
+              <CWTab
+                key={type}
+                label={type}
+                isSelected={tableTab === type}
+                onClick={() => {
+                  setTableTab(type);
+                }}
+              />
+            ))}
           </CWTabsRow>
         </div>
 
@@ -169,7 +164,9 @@ const WalletPage = () => {
         {tableTab === TableType.Referrals && (
           <ReferralTable referrals={referrals} isLoading={isReferralsLoading} />
         )}
-        {xpEnabled && tableTab === TableType.XPEarnings && <XPEarningsTable />}
+        {tableTab === TableType.XPEarnings && (
+          <XPEarningsTable userId={user.id} />
+        )}
       </section>
 
       <AuthModal

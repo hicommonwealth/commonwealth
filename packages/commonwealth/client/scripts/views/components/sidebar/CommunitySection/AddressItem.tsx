@@ -1,4 +1,4 @@
-import { WalletId } from '@hicommonwealth/shared';
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
 import {
@@ -14,7 +14,10 @@ import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
-import { getChainIcon, getSsoIconName } from 'client/scripts/utils/chainUtils';
+import {
+  getChainIcon,
+  getWalletIconName,
+} from 'client/scripts/utils/chainUtils';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import { formatAddressShort } from 'shared/utils';
 import { CWIdentificationTag } from '../../component_kit/new_designs/CWIdentificationTag';
@@ -53,16 +56,15 @@ const AddressItem = (props: AddressItemProps) => {
     <div className="AddressItem">
       <div className="address-section">
         <div className="address">
-          <CWCustomIcon
-            iconName={getChainIcon(addressInfo, fetchedCommunity?.base)}
-            iconSize="small"
-          />
+          {fetchedCommunity?.base &&
+            fetchedCommunity?.base !== ChainBase.Sui && (
+              <CWCustomIcon
+                iconName={getChainIcon(addressInfo, fetchedCommunity?.base)}
+                iconSize="small"
+              />
+            )}
           <CWIdentificationTag
-            iconLeft={
-              walletId === WalletId.Magic
-                ? getSsoIconName(walletSsoSource)
-                : walletId
-            }
+            iconLeft={getWalletIconName(walletId, walletSsoSource)}
             address={`\u2022 ${formatAddressShort(address)}`}
           />
         </div>

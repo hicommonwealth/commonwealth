@@ -32,6 +32,13 @@ interface VoterProfileData {
   address: string;
 }
 
+type SecondaryToken = {
+  token_address: string;
+  token_symbol?: string;
+  token_decimals: number;
+  vote_weight_multiplier: number;
+};
+
 export type PollCardProps = PollOptionProps &
   CastVoteProps &
   ResultsSectionProps & {
@@ -45,6 +52,8 @@ export type PollCardProps = PollOptionProps &
     voterProfiles?: Record<string, VoterProfileData>;
     tokenDecimals?: number;
     topicWeight?: TopicWeightedVoting | null;
+    tokenAddress?: string;
+    secondaryTokens?: SecondaryToken[];
     isLoadingVotes?: boolean;
     endTimestamp?: string;
     allowRevotes?: boolean;
@@ -74,6 +83,8 @@ export const PollCard = ({
   voterProfiles = {},
   tokenDecimals,
   topicWeight,
+  tokenAddress,
+  secondaryTokens,
   isLoadingVotes = false,
   allowRevotes = false,
   userHasVoted = false,
@@ -138,7 +149,9 @@ export const PollCard = ({
       };
     });
 
-    const filename = `${proposalTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${moment().format('YYYYMMDD_HHmmss')}_votes.csv`;
+    const filename = `${proposalTitle
+      .replace(/[^a-z0-9]/gi, '_')
+      .toLowerCase()}_${moment().format('YYYYMMDD_HHmmss')}_votes.csv`;
     downloadCSV(csvData, filename);
   };
 
@@ -247,6 +260,8 @@ export const PollCard = ({
           tokenDecimals={tokenDecimals}
           topicWeight={topicWeight}
           tokenSymbol={tokenSymbol}
+          tokenAddress={tokenAddress}
+          secondaryTokens={secondaryTokens}
           communityId={communityId}
           onDownloadCsv={handleDownloadCsv}
           isLoading={isLoadingVotes}

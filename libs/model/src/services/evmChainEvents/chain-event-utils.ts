@@ -1,8 +1,12 @@
+import { VoteGovernanceAbi } from '@commonxyz/common-governance-abis';
 import {
+  BinaryVaultAbi,
   CommunityNominationsAbi,
   CommunityStakeAbi,
   ContestGovernorAbi,
   ContestGovernorSingleAbi,
+  FutarchyGovernorAbi,
+  FutarchyRouterAbi,
   LPBondingCurveAbi,
   NamespaceFactoryAbi,
   ReferralFeeManagerAbi,
@@ -345,6 +349,145 @@ const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
   };
 };
 
+const predictionMarketTokensMintedMapper: EvmMapper<
+  'PredictionMarketTokensMinted'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: BinaryVaultAbi,
+    eventName: 'TokensMinted',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketTokensMinted',
+    event_payload: {
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      trader_address: decoded.args.to,
+      collateral_amount: decoded.args.amount,
+      p_token_amount: decoded.args.amount,
+      f_token_amount: decoded.args.amount,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
+const predictionMarketTokensMergedMapper: EvmMapper<
+  'PredictionMarketTokensMerged'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: BinaryVaultAbi,
+    eventName: 'TokensMerged',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketTokensMerged',
+    event_payload: {
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      trader_address: decoded.args.from,
+      collateral_amount: decoded.args.amount,
+      p_token_amount: decoded.args.amount,
+      f_token_amount: decoded.args.amount,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
+const predictionMarketSwapExecutedMapper: EvmMapper<
+  'PredictionMarketSwapExecuted'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: FutarchyRouterAbi,
+    eventName: 'SwapExecuted',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketSwapExecuted',
+    event_payload: {
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      trader_address: decoded.args.user,
+      buy_pass: decoded.args.buyPass,
+      amount_in: decoded.args.amountIn,
+      amount_out: decoded.args.amountOut,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
+const predictionMarketTokensRedeemedMapper: EvmMapper<
+  'PredictionMarketTokensRedeemed'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: BinaryVaultAbi,
+    eventName: 'TokensRedeemed',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketTokensRedeemed',
+    event_payload: {
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      trader_address: decoded.args.to,
+      collateral_amount: decoded.args.amount,
+      p_token_amount: decoded.args.outcome === 1 ? decoded.args.amount : 0n,
+      f_token_amount: decoded.args.outcome === 2 ? decoded.args.amount : 0n,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
+const predictionMarketProposalResolvedMapper: EvmMapper<
+  'PredictionMarketProposalResolved'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: FutarchyGovernorAbi,
+    eventName: 'ProposalResolved',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketProposalResolved',
+    event_payload: {
+      proposal_id: decoded.args.proposalId,
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      winner: decoded.args.winner,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
+const predictionMarketMarketResolvedMapper: EvmMapper<
+  'PredictionMarketMarketResolved'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: BinaryVaultAbi,
+    eventName: 'MarketResolved',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'PredictionMarketMarketResolved',
+    event_payload: {
+      market_id: decoded.args.marketId,
+      eth_chain_id: event.eventSource.ethChainId,
+      transaction_hash: event.rawLog.transactionHash as `0x${string}`,
+      winner: decoded.args.winner,
+      timestamp: Number(event.block.timestamp),
+    },
+  };
+};
+
 const communityNamespaceCreatedMapper: EvmMapper<
   'CommunityNamespaceCreated'
 > = (event: EvmEvent) => {
@@ -363,6 +506,89 @@ const communityNamespaceCreatedMapper: EvmMapper<
       token,
       namespaceAddress,
       governanceAddress,
+    },
+  };
+};
+
+const cmnOzProposalCreatedMapper: EvmMapper<'CmnOzProposalCreated'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: VoteGovernanceAbi,
+    eventName: 'ProposalCreated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+
+  // Will never happen - this is just here for type narrowing because
+  // the ABI has 2 events with the same 'ProposalCreated' name.
+  if (!('voteStart' in decoded.args))
+    throw new Error(
+      'CmnOzProposalCreatedMapper cannot process non-OZ proposal events',
+    );
+
+  const {
+    proposalId,
+    proposer: proposerAddress,
+    description,
+    voteStart: voteStartTimestamp,
+    voteEnd: voteEndTimestamp,
+  } = decoded.args;
+
+  return {
+    event_name: 'CmnOzProposalCreated',
+    event_payload: {
+      ...event,
+      parsedArgs: {
+        proposalId,
+        proposerAddress,
+        description,
+        voteStartTimestamp,
+        voteEndTimestamp,
+      },
+    },
+  };
+};
+
+const cmnTokenVoteCastMapper: EvmMapper<'CmnTokenVoteCast'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: VoteGovernanceAbi,
+    eventName: 'TokenVoteCast',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+
+  return {
+    event_name: 'CmnTokenVoteCast',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
+const cmnAddressVoteCastMapper: EvmMapper<'CmnAddressVoteCast'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: VoteGovernanceAbi,
+    eventName: 'AddressVoteCast',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  const { proposalId, voter: voterAddress, support } = decoded.args;
+
+  return {
+    event_name: 'CmnAddressVoteCast',
+    event_payload: {
+      ...event,
+      parsedArgs: {
+        proposalId,
+        voterAddress,
+        support,
+      },
     },
   };
 };
@@ -407,9 +633,29 @@ export const chainEventMappers: Record<string, EvmMapper<OutboxEvents>> = {
   [EvmEventSignatures.Contests.SingleContestVoterVoted]:
     singleContestVoteMapper,
 
+  // Prediction Markets
+  [EvmEventSignatures.PredictionMarket.TokensMinted]:
+    predictionMarketTokensMintedMapper,
+  [EvmEventSignatures.PredictionMarket.TokensMerged]:
+    predictionMarketTokensMergedMapper,
+  [EvmEventSignatures.PredictionMarket.SwapExecuted]:
+    predictionMarketSwapExecutedMapper,
+  [EvmEventSignatures.PredictionMarket.TokensRedeemed]:
+    predictionMarketTokensRedeemedMapper,
+  [EvmEventSignatures.PredictionMarket.ProposalResolved]:
+    predictionMarketProposalResolvedMapper,
+  [EvmEventSignatures.PredictionMarket.MarketResolved]:
+    predictionMarketMarketResolvedMapper,
+
   // TokenCommunityManager
   [EvmEventSignatures.TokenCommunityManager.CommunityNamespaceCreated]:
     communityNamespaceCreatedMapper,
+
+  // Common VoteGovernance
+  [EvmEventSignatures.VoteGovernance.OzProposalCreated]:
+    cmnOzProposalCreatedMapper,
+  [EvmEventSignatures.VoteGovernance.TokenVoteCast]: cmnTokenVoteCastMapper,
+  [EvmEventSignatures.VoteGovernance.AddressVoteCast]: cmnAddressVoteCastMapper,
 
   // User defined events (no hardcoded event signatures)
   XpChainEventCreated: xpChainEventCreatedMapper,

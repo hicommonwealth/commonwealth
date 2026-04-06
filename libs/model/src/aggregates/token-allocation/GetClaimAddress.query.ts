@@ -1,4 +1,4 @@
-import { InvalidState, type Query } from '@hicommonwealth/core';
+import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
@@ -15,18 +15,34 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
       >(
         `
           SELECT
+            CE.id as event_id,
+            CE.description,
+            CE.token,
+            CE.token_address,
+            CE.contract_address,
+            CE.initial_percentage::float8 as initial_percentage,
+            CE.unlock_start_at,
+            CE.cliff_date,
+            CE.end_registration_date,
             A.user_id,
             A.address,
             A.magna_allocation_id,
             A.magna_synced_at,
-            COALESCE(HA.token_allocation, 0)::numeric + COALESCE(AA.token_allocation, 0)::numeric as tokens
+            A.magna_claimed_at,
+            A.magna_claim_tx_hash,
+            A.magna_claim_tx_at,
+            A.magna_claim_tx_finalized,
+            A.magna_cliff_claimed_at,
+            A.magna_cliff_claim_tx_hash,
+            A.magna_cliff_claim_tx_at,
+            A.magna_cliff_claim_tx_finalized,
+            A.aura + A.historic + A.nft as tokens
           FROM
-            "ClaimAddresses" A
-            LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
-            LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
+            "ClaimEvents" CE JOIN "ClaimAddresses" A ON A.event_id = CE.id
           WHERE
             A.user_id = :user_id
-          LIMIT 1;
+          ORDER BY
+            A.created_at DESC
         `,
         {
           type: QueryTypes.SELECT,
@@ -35,14 +51,8 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
           },
         },
       );
-
-      if (!claimAddress || claimAddress.length === 0) return;
-      if (claimAddress.length > 1) {
-        // this will never happen but included for type-narrowing
-        throw new InvalidState('Duplicate claim addresses found');
-      }
-
-      return claimAddress[0];
+      if (!claimAddress || claimAddress.length === 0) return null;
+      return claimAddress;
     },
   };
 }

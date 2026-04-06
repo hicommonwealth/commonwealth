@@ -1,16 +1,19 @@
 import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
-import { linkValidationSchema } from 'helpers/formValidations/common';
-import { getLinkType, isLinkValid } from 'helpers/link';
-import { useFlag } from 'hooks/useFlag';
 import AddressInfo from 'models/AddressInfo';
 import NewProfile from 'models/NewProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
+import {
+  linkValidationSchema,
+  usernameSchema,
+} from 'shared/utils/formValidations/common';
+import { getLinkType, isLinkValid } from 'shared/utils/link';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useUserStore, { useUserAiSettingsStore } from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import ManageApiKey from 'views/components/EditProfile/ManageAPIKeys';
+import type { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
 import { PageNotFound } from '../../pages/404';
@@ -44,8 +47,6 @@ const EditProfile = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
-  const trustLevelEnabled = useFlag('trustLevel');
-
   const [profile, setProfile] = useState<NewProfile>();
   const [avatarUrl, setAvatarUrl] = useState<string>();
   const [addresses, setAddresses] = useState<AddressInfo[]>();
@@ -67,8 +68,6 @@ const EditProfile = () => {
 
   const { aiInteractionsToggleEnabled, setAIInteractionsToggleEnabled } =
     useUserAiSettingsStore();
-  const aiCommentsFeatureEnabled = useFlag('aiComments');
-
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
     usePreferenceTags();
 
@@ -98,6 +97,12 @@ const EditProfile = () => {
     },
     [],
   );
+
+  const validateUsername = (value: string): [ValidationStatus, string] | [] => {
+    const res = usernameSchema.safeParse(value);
+    if (res.success) return [];
+    return ['failure', JSON.parse(res.error.message)[0].message];
+  };
 
   useEffect(() => {
     if (isLoadingProfile) return;
@@ -311,7 +316,9 @@ const EditProfile = () => {
                     }
                     uploadCompleteCallback={(uploadUrl: string) => {
                       setIsUploadingProfileImage(false);
-                      setAvatarUrl(uploadUrl);
+                      if (uploadUrl) {
+                        setAvatarUrl(uploadUrl);
+                      }
                     }}
                   />
                 </div>
@@ -324,6 +331,7 @@ const EditProfile = () => {
                 // TODO: username generator like in PersonalInformationStep?
                 name="username"
                 hookToForm
+                inputValidationFn={validateUsername}
               />
               <CWTextInput
                 fullWidth
@@ -361,19 +369,17 @@ const EditProfile = () => {
                 canAddLinks={links.length <= 5}
               />
             </ProfileSection>
-            {trustLevelEnabled && (
-              <ProfileSection
-                title="User Verification"
-                description="Verification helps build a trusted
+            <ProfileSection
+              title="User Verification"
+              description="Verification helps build a trusted
               ecosystem where members can interact with confidence.
               As you progress throught verification levels,
               you'll gain increased capabilities and recognition
               within the community.
               "
-              >
-                <UserTrustLevel />
-              </ProfileSection>
-            )}
+            >
+              <UserTrustLevel />
+            </ProfileSection>
 
             <ProfileSection
               title="Personalize Your Profile"
@@ -437,40 +443,31 @@ const EditProfile = () => {
               title="Beta Features"
               description="Enable experimental features and help us test new functionality."
             >
-              {aiCommentsFeatureEnabled ? (
-                <div className="beta-features-section">
-                  <div className="beta-feature-item">
-                    <div className="beta-feature-header">
-                      <CWText type="h4" fontWeight="semiBold">
-                        AI Assistant
-                      </CWText>
-                      <CWToggle
-                        className="ai-toggle"
-                        checked={aiInteractionsToggleEnabled}
-                        onChange={() =>
-                          setAIInteractionsToggleEnabled(
-                            !aiInteractionsToggleEnabled,
-                          )
-                        }
-                        icon="sparkle"
-                        iconColor="#757575"
-                      />
-                    </div>
-                    <CWText type="b1" className="beta-feature-description">
-                      Enable AI-powered features including AI replies to
-                      comments and smart content generation. This is an
-                      experimental feature and may be updated or changed at any
-                      time.
+              <div className="beta-features-section">
+                <div className="beta-feature-item">
+                  <div className="beta-feature-header">
+                    <CWText type="h4" fontWeight="semiBold">
+                      AI Assistant
                     </CWText>
+                    <CWToggle
+                      className="ai-toggle"
+                      checked={aiInteractionsToggleEnabled}
+                      onChange={() =>
+                        setAIInteractionsToggleEnabled(
+                          !aiInteractionsToggleEnabled,
+                        )
+                      }
+                      icon="sparkle"
+                      iconColor="#757575"
+                    />
                   </div>
-                </div>
-              ) : (
-                <div className="beta-features-section">
-                  <CWText type="b1">
-                    No beta features are available for your community.
+                  <CWText type="b1" className="beta-feature-description">
+                    Enable AI-powered features including AI replies to comments
+                    and smart content generation. This is an experimental
+                    feature and may be updated or changed at any time.
                   </CWText>
                 </div>
-              )}
+              </div>
             </ProfileSection>
             <ManageApiKey />
             {actionButtons}

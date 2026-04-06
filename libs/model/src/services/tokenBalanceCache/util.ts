@@ -10,6 +10,90 @@ import { Balances, GetTendermintClientOptions } from './types';
 
 const log = logger(import.meta);
 
+interface JsonRpcRequest {
+  method: string;
+  params: Array<string | Record<string, string>>;
+  id: number;
+  jsonrpc: '2.0';
+}
+
+interface JsonRpcResponse {
+  jsonrpc: '2.0';
+  id: number;
+  result?: string;
+  error?: {
+    code: number;
+    message: string;
+    data?: unknown;
+  };
+}
+
+/**
+ * Helper function to perform fetch with exponential backoff for 429 responses
+ */
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries = 5,
+): Promise<Response> {
+  let retryCount = 0;
+
+  while (retryCount <= maxRetries) {
+    const response = await fetch(url, options);
+
+    // If not a 429, return the response (whether success or other error)
+    if (response.status !== 429) {
+      return response;
+    }
+
+    // If we've exhausted retries, return the 429 response
+    if (retryCount === maxRetries) {
+      log.warn(
+        `Max retries (${maxRetries}) reached for 429 response on ${url}`,
+      );
+      return response;
+    }
+
+    // Check for Retry-After header
+    const retryAfter = response.headers.get('Retry-After');
+    let waitTime: number;
+
+    if (retryAfter && parseInt(retryAfter) > 0) {
+      // Retry-After can be in seconds (integer) or HTTP date
+      const retryAfterValue = parseInt(retryAfter);
+      if (!isNaN(retryAfterValue)) {
+        waitTime = retryAfterValue * 1000; // Convert to milliseconds
+        log.info(
+          `Rate limited (429). Waiting ${retryAfterValue}s as specified by` +
+            ` Retry-After header. Retry ${retryCount + 1}/${maxRetries}`,
+        );
+      } else {
+        // If it's a date, calculate the difference
+        const retryDate = new Date(retryAfter);
+        const now = new Date();
+        waitTime = Math.max(0, retryDate.getTime() - now.getTime());
+        log.info(
+          `Rate limited (429). Waiting ${waitTime / 1000}s as specified by` +
+            ` Retry-After header. Retry ${retryCount + 1}/${maxRetries}`,
+        );
+      }
+    } else {
+      // Exponential backoff: 1s, 2s, 4s, 8s, 16s
+      waitTime = Math.pow(2, retryCount) * 1000;
+      log.info(
+        `Rate limited (429). Using exponential backoff: ${waitTime / 1000}s.` +
+          ` Retry ${retryCount + 1}/${maxRetries}`,
+      );
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, waitTime));
+    retryCount++;
+  }
+
+  // This should never be reached due to the return in the loop, but TypeScript needs it
+  throw new Error('Unexpected: fetchWithRetry exceeded max retries');
+}
+
 /**
  * This function batches hundreds of RPC requests (1 per address) into a few batched RPC requests.
  * This function cannot be used for on-chain batching since several hundred addresses are batched
@@ -33,12 +117,25 @@ export async function evmOffChainRpcBatching(
 ): Promise<{ balances: Balances; failedAddresses: string[] }> {
   if (!rpc.batchSize) rpc.batchSize = 500;
 
-  const batchRequestPromises = [];
+  const MAX_PARALLEL_REQUESTS = 5;
   // maps an RPC request id to an address
   const idAddressMap: Balances = {};
+  let failedAddresses: string[] = [];
+  const jsonPromises: Promise<JsonRpcResponse[]>[] = [];
 
-  // iterate through addresses in batches of size rpcBatchSize creating a single request for each batch
+  const chainNodeErrorMsg =
+    `${failingChainNodeError} RPC batch request failed for method '${rpc.method}' ` +
+    `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
+      source.contractAddress ? ` for token ${source.contractAddress}` : ''
+    }.`;
+
+  // First, prepare all batch request payloads
+  const batchPayloads: Array<{
+    rpcRequests: JsonRpcRequest[];
+    startIndex: number;
+  }> = [];
   let id = 1;
+
   for (
     let startIndex = 0;
     startIndex < addresses.length;
@@ -46,49 +143,50 @@ export async function evmOffChainRpcBatching(
   ) {
     const endIndex = Math.min(startIndex + rpc.batchSize, addresses.length);
     const batchAddresses = addresses.slice(startIndex, endIndex);
-    const rpcRequests = [];
+    const rpcRequests: JsonRpcRequest[] = [];
     for (const address of batchAddresses) {
       rpcRequests.push({
         method: rpc.method,
         params: [rpc.getParams(address, source.contractAddress), 'latest'],
         id,
-        jsonrpc: '2.0',
+        jsonrpc: '2.0' as const,
       });
       idAddressMap[id] = address;
       ++id;
     }
+    batchPayloads.push({ rpcRequests, startIndex });
+  }
 
-    batchRequestPromises.push(
-      fetch(source.url, {
+  // Process batches in groups of MAX_PARALLEL_REQUESTS
+  for (let i = 0; i < batchPayloads.length; i += MAX_PARALLEL_REQUESTS) {
+    const endIndex = Math.min(i + MAX_PARALLEL_REQUESTS, batchPayloads.length);
+    const currentBatchGroup = batchPayloads.slice(i, endIndex);
+
+    // Create and execute fetch promises for this group only
+    const batchRequestPromises = currentBatchGroup.map((payload) =>
+      fetchWithRetry(source.url, {
         method: 'POST',
-        body: JSON.stringify(rpcRequests),
+        body: JSON.stringify(payload.rpcRequests),
         headers: { 'Content-Type': 'application/json' },
       }),
     );
-  }
 
-  let failedAddresses: string[] = [];
-  const jsonPromises: Promise<any>[] = [];
-  const responses = await Promise.allSettled(batchRequestPromises);
-  const chainNodeErrorMsg =
-    `${failingChainNodeError} RPC batch request failed for method '${rpc.method}' ` +
-    `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
-      source.contractAddress ? ` for token ${source.contractAddress}` : ''
-    }.`;
-  responses.forEach((res, index) => {
-    // handle a failed batch request
-    if (res.status === 'rejected') {
-      const startIndex = rpc.batchSize! * index;
-      const relevantAddresses = addresses.slice(
-        startIndex,
-        Math.min(startIndex + rpc.batchSize!, addresses.length),
-      );
-      failedAddresses = [...failedAddresses, ...relevantAddresses];
-      log.fatal(chainNodeErrorMsg, res.reason);
-    } else {
-      jsonPromises.push(res.value.json());
-    }
-  });
+    const responses = await Promise.allSettled(batchRequestPromises);
+    responses.forEach((res, index) => {
+      // handle a failed batch request
+      if (res.status === 'rejected') {
+        const payload = currentBatchGroup[index];
+        const relevantAddresses = addresses.slice(
+          payload.startIndex,
+          Math.min(payload.startIndex + rpc.batchSize!, addresses.length),
+        );
+        failedAddresses = [...failedAddresses, ...relevantAddresses];
+        log.fatal(chainNodeErrorMsg, res.reason);
+      } else {
+        jsonPromises.push(res.value.json());
+      }
+    });
+  }
 
   let datas;
   try {
@@ -106,9 +204,18 @@ export async function evmOffChainRpcBatching(
     if (data.error) {
       failedAddresses.push(idAddressMap[data.id]);
       const msg = `RPC request failed on EVM chain id ${source.evmChainId}${
-        source.contractAddress ? `for token ${source.contractAddress}` : ''
+        source.contractAddress ? ` for token ${source.contractAddress}` : ''
       }.`;
-      log.error(msg, data.error);
+      log.error(msg, undefined, { rpcError: data.error });
+      continue;
+    }
+
+    if (!data.result) {
+      failedAddresses.push(idAddressMap[data.id]);
+      const msg = `RPC request returned no result on EVM chain id ${source.evmChainId}${
+        source.contractAddress ? ` for token ${source.contractAddress}` : ''
+      }.`;
+      log.error(msg);
       continue;
     }
 
@@ -296,7 +403,7 @@ export async function evmRpcRequest(
 ) {
   let data;
   try {
-    const response = await fetch(rpcEndpoint, {
+    const response = await fetchWithRetry(rpcEndpoint, {
       method: 'POST',
       body: JSON.stringify(rawRequestBody),
       headers: { 'Content-Type': 'application/json' },

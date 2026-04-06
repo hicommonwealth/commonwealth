@@ -100,6 +100,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
         allowNull: false,
         defaultValue: 0,
       },
+      // Legacy: Privy auth removed; keep for historical records.
       privy_id: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -108,6 +109,21 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
         type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: true,
+      },
+      wallet_verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      social_verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      chain_verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
       },
     },
     {

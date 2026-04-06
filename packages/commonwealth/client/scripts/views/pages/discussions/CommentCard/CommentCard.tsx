@@ -11,19 +11,16 @@ import {
   UserTierMap,
   verify,
 } from '@hicommonwealth/shared';
-import { useAiCompletion } from 'client/scripts/state/api/ai';
+import { AICompletionType, useAiCompletion } from 'client/scripts/state/api/ai';
 import clsx from 'clsx';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
-import { generateCommentPrompt } from 'state/api/ai/prompts';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { useCreateCommentMutation } from 'state/api/comments';
-import {
-  useCreateAICompletionCommentMutation,
-  useCreateAICompletionTokenMutation,
-} from 'state/api/comments/aiCompletion';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore, { useAIFeatureEnabled } from 'state/ui/user';
+import { useUserAiSettingsStore } from 'state/ui/user/userAiSettings';
+import { trpc } from 'utils/trpcClient';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import ShareButton from 'views/components/ShareButton';
@@ -92,7 +89,7 @@ type CommentCardProps = {
   streamingModelId?: string;
   modelName?: string;
   parentCommentText?: string;
-  onStreamingComplete?: () => void;
+  onStreamingComplete?: (commentPayload?: Record<string, unknown>) => void;
   // voting
   tokenNumDecimals?: number;
   tokenSymbol?: string;
@@ -155,6 +152,7 @@ export const CommentCard = ({
   const userOwnsComment = comment.user_id === user.id;
   const [streamingText, setStreamingText] = useState('');
   const { generateCompletion } = useAiCompletion();
+  const utils = trpc.useUtils();
 
   // Fetch community details
   const { data: community } = useGetCommunityByIdQuery({
@@ -163,6 +161,7 @@ export const CommentCard = ({
   });
 
   const { isAIEnabled } = useAIFeatureEnabled();
+  const { webSearchEnabled } = useUserAiSettingsStore();
 
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: comment.thread_id,
@@ -170,14 +169,28 @@ export const CommentCard = ({
     existingNumberOfComments: 0,
   });
 
-  const { mutateAsync: createAICompletionToken } =
-    useCreateAICompletionTokenMutation();
-  const { mutateAsync: createAICompletionComment } =
-    useCreateAICompletionCommentMutation({
-      communityId: comment.community_id,
-      threadId: comment.thread_id,
-      existingNumberOfComments: 0,
-    });
+  // Use refs for generateCompletion and cancel to avoid effect re-runs
+  const generateCompletionRef = useRef(generateCompletion);
+  useEffect(() => {
+    generateCompletionRef.current = generateCompletion;
+  }, [generateCompletion]);
+
+  // Use ref for utils to avoid effect re-runs
+  const utilsRef = useRef(utils);
+  useEffect(() => {
+    utilsRef.current = utils;
+  }, [utils]);
+
+  // Track if an AI request is already in progress to prevent duplicate calls
+  // This ref persists across StrictMode re-mounts and is used to check if we should process results
+  const streamingStateRef = useRef<{
+    inProgress: boolean;
+    commentId: number | null;
+  }>({
+    inProgress: false,
+    commentId: null,
+  });
+
   const [commentText, setCommentText] = useState(comment.body);
   const commentBody = React.useMemo(() => {
     const rawContent = editDraft || commentText || comment.body;
@@ -257,95 +270,85 @@ export const CommentCard = ({
     onStreamingCompleteRef.current = onStreamingComplete;
   }, [onStreamingComplete]);
 
-  const activeUserAddress = user.activeAccount?.address;
-
   useEffect(() => {
     if (!isStreamingAIReply || !streamingModelId) return;
 
-    let mounted = true;
-    let finalText = '';
+    // Prevent duplicate requests (e.g., from React StrictMode in development).
+    // NOTE: There is intentionally no separate cleanup effect — a cleanup that
+    // resets inProgress would defeat this guard during StrictMode's
+    // mount → unmount → remount cycle. The guard stays true through re-runs,
+    // and onComplete/onError/catch already reset it when the request finishes.
+    if (
+      streamingStateRef.current.inProgress &&
+      streamingStateRef.current.commentId === comment.id
+    ) {
+      return;
+    }
+
+    // Mark as in progress
+    streamingStateRef.current = {
+      inProgress: true,
+      commentId: comment.id,
+    };
+
     let accumulatedText = '';
 
     const generateAIReply = async () => {
       try {
-        const communityName = community?.name || 'this community';
-        const communityDescription =
-          community?.description || 'No specific description provided.';
-        const extendedCommunityContext = `Extended Community Context:
-Community Name: ${communityName}
-Community Description: ${communityDescription}`;
-
-        const originalThreadPart = [
-          threadTitle ? `Thread Title: ${threadTitle}` : '',
-          threadContext ? `Thread Body: ${threadContext}` : '',
-        ]
-          .filter(Boolean)
-          .join('\n');
-        const originalParentPart = parentCommentText
-          ? `Parent Comment: ${parentCommentText}`
-          : '';
-
-        const originalContext = [originalThreadPart, originalParentPart]
-          .filter(Boolean)
-          .join('\n\n');
-
-        const contextText =
-          `${extendedCommunityContext}\n\n` +
-          `Original Context (Thread and Parent Comment):\n` +
-          `${originalContext.trim()}`;
-
-        const { userPrompt, systemPrompt } = generateCommentPrompt(contextText);
-
         setStreamingText('');
 
-        await generateCompletion(userPrompt, {
-          systemPrompt: systemPrompt,
-          model: streamingModelId as CompletionModel,
-          stream: true,
-          communityId: comment.community_id,
-          onChunk: (chunk) => {
-            if (mounted) {
-              accumulatedText += chunk;
-              setStreamingText(accumulatedText);
-              finalText = accumulatedText;
-            }
+        // For root-level AI comments (isRootComment), pass threadId instead of parentCommentId
+        await generateCompletionRef.current(
+          {
+            communityId: comment.community_id,
+            completionType: AICompletionType.Comment,
+            ...(isRootComment
+              ? { threadId: comment.id }
+              : { parentCommentId: comment.id }),
+            model: streamingModelId as CompletionModel,
+            stream: true,
+            webSearchEnabled,
           },
-          onComplete: async (completedText) => {
-            if (
-              mounted &&
-              completedText &&
-              !completedText.startsWith('Error generating reply')
-            ) {
-              try {
-                if (!user.activeAccount?.address) {
-                  throw new Error('No active user account found');
-                }
-
-                // Create AI completion token with the generated content
-                const tokenResponse = await createAICompletionToken({
-                  user_id: user.id,
-                  community_id: comment.community_id,
-                  thread_id: comment.thread_id,
-                  parent_comment_id: isRootComment ? undefined : comment.id,
-                  content: completedText,
-                  expires_in_minutes: 60, // Token expires in 1 hour
-                });
-
-                // Immediately use the token to create the bot comment
-                await createAICompletionComment({
-                  token: tokenResponse.token,
-                });
-              } catch (error) {
-                console.error('Error creating AI completion comment:', error);
-                setStreamingText(
-                  `Failed to post reply from ${modelName || 'AI'}.`,
-                );
+          {
+            onChunk: (chunk) => {
+              if (
+                streamingStateRef.current.inProgress &&
+                streamingStateRef.current.commentId === comment.id
+              ) {
+                accumulatedText += chunk;
+                setStreamingText(accumulatedText);
               }
-            }
-            onStreamingCompleteRef.current?.();
-          },
-          onError: (error) => {
-            if (mounted) {
+            },
+            onComplete: (completedText, commentPayload) => {
+              if (
+                !streamingStateRef.current.inProgress ||
+                streamingStateRef.current.commentId !== comment.id
+              ) {
+                return;
+              }
+
+              if (
+                completedText &&
+                !completedText.startsWith('Error generating reply')
+              ) {
+                setStreamingText('');
+              }
+
+              onStreamingCompleteRef.current?.(commentPayload);
+
+              streamingStateRef.current = {
+                inProgress: false,
+                commentId: null,
+              };
+            },
+            onError: (error) => {
+              if (
+                !streamingStateRef.current.inProgress ||
+                streamingStateRef.current.commentId !== comment.id
+              ) {
+                return;
+              }
+
               console.error(
                 `Error streaming for model ${streamingModelId}:`,
                 error,
@@ -353,14 +356,20 @@ Community Description: ${communityDescription}`;
               setStreamingText(
                 `Error generating reply from ${modelName || 'AI'}.`,
               );
-              onStreamingCompleteRef.current?.();
-            }
-          },
-        });
 
-        // Token creation and comment posting is now handled in onComplete callback above
+              streamingStateRef.current = {
+                inProgress: false,
+                commentId: null,
+              };
+              onStreamingCompleteRef.current?.();
+            },
+          },
+        );
       } catch (error) {
-        if (mounted) {
+        if (
+          streamingStateRef.current.inProgress &&
+          streamingStateRef.current.commentId === comment.id
+        ) {
           console.error(
             `Error in AI reply process for model ${streamingModelId}:`,
             error,
@@ -368,36 +377,25 @@ Community Description: ${communityDescription}`;
           setStreamingText(
             `Failed to process reply from ${modelName || 'AI'}.`,
           );
+
+          streamingStateRef.current = {
+            inProgress: false,
+            commentId: null,
+          };
           onStreamingCompleteRef.current?.();
         }
       }
     };
 
     void generateAIReply();
-    return () => {
-      mounted = false;
-    };
   }, [
     isStreamingAIReply,
     streamingModelId,
     modelName,
-    isRootComment,
-    threadContext,
-    threadTitle,
-    parentCommentText,
     comment.id,
-    comment.thread_id,
     comment.community_id,
-    activeUserAddress,
-    generateCompletion,
-    community,
+    webSearchEnabled,
   ]);
-
-  useEffect(() => {
-    if (isStreamingAIReply) {
-      setStreamingText('');
-    }
-  }, [isStreamingAIReply]);
 
   const displayText = isStreamingAIReply ? streamingText : comment.body;
 

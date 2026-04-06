@@ -1,6 +1,6 @@
 import {
-  type CustomCronItem,
   GraphileTaskNames,
+  type CustomCronItem,
 } from '@hicommonwealth/model/services';
 import { config } from '../../config';
 
@@ -47,12 +47,18 @@ export const cronItems: Array<CustomCronItem | undefined> = [
     task: GraphileTaskNames.CountAggregator,
     match: '*/10 * * * *', // every 10 minutes
   }),
-  config.MAGNA
+  config.MAGNA.API_KEY
     ? buildCustomCronItem({
         task: GraphileTaskNames.MagnaSync,
         match: '0 * * * *', // every hour
       })
     : undefined,
+  // config.MAGNA.API_KEY
+  //   ? buildCustomCronItem({
+  //       task: GraphileTaskNames.MagnaTxnSync,
+  //       match: '30 * * * *', // every hour at 30 minutes past (30 min after MagnaSync)
+  //     })
+  //   : undefined,
   buildCustomCronItem({
     task: GraphileTaskNames.RefreshMaterializedViews,
     match: '*/30 * * * *', // every 30 minutes

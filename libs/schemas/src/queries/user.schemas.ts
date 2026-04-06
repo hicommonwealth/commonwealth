@@ -2,6 +2,7 @@ import { ChainBase, Roles, WalletId } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
 import { AuthContext, VerifiedContext } from '../context';
 import { ReferralFees, User } from '../entities';
+import { COMMUNITY_TIER } from '../entities/community.schemas';
 import { Tags } from '../entities/tag.schemas';
 import { USER_TIER, UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
@@ -32,6 +33,9 @@ export const UserProfileView = z.object({
   userId: PG_INT,
   tier: USER_TIER,
   profile: UserProfile,
+  wallet_verified: z.boolean(),
+  social_verified: z.boolean(),
+  chain_verified: z.boolean(),
   totalUpvotes: z.number().int(),
   addresses: z.array(UserProfileAddressView) as ZodType<
     UserProfileAddressView[]
@@ -48,18 +52,20 @@ export const UserProfileView = z.object({
   xp_referrer_points: PG_INT.default(0),
 });
 
-type UserProfileView = z.infer<typeof UserProfileView>;
+export type UserProfileViewType = z.infer<typeof UserProfileView>;
 
 export const GetUserProfile = {
   input: z.object({
     userId: PG_INT.optional(),
   }),
-  output: UserProfileView as ZodType<UserProfileView>,
+  output: UserProfileView as ZodType<UserProfileViewType>,
   context: VerifiedContext,
 };
 
 export const GetUser = {
-  input: z.object({}),
+  input: z
+    .object({})
+    .describe("Get the authenticated user's profile information"),
   output: z.union([User, z.object({})]),
 };
 
@@ -288,6 +294,7 @@ export const MutualCommunityView = z.object({
   name: z.string(),
   base: z.enum(ChainBase),
   icon_url: z.string().nullish(),
+  tier: COMMUNITY_TIER,
 });
 
 export const GetMutualConnections = {

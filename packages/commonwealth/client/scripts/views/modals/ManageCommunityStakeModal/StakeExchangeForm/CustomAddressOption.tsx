@@ -26,7 +26,7 @@ const CustomAddressOptionElement = ({
           iconName="checkCircleFilled"
         />
       )}
-      {formatAddressShort(label, 6)}
+      {value === '__connect_new__' ? label : formatAddressShort(label, 6)}
     </div>
   );
 };
@@ -48,7 +48,11 @@ const CustomAddressOption = ({
     <components.Option {...originalProps}>
       <CustomAddressOptionElement
         value={data.value}
-        label={formatAddressShort(label, 6)}
+        label={
+          data.value === '__connect_new__'
+            ? label
+            : formatAddressShort(label, 6)
+        }
         selectedAddressValue={selectedAddressValue}
       />
     </components.Option>

@@ -1,3 +1,4 @@
+import { getDefaultContestImage } from '@hicommonwealth/shared';
 import {
   navigateToCommunity,
   useCommonNavigate,
@@ -53,7 +54,11 @@ const TrendingToken = ({
     >
       <div className="header">
         <div className="token-data">
-          <img src={icon_url || ''} className="image" alt={name} />
+          <img
+            src={icon_url || getDefaultContestImage()}
+            className="image"
+            alt={name}
+          />
           <div className="info">
             <CWText fontWeight="semiBold">{smartTrim(name, 12)}</CWText>
             <div className="detail">

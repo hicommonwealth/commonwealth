@@ -19,7 +19,7 @@ type DeleteAddressModalAttrs = {
   addresses: AddressInfo[];
   address: AddressInfo;
   chain: string;
-  closeModal: () => void;
+  closeModal: (isDeleted?: boolean) => void;
   isBulkDelete?: boolean;
   communityName: string;
   isLastCommunityAddress?: boolean;
@@ -33,8 +33,8 @@ export const DeleteAddressModal = ({
   communityName,
   isLastCommunityAddress = false,
 }: DeleteAddressModalAttrs) => {
-  const { mutate: deleteAddress } = useDeleteAddressMutation();
-  const { mutate: deleteAllAddresses } = useDeleteAllAddressesMutation();
+  const { mutateAsync: deleteAddress } = useDeleteAddressMutation();
+  const { mutateAsync: deleteAllAddresses } = useDeleteAllAddressesMutation();
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -42,9 +42,21 @@ export const DeleteAddressModal = ({
       deleteAllAddresses({
         community_id: chain,
         address: address?.address,
-      });
-    else deleteAddress({ community_id: chain, address: address?.address });
-    closeModal();
+      })
+        .then(() => {
+          closeModal(true);
+        })
+        .catch(() => {
+          closeModal(false);
+        });
+    else
+      deleteAddress({ community_id: chain, address: address?.address })
+        .then(() => {
+          closeModal(true);
+        })
+        .catch(() => {
+          closeModal(false);
+        });
   };
 
   return (
@@ -58,7 +70,7 @@ export const DeleteAddressModal = ({
               : `Disconnect ${formatAddressShort(address?.address || '')}`
         }
         icon="danger"
-        onModalClose={closeModal}
+        onModalClose={() => closeModal(false)}
       />
       <CWModalBody>
         <CWText>
@@ -78,7 +90,7 @@ export const DeleteAddressModal = ({
         <CWButton
           label="Cancel"
           buttonType="secondary"
-          onClick={closeModal}
+          onClick={() => closeModal(false)}
           buttonHeight="sm"
         />
         <CWButton

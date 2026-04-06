@@ -56,6 +56,7 @@ export type RequirementSubTypeWithLabel = {
 };
 
 export type RequirementSubFormType = {
+  formIndex: number;
   errors?: RequirementSubType;
   defaultValues: RequirementSubTypeWithLabel;
   onRemove: () => any;
@@ -97,6 +98,7 @@ export type FormSubmitValues = {
 
 export type GroupFormProps = {
   formType: 'create' | 'edit';
+  isSubmitting?: boolean;
   onSubmit: (values: GroupResponseValuesType) => any;
   initialValues?: Partial<GroupInitialValuesTypeWithLabel>;
   onDelete?: () => any;

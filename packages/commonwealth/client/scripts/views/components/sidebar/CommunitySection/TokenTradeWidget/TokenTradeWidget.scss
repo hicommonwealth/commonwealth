@@ -12,11 +12,8 @@
     flex-direction: row;
     gap: 8px;
     align-items: center;
-    color: colors.$neutral-500 !important;
-
     .Text {
-      color: colors.$neutral-500 !important;
-      letter-spacing: 0.5Øpx;
+      letter-spacing: 0.5px;
     }
   }
 
@@ -42,6 +39,12 @@
         color: colors.$neutral-800;
       }
     }
+  }
+
+  .token-symbol-price {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 4px;
   }
 
   .pad-8 {

@@ -1,0 +1,24 @@
+# cwpg-dockerfile
+FROM postgres:15.1-alpine
+
+USER root
+
+# Install build tools
+RUN apk add --no-cache git make gcc musl-dev
+
+# Clone and build pg_partman (without background worker)
+RUN git clone --branch v5.0.1 https://github.com/pgpartman/pg_partman /tmp/pg_partman \
+    && cd /tmp/pg_partman \
+    && make NO_BGW=1 install \
+    && rm -rf /tmp/pg_partman
+
+# ✅ Create a writable subdirectory for macOS volumes
+RUN mkdir -p /var/lib/postgresql/pgdata \
+    && chown -R postgres:postgres /var/lib/postgresql
+
+# ✅ Inline SQL init script for pg_partman
+RUN mkdir -p /docker-entrypoint-initdb.d \
+    && echo "CREATE EXTENSION IF NOT EXISTS pg_partman;" > /docker-entrypoint-initdb.d/init-pg-partman.sql \
+    && chown -R postgres:postgres /docker-entrypoint-initdb.d
+
+USER postgres

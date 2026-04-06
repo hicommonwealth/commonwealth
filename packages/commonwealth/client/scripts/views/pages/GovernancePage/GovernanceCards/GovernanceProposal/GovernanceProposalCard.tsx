@@ -1,6 +1,7 @@
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import React from 'react';
 import './GovernanceProposalCard.scss';
+import ProposalsEmptyState from './ProposalsEmptyState';
 
 interface GovernaceProposalCardProps {
   totalProposals?: number;
@@ -9,6 +10,14 @@ interface GovernaceProposalCardProps {
 const GovernanceProposalCard = ({
   totalProposals = 0,
 }: GovernaceProposalCardProps) => {
+  if (totalProposals === 0) {
+    return (
+      <div className="GovernanceProposalCard">
+        <ProposalsEmptyState />
+      </div>
+    );
+  }
+
   return (
     <div className="GovernanceProposalCard">
       <div className="card-header">

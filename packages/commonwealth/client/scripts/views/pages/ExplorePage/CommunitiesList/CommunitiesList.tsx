@@ -1,7 +1,6 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainNetwork, CommunityType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
-import { useFlag } from 'hooks/useFlag';
 import React, {
   Fragment,
   MutableRefObject,
@@ -61,7 +60,6 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
   searchText,
   onClearSearch,
 }) => {
-  const launchpadEnabled = useFlag('launchpad');
   const user = useUserStore();
 
   const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery({
@@ -387,11 +385,7 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
           components={{
             // eslint-disable-next-line react/no-multi-comp
             EmptyPlaceholder: () => (
-              <section
-                className={clsx('empty-placeholder', {
-                  'my-16': launchpadEnabled,
-                })}
-              >
+              <section className={clsx('empty-placeholder', 'my-16')}>
                 <CWText type="h2">
                   No communities found
                   {filters.withCommunityEcosystem ||
