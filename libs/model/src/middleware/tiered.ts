@@ -6,6 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import {
   hasTierRateLimits,
+  TierRateLimitErrors,
   USER_TIERS,
   UserTierMap,
 } from '@hicommonwealth/shared';
@@ -14,6 +15,8 @@ import { Op } from 'sequelize';
 import { ZodType } from 'zod';
 import { config } from '../config';
 import { models } from '../database';
+import { isBotUser } from '../utils/botUser';
+import { setUserTier } from '../utils/tiers';
 
 type Counters = 'creates' | 'upvotes' | 'ai-images' | 'ai-text';
 
@@ -52,11 +55,15 @@ export function tiered({
   minTier?: UserTierMap;
 }) {
   return async function ({ actor }: Context<ZodType, ZodType>) {
+    // System actors and bot users bypass all tier checks
+    if (actor.is_system_actor) return;
+    if (actor.user.id && (await isBotUser(actor.user.id))) return;
+
     if (!actor.user.id) throw new InvalidActor(actor, 'Must be a user');
 
     const user = await models.User.findOne({
       where: { id: actor.user.id },
-      attributes: ['id', 'tier', 'created_at'],
+      attributes: ['id', 'tier', 'created_at', 'wallet_verified'],
       include: [
         {
           model: models.Address,
@@ -72,22 +79,32 @@ export function tiered({
     // upgrade tier after a week
     let tier = user.tier;
     if (
-      tier === UserTierMap.NewlyVerifiedWallet &&
+      user.wallet_verified === false &&
       dayjs().diff(dayjs(user.created_at), 'weeks') >= 1
-    )
+    ) {
       tier = UserTierMap.VerifiedWallet;
-
+    }
     // WARNING: If router is not authenticated before this middleware this will incorrectly bump user tier
-    if (tier === UserTierMap.IncompleteUser)
+    if (tier === UserTierMap.IncompleteUser) {
       tier = UserTierMap.NewlyVerifiedWallet;
-    if (tier > user.tier)
-      await models.User.update({ tier }, { where: { id: user.id } });
+    }
 
-    if (tier < minTier)
+    if (tier != user.tier) {
+      await models.sequelize.transaction(async (transaction) => {
+        await setUserTier({
+          userId: user.id!,
+          newTier: tier,
+          transaction,
+        });
+      });
+    }
+
+    if (tier < minTier) {
       throw new InvalidActor(
         actor,
         `Must be a user with tier above ${minTier}`,
       );
+    }
 
     // allow users with tiers above limits
     if (!hasTierRateLimits(tier)) return;
@@ -99,22 +116,22 @@ export function tiered({
         !config.IGNORE_CONTENT_CREATION_LIMIT &&
         last_creates >= tierLimitsPerHour.create
       )
-        throw new InvalidActor(actor, 'Exceeded content creation limit');
+        throw new InvalidActor(actor, TierRateLimitErrors.CREATES);
     }
     if (upvotes) {
       const last_upvotes = await getUserCount(user.id, 'upvotes');
       if (last_upvotes >= tierLimitsPerHour.upvote)
-        throw new InvalidActor(actor, 'Exceeded upvote limit');
+        throw new InvalidActor(actor, TierRateLimitErrors.UPVOTES);
     }
     if (ai.images) {
       const last_ai_images = await getUserCount(user.id, 'ai-images');
       if (last_ai_images >= tierLimitsPerHour.ai.images)
-        throw new InvalidActor(actor, 'Exceeded ai image creation limit');
+        throw new InvalidActor(actor, TierRateLimitErrors.AI_IMAGES);
     }
     if (ai.text) {
       const last_ai_text = await getUserCount(user.id, 'ai-text');
       if (last_ai_text >= tierLimitsPerHour.ai.text)
-        throw new InvalidActor(actor, 'Exceeded ai text creation limit');
+        throw new InvalidActor(actor, TierRateLimitErrors.AI_TEXT);
     }
   };
 }

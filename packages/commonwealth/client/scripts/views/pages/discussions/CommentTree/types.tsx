@@ -2,7 +2,7 @@ import { GatedActionEnum } from '@hicommonwealth/shared';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
-import Permissions from 'utils/Permissions';
+import Permissions from 'shared/utils/Permissions';
 import Thread from '../../../../models/Thread';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import './CommentTree.scss';
@@ -55,7 +55,10 @@ export type TreeHierarchyProps = Pick<
   CommentsTreeProps,
   'pageRef' | 'thread' | 'permissions'
 > & {
-  parentCommentId?: number;
+  parentComment?: {
+    id: number;
+    level: number;
+  };
   isThreadLocked: boolean;
   isThreadArchived: boolean;
   isReplyingToCommentId?: number;

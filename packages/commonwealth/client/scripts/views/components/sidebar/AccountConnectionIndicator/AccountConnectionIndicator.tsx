@@ -1,12 +1,13 @@
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
-import React from 'react';
+import { DeleteAddressModal } from 'client/scripts/views/modals/delete_address_modal';
+import React, { useState } from 'react';
 import app from 'state';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { SharePopover } from '../../SharePopover';
 import { AddressList } from '../CommunitySection/AddressList';
 
@@ -32,12 +33,24 @@ const AccountConnectionIndicator = ({
   isInsideCommunity,
 }: AccountConnectionIndicatorProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-  const referralsEnabled = useFlag('referrals');
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
+  const [isHovering, setIsHovering] = useState(false);
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
 
   if (!profile) {
     return null;
   }
+
+  // Find the current connected address instead of using addresses[0]
+  const currentAddress = addresses?.find((addr) => addr.address === address);
+
+  // Calculate if this is the last address for this community
+  const isLastCommunityAddress = addresses ? addresses.length === 1 : false;
+
+  // Get community info from the current address or app state
+  const communityId =
+    currentAddress?.community?.id || app.activeChainId() || '';
+  const communityName = app.chain?.meta?.name || '';
 
   return (
     <>
@@ -55,27 +68,34 @@ const AccountConnectionIndicator = ({
               />
             </div>
 
-            {referralsEnabled && (
-              <CWButton
-                buttonType="tertiary"
-                buttonHeight="sm"
-                buttonWidth="full"
-                label="Get referral link"
-                className="referral-link-button"
-                onClick={() => setIsInviteLinkModalOpen(true)}
-              />
-            )}
+            <CWButton
+              buttonType="tertiary"
+              buttonHeight="sm"
+              buttonWidth="full"
+              label="Get referral link"
+              className="referral-link-button"
+              onClick={() => setIsInviteLinkModalOpen(true)}
+            />
           </div>
         )}
 
         <div className="status-button">
           <CWButton
-            {...(connected ? { iconLeft: 'checkCircleFilled' } : {})}
+            {...(connected && !isHovering
+              ? { iconLeft: 'checkCircleFilled' }
+              : {})}
             buttonHeight="sm"
             buttonWidth="full"
-            label={connected ? 'Joined' : 'Join community'}
-            disabled={connected}
-            onClick={handleJoinCommunity}
+            buttonType={connected && isHovering ? 'destructive' : 'primary'}
+            buttonAlt={connected && isHovering ? 'rorange' : undefined}
+            label={
+              connected ? (isHovering ? 'Leave' : 'Joined') : 'Join community'
+            }
+            onMouseEnter={connected ? () => setIsHovering(true) : undefined}
+            onMouseLeave={connected ? () => setIsHovering(false) : undefined}
+            onClick={
+              connected ? () => setIsLeaveModalOpen(true) : handleJoinCommunity
+            }
           />
           <SharePopover
             linkToShare={
@@ -88,6 +108,24 @@ const AccountConnectionIndicator = ({
         </div>
       </div>
       {JoinCommunityModals}
+      <CWModal
+        size="small"
+        open={isLeaveModalOpen}
+        onClose={() => setIsLeaveModalOpen(false)}
+        content={
+          currentAddress && addresses ? (
+            <DeleteAddressModal
+              addresses={addresses}
+              address={currentAddress}
+              chain={communityId}
+              closeModal={() => setIsLeaveModalOpen(false)}
+              communityName={communityName}
+              isBulkDelete={false}
+              isLastCommunityAddress={isLastCommunityAddress}
+            />
+          ) : null
+        }
+      />
     </>
   );
 };

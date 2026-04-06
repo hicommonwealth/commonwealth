@@ -1,4 +1,6 @@
+import * as govAbis from '@commonxyz/common-governance-abis';
 import * as abis from '@commonxyz/common-protocol-abis';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 
 // Chains with deployed namespace factories. As new chains are enabled, add here.
 
@@ -15,6 +17,7 @@ export enum ValidChains {
   SKALE_TEST = 974399131,
   // SKALE = 1564830818,
   Anvil = 31337,
+  Soneium = 1868,
 }
 
 const chains = Object.entries(ValidChains)
@@ -56,9 +59,13 @@ export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
 export const NOMINATION_FEE = 0.00005;
 
-type AbiContractName = {
-  [K in keyof typeof abis]: K extends `${infer Base}Abi` ? Base : never;
-}[keyof typeof abis];
+type AbiContractName =
+  | {
+      [K in keyof typeof abis]: K extends `${infer Base}Abi` ? Base : never;
+    }[keyof typeof abis]
+  | {
+      [K in keyof typeof govAbis]: K extends `${infer Base}Abi` ? Base : never;
+    }[keyof typeof govAbis];
 
 export type FactoryContractsType = {
   [chain in ValidChains]: {
@@ -82,9 +89,13 @@ export const factoryContracts: FactoryContractsType = {
     TokenCommunityManager: '0x5620CfB48748c1bE2DFB919Eee7414B491CCba20',
     ReferralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
     // veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
+    VoteGovernance: '0x959982eFDa4ed7840a67CF56042e46ad16A1EF88',
     CommunityNominations: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
-    TokenLaunchpad: '0x26B3f37507c38a84C5eFAB888D422170102cCF10',
-    TokenBondingCurve: '0x112eAB263b0eEe88b6996Ff4A03D9629dad8a2b8',
+    TokenLaunchpad: '0x1fB82e534F0E81527970BFA3096ED1b728922ff8',
+    TokenBondingCurve: '0x3b3A346A679fd721710D778551766A71482926dd',
+    BinaryVault: '0xb3608fCB7Fa532aDC3cc10A66aF630A30cdB5E29',
+    FutarchyRouter: '0x7074A056B3ff6eCFBCc2F390a752cd0B00bAe53e',
+    FutarchyGovernor: '0x158F43491Ea75081752Dec4b906ECb3708250AdE',
     chainId: 84532,
   },
   [ValidChains.Blast]: {
@@ -99,6 +110,8 @@ export const factoryContracts: FactoryContractsType = {
     LPBondingCurve: '0x4bF195932E20Dc8459419Bc93a84B713bED20f38',
     TokenCommunityManager: '0x84A0CFb53a77202777fdbc845e7A5bb214311e88',
     ReferralFeeManager: '0x9d3BE262bed6F3A0AAb4E97c0232071EF730632f',
+    TokenLaunchpad: '0xACD353A1Bf569662E2e0e5Dd127FeCbee505986c',
+    TokenBondingCurve: '0xC815d94E05dCAa6D84a740291A03A1e73BF48C1f',
     chainId: 8453,
   },
   [ValidChains.Linea]: {
@@ -132,17 +145,21 @@ export const factoryContracts: FactoryContractsType = {
     chainId: 974399131,
   },
   [ValidChains.Anvil]: {
-    NamespaceFactory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
-    CommunityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
-    Launchpad: '0x0d3b664431FEB91E630DBAB864917DA60e1915b8',
-    LPBondingCurve: '0x40F620b5191fF99d0290F27194383c6979011a68',
-    TokenCommunityManager: '0x5620CfB48748c1bE2DFB919Eee7414B491CCba20',
-    ReferralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
-    // veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
+    NamespaceFactory: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
+    CommunityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
+    Launchpad: '0x0c1786961CfDac88EdEb5728E52F73A0DbBe7813',
+    LPBondingCurve: '0x4bF195932E20Dc8459419Bc93a84B713bED20f38',
+    TokenCommunityManager: '0x84A0CFb53a77202777fdbc845e7A5bb214311e88',
+    ReferralFeeManager: '0x9d3BE262bed6F3A0AAb4E97c0232071EF730632f',
     CommunityNominations: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
-    TokenLaunchpad: '0x26B3f37507c38a84C5eFAB888D422170102cCF10',
-    TokenBondingCurve: '0x112eAB263b0eEe88b6996Ff4A03D9629dad8a2b8',
+    TokenLaunchpad: '0xACD353A1Bf569662E2e0e5Dd127FeCbee505986c',
+    TokenBondingCurve: '0xC815d94E05dCAa6D84a740291A03A1e73BF48C1f',
     chainId: 31337,
+  },
+  [ValidChains.Soneium]: {
+    NamespaceFactory: ZERO_ADDRESS,
+    CommunityStake: ZERO_ADDRESS,
+    chainId: 1868,
   },
 };
 

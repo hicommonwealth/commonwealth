@@ -1,8 +1,10 @@
 import { TopicWeightedVoting, VoteView } from '@hicommonwealth/schemas';
-import { APIOrderDirection } from 'helpers/constants';
 import React, { Dispatch, SetStateAction, useMemo } from 'react';
-import { prettyVoteWeight } from 'shared/adapters/currency';
+import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
+import { saveToClipboard } from 'shared/utils/clipboard';
+import { APIOrderDirection } from 'shared/utils/constants';
 import app from 'state';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
@@ -37,6 +39,13 @@ export type PollOptionSummary = {
   totalWeightForOption: string | number; // Sum of voting weights for this option.
 };
 
+type SecondaryToken = {
+  token_address: string;
+  token_symbol?: string;
+  token_decimals: number;
+  vote_weight_multiplier: number;
+};
+
 type ViewPollVotesDrawerProps = {
   header: string; // Drawer title, e.g., "Votes for 'Poll Question XYZ'"
   votes: VoterWithProfile[]; // Array of individual vote records, enriched with profiles.
@@ -46,6 +55,9 @@ type ViewPollVotesDrawerProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   tokenDecimals?: number | null | undefined;
   topicWeight?: TopicWeightedVoting | null | undefined; // For formatting vote weights
+  tokenSymbol?: string; // Token symbol for Sui NAVX special handling
+  tokenAddress?: string; // Token address for weighted voting display
+  secondaryTokens?: SecondaryToken[]; // Additional tokens for compound voting
   communityId: string; // Community context, potentially for fetching profiles or other details.
   onDownloadCsv: () => void; // Callback to trigger CSV download.
   isLoading?: boolean; // To show loading state for votes
@@ -54,6 +66,7 @@ type ViewPollVotesDrawerProps = {
 const getColumns = (
   tokenDecimals?: number | null,
   topicWeight?: TopicWeightedVoting | null,
+  tokenSymbol?: string,
 ): CWTableColumnInfo[] => [
   {
     key: 'voter',
@@ -74,6 +87,7 @@ const getColumns = (
     sortable: true,
     tokenDecimals,
     weightedVoting: topicWeight,
+    tokenSymbol,
   },
   {
     key: 'timestamp',
@@ -84,6 +98,27 @@ const getColumns = (
   },
 ];
 
+function getTokenSymbolFallback(topicWeight: TopicWeightedVoting) {
+  switch (topicWeight) {
+    case TopicWeightedVoting.SuiNative:
+      return 'Sui Native';
+    case TopicWeightedVoting.SuiToken:
+      return 'Sui Token';
+    case TopicWeightedVoting.SuiNFT:
+      return 'Sui NFT';
+    case TopicWeightedVoting.SPL:
+      return 'SPL';
+    case TopicWeightedVoting.ERC20:
+      return 'ERC20';
+    case TopicWeightedVoting.Stake:
+      return 'Stake';
+    case TopicWeightedVoting.ERC1155ID:
+      return 'ERC1155ID';
+    default:
+      return 'ETH';
+  }
+}
+
 export const ViewPollVotesDrawer = ({
   header,
   votes,
@@ -93,13 +128,16 @@ export const ViewPollVotesDrawer = ({
   setIsOpen,
   tokenDecimals,
   topicWeight,
+  tokenSymbol,
+  tokenAddress,
+  secondaryTokens,
   communityId,
   onDownloadCsv,
   isLoading = false,
 }: ViewPollVotesDrawerProps) => {
   const columns = useMemo(
-    () => getColumns(tokenDecimals, topicWeight),
-    [tokenDecimals, topicWeight],
+    () => getColumns(tokenDecimals, topicWeight, tokenSymbol),
+    [tokenDecimals, topicWeight, tokenSymbol],
   );
 
   const tableState = useCWTableState({
@@ -145,10 +183,17 @@ export const ViewPollVotesDrawer = ({
         // Use renamed prop
         ...opt,
         percentage: '0.00%',
-        voteWeightDisplay: prettyVoteWeight(
-          opt.totalWeightForOption.toString(),
-          tokenDecimals,
+        voteWeightDisplay: prettyCompoundVoteWeight(
+          [
+            {
+              wei: opt.totalWeightForOption.toString(),
+              tokenNumDecimals: tokenDecimals,
+              multiplier: 1,
+              tokenSymbol: tokenSymbol,
+            },
+          ],
           topicWeight,
+          undefined,
         ),
       }));
     }
@@ -159,10 +204,17 @@ export const ViewPollVotesDrawer = ({
       return {
         ...opt,
         percentage: `${percentage}%`,
-        voteWeightDisplay: prettyVoteWeight(
-          opt.totalWeightForOption.toString(),
-          tokenDecimals,
+        voteWeightDisplay: prettyCompoundVoteWeight(
+          [
+            {
+              wei: opt.totalWeightForOption.toString(),
+              tokenNumDecimals: tokenDecimals,
+              multiplier: 1,
+              tokenSymbol: tokenSymbol,
+            },
+          ],
           topicWeight,
+          undefined,
         ),
       };
     });
@@ -188,9 +240,68 @@ export const ViewPollVotesDrawer = ({
               Download CSV
             </button>
           </div>
-
           <CWText type="h3">{header}</CWText>
-
+          {topicWeight && (
+            <div className="weighted-topic-info">
+              <CWText type="caption" className="weighted-topic-header">
+                Weighted by
+              </CWText>
+              <div className="token-info-stack">
+                {/* Primary token */}
+                <div className="token-entry">
+                  <div className="token-info">
+                    {tokenSymbol ? (
+                      <span className="token-symbol">{tokenSymbol}</span>
+                    ) : (
+                      <span className="token-symbol">
+                        {getTokenSymbolFallback(topicWeight)}
+                      </span>
+                    )}
+                    {tokenAddress && (
+                      <span className="token-address">{tokenAddress}</span>
+                    )}
+                  </div>
+                  {tokenAddress && (
+                    <CWIconButton
+                      iconName="copy"
+                      iconSize="small"
+                      onClick={() => {
+                        saveToClipboard(tokenAddress, true).catch(
+                          console.error,
+                        );
+                      }}
+                      className="copy-button"
+                    />
+                  )}
+                </div>
+                {/* Secondary tokens */}
+                {secondaryTokens &&
+                  secondaryTokens.length > 0 &&
+                  secondaryTokens.map((token, idx) => (
+                    <div key={idx} className="token-entry">
+                      <div className="token-info">
+                        <span className="token-symbol">
+                          {token.token_symbol || token?.token_address}
+                        </span>
+                        <span className="token-address">
+                          {token?.token_address}
+                        </span>
+                      </div>
+                      <CWIconButton
+                        iconName="copy"
+                        iconSize="small"
+                        onClick={() => {
+                          saveToClipboard(token?.token_address, true).catch(
+                            console.error,
+                          );
+                        }}
+                        className="copy-button"
+                      />
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
           <div className="percentage-breakdown-section">
             <CWText type="h4">Vote Breakdown</CWText>
             {percentageBreakdown.map((opt) => (
@@ -207,7 +318,6 @@ export const ViewPollVotesDrawer = ({
               </div>
             ))}
           </div>
-
           {isLoading ? (
             <CWText className="loading-text" type="b1">
               Loading votes...
@@ -245,11 +355,16 @@ export const ViewPollVotesDrawer = ({
                     Total Weight
                   </CWText>
                   <CWText type="b2">
-                    {prettyVoteWeight(
-                      totalVoteWeightInPoll.toString(),
-                      tokenDecimals,
+                    {prettyCompoundVoteWeight(
+                      [
+                        {
+                          wei: totalVoteWeightInPoll.toString(),
+                          tokenNumDecimals: tokenDecimals,
+                          multiplier: 1,
+                          tokenSymbol: tokenSymbol,
+                        },
+                      ],
                       topicWeight,
-                      1,
                       6,
                     )}
                   </CWText>

@@ -114,13 +114,13 @@ export async function getThreadContestManagers(
     contest_address: string;
   }>(
     `
-        SELECT cm.contest_address, cm.cancelled, cm.ended
-        FROM "Communities" c
-                 JOIN "ContestManagers" cm ON cm.community_id = c.id
-        WHERE cm.topic_id = :topic_id
-          AND cm.community_id = :community_id
-          AND cm.cancelled IS NOT TRUE
-          AND cm.ended IS NOT TRUE
+      SELECT cm.contest_address, cm.cancelled, cm.ended
+      FROM "Communities" c
+             JOIN "ContestManagers" cm ON cm.community_id = c.id
+      WHERE cm.topic_id = :topic_id
+        AND cm.community_id = :community_id
+        AND cm.cancelled IS NOT TRUE
+        AND cm.ended IS NOT TRUE
     `,
     {
       type: QueryTypes.SELECT,

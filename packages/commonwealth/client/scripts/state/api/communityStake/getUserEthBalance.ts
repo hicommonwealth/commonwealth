@@ -20,6 +20,7 @@ const getUserEthBalance = async ({
     getFactoryContract(ethChainId).CommunityStake,
     getFactoryContract(ethChainId).NamespaceFactory,
     chainRpc,
+    `${ethChainId}`,
   );
 
   return await communityStakes.getUserEthBalance(walletAddress);

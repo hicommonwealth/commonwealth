@@ -54,6 +54,7 @@ export const DEFAULT_COMPLETION_MODEL = 'gpt-4o-mini';
 export const DEFAULT_COMPLETION_MODEL_LABEL = 'GPT-4o-mini';
 export const DEFAULT_NANO_MODEL = 'gpt-4.1-nano';
 export const DEFAULT_IMAGE_MODEL = 'gpt-image-1';
+export const DEFAULT_AI_ASSISTANT_NAME = 'AI Assistant';
 
 // Supported image generation models
 export type ImageGenerationModel = 'gpt-image-1' | 'runware:100@1';

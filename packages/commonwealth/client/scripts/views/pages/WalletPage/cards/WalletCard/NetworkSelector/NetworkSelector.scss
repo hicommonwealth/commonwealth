@@ -1,0 +1,72 @@
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
+
+.NetworkSelector {
+  cursor: pointer !important;
+  .SelectList {
+    min-width: 100px;
+    width: 90px !important;
+    padding: 2px 4px !important;
+
+    .cwsl__control {
+      cursor: pointer !important;
+    }
+
+    .cwsl__value-container {
+      .cwsl__single-value,
+      .cwsl__single-value > div {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 6px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        min-height: 28px !important;
+
+        svg {
+          width: 18px !important;
+          height: 18px !important;
+        }
+
+        .Text {
+          font-size: 13px !important;
+        }
+      }
+
+      .cwsl__single-value {
+        margin-top: -2px !important;
+      }
+
+      input {
+        display: none !important;
+      }
+
+      .Icon {
+        background-color: transparent !important;
+        width: auto !important;
+      }
+    }
+
+    .cwsl__indicators {
+      display: none !important;
+    }
+
+    .cwsl__menu {
+      width: 100%;
+      min-width: 240px !important;
+      right: 0;
+      left: initial;
+
+      .cwsl__option {
+        justify-content: flex-start !important;
+        gap: 8px !important;
+      }
+
+      .Icon {
+        background-color: transparent !important;
+        width: auto !important;
+      }
+    }
+  }
+}

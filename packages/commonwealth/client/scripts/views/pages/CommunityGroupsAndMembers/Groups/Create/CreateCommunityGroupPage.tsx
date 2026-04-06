@@ -1,13 +1,13 @@
 import { buildCreateGroupInput } from 'client/scripts/state/api/groups/createGroup';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import Permissions from 'shared/utils/Permissions';
 import app from 'state';
 import { useCreateGroupMutation } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
 import useAppStatus from '../../../../../hooks/useAppStatus';
 import { PageNotFound } from '../../../404';
@@ -23,9 +23,10 @@ const CreateCommunityGroupPage = () => {
   const { setShouldShowGroupMutationBannerForCommunity } =
     useGroupMutationBannerStore();
   const communityId = app.activeChainId() || '';
-  const { mutateAsync: createGroup } = useCreateGroupMutation({
-    communityId,
-  });
+  const { mutateAsync: createGroup, isPending: isCreatingGroup } =
+    useCreateGroupMutation({
+      communityId,
+    });
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -62,6 +63,7 @@ const CreateCommunityGroupPage = () => {
           notifyError('Failed to create group');
         }
       }}
+      isSubmitting={isCreatingGroup}
       allowedAddresses={allowedAddresses}
       setAllowedAddresses={setAllowedAddresses}
     />

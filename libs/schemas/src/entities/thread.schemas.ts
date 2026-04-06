@@ -60,6 +60,7 @@ export const Thread = z.object({
     })
     .nullish(),
   comment_count: PG_INT.optional().optional(),
+  net_comment_count: PG_INT.optional(),
 
   activity_rank_date: z.coerce.date().nullish(),
 

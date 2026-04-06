@@ -65,18 +65,10 @@
           margin-left: 0;
         }
 
-        .Banner {
-          padding-left: calc(#{shared.$sidebar-width} + 20px);
-          margin-left: calc(
-            -#{shared.$sidebar-width} + 1px
-          ); // give it a negative margin equal to the parent's margin
-        }
-
+        .Banner,
         .MessageBanner {
-          padding-left: calc(#{shared.$sidebar-width} + 20px);
-          margin-left: calc(
-            -#{shared.$sidebar-width} + 1px
-          ); // give it a negative margin equal to the parent's margin
+          padding-left: calc(#{shared.$quick-switcher-width} + 32px);
+          margin-left: 0;
         }
       }
 

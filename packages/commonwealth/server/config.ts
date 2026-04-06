@@ -41,13 +41,11 @@ const {
   RELEASER_URL,
   RELEASER_API_KEY,
   RELEASER_WAIT_ONLY,
-  MAGNA_API_KEY,
-  MAGNA_API_URL,
-  MAGNA_CONTRACT_ID,
-  MAGNA_TOKEN_ID,
-  MAGNA_UNLOCK_SCHEDULE_ID,
-  MAGNA_UNLOCK_START_AT,
-  MAGNA_BATCH_SIZE,
+  RAILWAY_PUBLIC_DOMAIN,
+  OPENSEA_API_KEY,
+  TOKEN_ALLOCATION_CONFIG,
+  AURA_RETRO_DROP_CONFIG,
+  MAINTENANCE_MODE_POLLING,
 } = process.env;
 
 const DEFAULTS = {
@@ -64,7 +62,6 @@ const DEFAULTS = {
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_IN: 60 * 60,
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_OUT: 60 * 60 * 2,
   CACHE_GET_COMMUNITIES_JOIN_COMMUNITY: 60 * 60 * 24,
-  MAGNA_BATCH_SIZE: '10',
 };
 
 export const config = configure(
@@ -176,21 +173,16 @@ export const config = configure(
       RELEASER_URL,
       RELEASER_API_KEY,
       RELEASER_WAIT_ONLY: RELEASER_WAIT_ONLY === 'true',
+      RAILWAY_PUBLIC_DOMAIN,
     },
-    MAGNA: MAGNA_TOKEN_ID
-      ? {
-          API_URL: MAGNA_API_URL || '',
-          API_KEY: MAGNA_API_KEY || '',
-          CONTRACT_ID: MAGNA_CONTRACT_ID || '',
-          TOKEN_ID: MAGNA_TOKEN_ID || '',
-          UNLOCK_SCHEDULE_ID: MAGNA_UNLOCK_SCHEDULE_ID || '',
-          UNLOCK_START_AT: new Date(MAGNA_UNLOCK_START_AT || '9999-12-31'),
-          BATCH_SIZE: parseInt(
-            MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE,
-            10,
-          ),
-        }
+    OPENSEA_API_KEY,
+    TOKEN_ALLOCATION: TOKEN_ALLOCATION_CONFIG
+      ? JSON.parse(TOKEN_ALLOCATION_CONFIG)
       : undefined,
+    AURA_RETRO_DROP: AURA_RETRO_DROP_CONFIG
+      ? JSON.parse(AURA_RETRO_DROP_CONFIG)
+      : undefined,
+    MAINTENANCE_MODE_POLLING: MAINTENANCE_MODE_POLLING === 'true',
   },
   z.object({
     DISABLE_SITEMAP: z.boolean(),
@@ -338,16 +330,60 @@ export const config = configure(
         .describe(
           `When true, will not trigger a release but will await the result.`,
         ),
+      RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
     }),
-    MAGNA: z
+    OPENSEA_API_KEY: z.string().optional(),
+    TOKEN_ALLOCATION: z
       .object({
-        API_URL: z.string().url(),
-        API_KEY: z.string(),
-        CONTRACT_ID: z.string().uuid(),
-        TOKEN_ID: z.string().uuid(),
-        UNLOCK_SCHEDULE_ID: z.string().uuid(),
-        UNLOCK_START_AT: z.date(),
-        BATCH_SIZE: z.number(),
+        // Shared configuration
+        userTierWeights: z.record(z.string(), z.number()),
+
+        // NFT allocation specific
+        nft: z
+          .object({
+            tokenSupply: z.number().positive(),
+            rarityPercentiles: z.array(z.number()),
+            rarityRanks: z.array(z.number()),
+            rarityTierWeightsByRank: z.array(z.number()),
+            rarityTierWeightsByPercentile: z.array(z.number()),
+            equalDistributionPercent: z.number().min(0).max(1),
+            rarityDistributionPercent: z.number().min(0).max(1),
+          })
+          .refine(
+            (data) =>
+              data.equalDistributionPercent + data.rarityDistributionPercent ===
+              1,
+            {
+              message:
+                'equalDistributionPercent and rarityDistributionPercent must sum to 1',
+            },
+          ),
+
+        // Historic contribution scoring specific
+        historic: z.object({
+          supply: z.object({
+            total: z.number().positive(),
+            splits: z
+              .object({
+                historical: z.number().min(0).max(1),
+                aura: z.number().min(0).max(1),
+              })
+              .refine((data) => data.historical + data.aura === 1, {
+                message: 'historical and aura must sum to 1',
+              }),
+          }),
+          decay: z.object({
+            halfLifeDays: z.number().positive(),
+            factor: z.number().positive(),
+          }),
+        }),
+      })
+      .optional(),
+    MAINTENANCE_MODE_POLLING: z.boolean(),
+    AURA_RETRO_DROP: z
+      .object({
+        userTierWeights: z.record(z.string(), z.number()),
+        totalSupply: z.number().positive(),
       })
       .optional(),
   }),

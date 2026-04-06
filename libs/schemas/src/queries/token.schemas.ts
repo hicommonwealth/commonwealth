@@ -2,7 +2,25 @@ import { z } from 'zod';
 import { LaunchpadToken, LaunchpadTrade, ThreadToken } from '../entities';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
-export const TokenView = LaunchpadToken.extend({
+const TokenTypeEnum = z.enum(['launchpad', 'postcoin']);
+
+export const LaunchpadTokenView = LaunchpadToken.extend({
+  community_id: z.string(),
+  thread_id: z.number().nullish(),
+  token_type: TokenTypeEnum.default('launchpad'),
+  launchpad_liquidity: z.string(),
+  latest_price: z.number().nullish(),
+  old_price: z.number().nullish(),
+});
+
+export const TokenView = LaunchpadTokenView;
+
+export const ThreadTokenView = ThreadToken.extend({
+  community_id: z.string(),
+  namespace: z.string().nullish(),
+  description: z.string().nullish(),
+  icon_url: z.string().nullish(),
+  token_type: TokenTypeEnum.default('postcoin'),
   launchpad_liquidity: z.string(),
   latest_price: z.number().nullish(),
   old_price: z.number().nullish(),
@@ -11,12 +29,15 @@ export const TokenView = LaunchpadToken.extend({
 export const GetTokens = {
   input: PaginationParamsSchema.extend({
     search: z.string().optional(),
-    order_by: z.enum(['name', 'price', 'market_cap', 'created_at']).optional(),
+    order_by: z
+      .enum(['name', 'price', 'market_cap', 'created_at', '24_hr_pct_change'])
+      .optional(),
     with_stats: z.boolean().optional(),
     is_graduated: z.boolean().optional(),
-  }),
+    token_type: TokenTypeEnum.optional(),
+  }).describe('Search and list launchpad tokens with sorting options'),
   output: PaginatedResultSchema.extend({
-    results: TokenView.extend({ community_id: z.string() }).array(),
+    results: z.union([LaunchpadTokenView, ThreadTokenView]).array(),
   }),
 };
 
@@ -67,17 +88,23 @@ export const LaunchpadTradeView = LaunchpadTrade.extend({
 });
 
 export const GetLaunchpadTrades = {
-  input: z.object({
-    token_address: z.string().optional(),
-    trader_addresses: z.string().optional(),
-  }),
+  input: z
+    .object({
+      token_address: z.string().optional(),
+      trader_addresses: z.string().optional(),
+      user_id: z.number().optional(),
+    })
+    .describe(
+      'Get launchpad token trade history. ' +
+        'At least one of token_address, trader_addresses, or user_id must be provided.',
+    ),
   output: LaunchpadTrade.extend({
     community_token_amount: z.string(),
     floating_supply: z.string(),
     name: z.string(),
     symbol: z.string(),
-    community_id: z.string(),
-    community_icon_url: z.string(),
+    community_id: z.string().nullish(),
+    community_icon_url: z.string().nullish(),
     user_id: z.number().nullish(),
     user_name: z.string().nullish(),
     user_avatar_url: z.string().nullish(),
@@ -96,10 +123,12 @@ export const GetTokenizedThreadsAllowed = {
 };
 
 export const GetTokenInfoAlchemy = {
-  input: z.object({
-    eth_chain_id: z.number(),
-    token_address: z.string(),
-  }),
+  input: z
+    .object({
+      eth_chain_id: z.number(),
+      token_address: z.string(),
+    })
+    .describe('Get token price and market data from Alchemy'),
   output: z.object({
     network: z.string(),
     address: z.string(),
@@ -120,4 +149,26 @@ export const GetTokenStats = {
     holder_count: z.number(),
     volume_24h: z.number(),
   }),
+};
+
+export const ThreadTokenTradesInput = z.object({ thread_id: z.number() });
+
+export const ThreadTokenTradesOutput = z.object({
+  result: z
+    .array(
+      z.object({
+        id: z.string(),
+        type: z.enum(['buy', 'sell']),
+        amount: z.string(),
+        price: z.number(),
+        timestamp: z.number(),
+        address: z.string(),
+      }),
+    )
+    .nullable(),
+});
+
+export const ThreadTokenTradesSchema = {
+  input: ThreadTokenTradesInput,
+  output: ThreadTokenTradesOutput,
 };

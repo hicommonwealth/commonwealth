@@ -1,4 +1,4 @@
-import { APIOrderDirection } from 'helpers/constants';
+import { APIOrderDirection } from 'shared/utils/constants';
 
 export enum TokenSortOptions {
   MostRecent = 'Most Recent',
@@ -16,9 +16,15 @@ export const TokenSortDirectionsToEnumMap = {
   [TokenSortDirections.Descending]: APIOrderDirection.Desc,
 };
 
+export enum TokenTypes {
+  Launchpad = 'launchpad',
+  Postcoin = 'postcoin',
+}
+
 export type TokenFilters = {
   withTokenSortBy?: TokenSortOptions;
   withTokenSortOrder?: TokenSortDirections;
+  withTokenType?: TokenTypes;
   isGraduated?: boolean;
 };
 

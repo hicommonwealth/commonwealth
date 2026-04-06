@@ -3,6 +3,70 @@
 @use '../../../../styles/mixins/media_queries';
 @use '../../../../styles/mixins/text';
 
+// Global styles for token address popover content (rendered in portal)
+.token-addresses-popover-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 380px;
+  min-width: 280px;
+}
+
+.token-address-popover-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  .token-address-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .token-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: colors.$neutral-500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .token-address-text {
+    font-family: monospace;
+    font-size: 12px;
+    color: colors.$neutral-600;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    white-space: normal;
+    line-height: 1.4;
+    padding-right: 4px;
+  }
+
+  .copy-button {
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: opacity 0.2s ease;
+
+    svg {
+      fill: colors.$neutral-500;
+      transition: fill 0.2s ease;
+    }
+
+    &:hover {
+      svg {
+        fill: colors.$neutral-700;
+      }
+    }
+  }
+
+  & + & {
+    padding-top: 12px;
+    border-top: 1px solid colors.$neutral-200;
+  }
+}
+
 .HeaderWithFilters {
   background-color: colors.$white;
   display: flex;
@@ -28,6 +92,57 @@
   .subheader-text {
     @include text.b1;
     color: colors.$neutral-600;
+  }
+
+  .weighted-topic-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .weighted-topic-header.Text {
+      color: colors.$neutral-500;
+      font-weight: 500;
+    }
+
+    .token-info-stack {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+
+      .token-entry {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .token-symbol {
+        font-weight: 600;
+        color: colors.$neutral-900;
+        font-size: 14px;
+      }
+
+      .token-address-button-container {
+        position: relative;
+
+        .token-info-button {
+          color: colors.$neutral-400;
+          cursor: pointer;
+          transition: opacity 0.2s ease;
+
+          svg {
+            fill: colors.$neutral-400;
+            transition: fill 0.2s ease;
+          }
+
+          &:hover {
+            svg {
+              fill: colors.$neutral-600;
+            }
+          }
+        }
+      }
+    }
   }
 
   .filter-row {

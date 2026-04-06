@@ -1,9 +1,10 @@
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
+import { Link } from 'node_modules/react-router-dom/dist';
 import React, { useState } from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
+import useGetXPsRanked from 'state/api/user/getXPsRanked';
 import useUserStore from 'state/ui/user';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
@@ -24,8 +25,16 @@ const QuestSummaryCard = () => {
   const [activeTab, setActiveTab] = useState<QuestTimeline>(
     QuestTimeline.Active,
   );
-  const xpEnabled = useFlag('xp');
   const user = useUserStore();
+
+  // Get user's XP rank
+  const { data: userRankData } = useGetXPsRanked({
+    user_id: user.id,
+    limit: 1,
+    enabled: !!user.id,
+  });
+
+  const userRank = userRankData?.pages?.[0]?.results?.[0]?.rank;
 
   const {
     data: onGoingQuestsList,
@@ -36,7 +45,6 @@ const QuestSummaryCard = () => {
     end_after: moment().startOf('week').toDate(),
     // only show system quests in non-auth state
     include_system_quests: true,
-    enabled: xpEnabled,
   });
 
   const {
@@ -48,7 +56,6 @@ const QuestSummaryCard = () => {
     end_before: moment().startOf('week').toDate(),
     // only show system quests in non-auth state
     include_system_quests: true,
-    enabled: xpEnabled,
   });
 
   const handleSeeAllClick = () => {
@@ -66,8 +73,6 @@ const QuestSummaryCard = () => {
     ? (onGoingQuestsList?.pages || []).flatMap((page) => page.results)
     : (endedQuestsList?.pages || []).flatMap((page) => page.results);
 
-  if (!xpEnabled) return <></>;
-
   return (
     <RewardsCard
       title="Quests"
@@ -77,10 +82,18 @@ const QuestSummaryCard = () => {
     >
       <div className="QuestSummaryCard">
         <div className="xp-body">
-          <CWText fontWeight="bold" type="h4">
-            {user.xpPoints} Aura&nbsp;
-            <CWText type="caption">earned from quests</CWText>
+          <CWText type="caption">
+            <strong>{`${user.xpPoints || 0}`} Aura</strong>&nbsp;earned from
+            quests
           </CWText>
+          {userRank && (
+            <CWText type="caption">
+              You are&nbsp;<strong>{userRank}</strong>&nbsp;on the&nbsp;
+              <Link rel="noreferrer" to="/leaderboard">
+                leaderboard
+              </Link>
+            </CWText>
+          )}
         </div>
         <CWTabsRow>
           {Object.values(QuestTimeline).map((type) => (

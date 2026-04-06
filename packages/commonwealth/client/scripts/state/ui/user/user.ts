@@ -81,11 +81,15 @@ export const userStore = createStore<UserStoreProps>()(
           const newState = { ...state, ...data };
 
           // Compute hasMagicWallet whenever addresses or activeAccount changes
-          const currentAddressInfo = newState.addresses?.find(
-            (addr) => addr.address === newState.activeAccount?.address,
+          const hasMagicWallet = Boolean(
+            newState.activeAccount?.walletId === WalletId.Magic ||
+              newState.accounts?.some(
+                (account) => account.walletId === WalletId.Magic,
+              ) ||
+              newState.addresses?.some(
+                (addr) => addr.walletId === WalletId.Magic,
+              ),
           );
-          const hasMagicWallet =
-            currentAddressInfo?.walletId === WalletId.Magic;
 
           return {
             ...newState,

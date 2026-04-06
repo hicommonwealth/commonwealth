@@ -44,7 +44,7 @@ export const EditTopicModal = ({
   onModalClose,
   noRedirect,
 }: EditTopicModalProps) => {
-  const privateTopicsEnabled = useFlag('privateTopics');
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
   const {
     description: descriptionProp,
@@ -74,6 +74,9 @@ export const EditTopicModal = ({
   );
   const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
     topic?.featured_in_new_post || false,
+  );
+  const [allowTokenizedThreads, setAllowTokenizedThreads] = useState<boolean>(
+    topic?.allow_tokenized_threads || false,
   );
   const [name, setName] = useState<string>(nameProp);
   const [characterCount, setCharacterCount] = useState(0);
@@ -165,6 +168,7 @@ export const EditTopicModal = ({
         telegram: null,
         featured_in_sidebar: featuredInSidebar,
         featured_in_new_post: featuredInNewPost,
+        allow_tokenized_threads: allowTokenizedThreads,
         default_offchain_template:
           featuredInNewPost && newPostTemplate
             ? JSON.stringify(newPostTemplate)
@@ -329,15 +333,24 @@ export const EditTopicModal = ({
           value=""
           disabled={!!topic.archived_at}
         />
-        {privateTopicsEnabled && (
+        {tokenizedThreadsEnabled && (
           <CWCheckbox
-            label="Private topic"
-            checked={isPrivate}
-            onChange={() => setIsPrivate(!isPrivate)}
+            label="Allow Tokenized Threads"
+            checked={allowTokenizedThreads}
+            onChange={() => {
+              setAllowTokenizedThreads(!allowTokenizedThreads);
+            }}
+            value=""
             disabled={!!topic.archived_at}
           />
         )}
-        {privateTopicsEnabled && isPrivate && (
+        <CWCheckbox
+          label="Private topic"
+          checked={isPrivate}
+          onChange={() => setIsPrivate(!isPrivate)}
+          disabled={!!topic.archived_at}
+        />
+        {isPrivate && (
           <CWSelectList
             isMulti
             label={

@@ -11,6 +11,7 @@ type ViewCommentUpvotesDrawerProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   tokenDecimals?: number | null | undefined;
   weightType?: TopicWeightedVoting | null;
+  tokenSymbol?: string;
 };
 
 export const ViewCommentUpvotesDrawer = ({
@@ -19,6 +20,7 @@ export const ViewCommentUpvotesDrawer = ({
   setIsOpen,
   tokenDecimals,
   weightType,
+  tokenSymbol,
 }: ViewCommentUpvotesDrawerProps) => {
   return (
     <ViewUpvotesDrawer
@@ -42,6 +44,7 @@ export const ViewCommentUpvotesDrawer = ({
       publishDate={(comment?.created_at as string) || ''} // TODO: fix type
       tokenDecimals={tokenDecimals}
       topicWeight={weightType}
+      tokenSymbol={tokenSymbol}
     />
   );
 };

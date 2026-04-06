@@ -1,3 +1,4 @@
+import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import _ from 'lodash';
 import React, { useState } from 'react';
 import { useDebounce } from 'usehooks-ts';
@@ -61,7 +62,8 @@ export const EditCollaboratorsModal = ({
     searchTerm: debouncedSearchTerm,
     communityId: app.activeChainId() || '',
     limit: 30,
-    enabled: debouncedSearchTerm.length >= 3 && !!app.activeChainId(),
+    enabled:
+      debouncedSearchTerm.length >= MIN_SEARCH_LENGTH && !!app.activeChainId(),
   });
 
   const searchResults = profiles?.pages?.[0]?.results
@@ -85,7 +87,7 @@ export const EditCollaboratorsModal = ({
           <CWTextInput
             label="Search Members"
             value={searchTerm}
-            placeholder="Type 3 or more characters to search"
+            placeholder={`Type ${MIN_SEARCH_LENGTH} or more characters to search`}
             onInput={(e) => {
               setSearchTerm(e.target.value);
             }}

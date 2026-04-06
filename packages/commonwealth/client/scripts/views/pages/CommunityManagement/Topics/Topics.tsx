@@ -35,6 +35,7 @@ interface TopicFormRegular {
   featuredInSidebar?: boolean;
   featuredInNewPost?: boolean;
   newPostTemplate?: string;
+  allowTokenizedThreads?: boolean;
 }
 
 export interface TopicFormERC20 {
@@ -67,6 +68,12 @@ export interface TopicFormSuiToken {
   voteWeightMultiplier?: number;
   chainNodeId?: number;
   weightedVoting?: TopicWeightedVoting | null;
+  secondaryTokens?: Array<{
+    token_address: string;
+    token_symbol?: string;
+    token_decimals: number;
+    vote_weight_multiplier: number;
+  }>;
 }
 
 export interface TopicFormStake {
@@ -147,6 +154,10 @@ export const Topics = () => {
         featured_in_new_post: topicFormData.featuredInNewPost || false,
         default_offchain_template: topicFormData.newPostTemplate || '',
         community_id: app.activeChainId() || '',
+        allow_tokenized_threads:
+          topicFormData.allowTokenizedThreads !== undefined
+            ? topicFormData.allowTokenizedThreads
+            : community?.allow_tokenized_threads || false,
         ...(erc20
           ? {
               token_address: erc20.tokenAddress,
@@ -181,6 +192,10 @@ export const Topics = () => {
               vote_weight_multiplier: suiToken.voteWeightMultiplier,
               chain_node_id: suiToken.chainNodeId,
               weighted_voting: suiToken.weightedVoting,
+              ...(suiToken.secondaryTokens &&
+              suiToken.secondaryTokens.length > 0
+                ? { secondary_tokens: suiToken.secondaryTokens }
+                : {}),
             }
           : {}),
         ...(stake

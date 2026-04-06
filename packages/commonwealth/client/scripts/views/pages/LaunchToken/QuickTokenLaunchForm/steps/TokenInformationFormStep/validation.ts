@@ -1,4 +1,5 @@
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
+import { communityNameSchema } from 'shared/utils/formValidations/common';
+import { VALIDATION_MESSAGES } from 'shared/utils/formValidations/messages';
 import z from 'zod';
 
 export const tokenInformationFormValidationSchema = z.object({
@@ -6,10 +7,7 @@ export const tokenInformationFormValidationSchema = z.object({
     .string({ error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
     .max(100, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED }),
-  name: z
-    .string({ error: VALIDATION_MESSAGES.NO_INPUT })
-    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
-    .max(100, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED }),
+  name: communityNameSchema,
   symbol: z
     .string({ error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })

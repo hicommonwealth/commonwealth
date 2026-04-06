@@ -10,7 +10,7 @@ const log = logger(import.meta);
 export interface SnapshotSource {
   type: 'sui_nft';
   suiNetwork: string;
-  collectionId: string;
+  fullObjectType: string;
 }
 
 export class SuiNFTProvider {
@@ -39,7 +39,7 @@ export class SuiNFTProvider {
       balanceSourceType: BalanceSourceType.SuiNFT,
       sourceOptions: {
         suiNetwork: source.suiNetwork,
-        collectionId: source.collectionId,
+        fullObjectType: source.fullObjectType,
       },
       batchSize: 100,
     };
@@ -53,7 +53,7 @@ export class SuiNFTProvider {
       `Successfully captured snapshot for ${addresses.length} addresses`,
       {
         network: source.suiNetwork,
-        collectionId: source.collectionId,
+        fullObjectType: source.fullObjectType,
         addressCount: addresses.length,
       },
     );

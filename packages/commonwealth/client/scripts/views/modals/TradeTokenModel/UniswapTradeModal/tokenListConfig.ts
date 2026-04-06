@@ -43,6 +43,66 @@ export const uniswapTokenListConfig = {
           },
         ],
       },
+      [ValidChains.Soneium]: {
+        // Soneium token list
+        // Token addresses sourced from Soneium documentation: https://docs.soneium.org/docs/builders/contracts
+        list: [
+          {
+            name: 'Wrapped Ether',
+            address: '0x4200000000000000000000000000000000000006',
+            symbol: 'WETH',
+            decimals: 18,
+            chainId: ValidChains.Soneium,
+            logoURI:
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
+          },
+          {
+            name: 'Tether USD',
+            address: '0x3A337a6adA9d885b6Ad95ec48F9b75f197b5AE35',
+            symbol: 'USDT',
+            decimals: 6,
+            chainId: ValidChains.Soneium,
+            logoURI:
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png',
+          },
+          {
+            name: 'Bridged USD Coin',
+            address: '0xbA9986D2381edf1DA03B0B9c1f8b00dc4AacC369',
+            symbol: 'USDC.e',
+            decimals: 6,
+            chainId: ValidChains.Soneium,
+            logoURI:
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
+          },
+          {
+            name: 'Astar',
+            address: '0x2CAE934a1e84F693fbb78CA5ED3B0A6893259441',
+            symbol: 'ASTR',
+            decimals: 18,
+            chainId: ValidChains.Soneium,
+            logoURI:
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/astar/assets/0xAaAebbBE8Bc970F84bC5fE5c581926bE0B5F0B2d/logo.png',
+          },
+          {
+            name: 'Wrapped Staked Ether',
+            address: '0xaA9BD8c957D803466FA92504BDd728cC140f8941',
+            symbol: 'wstETH',
+            decimals: 18,
+            chainId: ValidChains.Soneium,
+            logoURI:
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0/logo.png',
+          },
+          {
+            name: 'Staked Ether',
+            address: '0x0Ce031AEd457C870D74914eCAA7971dd3176cDAF',
+            symbol: 'stETH',
+            decimals: 18,
+            chainId: ValidChains.Soneium,
+            logoURI:
+              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84/logo.png',
+          },
+        ],
+      },
     },
   },
 };

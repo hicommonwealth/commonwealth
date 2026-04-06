@@ -1,7 +1,7 @@
 import Tag from 'client/scripts/models/Tag';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { APIOrderDirection } from 'helpers/constants';
 import React, { useState } from 'react';
+import { APIOrderDirection } from 'shared/utils/constants';
 import {
   useCreateTagMutation,
   useDeleteTagMutation,

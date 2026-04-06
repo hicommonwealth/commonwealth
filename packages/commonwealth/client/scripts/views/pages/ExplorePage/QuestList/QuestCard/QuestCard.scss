@@ -1,6 +1,8 @@
 @use '../../../../../styles/shared';
 @use '../../../../../styles/mixins/border_radius';
 @use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/elevation';
+@use '../../../../../styles/mixins/media_queries';
 
 .QuestCard {
   border-radius: border_radius.$border-radius-corners;
@@ -10,9 +12,16 @@
   gap: 14px;
   background-color: colors.$white;
   width: 100%;
+  min-width: 330px;
   min-height: 360px;
   border: 1px solid colors.$neutral-300;
   cursor: pointer;
+  box-shadow: elevation.$elevation-1;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: elevation.$elevation-3;
+  }
 
   .text-dark {
     color: colors.$neutral-600;

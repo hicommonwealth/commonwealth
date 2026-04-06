@@ -356,7 +356,12 @@ export const useMention = ({
     const serverId = result.id;
     const serverHandle =
       'handle' in result && result.handle ? result.handle : result.name;
-    const description = result.description || 'MCP Server';
+    const baseDescription = result.description || 'MCP Server';
+    const authUsername =
+      'auth_username' in result ? result.auth_username : undefined;
+    const description = authUsername
+      ? `${baseDescription}\n\nConnected by ${authUsername}`
+      : baseDescription;
 
     const nameSpan = document.createElement('span');
     nameSpan.innerText = serverHandle;
@@ -512,6 +517,7 @@ export const useMention = ({
                   type: 'mcp_server' as const,
                   created_at: new Date().toISOString(),
                   handle: server.handle,
+                  auth_username: server.auth_username,
                 }),
               );
 

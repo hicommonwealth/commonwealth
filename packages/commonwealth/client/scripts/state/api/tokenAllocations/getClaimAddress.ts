@@ -1,6 +1,6 @@
 import { trpc } from 'utils/trpcClient';
 
-const GET_CLAIM_ADDRESS_STALE_TIME = 60 * 3_000; // 3 mins
+const GET_CLAIM_ADDRESS_STALE_TIME = 30 * 60 * 1_000;
 
 type UseGetClaimAddressProps = {
   enabled?: boolean;

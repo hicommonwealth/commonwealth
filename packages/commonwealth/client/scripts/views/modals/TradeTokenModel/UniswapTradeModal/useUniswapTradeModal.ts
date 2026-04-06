@@ -1,3 +1,4 @@
+import { Theme } from '@commonxyz/uniswap-widgets';
 import { Web3Provider } from '@ethersproject/providers';
 import { getChainHex } from '@hicommonwealth/evm-protocols';
 import {
@@ -5,14 +6,11 @@ import {
   UNISWAP_CONVENIENCE_FEE_PERCENT,
   UNISWAP_CONVENIENCE_FEE_RECIPIENT_ADDRESS,
 } from '@hicommonwealth/shared';
-import { Theme } from '@uniswap/widgets';
-import {
-  isMagicUser as checkIfMagicUser,
-  getMagicForChain,
-} from 'client/scripts/utils/magicNetworkUtils';
+import { isMagicUser as checkIfMagicUser } from 'client/scripts/utils/magicNetworkUtils';
+import MagicWebWalletController from 'controllers/app/webWallets/MagicWebWallet';
 import WebWalletController from 'controllers/app/web_wallets';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { uniswapTokenListConfig } from 'views/modals/TradeTokenModel/UniswapTradeModal/tokenListConfig';
 import {
@@ -60,6 +58,7 @@ const useUniswapTradeModal = ({
   ethChainId,
   rpcUrl,
   blockExplorerUrl,
+  node,
 }: UseUniswapTradeModalProps) => {
   const [isLoadingInitialState, setIsLoadingInitialState] = useState(true);
   const [ethersProvider, setEthersProvider] = useState<
@@ -71,18 +70,23 @@ const useUniswapTradeModal = ({
   // Check if user is logged in with Magic
   const userIsMagicUser = useMemo(() => checkIfMagicUser(), []);
 
-  // Automatically configure Magic provider for Magic users
+  // Automatically configure Magic provider for Magic users using controller
   useEffect(() => {
     if (userIsMagicUser && !isMagicConfigured && ethChainId) {
       const configureMagicProvider = () => {
         try {
           if (!ethChainId) return;
-          const magic = getMagicForChain(ethChainId);
-          if (!magic) return;
-
-          const ethersCompatibleProvider = new Web3Provider(magic.rpcProvider);
-          setEthersProvider(ethersCompatibleProvider);
-          setIsMagicConfigured(true);
+          const controller = new MagicWebWalletController();
+          void controller
+            .enable(`${ethChainId}`)
+            .then(() => {
+              const ethersCompatibleProvider = new Web3Provider(
+                controller.provider,
+              );
+              setEthersProvider(ethersCompatibleProvider);
+              setIsMagicConfigured(true);
+            })
+            .catch(() => {});
         } catch (error) {
           // Error configuring provider, fail silently
         }
@@ -90,7 +94,7 @@ const useUniswapTradeModal = ({
 
       void configureMagicProvider();
     }
-  }, [userIsMagicUser, isMagicConfigured, ethChainId]);
+  }, [userIsMagicUser, isMagicConfigured, ethChainId, node]);
 
   // Initialize token list
   useRunOnceOnCondition({
@@ -154,40 +158,17 @@ const useUniswapTradeModal = ({
       // If user is logged in with Magic but provider not configured yet
       if (userIsMagicUser) {
         console.log('[Network Debug] Using Magic authentication flow');
-        // Use the utility function to get Magic instance for the Base chain
-        const magic = getMagicForChain(ethChainId);
-
-        if (!magic) {
-          return false;
-        }
-
-        // Ensure user is logged in for this network
+        const controller = new MagicWebWalletController();
         try {
-          // Try to get user info first
-          await magic.user.getInfo();
-
-          // User is already logged in, set up provider
-          const ethersCompatibleProvider = new Web3Provider(magic.rpcProvider);
-
+          await controller.enable(`${ethChainId}`);
+          const ethersCompatibleProvider = new Web3Provider(
+            controller.provider,
+          );
           setEthersProvider(ethersCompatibleProvider);
           setIsMagicConfigured(true);
           return true;
-        } catch (userError) {
-          try {
-            // Show the Magic UI to authenticate for this network
-            await magic.wallet.showUI();
-
-            // After UI is shown, create the provider
-            const ethersCompatibleProvider = new Web3Provider(
-              magic.rpcProvider,
-            );
-
-            setEthersProvider(ethersCompatibleProvider);
-            setIsMagicConfigured(true);
-            return true;
-          } catch (uiError) {
-            return false;
-          }
+        } catch {
+          return false;
         }
       } else {
         // Use regular wallet connection if not Magic

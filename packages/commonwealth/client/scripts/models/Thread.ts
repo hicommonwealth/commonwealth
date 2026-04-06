@@ -219,6 +219,10 @@ export class Thread implements IUniqueId {
   public contentUrl?: string | null;
   public isLinkingToken?: boolean;
   public launchpadTokenAddress?: string | null;
+  public lastPurchaseActivity?: {
+    is_buy?: boolean | null;
+    price?: number | null;
+  } | null;
 
   public readonly profile: UserProfile;
 
@@ -292,7 +296,7 @@ export class Thread implements IUniqueId {
       : undefined;
     this.archivedAt = t.archived_at ? moment(t.archived_at) : null;
     this.lockedAt = t.locked_at ? moment(t.locked_at) : undefined;
-    this.numberOfComments = t.comment_count ?? 0;
+    this.numberOfComments = t.net_comment_count ?? 0;
     this.canvasSignedData = t.canvas_signed_data ?? undefined;
     this.canvasMsgId = t.canvas_msg_id ?? undefined;
     this.links = t.links || [];
@@ -322,6 +326,7 @@ export class Thread implements IUniqueId {
     this.contentUrl = t.content_url;
     this.isLinkingToken = t.is_linking_token;
     this.launchpadTokenAddress = t.launchpad_token_address;
+    this.lastPurchaseActivity = t.last_purchase_activity;
 
     this.recentComments = (t.recentComments ?? t.Comments ?? []).map(
       (rc) =>

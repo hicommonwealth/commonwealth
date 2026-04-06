@@ -34,6 +34,10 @@ import { models } from '../../src/database';
 import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
 import { seed } from '../../src/tester';
 import * as utils from '../../src/utils';
+import {
+  createQuestMaterializedView,
+  getQuestXpLeaderboardViewName,
+} from '../../src/utils/quests';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 import { createSIWESigner, signIn } from '../utils/sign-in';
@@ -90,6 +94,130 @@ describe('User lifecycle', () => {
   }
 
   describe('xp', () => {
+    beforeAll(async () => {
+      await models.sequelize.query(`
+        CREATE OR REPLACE FUNCTION public.update_total_xp()
+        RETURNS TRIGGER AS '
+        BEGIN
+            NEW.total_xp = NEW.xp_points + NEW.xp_referrer_points;
+            RETURN NEW;
+        END;
+        ' LANGUAGE plpgsql;
+        
+        CREATE TRIGGER update_total_xp_trigger
+        BEFORE INSERT OR UPDATE OF xp_points, xp_referrer_points
+        ON public."Users"
+        FOR EACH ROW
+        EXECUTE FUNCTION public.update_total_xp();
+      
+        CREATE MATERIALIZED VIEW user_leaderboard AS
+        SELECT 
+            id as user_id,
+            total_xp as xp_points,
+            tier,
+            (ROW_NUMBER() OVER (ORDER BY total_xp DESC, id ASC))::int as rank
+        FROM "Users" WHERE tier > 1;
+        
+        CREATE UNIQUE INDEX user_leaderboard_user_id_idx ON public.user_leaderboard (user_id);
+        CREATE INDEX user_leaderboard_rank_idx ON public.user_leaderboard (rank);
+        
+        CREATE OR REPLACE FUNCTION create_quest_xp_leaderboard(quest_id_param INTEGER, tier_param INTEGER)
+          RETURNS VOID
+          LANGUAGE plpgsql
+        AS $$
+        DECLARE
+            view_name TEXT;
+            user_index_name TEXT;
+            rank_index_name TEXT;
+            create_view_sql TEXT;
+            create_user_index_sql TEXT;
+            create_rank_index_sql TEXT;
+        BEGIN
+            -- Generate dynamic names
+            view_name := 'quest_' || quest_id_param || '_xp_leaderboard';
+            user_index_name := 'quest_' || quest_id_param || '_xp_leaderboard_user_id';
+            rank_index_name := 'quest_' || quest_id_param || '_xp_leaderboard_rank';
+        
+            -- Drop existing view if it exists
+            EXECUTE 'DROP MATERIALIZED VIEW IF EXISTS "' || view_name || '" CASCADE';
+        
+            -- Build the CREATE MATERIALIZED VIEW statement
+            create_view_sql := '
+                CREATE MATERIALIZED VIEW "' || view_name || '" AS
+                WITH user_xp_combined AS (
+                    SELECT
+                        l.user_id as user_id,
+                        COALESCE(l.xp_points, 0) as xp_points,
+                        0 as creator_xp_points,
+                        0 as referrer_xp_points
+                    FROM "XpLogs" l
+                             JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
+                             JOIN "Quests" q ON m.quest_id = q.id
+                    WHERE l.user_id IS NOT NULL AND q.id = ' || quest_id_param || '
+        
+                    UNION ALL
+        
+                    SELECT
+                        l.creator_user_id as user_id,
+                        0 as xp_points,
+                        COALESCE(l.creator_xp_points, 0) as creator_xp_points,
+                        0 as referrer_xp_points
+                    FROM "XpLogs" l
+                             JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
+                             JOIN "Quests" q ON m.quest_id = q.id
+                    WHERE l.creator_user_id IS NOT NULL AND q.id = ' || quest_id_param || '
+        
+                    UNION ALL
+        
+                    SELECT
+                        l.referrer_user_id as user_id,
+                        0 as xp_points,
+                        0 as creator_xp_points,
+                        COALESCE(l.referrer_xp_points, 0) as referrer_xp_points
+                    FROM "XpLogs" l
+                             JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
+                             JOIN "Quests" q ON m.quest_id = q.id
+                    WHERE l.referrer_user_id IS NOT NULL AND q.id = ' || quest_id_param || '
+                ),
+                aggregated_xp AS (
+                    SELECT
+                        user_id,
+                        SUM(xp_points)::int as total_user_xp,
+                        SUM(creator_xp_points)::int as total_creator_xp,
+                        SUM(referrer_xp_points)::int as total_referrer_xp
+                    FROM user_xp_combined
+                    GROUP BY user_id
+                )
+                SELECT
+                    a.user_id,
+                    (a.total_user_xp + a.total_creator_xp + a.total_referrer_xp) as xp_points,
+                    u.tier,
+                    ROW_NUMBER() OVER (ORDER BY (a.total_user_xp + a.total_creator_xp + a.total_referrer_xp) DESC, a.user_id ASC)::int as rank
+                FROM aggregated_xp a
+                         JOIN "Users" u ON a.user_id = u.id
+                WHERE u.tier > ' || tier_param;
+        
+            -- Execute the CREATE MATERIALIZED VIEW
+            EXECUTE create_view_sql;
+        
+            -- Create indexes
+            create_user_index_sql := '
+                CREATE UNIQUE INDEX "' || user_index_name || '"
+                ON "' || view_name || '" (user_id)';
+        
+            create_rank_index_sql := '
+                CREATE INDEX "' || rank_index_name || '"
+                ON "' || view_name || '" (rank DESC)';
+        
+            EXECUTE create_user_index_sql;
+            EXECUTE create_rank_index_sql;
+        
+            RAISE NOTICE 'Created materialized view: %', view_name;
+        END;
+        $$;
+      `);
+    });
+
     it('should project xp points', async () => {
       // setup quest
       const quest = await command(CreateQuest(), {
@@ -398,6 +526,10 @@ describe('User lifecycle', () => {
         start_date: new Date(),
         end_date: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7),
         quest_type: 'common',
+      });
+
+      await models.sequelize.transaction(async (transaction) => {
+        await createQuestMaterializedView(-1, transaction);
       });
 
       await models.QuestActionMeta.bulkCreate([
@@ -1014,6 +1146,11 @@ describe('User lifecycle', () => {
         WalletId.Coinbase,
       );
 
+      await models.User.update(
+        { tier: UserTierMap.ManuallyVerified },
+        { where: { id: result!.user_id! } },
+      );
+
       vi.clearAllMocks();
 
       const before = await models.User.findOne({
@@ -1089,6 +1226,10 @@ describe('User lifecycle', () => {
     });
 
     it('should query ranked by xp points', async () => {
+      await models.sequelize.query(`
+        REFRESH MATERIALIZED VIEW user_leaderboard;
+      `);
+
       // dump xp logs to debug xp ranking
       const logs = await query(GetXps(), {
         actor: admin,
@@ -1098,9 +1239,9 @@ describe('User lifecycle', () => {
 
       const xps1 = await query(GetXpsRanked(), {
         actor: admin,
-        payload: { top: 10 },
+        payload: { limit: 10, cursor: 1 },
       });
-      expect(xps1!.length).to.equal(4);
+      expect(xps1!.totalResults).to.equal(4);
       // member has 203 total points
       //   42 awarded points
       //   25+18+18+13+12+11+10+10+10+10+10=147 xp points
@@ -1112,20 +1253,25 @@ describe('User lifecycle', () => {
       //   16+11+10 xp points
       // superadmin has
       //   11 xp points
-      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([203, 50, 37, 11]);
+      expect(xps1.results?.map((x) => x.xp_points)).to.deep.eq([
+        203, 50, 37, 11,
+      ]);
 
+      await models.sequelize.query(`
+        REFRESH MATERIALIZED VIEW "${getQuestXpLeaderboardViewName(-1)}";
+      `);
       const xps2 = await query(GetXpsRanked(), {
         actor: admin,
-        payload: { top: 10, quest_id: -1 },
+        payload: { limit: 10, cursor: 1, quest_id: -1 },
       });
       console.log(xps2);
-      expect(xps2!.length).to.equal(2);
+      expect(xps2!.totalResults).to.equal(2);
       // new_user has 16 for SignUpFlowCompleted
       // member has
       //   10 for WalletLinked
       //   4 for SignUpFlowCompleted as referrer
       //   42 for AwardXp
-      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([56, 16]);
+      expect(xps2.results?.map((x) => x.xp_points)).to.deep.eq([56, 16]);
     });
   });
 

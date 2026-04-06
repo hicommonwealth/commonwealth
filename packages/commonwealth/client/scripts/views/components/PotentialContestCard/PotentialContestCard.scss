@@ -24,11 +24,14 @@
 }
 
 .PotentialContestCard {
-  width: 335px;
+  width: 330px;
   padding: 0;
   display: flex;
   flex-direction: column;
   position: relative;
+  border: 1px solid colors.$neutral-300;
+  border-radius: border_radius.$border-radius-corners;
+  cursor: default;
 
   &.PotentialContestCard--Skeleton {
     .Skeleton {
@@ -74,10 +77,6 @@
           color: colors.$neutral-600;
           font-family: shared.$font-family-silka;
           font-weight: 600;
-        }
-
-        .bold {
-          font-family: shared.$font-family-monospace;
         }
       }
 

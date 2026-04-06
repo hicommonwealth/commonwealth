@@ -1,11 +1,12 @@
 import { type Command } from '@hicommonwealth/core';
 import * as protocols from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BalanceSourceType, UserTierMap } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
 import { emitEvent } from '../../utils/outbox';
+import { setUserTier } from '../../utils/tiers';
 
 export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
@@ -61,6 +62,13 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
           },
           transaction,
         });
+
+        if (community_id) {
+          await models.Community.update(
+            { thread_purchase_token: token_address },
+            { where: { id: community_id }, transaction },
+          );
+        }
 
         // create token holders group
         let group_id: number | undefined = undefined;
@@ -118,6 +126,12 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
             ],
             transaction,
           );
+
+        await setUserTier({
+          userAddress: creator_address,
+          newTier: UserTierMap.ChainVerified,
+          transaction,
+        });
 
         return {
           ...token!.toJSON(),

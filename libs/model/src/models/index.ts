@@ -74,6 +74,7 @@ export const buildDb = (sequelize: Sequelize): DB => {
 };
 
 export * from './address';
+export * from './ai_completion_token';
 export * from './api_key';
 export * from './chain_event_xp_sources';
 export * from './chain_node';
@@ -89,6 +90,7 @@ export * from './community_tags';
 export * from './discord_bot_config';
 export * from './email_update_token';
 export * from './evmEventSource';
+export * from './governance_proposals';
 export * from './group';
 export * from './lastProcessedEvmBlock';
 export * from './launchpad_trade';
@@ -97,7 +99,9 @@ export * from './mcp_server_community';
 export * from './membership';
 export * from './outbox';
 export * from './poll';
+export * from './prediction_market';
 export * from './profile_tags';
+export * from './proposal_votes';
 export * from './reaction';
 export * from './referral';
 export * from './referral_fee';

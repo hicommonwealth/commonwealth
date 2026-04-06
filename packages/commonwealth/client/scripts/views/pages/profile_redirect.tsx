@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCommonNavigate } from 'navigation/helpers';
+import useNecessaryEffect from 'shared/hooks/useNecessaryEffect';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';

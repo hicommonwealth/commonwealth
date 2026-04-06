@@ -1,7 +1,4 @@
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
-import { OpenFeature } from '@openfeature/web-sdk';
-import { APIOrderDirection } from 'helpers/constants';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { DEFAULT_NAME, MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -11,6 +8,9 @@ import {
   MixpanelPageViewEvent,
   MixpanelPageViewEventPayload,
 } from 'shared/analytics/types';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import Permissions from 'shared/utils/Permissions';
+import { APIOrderDirection } from 'shared/utils/constants';
 import app from 'state';
 import {
   useGetCommunityByIdQuery,
@@ -20,7 +20,6 @@ import { useFetchGroupsQuery } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
-import Permissions from 'utils/Permissions';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
@@ -47,9 +46,6 @@ import {
   SearchFilters,
 } from './index.types';
 
-const client = OpenFeature.getClient();
-const referralsEnabled = client.getBooleanValue('referrals', false);
-
 enum TabValues {
   AllMembers = 'all-members',
   Leaderboard = 'leaderboard',
@@ -58,9 +54,7 @@ enum TabValues {
 
 const TABS = [
   { value: TabValues.AllMembers, label: 'All members' },
-  ...(referralsEnabled
-    ? [{ value: TabValues.Leaderboard, label: 'Leaderboard' }]
-    : []),
+  { value: TabValues.Leaderboard, label: 'Leaderboard' },
   { value: TabValues.Groups, label: 'Groups' },
 ];
 
@@ -175,9 +169,10 @@ const CommunityMembersPage = () => {
       ? 'last_active'
       : tableState.orderBy) as MemberResultsOrderBy,
     order_direction: tableState.orderDirection as APIOrderDirection,
-    ...(debouncedSearchTerm && {
-      search: debouncedSearchTerm,
-    }),
+    ...(debouncedSearchTerm &&
+      debouncedSearchTerm.length >= MIN_SEARCH_LENGTH && {
+        search: debouncedSearchTerm,
+      }),
     community_id: communityId,
     include_roles: true,
     ...(membershipsFilter && {
@@ -419,7 +414,7 @@ const CommunityMembersPage = () => {
                 }))
               }
             />
-            {user.activeAccount && (
+            {groups && groups.length > 0 && (
               <div className="select-dropdown-container">
                 <CWText type="b2" fontWeight="bold" className="filter-text">
                   Filter

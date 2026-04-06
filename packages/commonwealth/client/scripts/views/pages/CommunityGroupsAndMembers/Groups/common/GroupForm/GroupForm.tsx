@@ -32,7 +32,9 @@ import { ZodError, ZodObject } from 'zod';
 import {
   AMOUNT_CONDITIONS,
   ERC_SPECIFICATIONS,
+  SUI_NFT_SPECIFICATION,
   TOKENS,
+  TRUST_LEVEL_SPECIFICATION,
   conditionTypes,
 } from '../../../common/constants';
 import Allowlist from './Allowlist';
@@ -135,24 +137,75 @@ const getRequirementSubFormSchema = (
   requirementType: string,
 ): ZodObject<any> => {
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+  const isERC721Requirement = requirementType === ERC_SPECIFICATIONS.ERC_721;
   const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
+  const isTrustLevelRequirement = requirementType === TRUST_LEVEL_SPECIFICATION;
+  const isSuiTokenRequirement = requirementType === TOKENS.SUI_TOKEN_TYPE;
+  const isSuiNftRequirement = requirementType === SUI_NFT_SPECIFICATION;
 
-  const schema = isTokenRequirement
-    ? requirementSubFormValidationSchema.omit({
-        requirementContractAddress: true,
-        requirementTokenId: true,
-      })
-    : !is1155Requirement
-      ? requirementSubFormValidationSchema.omit({
-          requirementTokenId: true,
-        })
-      : requirementSubFormValidationSchema;
-  return schema;
+  if (isTrustLevelRequirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementChain: true,
+      requirementContractAddress: true,
+      requirementCondition: true,
+      requirementAmount: true,
+      requirementTokenId: true,
+      requirementCoinType: true,
+    });
+  }
+
+  if (isSuiTokenRequirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementContractAddress: true,
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+    });
+  }
+
+  if (isSuiNftRequirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+      requirementCoinType: true,
+    });
+  }
+
+  if (isTokenRequirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementContractAddress: true,
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+      requirementCoinType: true,
+    });
+  }
+
+  if (is1155Requirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+      requirementCoinType: true,
+    });
+  }
+
+  if (isERC721Requirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+      requirementCoinType: true,
+    });
+  }
+
+  return requirementSubFormValidationSchema.omit({
+    requirementTrustLevel: true,
+    requirementCoinType: true,
+    requirementTokenId: !isTokenRequirement,
+  });
 };
 
 const GroupForm = ({
   formType,
   onSubmit,
+  isSubmitting,
   initialValues = {},
   onDelete = () => {},
   allowedAddresses,
@@ -241,6 +294,7 @@ const GroupForm = ({
             requirementType: x?.requirementType?.value || '',
             requirementTokenId: x?.requirementTokenId || '',
             requirementCoinType: x?.requirementCoinType || '',
+            requirementTrustLevel: x?.requirementTrustLevel?.value || '',
           },
           errors: {},
         })),
@@ -466,9 +520,9 @@ const GroupForm = ({
           const existingTopic = topicPermissionsToggleGroupSubForms.find(
             (existing) => existing.topic.id === Number(topic.value),
           );
-          const currentGroupTopic = (currentGroup?.topics || []).find(
-            (t) => t.id === Number(topic.value),
-          );
+          const currentGroupTopic = (currentGroup?.topics || [])
+            .filter((t) => t.id !== undefined)
+            .find((t) => t.id === Number(topic.value));
           return {
             topic: {
               id: Number(topic.value),
@@ -585,6 +639,7 @@ const GroupForm = ({
                     // @ts-expect-error <StrictNullChecks/>
                     defaultValues={subForm.defaultValues}
                     errors={subForm.errors}
+                    formIndex={index}
                     onChange={(val) => validateChangedValue(val, index)}
                     isRemoveable={index > 0}
                     onRemove={() => removeRequirementByIndex(index)}
@@ -806,6 +861,7 @@ const GroupForm = ({
                 type="submit"
                 buttonWidth="wide"
                 disabled={
+                  isSubmitting ||
                   isNameTaken ||
                   isProcessingProfileImage ||
                   (requirementSubForms.length === 0 &&

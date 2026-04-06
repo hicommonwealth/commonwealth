@@ -1,4 +1,5 @@
 import { DEFAULT_NAME, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { useGetUserCommunitiesQuery } from 'client/scripts/state/api/user/useGetUserCommunitiesQuery';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
@@ -33,6 +34,11 @@ const Profile = ({ userId }: ProfileProps) => {
   const { data, error, isLoading } = useFetchProfileByIdQuery({
     userId,
     apiCallEnabled: !!userId,
+  });
+
+  const { data: userCommunities } = useGetUserCommunitiesQuery({
+    userId,
+    enabled: !!userId,
   });
 
   useEffect(() => {
@@ -169,7 +175,12 @@ const Profile = ({ userId }: ProfileProps) => {
           >
             {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity threads={threads} comments={comments} />
+            <ProfileActivity
+              threads={threads}
+              comments={comments}
+              userId={userId}
+              communities={userCommunities || []}
+            />
           </div>
         </CWPageLayout>
       </div>
@@ -181,7 +192,12 @@ const Profile = ({ userId }: ProfileProps) => {
           <div className="ProfilePageContainer">
             {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity threads={threads} comments={comments} />
+            <ProfileActivity
+              threads={threads}
+              comments={comments}
+              userId={userId}
+              communities={userCommunities || []}
+            />
           </div>
         </div>
       </CWPageLayout>

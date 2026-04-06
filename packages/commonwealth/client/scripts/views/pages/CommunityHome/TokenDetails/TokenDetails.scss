@@ -36,6 +36,12 @@
 
 .token-description {
   margin-top: 12px;
+
+  .Text:last-child {
+    display: inline-block;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
 }
 
 .token-stats {

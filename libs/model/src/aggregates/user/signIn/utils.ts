@@ -1,12 +1,7 @@
 import { InvalidActor, logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
-import {
-  BalanceSourceType,
-  bumpUserTier,
-  UserTierMap,
-} from '@hicommonwealth/shared';
-import { User as PrivyUser } from '@privy-io/server-auth';
-import { Transaction } from 'sequelize';
+import { BalanceSourceType, UserTierMap } from '@hicommonwealth/shared';
+import { QueryTypes, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../../config';
 import { models } from '../../../database';
@@ -14,6 +9,7 @@ import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
 import { getBalances } from '../../../services/tokenBalanceCache';
 import { VerifiedUserInfo } from '../../../utils/oauth/types';
+import { setUserTier } from '../../../utils/tiers';
 import { emitSignInEvents } from './emitSignInEvents';
 
 const log = logger(import.meta);
@@ -134,7 +130,6 @@ export async function findOrCreateUser({
   transaction,
   ssoInfo,
   referrer_address,
-  privyUserId,
   hex,
   signedInUser,
   ethChainId,
@@ -143,7 +138,6 @@ export async function findOrCreateUser({
   transaction: Transaction;
   ssoInfo?: VerifiedUserInfo;
   referrer_address?: string | null;
-  privyUserId?: string;
   hex?: string;
   signedInUser?: UserAttributes | null;
   ethChainId?: number;
@@ -156,9 +150,7 @@ export async function findOrCreateUser({
     : await findUserByAddressOrHex(hex ? { hex } : { address }, transaction);
 
   const tier =
-    privyUserId &&
-    ssoInfo &&
-    (!('emailVerified' in ssoInfo) || ssoInfo.emailVerified)
+    ssoInfo && (!('emailVerified' in ssoInfo) || ssoInfo.emailVerified)
       ? UserTierMap.SocialVerified
       : await checkNativeWalletBalance(address, foundUser, ethChainId);
 
@@ -169,20 +161,18 @@ export async function findOrCreateUser({
 
   if (signedInUser?.id) {
     const values: Partial<UserAttributes> = {};
-    if (!signedInUser.privy_id && privyUserId) values.privy_id = privyUserId;
-    bumpUserTier({
-      oldTier: signedInUser.tier,
+    await setUserTier({
+      userId: signedInUser.id!,
       newTier: tier,
-      targetObject: values,
+      transaction,
     });
     await updateUser(signedInUser.id, values);
   } else if (foundUser?.id) {
     const values: Partial<UserAttributes> = {};
-    if (!foundUser.privy_id && privyUserId) values.privy_id = privyUserId;
-    bumpUserTier({
-      oldTier: foundUser.tier,
+    await setUserTier({
+      userId: foundUser.id!,
       newTier: tier,
-      targetObject: values,
+      transaction,
     });
     await updateUser(foundUser.id, values);
   }
@@ -211,14 +201,13 @@ export async function findOrCreateUser({
     };
   }
 
-  // New user signing in (Privy or native wallet)
+  // New user signing in with a native wallet
   // if (!foundUser && !signedInUser)
   const user = await models.User.create(
     {
       email: null,
       profile: {},
       referred_by_address: referrer_address ?? null,
-      privy_id: privyUserId ?? null,
       tier,
     },
     { transaction },
@@ -302,7 +291,6 @@ async function transferAddressOwnership({
 export async function signInUser({
   payload,
   verificationData,
-  privyUser,
   verifiedSsoInfo,
   signedInUser,
   ethChainId,
@@ -312,24 +300,20 @@ export async function signInUser({
     verification_token: string;
     verification_token_expires: Date;
   };
-  privyUser?: PrivyUser;
   verifiedSsoInfo?: VerifiedUserInfo;
   signedInUser?: UserAttributes | null;
   ethChainId?: number;
 }) {
   let addressCount = 1;
   let transferredUser = false;
-  let address: AddressAttributes | undefined,
-    newAddress = false;
   let foundOrCreatedUser: UserAttributes | undefined;
   let newUser = false;
 
-  await models.sequelize.transaction(async (transaction) => {
+  const address = await models.sequelize.transaction(async (transaction) => {
     const userRes = await findOrCreateUser({
       address: payload.address,
       ssoInfo: verifiedSsoInfo,
       referrer_address: payload.referrer_address,
-      privyUserId: privyUser?.id,
       hex: payload.hex,
       transaction,
       signedInUser,
@@ -366,31 +350,102 @@ export async function signInUser({
       transaction,
     });
 
-    [address, newAddress] = await models.Address.findOrCreate({
-      where: { community_id: payload.community_id, address: payload.address },
-      defaults: {
-        community_id: payload.community_id,
-        address: payload.address,
-        user_id: signedInUser?.id ?? foundOrCreatedUser.id!,
-        hex: payload.hex,
-        wallet_id: payload.wallet_id,
-        verification_token: verificationData.verification_token,
-        verification_token_expires: verificationData.verification_token_expires,
-        block_info: payload.block_info ?? null,
-        last_active: new Date(),
-        verified: new Date(),
-        role: 'member',
-        ghost_address: false,
-        is_banned: false,
+    const replacements = {
+      community_id: payload.community_id,
+      address: payload.address,
+      user_id: signedInUser?.id || foundOrCreatedUser.id!,
+      hex: payload.hex || null,
+      wallet_id: payload.wallet_id,
+      verification_token: verificationData.verification_token,
+      verification_token_expires: verificationData.verification_token_expires,
+      block_info: payload.block_info || null,
+    };
+    const [addresses] = await models.sequelize.query(
+      `
+    INSERT INTO "Addresses" (
+      community_id,
+      address,
+      user_id,
+      hex,
+      wallet_id,
+      verification_token,
+      verification_token_expires,
+      block_info,
+      last_active,
+      verified,
+      role,
+      ghost_address,
+      is_banned,
+      created_at,
+      updated_at
+    )
+    VALUES (
+      :community_id, 
+      :address, 
+      :user_id, 
+      :hex, 
+      :wallet_id, 
+      :verification_token, 
+      :verification_token_expires, 
+      :block_info, 
+      NOW(), 
+      NOW(), 
+      'member', 
+      FALSE, 
+      FALSE, 
+      NOW(), 
+      NOW()
+    )
+    ON CONFLICT (community_id, address)
+    DO NOTHING
+    RETURNING *;
+  `,
+      {
+        raw: true,
+        replacements,
+        transaction,
       },
-      transaction,
-    });
+    );
+    const newAddress = addresses.length > 0;
+
+    const [found] = await models.sequelize.query<AddressAttributes>(
+      `SELECT * FROM "Addresses" WHERE community_id = :community_id AND address = :address; `,
+      {
+        type: QueryTypes.SELECT,
+        raw: true,
+        replacements: {
+          community_id: payload.community_id,
+          address: payload.address,
+        },
+        transaction,
+      },
+    );
+
+    // recover deleted users
+    if (found && !newAddress && found.user_id === null) {
+      await models.Address.update(
+        {
+          user_id: signedInUser?.id ?? foundOrCreatedUser.id!,
+          wallet_id: payload.wallet_id,
+          verification_token: verificationData.verification_token,
+          verification_token_expires:
+            verificationData.verification_token_expires,
+          block_info: payload.block_info ?? null,
+          last_active: new Date(),
+          verified: new Date(),
+        },
+        {
+          where: { id: found.id, user_id: null },
+          transaction,
+        },
+      );
+    }
 
     await emitSignInEvents({
       newUser,
       user: signedInUser || foundOrCreatedUser,
       transferredUser,
-      address,
+      address: found,
       newAddress,
       transaction,
       originalUserId: transferredUser ? foundOrCreatedUser.id : undefined,
@@ -403,6 +458,7 @@ export async function signInUser({
       },
       transaction,
     });
+    return { found, newAddress };
   });
 
   if (!address || !foundOrCreatedUser)
@@ -411,8 +467,8 @@ export async function signInUser({
   return {
     user: signedInUser || foundOrCreatedUser,
     newUser,
-    address,
-    newAddress,
+    address: address.found,
+    newAddress: address.newAddress,
     addressCount,
     transferredUser,
   };

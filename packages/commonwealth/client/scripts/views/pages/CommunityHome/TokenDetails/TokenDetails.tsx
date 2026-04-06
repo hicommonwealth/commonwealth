@@ -55,6 +55,7 @@ const TokenDetails = ({
   // Use values directly from hook (market cap fallback is handled inside hook)
   const finalMarketCap = tokenPricing?.marketCapCurrent;
   const displayPrice = tokenPricing?.currentPrice; // Use price directly from hook
+  const hasLaunchpadToken = communityToken && !isPinnedToken && tokenPricing;
 
   return (
     <div className="token-details">
@@ -88,64 +89,53 @@ const TokenDetails = ({
       </div>
 
       <div className="token-stats">
-        <div className="stat-item">
-          <CWText type="b1" className="faded">
-            24h Change
-          </CWText>
-          <div>
-            {communityToken ? (
-              <>
-                {' '}
-                {tokenPricing && (
-                  <PricePercentageChange
-                    pricePercentage24HourChange={
-                      tokenPricing.pricePercentage24HourChange
-                    }
-                    alignment="left"
-                    className="pad-8"
-                  />
-                )}
-              </>
-            ) : (
-              <CWText>N/A</CWText>
-            )}
+        {hasLaunchpadToken && (
+          <div className="stat-item">
+            <CWText type="b1" className="faded">
+              24h Change
+            </CWText>
+            <div>
+              <PricePercentageChange
+                pricePercentage24HourChange={
+                  tokenPricing.pricePercentage24HourChange
+                }
+                alignment="left"
+                className="pad-8"
+              />
+            </div>
           </div>
-        </div>
-        <div className="stat-item">
-          <CWText type="b1" className="faded">
-            Address
-          </CWText>
-          <CWText>
-            {communityToken && address ? (
-              <>
-                {formatAddressShort(address)}
-                <CWTooltip
-                  placement="top"
-                  content="address copied!"
-                  renderTrigger={(handleInteraction, isTooltipOpen) => {
-                    return (
-                      <CWIconButton
-                        iconName="copySimple"
-                        onClick={(event) => {
-                          saveToClipboard(address).catch(console.error);
-                          handleInteraction(event);
-                        }}
-                        onMouseLeave={(e) => {
-                          if (isTooltipOpen) {
-                            handleInteraction(e);
-                          }
-                        }}
-                        className="copy-icon"
-                      />
-                    );
-                  }}
-                />
-              </>
-            ) : (
-              <CWText>N/A</CWText>
-            )}
-          </CWText>
-        </div>
+        )}
+        {communityToken && address && (
+          <div className="stat-item">
+            <CWText type="b1" className="faded">
+              Address
+            </CWText>
+            <CWText>
+              {formatAddressShort(address)}
+              <CWTooltip
+                placement="top"
+                content="address copied!"
+                renderTrigger={(handleInteraction, isTooltipOpen) => {
+                  return (
+                    <CWIconButton
+                      iconName="copySimple"
+                      onClick={(event) => {
+                        saveToClipboard(address).catch(console.error);
+                        handleInteraction(event);
+                      }}
+                      onMouseLeave={(e) => {
+                        if (isTooltipOpen) {
+                          handleInteraction(e);
+                        }
+                      }}
+                      className="copy-icon"
+                    />
+                  );
+                }}
+              />
+            </CWText>
+          </div>
+        )}
         {communityToken && (
           <>
             <div className="stat-item">

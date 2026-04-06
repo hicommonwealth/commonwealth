@@ -2,11 +2,11 @@ import { ChainBase, DefaultPage } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
-import { isS3URL } from 'helpers/awsHelpers';
-import useBeforeUnload from 'hooks/useBeforeUnload';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useRef, useState } from 'react';
+import useBeforeUnload from 'shared/hooks/useBeforeUnload';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { slugifyPreserveDashes } from 'shared/utils';
+import { isS3URL } from 'shared/utils/awsHelpers';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import useCreateCommunityMutation, {
   buildCreateCommunityInput,
@@ -501,13 +501,10 @@ export const QuickTokenLaunchForm = ({
             <>
               <CWBanner
                 type="info"
-                body={`Launching token will create a complimentary community.
-                      You can edit your community post launch.`}
-              />
-              <CWBanner
-                type="info"
-                body={`Launching your token on BASE requires a small amount of BASE ETH to cover gas fees.
-                      ${ethFee ? `Estimated fee: ${ethFee} BASE ETH.` : ''}`}
+                body={[
+                  'Launching your token will create an associated community on Base and requires ',
+                  '0.000444 ETH and a compatible EVM wallet.',
+                ].join('')}
               />
               <div className="cta-elements">
                 {/* allows to switch b/w generated ideas */}

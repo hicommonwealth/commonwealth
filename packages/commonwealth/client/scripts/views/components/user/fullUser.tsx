@@ -152,16 +152,16 @@ export const FullUser = ({
           {profile?.name} &nbsp;
           <TrustLevelRole
             type="user"
-            level={profile?.tier || UserTierMap.IncompleteUser}
+            tier={profile?.tier || UserTierMap.IncompleteUser}
           />
         </>
       ) : (
         <>
-          <div className="profile-name">
-            {profile?.name}{' '}
+          <div className="profile-name">{profile?.name} </div>
+          <div className="profile-tier">
             <TrustLevelRole
               type="user"
-              level={profile?.tier || UserTierMap.IncompleteUser}
+              tier={profile?.tier || UserTierMap.IncompleteUser}
             />
           </div>
           <div className="id-short">{fullAddress}</div>
@@ -259,7 +259,7 @@ export const FullUser = ({
                     {profile?.name}{' '}
                     <TrustLevelRole
                       type="user"
-                      level={profile?.tier || UserTierMap.IncompleteUser}
+                      tier={profile?.tier || UserTierMap.IncompleteUser}
                     />
                   </>
                 ) : (
@@ -268,7 +268,7 @@ export const FullUser = ({
                       {profile?.name}{' '}
                       <TrustLevelRole
                         type="user"
-                        level={profile?.tier || UserTierMap.IncompleteUser}
+                        tier={profile?.tier || UserTierMap.IncompleteUser}
                       />
                     </>
                     <div className="id-short">{redactedAddress}</div>
@@ -285,7 +285,7 @@ export const FullUser = ({
               {profile?.name}{' '}
               <TrustLevelRole
                 type="user"
-                level={profile?.tier || UserTierMap.IncompleteUser}
+                tier={profile?.tier || UserTierMap.IncompleteUser}
               />
             </Link>
           )}{' '}

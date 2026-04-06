@@ -240,9 +240,23 @@ export const trpcRouter = trpc.router({
     Community.SetCommunityMCPServers,
     trpc.Tag.Community,
   ),
+  deletePrivateMcpServer: trpc.command(
+    Community.DeletePrivateMCPServer,
+    trpc.Tag.Community,
+  ),
   getRoles: trpc.query(Community.GetRoles, trpc.Tag.Community),
   refreshWeightedVotes: trpc.command(
     Community.RefreshWeightedVotes,
+    trpc.Tag.Community,
+  ),
+  subscribeMarket: trpc.command(Community.SubscribeMarket, trpc.Tag.Community),
+  unsubscribeMarket: trpc.command(
+    Community.UnsubscribeMarket,
+    trpc.Tag.Community,
+  ),
+  getMarkets: trpc.query(Community.GetMarkets, trpc.Tag.Community),
+  discoverExternalMarkets: trpc.query(
+    Community.DiscoverExternalMarkets,
     trpc.Tag.Community,
   ),
 });

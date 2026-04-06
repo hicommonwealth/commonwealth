@@ -26,6 +26,8 @@ const buyThreadToken = async ({
     !ethChainId ||
     !chainRpc ||
     !tokenAddress ||
+    !amountIn ||
+    !minAmountOut ||
     !walletAddress ||
     !paymentTokenAddress
   ) {
@@ -66,7 +68,10 @@ const useBuyThreadTokenMutation = () => {
   return useMutation({
     mutationFn: buyThreadToken,
     onSuccess: async (_, variables) => {
-      await resetBalancesCache(_, variables);
+      await resetBalancesCache(_, {
+        ...variables,
+        paymentTokenAddress: variables.paymentTokenAddress,
+      });
     },
   });
 };

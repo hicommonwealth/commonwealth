@@ -7,6 +7,7 @@ export type RequirementSubFormsState = {
 };
 
 export type RequirementSubType = {
+  requirementTrustLevel?: string;
   requirementType?: string;
   requirementContractAddress?: string;
   requirementChain?: string;
@@ -44,6 +45,7 @@ export type LabelType = {
 };
 
 export type RequirementSubTypeWithLabel = {
+  requirementTrustLevel?: LabelType;
   requirementCoinType?: string;
   requirementType?: LabelType;
   requirementContractAddress?: string;
@@ -54,6 +56,7 @@ export type RequirementSubTypeWithLabel = {
 };
 
 export type RequirementSubFormType = {
+  formIndex: number;
   errors?: RequirementSubType;
   defaultValues: RequirementSubTypeWithLabel;
   onRemove: () => any;
@@ -95,6 +98,7 @@ export type FormSubmitValues = {
 
 export type GroupFormProps = {
   formType: 'create' | 'edit';
+  isSubmitting?: boolean;
   onSubmit: (values: GroupResponseValuesType) => any;
   initialValues?: Partial<GroupInitialValuesTypeWithLabel>;
   onDelete?: () => any;

@@ -17,51 +17,59 @@ import { models } from '../../database';
 
 const log = logger(import.meta);
 
-async function getUserByAddressId(address_id: number) {
+async function getUserByAddressId(
+  address_id: number,
+  minTier = UserTierMap.NewlyVerifiedWallet,
+) {
   const addr = await models.Address.findOne({
-    where: { id: address_id },
+    where: { id: address_id, is_banned: false },
     attributes: ['user_id'],
     include: [
       {
         model: models.User,
         attributes: ['id'],
         required: true,
-        where: {
-          tier: { [Op.ne]: UserTierMap.BannedUser },
-        },
+        where: { tier: { [Op.gte]: minTier } },
       },
     ],
   });
   return addr?.user_id ?? undefined;
 }
 
-async function getUserByAddress(address: string) {
-  const addr = await models.Address.findOne({
-    where: {
-      [Op.and]: [
-        {
-          [Op.or]: [
-            { address: address }, // exact match
-            { address: address.toLowerCase() }, // lowercase variant
-            { address: address.toUpperCase() }, // uppercase variant (optional)
-          ],
-        },
-        { user_id: { [Op.not]: null } },
-      ],
-    },
-    attributes: ['user_id'],
-    include: [
-      {
-        model: models.User,
-        attributes: ['id'],
-        required: true,
-        // don't reward unverified or banned users
-        where: { tier: { [Op.gt]: UserTierMap.BannedUser } },
+async function getUserByAddress(
+  address: string,
+  minTier = UserTierMap.NewlyVerifiedWallet,
+) {
+  try {
+    const validated = getEvmAddress(address);
+    const addr = await models.Address.findOne({
+      where: {
+        [Op.and]: [
+          {
+            [Op.or]: [
+              { address: address.toLowerCase() },
+              { address: validated },
+            ],
+          },
+          { user_id: { [Op.not]: null } },
+          { is_banned: { [Op.eq]: false } },
+        ],
       },
-    ],
-  });
-
-  return addr?.user_id ?? undefined;
+      attributes: ['user_id'],
+      include: [
+        {
+          model: models.User,
+          attributes: ['id'],
+          required: true,
+          where: { tier: { [Op.gte]: minTier } },
+        },
+      ],
+    });
+    return addr?.user_id ?? undefined;
+  } catch (err) {
+    log.error('Error validating address', err as Error);
+    return undefined;
+  }
 }
 
 /*
@@ -130,7 +138,7 @@ async function recordXpsForQuest({
     ? await getUserByAddress(creator_address)
     : null;
   const referrer_user_id = referrer_address
-    ? await getUserByAddress(referrer_address)
+    ? await getUserByAddress(referrer_address, UserTierMap.SocialVerified)
     : null;
 
   for (const action_meta of action_metas) {
@@ -193,11 +201,12 @@ async function recordXpsForQuest({
       ? Math.round(reward_amount * action_meta.creator_reward_weight)
       : null;
     const xp_points = reward_amount - (shared_reward ?? 0);
-    const creator_xp_points = creator_address ? shared_reward : null;
-    const referrer_xp_points = referrer_address
-      ? creator_xp_points
-        ? reward_amount * 0.1 // automatically share 10% of the reward with referrer when not a referral event
-        : shared_reward
+    const creator_xp_points = creator_user_id ? shared_reward : null;
+    const referrer_fee = reward_amount * config.XP.REFERRER_FEE_RATIO;
+    const referrer_xp_points = referrer_user_id
+      ? creator_address
+        ? referrer_fee
+        : shared_reward || referrer_fee
       : null;
     await models.sequelize.query(
       `
@@ -263,7 +272,7 @@ async function recordXpsForQuest({
       xp_awarded = xp_awarded + :total_reward,
       end_date = CASE 
           WHEN (xp_awarded + :total_reward) >= max_xp_to_end
-          THEN NOW()
+          THEN :event_created_at
           ELSE end_date
         END
     WHERE id = :quest_id
@@ -275,8 +284,8 @@ async function recordXpsForQuest({
           event_id,
           event_created_at,
           user_id,
-          creator_user_id,
-          referrer_user_id,
+          creator_user_id: creator_user_id || null,
+          referrer_user_id: referrer_user_id || null,
           xp_points,
           creator_xp_points,
           referrer_xp_points,
@@ -577,7 +586,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       },
       LaunchpadTokenRecordCreated: async ({ id, payload }) => {
         const user_id = await getUserByAddress(payload.creator_address);
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenRecordCreated', { id, payload, user_id });
         if (!user_id) return;
 
@@ -586,7 +595,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           { created_at },
           'LaunchpadTokenRecordCreated',
         );
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenRecordCreated', {
             id,
             payload,
@@ -606,14 +615,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       },
       LaunchpadTokenTraded: async ({ id, payload }) => {
         const user_id = await getUserByAddress(payload.trader_address);
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenTraded', { id, payload, user_id });
         if (!user_id) return;
 
         const token = await models.LaunchpadToken.findOne({
           where: { token_address: payload.token_address.toLowerCase() },
         });
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenTraded', { id, payload, user_id, token });
         if (!token) return;
 
@@ -629,7 +638,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
 
         // payload eth_amount is in wei, a little misleading
         const eth_amount = Number(payload.eth_amount) / 1e18;
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenTraded', {
             id,
             payload,
@@ -656,7 +665,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const user_id =
           payload.token.creator_address &&
           (await getUserByAddress(payload.token.creator_address));
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenGraduated', { id, payload, user_id });
         if (!user_id) return;
 

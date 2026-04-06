@@ -1,0 +1,65 @@
+@use '../../../../styles/mixins/media_queries';
+
+.ManageMagicWalletContent {
+  .CWModalBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    .usd-value {
+      font-size: 32px;
+      font-weight: 500;
+      text-align: center;
+      margin-block: 16px;
+    }
+
+    .refresh-link {
+      color: #0064c8;
+      font-size: 14px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 16px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .fund-options {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .go-back {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      width: 80%;
+      @include media_queries.smallInclusive {
+        width: 100% !important;
+      }
+    }
+
+    #moonpay-react-sdk-embedded-frame {
+      border: 0 !important;
+      border-radius: 0 !important;
+      outline: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      @include media_queries.smallInclusive {
+        width: 100% !important;
+        min-height: 300px !important;
+        height: 400px !important;
+        max-height: 100% !important;
+      }
+      iframe {
+        border: 0 !important;
+      }
+    }
+  }
+}

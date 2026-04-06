@@ -1,0 +1,5 @@
+{
+  "name": "common-proxy",
+  "main": "cfworker/src/commonProxy.ts",
+  "compatibility_date": "2025-10-06",
+}

@@ -24,7 +24,7 @@ export const GlobalFeed = {
     comment_limit: z.number().int().min(0).max(10).optional().default(3),
     community_id: z.string().optional(),
     search: z.string().optional(),
-  }),
+  }).describe('Get the global activity feed of threads across all communities'),
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),
   }),
@@ -35,7 +35,7 @@ export const ActivityFeed = {
   input: PaginationParamsSchema.extend({
     thread_limit: z.number().optional(),
     comment_limit: z.number().optional(),
-  }),
+  }).describe('Get the activity feed for the authenticated user'),
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),
   }),

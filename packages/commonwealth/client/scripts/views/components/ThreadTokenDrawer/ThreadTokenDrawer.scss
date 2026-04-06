@@ -1,0 +1,144 @@
+.ThreadTokenDrawer {
+  .thread-token-drawer {
+    width: 600px;
+    max-width: 90vw;
+
+    .content-container {
+      padding: 24px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+
+      .drawer-header {
+        margin-bottom: 24px;
+        color: var(--text-primary);
+      }
+
+      .tabs-container {
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .tab-content-wrapper {
+        flex: 1;
+        overflow-y: auto;
+
+        .tab-content {
+          .tab-header {
+            margin-bottom: 16px;
+            color: var(--text-primary);
+          }
+
+          .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+
+            .empty-text {
+              color: var(--text-secondary);
+              text-align: center;
+            }
+          }
+
+          .token-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+
+            .info-item {
+              padding: 16px;
+              border: 1px solid var(--border-color);
+              border-radius: 8px;
+              background: var(--bg-secondary);
+
+              .info-label {
+                color: var(--text-secondary);
+                margin-bottom: 4px;
+                text-transform: uppercase;
+                font-weight: 500;
+              }
+
+              .info-value {
+                color: var(--text-primary);
+                font-weight: 600;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .address {
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+  }
+
+  .trade-type {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+
+    &.buy {
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+    }
+
+    &.sell {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+    }
+  }
+
+  // Table styling overrides
+  .CWTable {
+    .table-container {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-row {
+      border-bottom: 1px solid var(--border-color);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background: var(--bg-hover);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .thread-token-drawer {
+      width: 100vw;
+      max-width: 100vw;
+
+      .content-container {
+        padding: 16px;
+
+        .token-info-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+  }
+}

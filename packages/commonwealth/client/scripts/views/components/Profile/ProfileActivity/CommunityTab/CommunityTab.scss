@@ -1,4 +1,23 @@
 @use '../../../../../styles/shared.scss';
+
 .CommunityTab {
   padding: 0px;
+
+  .community-cell {
+    .community-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: inherit;
+
+      .community-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
+    }
+  }
 }

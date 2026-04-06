@@ -104,7 +104,7 @@ export async function getSessionFromWallet(
         publicKey,
         authorizationData: {
           message,
-          signature: Buffer.from(signature).toString('hex'),
+          signature,
         },
         context: {
           timestamp: Date.now(),

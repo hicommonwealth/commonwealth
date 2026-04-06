@@ -3,16 +3,23 @@ import { buildCreateCommentInput } from 'client/scripts/state/api/comments/creat
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import { useDraft } from 'hooks/useDraft';
+import { useMentionExtractor } from 'hooks/useMentionExtractor';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useDraft } from 'shared/hooks/useDraft';
+import {
+  isRateLimitError,
+  isTierRateLimitError,
+  RATE_LIMIT_MESSAGE,
+} from 'shared/utils/rateLimit';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
+import { MentionEntityType } from '../react_quill_editor/mention-config';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { StickyInput } from '../StickEditorContainer';
 import { ArchiveMsg } from './ArchiveMsg';
@@ -54,6 +61,7 @@ export const CreateComment = ({
 
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+  const { extractMentionsFromDelta } = useMentionExtractor();
 
   // get restored draft on init
   const restoredDraft = useMemo(() => {
@@ -101,12 +109,16 @@ export const CreateComment = ({
 
     try {
       const communityId = app.activeChainId() || '';
+      const bodyText = serializeDelta(contentDelta);
+      if (!bodyText.trim()) {
+        throw new Error('Comment body cannot be empty');
+      }
       const input = await buildCreateCommentInput({
         communityId,
         address: user.activeAccount!.address,
         threadId: rootThread.id,
         threadMsgId: rootThread.canvasMsgId ?? null,
-        unescapedText: serializeDelta(contentDelta),
+        unescapedText: bodyText,
         parentCommentId: parentCommentId ?? null,
         parentCommentMsgId: parentCommentMsgId ?? null,
         existingNumberOfComments: rootThread.numberOfComments || 0,
@@ -122,6 +134,12 @@ export const CreateComment = ({
       // Store the ID before any state changes
       const commentId = newComment.id;
 
+      // Check for MCP mentions in the comment content
+      const mentions = extractMentionsFromDelta(contentDelta);
+      const hasMCPMentions = mentions.some(
+        (mention) => mention.type === MentionEntityType.MCP_SERVER,
+      );
+
       // Now update state
       setErrorMsg(null);
       setContentDelta(createDeltaFromText(''));
@@ -131,8 +149,11 @@ export const CreateComment = ({
         handleIsReplying(false);
       }
 
+      // Automatically trigger AI reply if MCP mentions are detected, regardless of AI toggle state
+      const shouldTriggerAI = aiCommentsToggleEnabled || hasMCPMentions;
+
       // Notify parent about the new comment and its AI status
-      onCommentCreated?.(commentId, aiCommentsToggleEnabled);
+      onCommentCreated?.(commentId, shouldTriggerAI);
 
       return commentId;
     } catch (err) {
@@ -143,7 +164,13 @@ export const CreateComment = ({
       const errMsg = err?.responseJSON?.error || err?.message;
       console.error('CreateComment - Error:', errMsg);
 
-      notifyError('Failed to create comment');
+      if (isRateLimitError(err)) {
+        notifyError(RATE_LIMIT_MESSAGE);
+      } else if (isTierRateLimitError(err)) {
+        notifyError(err.message);
+      } else {
+        notifyError('Failed to create comment');
+      }
       setErrorMsg(errMsg);
       throw err;
     } finally {
@@ -189,7 +216,6 @@ export const CreateComment = ({
       handleIsReplying={handleIsReplying}
       replyingToAuthor={replyingToAuthor}
       thread={rootThread}
-      parentCommentText={parentCommentText}
       communityId={app.activeChainId() || ''}
     />
   ) : (

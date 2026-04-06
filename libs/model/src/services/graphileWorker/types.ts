@@ -12,6 +12,8 @@ export enum GraphileTaskNames {
   CountAggregator = 'CountAggregator',
   CaptureGroupSnapshot = 'CaptureGroupSnapshot',
   MagnaSync = 'MagnaSync',
+  MagnaTxnSync = 'MagnaTxnSync',
+  RefreshMaterializedViews = 'RefreshMaterializedViews',
 }
 
 export type CustomCronItem = CronItem & {
@@ -19,6 +21,7 @@ export type CustomCronItem = CronItem & {
 };
 
 export const TaskPayloads = {
+  RefreshMaterializedViews: z.object({}),
   ArchiveOutbox: z.object({}),
   UpdateSitemap: z.object({}),
   CleanSubscriptions: z.object({}),
@@ -28,6 +31,7 @@ export const TaskPayloads = {
   CountAggregator: z.object({}),
   CaptureGroupSnapshot: z.object({ groupId: z.number() }),
   MagnaSync: z.object({}),
+  MagnaTxnSync: z.object({}),
 };
 
 export type GraphileTaskHandler<K extends keyof typeof TaskPayloads> = (

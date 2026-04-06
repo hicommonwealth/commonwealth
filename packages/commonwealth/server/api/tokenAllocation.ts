@@ -10,4 +10,24 @@ export const trpcRouter = trpc.router({
     TokenAllocation.GetClaimAddress,
     trpc.Tag.TokenAllocation,
   ),
+  getAllocation: trpc.query(
+    TokenAllocation.GetAllocation,
+    trpc.Tag.TokenAllocation,
+  ),
+  claimToken: trpc.command(
+    TokenAllocation.ClaimToken,
+    trpc.Tag.TokenAllocation,
+  ),
+  updateClaimTransactionHash: trpc.command(
+    TokenAllocation.UpdateClaimTransactionHash,
+    trpc.Tag.TokenAllocation,
+  ),
+  claimTokenCliff: trpc.command(
+    TokenAllocation.ClaimTokenCliff,
+    trpc.Tag.TokenAllocation,
+  ),
+  updateClaimCliffTransactionHash: trpc.command(
+    TokenAllocation.UpdateClaimCliffTransactionHash,
+    trpc.Tag.TokenAllocation,
+  ),
 });

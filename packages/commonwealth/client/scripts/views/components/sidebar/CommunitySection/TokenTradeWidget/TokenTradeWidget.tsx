@@ -1,14 +1,13 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { formatAddressShort } from 'helpers';
+import { useTokenPricing } from 'hooks/useTokenPricing';
+import React, { useState } from 'react';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import {
   currencyNameToSymbolMap,
   SupportedFiatCurrencies,
-} from 'helpers/currency';
-import { useTokenPricing } from 'hooks/useTokenPricing';
-import React, { useState } from 'react';
-import { saveToClipboard } from 'utils/clipboard';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
+} from 'shared/utils/currency';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -88,7 +87,7 @@ export const TokenTradeWidget = ({
           weight="fill"
           onClick={() => setIsWidgetExpanded((e) => !e)}
         />
-        <CWText type="b2" fontWeight="semiBold">
+        <CWText type="caption" fontWeight="medium" className="status-text">
           Token
         </CWText>
 
@@ -127,11 +126,15 @@ export const TokenTradeWidget = ({
               />
             </CWText>
           </div>
-          <CWText type="h3" fontWeight="bold" className="pad-8">
+          <CWText
+            type="h3"
+            fontWeight="bold"
+            className="token-symbol-price pad-8"
+          >
             <CWText type="h3" fontWeight="bold">
               {communityToken.symbol}
             </CWText>
-            <CWText type="h3" fontWeight="bold" className="ml-auto">
+            <CWText type="h3" fontWeight="bold">
               {currencySymbol}
               <FractionalValue
                 value={
@@ -213,7 +216,6 @@ export const TokenTradeWidget = ({
           onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
         />
       )}
-      <CWDivider />
     </section>
   );
 };

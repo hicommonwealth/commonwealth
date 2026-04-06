@@ -56,6 +56,7 @@ export const ThreadSubscription = z.object({
     address_id: true,
     title: true,
     comment_count: true,
+    net_comment_count: true,
     created_at: true,
     url: true,
   })
@@ -95,6 +96,7 @@ export const CommentSubscription = z.object({
           community_id: true,
           title: true,
           comment_count: true,
+          net_comment_count: true,
           created_at: true,
           url: true,
         })

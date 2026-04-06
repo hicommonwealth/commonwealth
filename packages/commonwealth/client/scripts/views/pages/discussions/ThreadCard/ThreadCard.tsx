@@ -1,5 +1,10 @@
-import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
+import {
+  ActionGroups,
+  GatedActionEnum,
+  isValidImageUrl,
+} from '@hicommonwealth/shared';
 import { useShowImage } from 'client/scripts/hooks/useShowImage';
+import { ThreadPredictionMarketTagContainer } from 'client/scripts/views/components/ThreadPredictionMarketTag';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -10,11 +15,9 @@ import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useGetThreadToken from 'state/api/tokens/getThreadToken';
 import useUserStore from 'state/ui/user';
-import {
-  default as MarkdownViewerUsingQuillOrNewEditor,
-  default as MarkdownViewerWithFallback,
-} from 'views/components/MarkdownViewerWithFallback';
+import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
+import { ThreadTokenDrawer } from 'views/components/ThreadTokenDrawer';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -119,11 +122,16 @@ export const ThreadCard = ({
   const [showCommentVisible, setShowCommentVisible] =
     useState<boolean>(showCommentState);
   const [isTradeModalOpen, setIsTradeModalOpen] = useState<boolean>(false);
+  const [isTokenDrawerOpen, setIsTokenDrawerOpen] = useState<boolean>(false);
   const toggleShowComments = () => setShowCommentVisible((prev) => !prev);
   const showImage = useShowImage();
 
   const handleTradeClick = () => {
     setIsTradeModalOpen(true);
+  };
+
+  const handleTokenDrawerClick = () => {
+    setIsTokenDrawerOpen(true);
   };
 
   const { data: community, isLoading: isLoadingCommunity } =
@@ -249,6 +257,8 @@ export const ThreadCard = ({
             <div className="content-top-tags">
               {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
+              <ThreadPredictionMarketTagContainer thread={thread} />
+
               {linkedSnapshots.length > 0 && (
                 <CWTag
                   type="active"
@@ -268,7 +278,7 @@ export const ThreadCard = ({
               })}
             >
               {!isCardView ? (
-                <MarkdownViewerUsingQuillOrNewEditor
+                <MarkdownViewerWithFallback
                   markdown={
                     !removeImagesFromMarkDown
                       ? thread.body
@@ -290,7 +300,7 @@ export const ThreadCard = ({
                   cutoffLines={cutoffLines}
                 />
               )}
-              {threadImage && (
+              {threadImage && isValidImageUrl(threadImage) && (
                 <div className="card-image-container">
                   <img src={threadImage} alt="Thread content" />
                 </div>
@@ -377,6 +387,7 @@ export const ThreadCard = ({
                   actionGroups={actionGroups}
                   bypassGating={bypassGating}
                   onTradeClick={handleTradeClick}
+                  onTokenDrawerClick={handleTokenDrawerClick}
                 />
               )}
             </div>
@@ -390,7 +401,10 @@ export const ThreadCard = ({
       thread?.recentComments?.length > 0 ? (
         <div className={clsx('RecentComments', { hideReactionButton })}>
           {[...(thread?.recentComments || [])]
-            ?.filter((recentComment) => !recentComment.deleted)
+            ?.filter(
+              (recentComment) =>
+                !recentComment.deleted && !recentComment.markedAsSpamAt,
+            )
             ?.slice?.(0, maxRecentCommentsToDisplay)
             ?.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
             ?.map((recentComment) => (
@@ -442,6 +456,7 @@ export const ThreadCard = ({
                     )
                   }
                   tokenNumDecimals={thread.topic?.token_decimals || undefined}
+                  tokenSymbol={thread.topic?.token_symbol || undefined}
                 />
               </Link>
             ))}
@@ -464,6 +479,13 @@ export const ThreadCard = ({
         addressType={app.chain?.base || 'ethereum'}
         tokenCommunity={app.chain?.meta}
       />
+      {threadToken?.token_address && (
+        <ThreadTokenDrawer
+          threadId={thread.id}
+          isOpen={isTokenDrawerOpen}
+          setIsOpen={setIsTokenDrawerOpen}
+        />
+      )}
       <CWDivider className="ThreadDivider" />
     </>
   );

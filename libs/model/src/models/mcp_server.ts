@@ -2,10 +2,20 @@ import { MCPServer } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance } from './types';
+import type { UserInstance } from './user';
 
-export type MCPServerAttributes = z.infer<typeof MCPServer>;
+export type MCPServerAttributes = z.infer<typeof MCPServer> & {
+  // associations
+  AuthUser?: UserInstance;
+};
 
-export type MCPServerInstance = ModelInstance<MCPServerAttributes>;
+export type MCPServerInstance = ModelInstance<MCPServerAttributes> & {
+  getAuthUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
+  setAuthUser: Sequelize.BelongsToSetAssociationMixin<
+    UserInstance,
+    UserInstance['id']
+  >;
+};
 
 export type MCPServerModelStatic = Sequelize.ModelStatic<MCPServerInstance>;
 
