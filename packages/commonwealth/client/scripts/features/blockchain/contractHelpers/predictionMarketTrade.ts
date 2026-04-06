@@ -12,6 +12,53 @@ import Web3 from 'web3';
 import type { AbiItem } from 'web3-utils';
 import ContractBase from './ContractBase';
 
+/** Uniswap V3 QuoterV2 — same canonical addresses on each chain (see Uniswap deploy docs). */
+export const UNISWAP_V3_QUOTER_V2_BY_CHAIN_ID: Record<number, string> = {
+  // Ethereum mainnet
+  1: '0x61fFE014bA17989E743c5F6cB21bF9697530B21e',
+  // Base
+  8453: '0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a',
+  // Base Sepolia
+  84532: '0xC5290058841028F1614F3A6F0F5816cAd0df5E27',
+};
+
+const QUOTER_V2_ABI: AbiItem[] = [
+  {
+    type: 'function',
+    name: 'quoteExactInputSingle',
+    inputs: [
+      {
+        components: [
+          { name: 'tokenIn', type: 'address' },
+          { name: 'tokenOut', type: 'address' },
+          { name: 'amountIn', type: 'uint256' },
+          { name: 'fee', type: 'uint24' },
+          { name: 'sqrtPriceLimitX96', type: 'uint160' },
+        ],
+        name: 'params',
+        type: 'tuple',
+      },
+    ],
+    outputs: [
+      { name: 'amountOut', type: 'uint256' },
+      { name: 'sqrtPriceX96After', type: 'uint160' },
+      { name: 'initializedTicksCrossed', type: 'uint32' },
+      { name: 'gasEstimate', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+];
+
+function quoterResultToAmountOut(result: unknown): bigint {
+  if (result == null) throw new Error('Quoter returned empty result');
+  if (typeof result === 'object' && !Array.isArray(result)) {
+    const obj = result as Record<string, unknown>;
+    if ('amountOut' in obj) return BigInt(String(obj.amountOut));
+  }
+  if (Array.isArray(result)) return BigInt(String(result[0]));
+  return BigInt(String(result));
+}
+
 /** Ensure market_id is 0x-prefixed 32-byte hex (64 hex chars). */
 export function marketIdToBytes32(marketId: string): `0x${string}` {
   const hex = marketId.startsWith('0x') ? marketId.slice(2) : marketId;
@@ -140,8 +187,9 @@ export async function getCollateralBalanceAndSymbol(
 }
 
 /**
- * Fetch the vault's balance of the collateral token (on-chain). Use this to verify
- * the market actually holds collateral even if the app DB total_collateral is stale.
+ * Fetch the vault's total balance of the collateral token on-chain. This is the
+ * sum across all markets that share this vault, not per-market. For "Total minted"
+ * per thread/market, use the API's market.total_collateral instead.
  */
 export async function getVaultCollateralBalance(
   chainRpc: string,
@@ -162,6 +210,75 @@ export async function getVaultCollateralBalance(
   );
 }
 
+/**
+ * Compute market-specific locked collateral from vault events:
+ * minted - merged - redeemed for a single marketId.
+ */
+export async function getMarketCollateralBalanceFromLogs(
+  chainRpc: string,
+  vaultAddress: string,
+  marketId: string,
+): Promise<bigint> {
+  if (!chainRpc || !vaultAddress || !marketId) return 0n;
+
+  const web3 = new Web3(chainRpc);
+  const marketTopic = marketIdToBytes32(marketId).toLowerCase();
+  const sigMinted = (
+    web3 as unknown as { utils: { sha3: (s: string) => string } }
+  ).utils.sha3('TokensMinted(bytes32,address,uint256)');
+  const sigMerged = (
+    web3 as unknown as { utils: { sha3: (s: string) => string } }
+  ).utils.sha3('TokensMerged(bytes32,address,uint256)');
+  const sigRedeemed = (
+    web3 as unknown as { utils: { sha3: (s: string) => string } }
+  ).utils.sha3('TokensRedeemed(bytes32,address,uint256,uint8)');
+  if (!sigMinted || !sigMerged || !sigRedeemed) return 0n;
+
+  const [mintedLogs, mergedLogs, redeemedLogs] = await Promise.all([
+    web3.eth.getPastLogs({
+      address: vaultAddress,
+      fromBlock: 0,
+      toBlock: 'latest',
+      topics: [sigMinted, marketTopic],
+    }),
+    web3.eth.getPastLogs({
+      address: vaultAddress,
+      fromBlock: 0,
+      toBlock: 'latest',
+      topics: [sigMerged, marketTopic],
+    }),
+    web3.eth.getPastLogs({
+      address: vaultAddress,
+      fromBlock: 0,
+      toBlock: 'latest',
+      topics: [sigRedeemed, marketTopic],
+    }),
+  ]);
+
+  const sumSingleUintLogData = (logs: Array<{ data?: string } | string>) =>
+    logs.reduce((acc, log) => {
+      if (typeof log === 'string' || !log.data) return acc;
+      const decoded = web3.eth.abi.decodeParameter('uint256', log.data);
+      return acc + BigInt(String(decoded ?? 0));
+    }, 0n);
+
+  const sumRedeemedLogData = (logs: Array<{ data?: string } | string>) =>
+    logs.reduce((acc, log) => {
+      if (typeof log === 'string' || !log.data) return acc;
+      const decoded = web3.eth.abi.decodeParameters(
+        ['uint256', 'uint8'],
+        log.data,
+      );
+      return acc + BigInt(String(decoded?.[0] ?? 0));
+    }, 0n);
+
+  const minted = sumSingleUintLogData(mintedLogs);
+  const merged = sumSingleUintLogData(mergedLogs);
+  const redeemed = sumRedeemedLogData(redeemedLogs);
+  const net = minted - merged - redeemed;
+  return net > 0n ? net : 0n;
+}
+
 /** Parse human-readable token amount to smallest units. */
 export function parseTokenAmount(value: string, decimals: number): bigint {
   if (!value || value.trim() === '') return 0n;
@@ -176,6 +293,71 @@ export function parseTokenAmount(value: string, decimals: number): bigint {
 /** Apply slippage to get minimum output (e.g. 1% slippage => minOut = amount * 0.99). */
 export function applySlippage(amount: bigint, slippageBps: number): bigint {
   return (amount * BigInt(10000 - slippageBps)) / 10000n;
+}
+
+export type SwapQuoteParams = {
+  chain_rpc: string;
+  eth_chain_id: number;
+  router_address: string;
+  market_id: string;
+  buy_pass: boolean;
+  amount_in_wei: bigint;
+  p_token_address: string;
+  f_token_address: string;
+};
+
+/**
+ * Expected output amount for an exact-in swap on the market's Uniswap V3 pool (via strategy POOL_FEE).
+ * Use this (not amountIn) as the base for minOut after slippage.
+ */
+export async function quoteSwapAmountOut(
+  params: SwapQuoteParams,
+): Promise<bigint> {
+  const quoterAddress = UNISWAP_V3_QUOTER_V2_BY_CHAIN_ID[params.eth_chain_id];
+  if (!quoterAddress) {
+    throw new Error(
+      `Uniswap V3 QuoterV2 is not configured for chain id ${params.eth_chain_id}`,
+    );
+  }
+  const web3 = new Web3(params.chain_rpc);
+  const marketIdBytes = marketIdToBytes32(params.market_id);
+  const router = new web3.eth.Contract(
+    FutarchyRouterAbi as unknown as AbiItem[],
+    params.router_address,
+  );
+  const strategyAddress = (await router.methods
+    .getStrategy(marketIdBytes)
+    .call()) as string;
+  if (
+    !strategyAddress ||
+    strategyAddress.toLowerCase() === ZERO_ADDRESS.toLowerCase()
+  ) {
+    throw new Error('No strategy registered for this market');
+  }
+  const strategy = new web3.eth.Contract(
+    UniswapV3StrategyAbi as unknown as AbiItem[],
+    strategyAddress,
+  );
+  const poolFeeRaw = await strategy.methods.POOL_FEE().call();
+  const poolFee = Number(poolFeeRaw);
+  const tokenIn = params.buy_pass
+    ? params.f_token_address
+    : params.p_token_address;
+  const tokenOut = params.buy_pass
+    ? params.p_token_address
+    : params.f_token_address;
+
+  const quoter = new web3.eth.Contract(QUOTER_V2_ABI, quoterAddress);
+  const result = await quoter.methods
+    .quoteExactInputSingle({
+      tokenIn,
+      tokenOut,
+      amountIn: params.amount_in_wei.toString(10),
+      fee: poolFee,
+      sqrtPriceLimitX96: '0',
+    })
+    .call();
+  return quoterResultToAmountOut(result);
 }
 
 export type TradeParams = {
@@ -395,6 +577,11 @@ export async function swapTokens(
     min_amount_out_wei: bigint;
   },
 ): Promise<{ transactionHash: string }> {
+  if (!params.user_address?.trim()) {
+    throw new Error(
+      'Wallet address is missing. Connect an Ethereum wallet and try again.',
+    );
+  }
   const marketIdBytes = marketIdToBytes32(params.market_id);
   const tokenIn = params.buy_pass
     ? params.f_token_address

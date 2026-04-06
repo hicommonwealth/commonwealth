@@ -54,11 +54,9 @@ export const MembersStatsView = z.object({
 
 export const GetCommunityMembersStats = {
   input: z.object({
-    community_id: z.string().optional(),
+    community_id: z.string(),
   }),
-  output: z.object({
-    members: z.array(MembersStatsView),
-  }),
+  output: z.array(MembersStatsView),
 };
 
 export const GetCommunityGoalMetas = {

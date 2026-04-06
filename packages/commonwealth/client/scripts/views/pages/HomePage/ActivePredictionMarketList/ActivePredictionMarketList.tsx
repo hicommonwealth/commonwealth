@@ -2,7 +2,13 @@ import { getThreadUrl } from '@hicommonwealth/shared';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import FractionalValue from 'client/scripts/views/components/FractionalValue';
+import { useCollateralMeta } from 'client/scripts/views/components/PredictionMarket/useCollateralMeta';
 import { Skeleton } from 'client/scripts/views/components/Skeleton';
+import {
+  sumWeiValues,
+  weiToDisplayNumber,
+} from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -18,18 +24,6 @@ interface ActivePredictionMarketListProps {
 }
 
 const DISPLAY_LIMIT = 10;
-const WEI_PER_UNIT = 1e18;
-
-/** Format wei string to whole number with commas (e.g. 540230 -> "540,230") */
-function formatTotalMinted(weiStr: string | undefined): string {
-  if (!weiStr) return '0';
-  try {
-    const n = Number(BigInt(weiStr) / BigInt(WEI_PER_UNIT));
-    return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  } catch {
-    return '0';
-  }
-}
 
 /** Format time remaining as "12D 4H" style */
 function formatTimeRemaining(endTime: moment.Moment): string {
@@ -53,6 +47,8 @@ const PredictionMarketCardCompact = ({
     end_time?: string | Date | null;
     status: string;
     total_collateral?: string;
+    initial_liquidity?: string | null;
+    collateral_address?: string;
   };
 }) => {
   const threadUrl = getThreadUrl(
@@ -67,7 +63,19 @@ const PredictionMarketCardCompact = ({
     endTime && endTime.isValid() && endTime.isAfter(moment())
       ? formatTimeRemaining(endTime)
       : null;
-  const totalMinted = formatTotalMinted(market.total_collateral);
+  const collateralMeta = useCollateralMeta({
+    communityId: market.community_id,
+    collateralAddress: market.collateral_address,
+  });
+
+  const totalMintedWei = sumWeiValues(
+    market.total_collateral,
+    market.initial_liquidity,
+  );
+  const totalMinted = weiToDisplayNumber(
+    totalMintedWei,
+    collateralMeta.decimals,
+  );
   const navigate = useCommonNavigate();
 
   const handleViewThread = (e: React.MouseEvent) => {
@@ -90,10 +98,16 @@ const PredictionMarketCardCompact = ({
         <CWText type="h4" fontWeight="semiBold" className="prompt">
           {market.prompt || 'Prediction market'}
         </CWText>
-        {totalMinted !== '0' && (
+        {totalMinted > 0 && (
           <div className="volume-row">
             <CWIcon iconName="chartLineUp" iconSize="small" />
-            <CWText type="caption">{totalMinted} minted</CWText>
+            <FractionalValue
+              type="caption"
+              value={totalMinted}
+              currencySymbol={` ${collateralMeta.symbol}`}
+              symbolLast
+            />
+            <CWText type="caption">&nbsp;minted</CWText>
           </div>
         )}
         <div className="metrics">
@@ -101,9 +115,14 @@ const PredictionMarketCardCompact = ({
             <CWText type="caption" className="metric-label">
               TOTAL MINTED
             </CWText>
-            <CWText type="h4" fontWeight="semiBold" className="metric-value">
-              {totalMinted}
-            </CWText>
+            <FractionalValue
+              type="h4"
+              fontWeight="semiBold"
+              className="metric-value"
+              value={totalMinted}
+              currencySymbol={` ${collateralMeta.symbol}`}
+              symbolLast
+            />
           </div>
           <div className="metric-box">
             <CWText type="caption" className="metric-label">

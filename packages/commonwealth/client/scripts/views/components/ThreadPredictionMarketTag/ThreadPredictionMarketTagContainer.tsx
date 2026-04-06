@@ -34,7 +34,12 @@ const ThreadPredictionMarketTagContainer = ({
 
   if (!showTag || !displayMarket) return null;
 
-  return <ThreadPredictionMarketTag market={displayMarket} />;
+  return (
+    <ThreadPredictionMarketTag
+      market={displayMarket}
+      communityId={thread?.communityId}
+    />
+  );
 };
 
 export default ThreadPredictionMarketTagContainer;

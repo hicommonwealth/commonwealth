@@ -79,6 +79,12 @@ export const DeployDraftPredictionMarketModal = ({
   const collateralAddress = (market.collateral_address ?? '').trim();
   const isValidCollateral =
     collateralAddress.startsWith('0x') && collateralAddress.length === 42;
+  const initialLiquidity = (market.initial_liquidity ?? '').toString().trim();
+  const initialLiquidityWei =
+    /^\d+$/.test(initialLiquidity) && initialLiquidity.length > 0
+      ? BigInt(initialLiquidity)
+      : 0n;
+  const hasValidInitialLiquidity = initialLiquidityWei > 0n;
 
   const handleDeploy = async () => {
     if (!thread?.id || !activeAddress) {
@@ -104,10 +110,14 @@ export const DeployDraftPredictionMarketModal = ({
     setErrorMessage(null);
     setPhase('deploying');
 
-    const initialLiquidity =
-      (market.initial_liquidity ?? '').toString().trim() || '0';
-
-    console.log('market => ', market);
+    if (!hasValidInitialLiquidity) {
+      setErrorMessage(
+        'Initial liquidity must be greater than 0 to deploy on-chain.',
+      );
+      notifyError('Initial liquidity is required for deployment.');
+      setPhase('error');
+      return;
+    }
 
     try {
       const payload = await deployPredictionMarketOnChain({
@@ -118,7 +128,7 @@ export const DeployDraftPredictionMarketModal = ({
         collateral_address: collateralAddress as `0x${string}`,
         duration_days: durationDays,
         resolution_threshold: resolutionThreshold,
-        initial_liquidity: initialLiquidity,
+        initial_liquidity_wei: initialLiquidityWei.toString(),
       });
 
       await deployMutation.mutateAsync({
@@ -134,7 +144,7 @@ export const DeployDraftPredictionMarketModal = ({
         proposal_id: payload.proposal_id,
         start_time: payload.start_time,
         end_time: payload.end_time,
-        initial_liquidity: initialLiquidity,
+        initial_liquidity: initialLiquidityWei.toString(),
       });
 
       notifySuccess('Prediction market deployed.');
@@ -188,6 +198,12 @@ export const DeployDraftPredictionMarketModal = ({
           This draft will be deployed to the chain. You will need to sign a
           transaction.
         </CWText>
+        {!hasValidInitialLiquidity && (
+          <CWText type="caption" className="help-text">
+            This draft has no initial liquidity. Set initial liquidity before
+            deploying.
+          </CWText>
+        )}
         {!deployConfigured && (
           <CWText type="caption" className="help-text">
             On-chain deployment is configured only for Base Sepolia (chain ID
@@ -212,7 +228,12 @@ export const DeployDraftPredictionMarketModal = ({
           label="Deploy on-chain"
           buttonType="primary"
           buttonHeight="sm"
-          disabled={!deployConfigured || !activeAddress || !isValidCollateral}
+          disabled={
+            !deployConfigured ||
+            !activeAddress ||
+            !isValidCollateral ||
+            !hasValidInitialLiquidity
+          }
           onClick={() => void handleDeploy()}
         />
       </CWModalFooter>

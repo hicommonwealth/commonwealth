@@ -16,6 +16,7 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 export const PredictionMarketView = PredictionMarket.extend({
   id: PG_INT,
   total_collateral: z.string(),
+  market_volume: z.string().optional(),
   initial_liquidity: z.string().nullish(),
   start_time: z.coerce.date().or(z.string()).nullish(),
   end_time: z.coerce.date().or(z.string()).nullish(),
