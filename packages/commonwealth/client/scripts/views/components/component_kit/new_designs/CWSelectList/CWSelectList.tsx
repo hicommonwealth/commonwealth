@@ -12,7 +12,7 @@ import { MultiValueRemove } from './MultiValueRemove';
 import { Option } from './Option';
 
 type CustomCWSelectListProps = {
-  label?: string;
+  label?: React.ReactNode;
   hookToForm?: boolean;
   customError?: string;
   // eslint-disable-next-line prettier/prettier
@@ -89,6 +89,14 @@ export const CWSelectList = <
 
   const isDisabled = props?.isDisabled || formFieldContext?.disabled;
 
+  const renderLabel = () => {
+    if (!label) return null;
+    if (typeof label === 'string') {
+      return <MessageRow label={label} />;
+    }
+    return label;
+  };
+
   return (
     <div
       className={getClasses<{
@@ -102,7 +110,7 @@ export const CWSelectList = <
         'CWSelectList',
       )}
     >
-      {label && <MessageRow label={label} />}
+      {renderLabel()}
       <Select
         {...props}
         {...formFieldContext}
