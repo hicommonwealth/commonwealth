@@ -1,8 +1,8 @@
 import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
+import { getMagicForChain } from 'client/scripts/utils/magicNetworkUtils';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 import { userStore } from 'state/ui/user';
-import { getMagicForChain } from 'utils/magicNetworkUtils';
 import { fetchNodes } from '../nodes';
 
 interface LaunchTokenProps {
