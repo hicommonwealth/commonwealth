@@ -5,10 +5,12 @@ import {
 } from '@knocklabs/client';
 import { Avatar, NotificationCellProps } from '@knocklabs/react';
 import '@knocklabs/react-notification-feed/dist/index.css';
+import DOMPurify from 'dompurify';
 import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { CWText } from '../component_kit/cw_text';
+import { dompurifyConfig } from '../react_quill_editor/utils';
 type WorkflowKey =
   | 'comment-creation'
   | 'snapshot-proposals'
@@ -64,7 +66,12 @@ const CustomNotificationCell = ({ item }: NotificationCellProps) => {
           {isRenderableBlock(contentBlock) && (
             <div
               className="main-container"
-              dangerouslySetInnerHTML={{ __html: contentBlock.rendered }}
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(
+                  contentBlock.rendered,
+                  dompurifyConfig,
+                ),
+              }}
             />
           )}
           <CWText fontWeight="regular" type="b2">

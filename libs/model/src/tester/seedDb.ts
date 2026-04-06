@@ -57,8 +57,8 @@ export const seedDb = async () => {
           balance_type: BalanceType.Substrate,
         },
         ethereum: {
-          url: 'https://eth-mainnet.alchemyapi.io/v2/dummy_key',
-          private_url: 'https://eth-mainnet.alchemyapi.io/v2/dummy_key',
+          url: 'https://eth-mainnet.g.alchemy.com/v2/dummy_key',
+          private_url: 'https://eth-mainnet.g.alchemy.com/v2/dummy_key',
           name: 'Ethereum Mainnet',
           eth_chain_id: 1,
           balance_type: BalanceType.Ethereum,

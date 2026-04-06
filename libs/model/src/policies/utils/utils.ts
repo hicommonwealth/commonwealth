@@ -1,24 +1,4 @@
-import { CustomRetryStrategyError } from '@hicommonwealth/core';
 import { config } from '../../config';
-import { models } from '../../database';
-
-export async function chainNodeMustExist(ethChainId: number) {
-  const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
-    where: {
-      eth_chain_id: ethChainId,
-    },
-  });
-
-  if (!chainNode) {
-    // dead-letter with no retries -- should never happen
-    throw new CustomRetryStrategyError(
-      `Chain node with eth_chain_id ${ethChainId} not found!`,
-      { strategy: 'nack' },
-    );
-  }
-
-  return chainNode;
-}
 
 function parseCustomDomain(customDomain: string) {
   let parsedDomain = customDomain;

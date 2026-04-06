@@ -584,7 +584,7 @@ describe('Gating lifecycle', () => {
 
       const botAddress = botUser.Addresses[0];
 
-      // Create system actor for bot (this is how CreateAICompletionComment does it)
+      // Create system actor for bot (this is how the AI completion handler does it)
       const botSystemActor = systemActor({
         address: botAddress.address,
         id: botUser.id!,

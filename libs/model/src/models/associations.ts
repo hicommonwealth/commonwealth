@@ -171,6 +171,24 @@ export const buildAssociations = (db: DB) => {
       foreignKey: 'thread_id',
     });
 
+  db.Thread.withMany(db.PredictionMarket, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
+
+  db.PredictionMarket.withMany(db.PredictionMarketTrade, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  }).withMany(db.PredictionMarketPosition, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
+
+  db.User.withMany(db.PredictionMarketPosition, {
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  });
+
   db.ThreadToken.withMany(db.ThreadTokenTrade, {
     foreignKey: 'token_address',
     onUpdate: 'CASCADE',
@@ -211,6 +229,17 @@ export const buildAssociations = (db: DB) => {
 
   db.Group.withMany(db.GroupGatedAction, {
     foreignKey: 'group_id',
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
+
+  db.ClaimEvents.withMany(db.ClaimAddresses, {
+    foreignKey: 'event_id',
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
+  db.User.withMany(db.ClaimAddresses, {
+    foreignKey: 'user_id',
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   });
@@ -301,6 +330,11 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
       asOne: 'meta',
     },
+  );
+
+  db.CommunityMarket.withManyToMany(
+    { model: db.Community },
+    { model: db.Market },
   );
 
   db.LaunchpadToken.withMany(db.LaunchpadTrade, {

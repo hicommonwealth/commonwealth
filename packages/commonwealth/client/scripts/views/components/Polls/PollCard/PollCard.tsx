@@ -32,6 +32,13 @@ interface VoterProfileData {
   address: string;
 }
 
+type SecondaryToken = {
+  token_address: string;
+  token_symbol?: string;
+  token_decimals: number;
+  vote_weight_multiplier: number;
+};
+
 export type PollCardProps = PollOptionProps &
   CastVoteProps &
   ResultsSectionProps & {
@@ -46,6 +53,7 @@ export type PollCardProps = PollOptionProps &
     tokenDecimals?: number;
     topicWeight?: TopicWeightedVoting | null;
     tokenAddress?: string;
+    secondaryTokens?: SecondaryToken[];
     isLoadingVotes?: boolean;
     endTimestamp?: string;
     allowRevotes?: boolean;
@@ -76,6 +84,7 @@ export const PollCard = ({
   tokenDecimals,
   topicWeight,
   tokenAddress,
+  secondaryTokens,
   isLoadingVotes = false,
   allowRevotes = false,
   userHasVoted = false,
@@ -252,6 +261,7 @@ export const PollCard = ({
           topicWeight={topicWeight}
           tokenSymbol={tokenSymbol}
           tokenAddress={tokenAddress}
+          secondaryTokens={secondaryTokens}
           communityId={communityId}
           onDownloadCsv={handleDownloadCsv}
           isLoading={isLoadingVotes}

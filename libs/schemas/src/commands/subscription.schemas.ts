@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { VerifiedContext } from '../context';
+import { ThreadContext, VerifiedContext } from '../context';
 import {
   CommentSubscription,
   CommunityAlert,
@@ -96,7 +96,7 @@ export const CreateThreadSubscription = {
     thread_id: PG_INT,
   }),
   output: ThreadSubscription,
-  context: VerifiedContext,
+  context: ThreadContext,
 };
 
 export const RegisterClientRegistrationToken = {

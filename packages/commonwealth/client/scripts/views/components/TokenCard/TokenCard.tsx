@@ -3,12 +3,12 @@ import { getDefaultContestImage } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import clsx from 'clsx';
+import { useTokenPricing } from 'hooks/useTokenPricing';
+import React from 'react';
 import {
   currencyNameToSymbolMap,
   SupportedFiatCurrencies,
-} from 'helpers/currency';
-import { useTokenPricing } from 'hooks/useTokenPricing';
-import React from 'react';
+} from 'shared/utils/currency';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';

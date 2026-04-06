@@ -1,6 +1,6 @@
 import { Webhook, WebhookSupportedEvents } from '@hicommonwealth/schemas';
 import React, { useState } from 'react';
-import { saveToClipboard } from 'utils/clipboard';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import z from 'zod';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';

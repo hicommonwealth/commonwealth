@@ -5,7 +5,6 @@ import {
   getSessionSigners,
   WalletId,
 } from '@hicommonwealth/shared';
-import { usePrivy } from '@privy-io/react-auth';
 import axios from 'axios';
 import {
   LocalStorageKeys,
@@ -16,7 +15,6 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { getUniqueUserAddresses } from 'helpers/user';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
@@ -33,7 +31,6 @@ import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
-import { usePrivyMobileLogout } from 'views/components/PrivyMobile/usePrivyMobileLogout';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { MobileTabType } from '../../pages/WalletPage/types';
 import { mobileTabParam } from '../../pages/WalletPage/utils';
@@ -74,14 +71,6 @@ const useUserMenuItems = ({
     recheck: isMenuOpen,
   });
 
-  const rewardsEnabled = useFlag('rewardsPage');
-  const referralsEnabled = useFlag('referrals');
-  const xpEnabled = useFlag('xp');
-  const privyEnabled = useFlag('privy');
-
-  const { authenticated, logout } = usePrivy();
-  const privyMobileLogout = usePrivyMobileLogout();
-
   const userData = useUserStore();
   const hasMagic = userData.hasMagicWallet;
 
@@ -109,20 +98,12 @@ const useUserMenuItems = ({
 
   const handleLogout = useCallback(async () => {
     try {
-      await axios.get(`${SERVER_URL}/logout`);
+      await axios.post(`${SERVER_URL}/logout`);
       await initAppState();
       await resetWalletConnectSession();
       for (const signer of getSessionSigners()) {
         signer.target.clear();
       }
-      if (privyEnabled && authenticated) {
-        await logout();
-      }
-
-      // when in the mobile, app, logout there too. It's safe to call this
-      // when not in the mobile app.
-      privyMobileLogout({}).catch(console.error);
-
       notifySuccess('Signed out');
       darkModeStore.getState().reCalculateDarkMode();
       setLocalStorageItem(LocalStorageKeys.HasSeenNotifications, 'true');
@@ -131,7 +112,7 @@ const useUserMenuItems = ({
       notifyError('Something went wrong during logging out.');
       window.location.reload();
     }
-  }, [authenticated, logout, privyEnabled, privyMobileLogout]);
+  }, []);
 
   useEffect(() => {
     // if a user is in a stake enabled community without membership, set first user address as active that
@@ -310,38 +291,28 @@ const useUserMenuItems = ({
             },
           ]
         : []),
-      ...(referralsEnabled
-        ? [
-            {
-              type: 'default',
-              label: 'Get referral link',
-              onClick: () => {
-                onReferralItemClick?.();
-              },
-            },
-          ]
-        : []),
+      {
+        type: 'default',
+        label: 'Get referral link',
+        onClick: () => {
+          onReferralItemClick?.();
+        },
+      },
       {
         type: 'default',
         label: 'My transactions',
         onClick: () =>
           navigate(
-            rewardsEnabled
-              ? `/wallet?tab=${mobileTabParam[MobileTabType.WalletBalance]}`
-              : `/myTransactions`,
+            `/wallet?tab=${mobileTabParam[MobileTabType.WalletBalance]}`,
             {},
             null,
           ),
       },
-      ...(xpEnabled
-        ? [
-            {
-              type: 'default',
-              label: 'Leaderboard',
-              onClick: () => navigate(`/leaderboard`, {}, null),
-            },
-          ]
-        : []),
+      {
+        type: 'default',
+        label: 'Leaderboard',
+        onClick: () => navigate(`/leaderboard`, {}, null),
+      },
       {
         type: 'default',
         label: 'Notification settings',

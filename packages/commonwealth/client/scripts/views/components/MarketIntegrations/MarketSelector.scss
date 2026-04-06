@@ -1,0 +1,38 @@
+.MarketSelector {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .markets-header {
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e9ecef;
+
+    .markets-title {
+      margin-bottom: 8px;
+      color: #1a1a1a;
+      font-size: 32px;
+      letter-spacing: -0.5px;
+    }
+
+    .markets-subtitle {
+      color: #6c757d;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+  }
+
+  .markets-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+  }
+
+  .load-more-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 24px 0;
+  }
+}

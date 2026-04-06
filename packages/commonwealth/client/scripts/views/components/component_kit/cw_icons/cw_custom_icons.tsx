@@ -1163,10 +1163,6 @@ export const CWPara = ({
   );
 };
 
-export const CWPrivy = () => {
-  return <svg></svg>;
-};
-
 export const CWSolana = (props: CustomIconProps) => {
   const { componentType, iconSize, ...otherProps } = props;
   return (

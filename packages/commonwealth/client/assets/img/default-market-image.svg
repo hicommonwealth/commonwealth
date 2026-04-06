@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200" fill="none">
+  <rect width="400" height="200" fill="#f8f9fa"/>
+  <rect x="100" y="60" width="200" height="80" rx="8" fill="#e9ecef"/>
+  <path d="M160 90 L200 110 L240 85 L280 100" stroke="#667eea" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="160" cy="90" r="5" fill="#667eea"/>
+  <circle cx="200" cy="110" r="5" fill="#667eea"/>
+  <circle cx="240" cy="85" r="5" fill="#667eea"/>
+  <circle cx="280" cy="100" r="5" fill="#667eea"/>
+  <text x="200" y="165" font-family="system-ui, sans-serif" font-size="14" fill="#6c757d" text-anchor="middle">Prediction Market</text>
+</svg>

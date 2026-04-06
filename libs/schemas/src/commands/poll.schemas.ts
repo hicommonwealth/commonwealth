@@ -5,32 +5,42 @@ import { Poll, Vote } from '../entities/poll.schemas';
 import { PG_INT } from '../utils';
 
 export const CreatePoll = {
-  input: z.object({
-    thread_id: PG_INT,
-    prompt: z.string(),
-    options: z.array(z.string()),
-    duration: PG_INT.min(1).max(31).default(DEFAULT_POLL_DURATION).nullable(), // null means infinite
-    allow_revotes: z.boolean().default(false),
-  }),
+  input: z
+    .object({
+      thread_id: PG_INT,
+      prompt: z.string(),
+      options: z.array(z.string()),
+      duration: PG_INT.min(1).max(31).default(DEFAULT_POLL_DURATION).nullable(), // null means infinite
+      allow_revotes: z.boolean().default(false),
+    })
+    .describe('Create a poll on a thread with options and duration'),
   output: Poll,
   context: ThreadContext,
 };
 
 export const DeletePoll = {
-  input: z.object({
-    thread_id: PG_INT,
-    poll_id: PG_INT,
-  }),
+  input: z
+    .object({
+      thread_id: PG_INT,
+      poll_id: PG_INT,
+    })
+    .describe('Delete a poll from a thread'),
   output: z.boolean(),
   context: ThreadContext,
 };
 
 export const CreatePollVote = {
-  input: z.object({
-    thread_id: PG_INT,
-    poll_id: PG_INT,
-    option: z.string(),
-  }),
+  input: z
+    .object({
+      thread_id: PG_INT,
+      poll_id: PG_INT,
+      option: z.string(),
+    })
+    .describe(
+      'Vote on a poll option. ' +
+        "The option must be one of the poll's defined options. " +
+        'The thread must not be archived or locked.',
+    ),
   output: Vote,
   context: PollContext,
 };

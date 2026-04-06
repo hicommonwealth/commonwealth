@@ -35,6 +35,7 @@ import {
   mainnet,
   optimism,
   skaleCalypsoTestnet,
+  soneium,
 } from 'viem/chains';
 import Web3, { AbiInput, TransactionReceipt, Web3 as Web3Type } from 'web3';
 import * as AbiCoder from 'web3-eth-abi';
@@ -260,6 +261,7 @@ export const ViemChains: Record<ValidChains, Chain> = {
   [ValidChains.BSC]: bsc,
   [ValidChains.Anvil]: anvil,
   [ValidChains.SKALE_TEST]: skaleCalypsoTestnet,
+  [ValidChains.Soneium]: soneium,
 };
 
 export type EvmProtocolChain = {

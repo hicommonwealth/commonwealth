@@ -1,7 +1,8 @@
+import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import React, { useState } from 'react';
+import Permissions from 'shared/utils/Permissions';
 import { useGetMembersQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
-import Permissions from 'utils/Permissions';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -58,7 +59,9 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
       search: debouncedSearchTerm,
       limit: 5,
       apiEnabled:
-        !!communityId && debouncedSearchTerm.length > 2 && isSearchVisible,
+        !!communityId &&
+        debouncedSearchTerm.length >= MIN_SEARCH_LENGTH &&
+        isSearchVisible,
       searchByNameAndAddress: true,
     });
 
@@ -188,11 +191,13 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
           </div>
 
           <div className="search-results">
-            {searchTerm.length > 0 && searchTerm.length < 3 ? (
+            {searchTerm.length > 0 && searchTerm.length < MIN_SEARCH_LENGTH ? (
               <div className="no-results">
-                <CWText>Search term must be at least 3 characters</CWText>
+                <CWText>
+                  Search term must be at least {MIN_SEARCH_LENGTH} characters
+                </CWText>
               </div>
-            ) : debouncedSearchTerm.length > 2 ? (
+            ) : debouncedSearchTerm.length >= MIN_SEARCH_LENGTH ? (
               isSearchLoading ? (
                 <div className="loading-container">
                   <CWCircleMultiplySpinner />

@@ -1,3 +1,4 @@
+import { MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import { Memberships } from 'client/scripts/state/api/groups/getMemberships';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
@@ -44,7 +45,10 @@ export const useMemberData = ({
     order_by: tableState.orderBy,
     // @ts-expect-error StrictNullChecks
     order_direction: tableState.orderDirection as 'ASC' | 'DESC',
-    search: debouncedSearchTerm,
+    ...(debouncedSearchTerm &&
+      debouncedSearchTerm.length >= MIN_SEARCH_LENGTH && {
+        search: debouncedSearchTerm,
+      }),
     community_id: communityId,
     include_roles: true,
     ...(membershipsFilter && {

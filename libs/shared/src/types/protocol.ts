@@ -94,6 +94,7 @@ export type AbiType = Record<string, unknown>[];
 
 export enum WalletId {
   Magic = 'magic',
+  // Legacy: Privy auth removed; keep for historical records.
   Privy = 'privy',
   Polkadot = 'polkadot',
   Metamask = 'metamask',

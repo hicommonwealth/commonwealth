@@ -9,7 +9,6 @@ import {
 } from '@hicommonwealth/model';
 import { systemActor } from '@hicommonwealth/model/middleware';
 import { Router, raw } from 'express';
-import farcasterRouter from 'server/farcaster/router';
 import { validateFarcasterAction } from 'server/middleware/validateFarcasterAction';
 import { validateNeynarWebhook } from 'server/middleware/validateNeynarWebhook';
 import { config as serverConfig } from '../config';
@@ -34,10 +33,6 @@ function build() {
     },
     express.command(ChainEvents.ChainEventCreated()),
   );
-
-  // Farcaster frames
-  // WARNING: do not change this because cloudflare may route to it
-  router.use('/farcaster/contests', farcasterRouter);
 
   // Farcaster webhooks/actions
   router.post(

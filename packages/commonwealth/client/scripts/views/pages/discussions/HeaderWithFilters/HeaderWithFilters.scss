@@ -4,12 +4,33 @@
 @use '../../../../styles/mixins/text';
 
 // Global styles for token address popover content (rendered in portal)
+.token-addresses-popover-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 380px;
+  min-width: 280px;
+}
+
 .token-address-popover-content {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  max-width: 320px;
-  min-width: 250px;
+
+  .token-address-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .token-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: colors.$neutral-500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 
   .token-address-text {
     font-family: monospace;
@@ -19,7 +40,6 @@
     overflow-wrap: break-word;
     white-space: normal;
     line-height: 1.4;
-    flex: 1;
     padding-right: 4px;
   }
 
@@ -39,6 +59,11 @@
         fill: colors.$neutral-700;
       }
     }
+  }
+
+  & + & {
+    padding-top: 12px;
+    border-top: 1px solid colors.$neutral-200;
   }
 }
 
@@ -83,6 +108,13 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
+
+      .token-entry {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
 
       .token-symbol {
         font-weight: 600;

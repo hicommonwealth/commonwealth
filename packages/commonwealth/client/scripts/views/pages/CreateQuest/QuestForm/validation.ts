@@ -1,8 +1,8 @@
 import {
   linkValidationSchema,
   numberNonDecimalGTZeroValidationSchema,
-} from 'helpers/formValidations/common';
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
+} from 'shared/utils/formValidations/common';
+import { VALIDATION_MESSAGES } from 'shared/utils/formValidations/messages';
 import { z } from 'zod';
 import { QuestTypes } from './types';
 
