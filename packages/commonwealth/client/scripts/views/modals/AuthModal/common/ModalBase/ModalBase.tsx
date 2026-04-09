@@ -90,7 +90,6 @@ const ModalBase = ({
   showAuthOptionTypesFor,
   bodyClassName,
   onSignInClick,
-  triggerOpenEVMWalletsSubModal,
   isUserFromWebView = false,
 }: ModalBaseProps) => {
   const mobileApp = isUserFromWebView;
@@ -178,7 +177,6 @@ const ModalBase = ({
   const findWalletById = (walletId: WalletId) =>
     wallets.find((wallet) => wallet.name === walletId);
 
-  const hasWalletConnect = findWalletById(WalletId.WalletConnect);
   const isOkxWalletAvailable = findWalletById(WalletId.OKX);
   const isBinanceWalletAvailable = findWalletById(WalletId.Binance);
   const isGateWalletAvailable = findWalletById(WalletId.Gate);
