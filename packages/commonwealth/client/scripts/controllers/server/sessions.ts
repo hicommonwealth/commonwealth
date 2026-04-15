@@ -117,7 +117,13 @@ export async function getSessionFromWallet(
     } else {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const session = (wallet as any).getSession();
-      return session;
+      if (session) {
+        return session;
+      }
+
+      // Revalidation paths may request a Sui session before a local cached
+      // session exists. In that case, mint one on-demand.
+      return getSessionFromWallet(wallet, { newSession: true });
     }
   }
 
