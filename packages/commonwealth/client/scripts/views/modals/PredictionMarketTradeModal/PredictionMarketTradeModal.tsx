@@ -109,6 +109,14 @@ type PredictionMarketTradeModalProps = {
 };
 
 type TabId = 'mint' | 'swap' | 'merge' | 'redeem';
+type SuccessAction = 'mint' | 'swap' | 'merge' | 'redeem';
+
+type SuccessState = {
+  action: SuccessAction;
+  txHash: string;
+  submittedBy: string;
+  completedAt: string;
+};
 
 function getTradeParams(
   market: Market,
@@ -187,6 +195,7 @@ export const PredictionMarketTradeModal = ({
   const [swapQuoteOutWei, setSwapQuoteOutWei] = useState<bigint | null>(null);
   const [swapQuoteError, setSwapQuoteError] = useState<string | null>(null);
   const [swapQuoteLoading, setSwapQuoteLoading] = useState(false);
+  const [successState, setSuccessState] = useState<SuccessState | null>(null);
   const swapQuoteDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -202,6 +211,12 @@ export const PredictionMarketTradeModal = ({
   const ethChainId =
     (community as { ChainNode?: { eth_chain_id?: number } } | undefined)
       ?.ChainNode?.eth_chain_id ?? 0;
+  const chainLabel =
+    (community as { ChainNode?: { name?: string } } | undefined)?.ChainNode
+      ?.name ?? 'Current network';
+  const blockExplorerBaseUrl =
+    (community as { ChainNode?: { block_explorer?: string } } | undefined)
+      ?.ChainNode?.block_explorer ?? 'https://basescan.org/';
 
   const { data: positions = [], refetch: refetchPositions } =
     useGetPredictionMarketPositionsQuery({
@@ -486,7 +501,7 @@ export const PredictionMarketTradeModal = ({
         notifyError('Wallet not found for this address.');
         return;
       }
-      await mintTokens({
+      const { transactionHash } = await mintTokens({
         ...getTradeParams(
           effectiveMarket,
           chainRpc,
@@ -507,7 +522,12 @@ export const PredictionMarketTradeModal = ({
         ).then((info) => setCollateralInfo(info));
       }
       onSuccess?.();
-      onClose();
+      setSuccessState({
+        action: 'mint',
+        txHash: transactionHash,
+        submittedBy: activeAddress,
+        completedAt: new Date().toLocaleString(),
+      });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Mint failed.';
       setErrorMessage(msg);
@@ -575,7 +595,7 @@ export const PredictionMarketTradeModal = ({
         notifyError(qMsg);
         return;
       }
-      await swapTokens({
+      const { transactionHash } = await swapTokens({
         ...getTradeParams(
           effectiveMarket,
           chainRpc,
@@ -600,7 +620,12 @@ export const PredictionMarketTradeModal = ({
         );
       }
       onSuccess?.();
-      onClose();
+      setSuccessState({
+        action: 'swap',
+        txHash: transactionHash,
+        submittedBy: activeAddress,
+        completedAt: new Date().toLocaleString(),
+      });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Swap failed.';
       setErrorMessage(msg);
@@ -638,7 +663,7 @@ export const PredictionMarketTradeModal = ({
         notifyError('Wallet not found for this address.');
         return;
       }
-      await mergeTokens({
+      const { transactionHash } = await mergeTokens({
         ...getTradeParams(
           effectiveMarket,
           chainRpc,
@@ -669,7 +694,12 @@ export const PredictionMarketTradeModal = ({
         );
       }
       onSuccess?.();
-      onClose();
+      setSuccessState({
+        action: 'merge',
+        txHash: transactionHash,
+        submittedBy: activeAddress,
+        completedAt: new Date().toLocaleString(),
+      });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Merge failed.';
       setErrorMessage(msg);
@@ -707,7 +737,7 @@ export const PredictionMarketTradeModal = ({
         notifyError('Wallet not found for this address.');
         return;
       }
-      await redeemTokens({
+      const { transactionHash } = await redeemTokens({
         ...getTradeParams(
           effectiveMarket,
           chainRpc,
@@ -722,7 +752,12 @@ export const PredictionMarketTradeModal = ({
       await refetchPositions();
       await refetchEthBalance();
       onSuccess?.();
-      onClose();
+      setSuccessState({
+        action: 'redeem',
+        txHash: transactionHash,
+        submittedBy: activeAddress,
+        completedAt: new Date().toLocaleString(),
+      });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Redeem failed.';
       setErrorMessage(msg);
@@ -1079,6 +1114,26 @@ export const PredictionMarketTradeModal = ({
     );
   };
 
+  const getSuccessActionLabel = (action: SuccessAction) => {
+    if (action === 'mint') return 'Deposit and Mint';
+    if (action === 'swap') return 'Swap';
+    if (action === 'merge') return 'Merge';
+    return 'Redeem';
+  };
+
+  const truncateTxHash = (txHash: string) => {
+    if (!txHash) return '';
+    if (txHash.length <= 16) return txHash;
+    return `${txHash.slice(0, 10)}...${txHash.slice(-8)}`;
+  };
+
+  const buildTxExplorerLink = (txHash: string) =>
+    `${blockExplorerBaseUrl}tx/${txHash}`;
+  const successPanelState: SuccessState | null = successState;
+  const handleClose = () => {
+    onClose();
+  };
+
   if (!hasAddresses) {
     return (
       <div className="PredictionMarketTradeModal">
@@ -1169,428 +1224,535 @@ export const PredictionMarketTradeModal = ({
   return (
     <div className="PredictionMarketTradeModal">
       <CWModalHeader
-        label="Prediction market — Trade"
-        subheader={market.prompt ?? ''}
+        label={
+          successPanelState
+            ? 'Transaction submitted successfully'
+            : 'Prediction market — Trade'
+        }
+        subheader={successPanelState ? '' : (market.prompt ?? '')}
         onModalClose={onClose}
       />
       <CWDivider />
       <CWModalBody>
-        <div className="address-selector-row">
-          <CWSelectList
-            components={{
-              Option: (originalProps) =>
-                CustomAddressOption({
-                  originalProps,
-                  selectedAddressValue: activeAddress,
-                }),
-            }}
-            noOptionsMessage={() => 'No available address'}
-            value={convertAddressToDropdownOption(activeAddress)}
-            formatOptionLabel={(option) => (
-              <CustomAddressOptionElement
-                value={option.value}
-                label={option.label}
-                selectedAddressValue={activeAddress}
-              />
-            )}
-            isClearable={false}
-            isSearchable={false}
-            options={uniqueAddresses.map(convertAddressToDropdownOption)}
-            onChange={(option) =>
-              option?.value && setSelectedAddress(option.value)
-            }
-          />
-        </div>
-        <div className="collateral-row">
-          <button
-            type="button"
-            className="collateral-row-header"
-            onClick={() => setDetailsCollapsed((c) => !c)}
-            aria-expanded={!detailsCollapsed}
-          >
-            <div className="collateral-row-summary">
-              {(marketCollateralOnChain != null ||
-                market.total_collateral != null) && (
-                <div className="collateral-label total-minted">
-                  <CWText type="caption">Total minted:&nbsp;</CWText>
-                  <FractionalValue
-                    type="caption"
-                    value={totalMintedDisplay}
-                    currencySymbol={` ${collateralInfo ? collateralInfo.symbol : 'ETH'}`}
-                    symbolLast
-                  />
-                </div>
-              )}
-              {market.end_time && (
-                <CWText type="caption" className="collateral-label market-ends">
-                  Market ends:&nbsp;
-                  {new Date(market.end_time).toLocaleString(undefined, {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true,
-                  })}
+        {successPanelState ? (
+          <div className="success-state-panel">
+            <CWText type="b2" className="success-description">
+              Your transaction is on-chain. Use the details below to verify it
+              in your block explorer.
+            </CWText>
+
+            <div className="success-details">
+              <div className="success-detail-row">
+                <CWText type="caption">Action</CWText>
+                <CWText type="caption" fontWeight="medium">
+                  {getSuccessActionLabel(successPanelState.action)}
                 </CWText>
+              </div>
+              <div className="success-detail-row">
+                <CWText type="caption">Network</CWText>
+                <CWText type="caption" fontWeight="medium">
+                  {chainLabel}
+                </CWText>
+              </div>
+              <div className="success-detail-row">
+                <CWText type="caption">Submitted by</CWText>
+                <CWText type="caption" fontWeight="medium">
+                  {formatAddressShort(successPanelState.submittedBy, 8, 6)}
+                </CWText>
+              </div>
+              <div className="success-detail-row">
+                <CWText type="caption">Completed</CWText>
+                <CWText type="caption" fontWeight="medium">
+                  {successPanelState.completedAt}
+                </CWText>
+              </div>
+              <div className="success-tx-row">
+                <CWText type="caption">Transaction ID</CWText>
+                <div className="success-tx-actions">
+                  <button
+                    type="button"
+                    className="success-tx-copy"
+                    onClick={() =>
+                      saveToClipboard(successPanelState.txHash, true).catch(
+                        () => notifyError('Failed to copy'),
+                      )
+                    }
+                    title="Copy transaction hash"
+                  >
+                    <span className="tx-hash-text">
+                      {truncateTxHash(successPanelState.txHash)}
+                    </span>
+                    <CWIcon
+                      iconName="copy"
+                      iconSize="small"
+                      className="copy-icon"
+                    />
+                  </button>
+                  <CWButton
+                    label="View on Explorer"
+                    buttonType="secondary"
+                    buttonHeight="sm"
+                    iconRight="externalLink"
+                    onClick={() =>
+                      window.open(
+                        buildTxExplorerLink(successPanelState.txHash),
+                        '_blank',
+                      )
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="address-selector-row">
+              <CWSelectList
+                components={{
+                  Option: (originalProps) =>
+                    CustomAddressOption({
+                      originalProps,
+                      selectedAddressValue: activeAddress,
+                    }),
+                }}
+                noOptionsMessage={() => 'No available address'}
+                value={convertAddressToDropdownOption(activeAddress)}
+                formatOptionLabel={(option) => (
+                  <CustomAddressOptionElement
+                    value={option.value}
+                    label={option.label}
+                    selectedAddressValue={activeAddress}
+                  />
+                )}
+                isClearable={false}
+                isSearchable={false}
+                options={uniqueAddresses.map(convertAddressToDropdownOption)}
+                onChange={(option) =>
+                  option?.value && setSelectedAddress(option.value)
+                }
+              />
+            </div>
+            <div className="collateral-row">
+              <button
+                type="button"
+                className="collateral-row-header"
+                onClick={() => setDetailsCollapsed((c) => !c)}
+                aria-expanded={!detailsCollapsed}
+              >
+                <div className="collateral-row-summary">
+                  {(marketCollateralOnChain != null ||
+                    market.total_collateral != null) && (
+                    <div className="collateral-label total-minted">
+                      <CWText type="caption">Total minted:&nbsp;</CWText>
+                      <FractionalValue
+                        type="caption"
+                        value={totalMintedDisplay}
+                        currencySymbol={` ${collateralInfo ? collateralInfo.symbol : 'ETH'}`}
+                        symbolLast
+                      />
+                    </div>
+                  )}
+                  {market.end_time && (
+                    <CWText
+                      type="caption"
+                      className="collateral-label market-ends"
+                    >
+                      Market ends:&nbsp;
+                      {new Date(market.end_time).toLocaleString(undefined, {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
+                      })}
+                    </CWText>
+                  )}
+                </div>
+                {detailsCollapsed ? (
+                  <CaretDown
+                    size={16}
+                    weight="bold"
+                    className="collateral-chevron"
+                  />
+                ) : (
+                  <CaretUp
+                    size={16}
+                    weight="bold"
+                    className="collateral-chevron"
+                  />
+                )}
+              </button>
+              {!detailsCollapsed && (
+                <div className="collateral-row-details">
+                  {effectiveMarket.vault_address &&
+                    market.collateral_address && (
+                      <div className="copyable-address-row">
+                        <CWText type="caption" className="collateral-label">
+                          Vault
+                        </CWText>
+                        <button
+                          type="button"
+                          className="copyable-address"
+                          onClick={() =>
+                            saveToClipboard(
+                              effectiveMarket.vault_address ?? '',
+                              true,
+                            ).catch(() => notifyError('Failed to copy'))
+                          }
+                          title="Copy vault address"
+                        >
+                          <span className="address-text">
+                            {effectiveMarket.vault_address}
+                          </span>
+                          <CWIcon
+                            iconName="copy"
+                            iconSize="small"
+                            className="copy-icon"
+                          />
+                        </button>
+                      </div>
+                    )}
+                  {market.collateral_address && (
+                    <div className="copyable-address-row">
+                      <CWText type="caption" className="collateral-label">
+                        Collateral
+                      </CWText>
+                      <button
+                        type="button"
+                        className="copyable-address"
+                        onClick={() =>
+                          saveToClipboard(
+                            market.collateral_address ?? '',
+                            true,
+                          ).catch(() => notifyError('Failed to copy'))
+                        }
+                        title="Copy collateral address"
+                      >
+                        <span className="address-text">
+                          {market.collateral_address}
+                        </span>
+                        <CWIcon
+                          iconName="copy"
+                          iconSize="small"
+                          className="copy-icon"
+                        />
+                      </button>
+                    </div>
+                  )}
+                  {effectiveMarket.router_address && (
+                    <div className="copyable-address-row">
+                      <CWText type="caption" className="collateral-label">
+                        Router
+                      </CWText>
+                      <button
+                        type="button"
+                        className="copyable-address"
+                        onClick={() =>
+                          saveToClipboard(
+                            effectiveMarket.router_address ?? '',
+                            true,
+                          ).catch(() => notifyError('Failed to copy'))
+                        }
+                        title="Copy router address"
+                      >
+                        <span className="address-text">
+                          {effectiveMarket.router_address}
+                        </span>
+                        <CWIcon
+                          iconName="copy"
+                          iconSize="small"
+                          className="copy-icon"
+                        />
+                      </button>
+                    </div>
+                  )}
+                  {market.strategy_address && (
+                    <div className="copyable-address-row">
+                      <CWText type="caption" className="collateral-label">
+                        Strategy
+                      </CWText>
+                      <button
+                        type="button"
+                        className="copyable-address"
+                        onClick={() =>
+                          saveToClipboard(
+                            market.strategy_address ?? '',
+                            true,
+                          ).catch(() => notifyError('Failed to copy'))
+                        }
+                        title="Copy strategy address"
+                      >
+                        <span className="address-text">
+                          {market.strategy_address}
+                        </span>
+                        <CWIcon
+                          iconName="copy"
+                          iconSize="small"
+                          className="copy-icon"
+                        />
+                      </button>
+                    </div>
+                  )}
+                  {market.governor_address && (
+                    <div className="copyable-address-row">
+                      <CWText type="caption" className="collateral-label">
+                        Governor
+                      </CWText>
+                      <button
+                        type="button"
+                        className="copyable-address"
+                        onClick={() =>
+                          saveToClipboard(
+                            market.governor_address ?? '',
+                            true,
+                          ).catch(() => notifyError('Failed to copy'))
+                        }
+                        title="Copy governor address"
+                      >
+                        <span className="address-text">
+                          {market.governor_address}
+                        </span>
+                        <CWIcon
+                          iconName="copy"
+                          iconSize="small"
+                          className="copy-icon"
+                        />
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
-            {detailsCollapsed ? (
-              <CaretDown
-                size={16}
-                weight="bold"
-                className="collateral-chevron"
+            <div className="balances-section">
+              <div className="balance-card pass">
+                <div className="balance-card-header">
+                  <span className="balance-dot" />
+                  <CWText type="caption" className="balance-label">
+                    PASS BALANCE
+                  </CWText>
+                  {effectiveMarket.p_token_address && (
+                    <div className="balance-address-copy">
+                      <CWText type="caption" className="balance-address">
+                        {formatAddressShort(
+                          effectiveMarket.p_token_address,
+                          6,
+                          4,
+                        )}
+                      </CWText>
+                      <button
+                        type="button"
+                        className="balance-copy-btn"
+                        onClick={() =>
+                          saveToClipboard(
+                            effectiveMarket.p_token_address ?? '',
+                            true,
+                          ).catch(() => notifyError('Failed to copy'))
+                        }
+                        title="Copy PASS token address"
+                        aria-label="Copy PASS token address"
+                      >
+                        <CWIcon
+                          iconName="copy"
+                          iconSize="xs"
+                          className="copy-icon"
+                        />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="balance-card-value">
+                  <FractionalValue
+                    type="b1"
+                    fontWeight="bold"
+                    value={pBalanceDisplay}
+                  />
+                  <CWText type="b2" fontWeight="regular">
+                    &nbsp;PASS
+                  </CWText>
+                </div>
+              </div>
+              <div className="balance-card fail">
+                <div className="balance-card-header">
+                  <span className="balance-dot" />
+                  <CWText type="caption" className="balance-label">
+                    FAIL BALANCE
+                  </CWText>
+                  {effectiveMarket.f_token_address && (
+                    <div className="balance-address-copy">
+                      <CWText type="caption" className="balance-address">
+                        {formatAddressShort(
+                          effectiveMarket.f_token_address,
+                          6,
+                          4,
+                        )}
+                      </CWText>
+                      <button
+                        type="button"
+                        className="balance-copy-btn"
+                        onClick={() =>
+                          saveToClipboard(
+                            effectiveMarket.f_token_address ?? '',
+                            true,
+                          ).catch(() => notifyError('Failed to copy'))
+                        }
+                        title="Copy FAIL token address"
+                        aria-label="Copy FAIL token address"
+                      >
+                        <CWIcon
+                          iconName="copy"
+                          iconSize="xs"
+                          className="copy-icon"
+                        />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="balance-card-value">
+                  <FractionalValue
+                    type="b1"
+                    fontWeight="bold"
+                    value={fBalanceDisplay}
+                  />
+                  <CWText type="b2" fontWeight="regular">
+                    &nbsp;FAIL
+                  </CWText>
+                </div>
+              </div>
+            </div>
+            <CWTabsRow className="tabs-row">
+              {isResolved ? (
+                <CWTooltip
+                  placement="top"
+                  content="This action is not available for resolved markets."
+                  renderTrigger={(handleInteraction) => (
+                    <div
+                      onMouseEnter={handleInteraction}
+                      onMouseLeave={handleInteraction}
+                      style={{ flex: 1 }}
+                    >
+                      <CWTab
+                        label="Mint"
+                        isSelected={false}
+                        onClick={() => {}}
+                        isDisabled
+                      />
+                    </div>
+                  )}
+                />
+              ) : (
+                <CWTab
+                  label="Mint"
+                  isSelected={activeTab === 'mint'}
+                  onClick={() => setActiveTab('mint')}
+                />
+              )}
+              {isResolved ? (
+                <CWTooltip
+                  placement="top"
+                  content="This action is not available for resolved markets."
+                  renderTrigger={(handleInteraction) => (
+                    <div
+                      onMouseEnter={handleInteraction}
+                      onMouseLeave={handleInteraction}
+                      style={{ flex: 1 }}
+                    >
+                      <CWTab
+                        label="Swap"
+                        isSelected={false}
+                        onClick={() => {}}
+                        isDisabled
+                      />
+                    </div>
+                  )}
+                />
+              ) : (
+                <CWTab
+                  label="Swap"
+                  isSelected={activeTab === 'swap'}
+                  onClick={() => setActiveTab('swap')}
+                  isDisabled={swapDisabled}
+                />
+              )}
+              {isResolved ? (
+                <CWTooltip
+                  placement="top"
+                  content="This action is not available for resolved markets."
+                  renderTrigger={(handleInteraction) => (
+                    <div
+                      onMouseEnter={handleInteraction}
+                      onMouseLeave={handleInteraction}
+                      style={{ flex: 1 }}
+                    >
+                      <CWTab
+                        label="Merge"
+                        isSelected={false}
+                        onClick={() => {}}
+                        isDisabled
+                      />
+                    </div>
+                  )}
+                />
+              ) : (
+                <CWTab
+                  label="Merge"
+                  isSelected={activeTab === 'merge'}
+                  onClick={() => setActiveTab('merge')}
+                />
+              )}
+              <CWTab
+                label="Redeem"
+                isSelected={activeTab === 'redeem'}
+                onClick={() => setActiveTab('redeem')}
               />
-            ) : (
-              <CaretUp size={16} weight="bold" className="collateral-chevron" />
+            </CWTabsRow>
+            {errorMessage && (
+              <div className="alert-error">
+                <CWIcon
+                  iconName="warning"
+                  iconSize="small"
+                  className="alert-icon"
+                />
+                <CWText type="b2">{errorMessage}</CWText>
+              </div>
             )}
-          </button>
-          {!detailsCollapsed && (
-            <div className="collateral-row-details">
-              {effectiveMarket.vault_address && market.collateral_address && (
-                <div className="copyable-address-row">
-                  <CWText type="caption" className="collateral-label">
-                    Vault
-                  </CWText>
-                  <button
-                    type="button"
-                    className="copyable-address"
-                    onClick={() =>
-                      saveToClipboard(
-                        effectiveMarket.vault_address ?? '',
-                        true,
-                      ).catch(() => notifyError('Failed to copy'))
-                    }
-                    title="Copy vault address"
-                  >
-                    <span className="address-text">
-                      {effectiveMarket.vault_address}
-                    </span>
-                    <CWIcon
-                      iconName="copy"
-                      iconSize="small"
-                      className="copy-icon"
-                    />
-                  </button>
-                </div>
-              )}
-              {market.collateral_address && (
-                <div className="copyable-address-row">
-                  <CWText type="caption" className="collateral-label">
-                    Collateral
-                  </CWText>
-                  <button
-                    type="button"
-                    className="copyable-address"
-                    onClick={() =>
-                      saveToClipboard(
-                        market.collateral_address ?? '',
-                        true,
-                      ).catch(() => notifyError('Failed to copy'))
-                    }
-                    title="Copy collateral address"
-                  >
-                    <span className="address-text">
-                      {market.collateral_address}
-                    </span>
-                    <CWIcon
-                      iconName="copy"
-                      iconSize="small"
-                      className="copy-icon"
-                    />
-                  </button>
-                </div>
-              )}
-              {effectiveMarket.router_address && (
-                <div className="copyable-address-row">
-                  <CWText type="caption" className="collateral-label">
-                    Router
-                  </CWText>
-                  <button
-                    type="button"
-                    className="copyable-address"
-                    onClick={() =>
-                      saveToClipboard(
-                        effectiveMarket.router_address ?? '',
-                        true,
-                      ).catch(() => notifyError('Failed to copy'))
-                    }
-                    title="Copy router address"
-                  >
-                    <span className="address-text">
-                      {effectiveMarket.router_address}
-                    </span>
-                    <CWIcon
-                      iconName="copy"
-                      iconSize="small"
-                      className="copy-icon"
-                    />
-                  </button>
-                </div>
-              )}
-              {market.strategy_address && (
-                <div className="copyable-address-row">
-                  <CWText type="caption" className="collateral-label">
-                    Strategy
-                  </CWText>
-                  <button
-                    type="button"
-                    className="copyable-address"
-                    onClick={() =>
-                      saveToClipboard(
-                        market.strategy_address ?? '',
-                        true,
-                      ).catch(() => notifyError('Failed to copy'))
-                    }
-                    title="Copy strategy address"
-                  >
-                    <span className="address-text">
-                      {market.strategy_address}
-                    </span>
-                    <CWIcon
-                      iconName="copy"
-                      iconSize="small"
-                      className="copy-icon"
-                    />
-                  </button>
-                </div>
-              )}
-              {market.governor_address && (
-                <div className="copyable-address-row">
-                  <CWText type="caption" className="collateral-label">
-                    Governor
-                  </CWText>
-                  <button
-                    type="button"
-                    className="copyable-address"
-                    onClick={() =>
-                      saveToClipboard(
-                        market.governor_address ?? '',
-                        true,
-                      ).catch(() => notifyError('Failed to copy'))
-                    }
-                    title="Copy governor address"
-                  >
-                    <span className="address-text">
-                      {market.governor_address}
-                    </span>
-                    <CWIcon
-                      iconName="copy"
-                      iconSize="small"
-                      className="copy-icon"
-                    />
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        <div className="balances-section">
-          <div className="balance-card pass">
-            <div className="balance-card-header">
-              <span className="balance-dot" />
-              <CWText type="caption" className="balance-label">
-                PASS BALANCE
-              </CWText>
-              {effectiveMarket.p_token_address && (
-                <div className="balance-address-copy">
-                  <CWText type="caption" className="balance-address">
-                    {formatAddressShort(effectiveMarket.p_token_address, 6, 4)}
-                  </CWText>
-                  <button
-                    type="button"
-                    className="balance-copy-btn"
-                    onClick={() =>
-                      saveToClipboard(
-                        effectiveMarket.p_token_address ?? '',
-                        true,
-                      ).catch(() => notifyError('Failed to copy'))
-                    }
-                    title="Copy PASS token address"
-                    aria-label="Copy PASS token address"
-                  >
-                    <CWIcon
-                      iconName="copy"
-                      iconSize="xs"
-                      className="copy-icon"
-                    />
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="balance-card-value">
-              <FractionalValue
-                type="b1"
-                fontWeight="bold"
-                value={pBalanceDisplay}
-              />
-              <CWText type="b2" fontWeight="regular">
-                &nbsp;PASS
-              </CWText>
-            </div>
-          </div>
-          <div className="balance-card fail">
-            <div className="balance-card-header">
-              <span className="balance-dot" />
-              <CWText type="caption" className="balance-label">
-                FAIL BALANCE
-              </CWText>
-              {effectiveMarket.f_token_address && (
-                <div className="balance-address-copy">
-                  <CWText type="caption" className="balance-address">
-                    {formatAddressShort(effectiveMarket.f_token_address, 6, 4)}
-                  </CWText>
-                  <button
-                    type="button"
-                    className="balance-copy-btn"
-                    onClick={() =>
-                      saveToClipboard(
-                        effectiveMarket.f_token_address ?? '',
-                        true,
-                      ).catch(() => notifyError('Failed to copy'))
-                    }
-                    title="Copy FAIL token address"
-                    aria-label="Copy FAIL token address"
-                  >
-                    <CWIcon
-                      iconName="copy"
-                      iconSize="xs"
-                      className="copy-icon"
-                    />
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="balance-card-value">
-              <FractionalValue
-                type="b1"
-                fontWeight="bold"
-                value={fBalanceDisplay}
-              />
-              <CWText type="b2" fontWeight="regular">
-                &nbsp;FAIL
-              </CWText>
-            </div>
-          </div>
-        </div>
-        <CWTabsRow className="tabs-row">
-          {isResolved ? (
-            <CWTooltip
-              placement="top"
-              content="This action is not available for resolved markets."
-              renderTrigger={(handleInteraction) => (
-                <div
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                  style={{ flex: 1 }}
-                >
-                  <CWTab
-                    label="Mint"
-                    isSelected={false}
-                    onClick={() => {}}
-                    isDisabled
-                  />
-                </div>
-              )}
-            />
-          ) : (
-            <CWTab
-              label="Mint"
-              isSelected={activeTab === 'mint'}
-              onClick={() => setActiveTab('mint')}
-            />
-          )}
-          {isResolved ? (
-            <CWTooltip
-              placement="top"
-              content="This action is not available for resolved markets."
-              renderTrigger={(handleInteraction) => (
-                <div
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                  style={{ flex: 1 }}
-                >
-                  <CWTab
-                    label="Swap"
-                    isSelected={false}
-                    onClick={() => {}}
-                    isDisabled
-                  />
-                </div>
-              )}
-            />
-          ) : (
-            <CWTab
-              label="Swap"
-              isSelected={activeTab === 'swap'}
-              onClick={() => setActiveTab('swap')}
-              isDisabled={swapDisabled}
-            />
-          )}
-          {isResolved ? (
-            <CWTooltip
-              placement="top"
-              content="This action is not available for resolved markets."
-              renderTrigger={(handleInteraction) => (
-                <div
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                  style={{ flex: 1 }}
-                >
-                  <CWTab
-                    label="Merge"
-                    isSelected={false}
-                    onClick={() => {}}
-                    isDisabled
-                  />
-                </div>
-              )}
-            />
-          ) : (
-            <CWTab
-              label="Merge"
-              isSelected={activeTab === 'merge'}
-              onClick={() => setActiveTab('merge')}
-            />
-          )}
-          <CWTab
-            label="Redeem"
-            isSelected={activeTab === 'redeem'}
-            onClick={() => setActiveTab('redeem')}
-          />
-        </CWTabsRow>
-        {errorMessage && (
-          <div className="alert-error">
-            <CWIcon
-              iconName="warning"
-              iconSize="small"
-              className="alert-icon"
-            />
-            <CWText type="b2">{errorMessage}</CWText>
-          </div>
+            {isLoading && (
+              <div className="loading-row">
+                <CWCircleMultiplySpinner />
+              </div>
+            )}
+            {!isLoading && renderTabContent()}
+          </>
         )}
-        {isLoading && (
-          <div className="loading-row">
-            <CWCircleMultiplySpinner />
-          </div>
-        )}
-        {!isLoading && renderTabContent()}
       </CWModalBody>
       <CWDivider />
       <CWModalFooter className="footer-actions">
-        <CWButton
-          label="Cancel"
-          buttonType="secondary"
-          buttonHeight="sm"
-          onClick={onClose}
-        />
-        <CWButton
-          label={primaryButtonLabel}
-          buttonType="primary"
-          buttonHeight="sm"
-          disabled={primaryDisabled || isLoading || !activeAddress}
-          onClick={onPrimaryAction}
-        />
+        {successPanelState ? (
+          <>
+            <CWButton
+              label="Done"
+              buttonType="primary"
+              buttonHeight="sm"
+              onClick={handleClose}
+            />
+          </>
+        ) : (
+          <>
+            <CWButton
+              label="Cancel"
+              buttonType="secondary"
+              buttonHeight="sm"
+              onClick={onClose}
+            />
+            <CWButton
+              label={primaryButtonLabel}
+              buttonType="primary"
+              buttonHeight="sm"
+              disabled={primaryDisabled || isLoading || !activeAddress}
+              onClick={onPrimaryAction}
+            />
+          </>
+        )}
       </CWModalFooter>
     </div>
   );

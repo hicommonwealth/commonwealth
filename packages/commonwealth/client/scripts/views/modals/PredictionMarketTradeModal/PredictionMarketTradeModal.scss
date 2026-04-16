@@ -354,6 +354,83 @@
     margin-bottom: 12px;
   }
 
+  .success-state-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .success-emoji {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .success-description {
+      color: colors.$neutral-600;
+      margin: 0;
+    }
+
+    .success-details {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid colors.$neutral-200;
+      border-radius: 10px;
+      background: colors.$neutral-75;
+    }
+
+    .success-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .success-tx-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid colors.$neutral-150;
+    }
+
+    .success-tx-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .success-tx-copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border: 1px solid colors.$neutral-200;
+      border-radius: 6px;
+      background: colors.$white;
+      cursor: pointer;
+      max-width: 100%;
+      min-width: 0;
+      font: inherit;
+      color: inherit;
+
+      .tx-hash-text {
+        font-size: 12px;
+        color: colors.$neutral-700;
+      }
+
+      .copy-icon {
+        color: colors.$neutral-500;
+      }
+
+      &:hover {
+        border-color: colors.$primary-300;
+      }
+    }
+  }
+
   .PredictionMarketTradeModal-tab-content {
     display: flex;
     flex-direction: column;
