@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import moment from 'moment';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { ContestFeeType, ContestFormData, ContestRecurringType } from './types';
 
 interface UseManageContestFormProps {
@@ -37,7 +37,7 @@ const useManageContestForm = ({
         contestDescription: contestData.description ?? '',
         contestTopic: {
           value: contestData.topics[0]?.id,
-          label: contestData.topics[0]?.name,
+          label: contestData.topics[0]?.name || '',
         },
         contestDuration:
           contestData.interval === 0

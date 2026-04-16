@@ -1,17 +1,1 @@
-import useAppStatus from 'shared/hooks/useAppStatus';
-import { getBrowserType } from 'shared/utils/browser';
-
-const SAFARI_ENABLED = true;
-
-export const useSupportsPushNotifications = () => {
-  const { isAddedToHomeScreen } = useAppStatus();
-
-  const browserType = getBrowserType();
-
-  if (browserType === 'safari' && isAddedToHomeScreen) {
-    // Safari only works if we've added it as a PWA
-    return SAFARI_ENABLED;
-  }
-
-  return browserType === 'chrome';
-};
+export { useSupportsPushNotifications } from 'features/notifications/hooks/useSupportsPushNotifications';

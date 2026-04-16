@@ -1,8 +1,8 @@
+import { useCommentSubscriptions } from 'features/notifications/hooks/useCommentSubscriptions';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useCreateCommentSubscriptionMutation } from 'state/api/trpc/subscription/useCreateCommentSubscriptionMutation';
 import { useDeleteCommentSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteCommentSubscriptionMutation';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { useCommentSubscriptions } from 'views/pages/NotificationSettings/useCommentSubscriptions';
 import { CommentViewParams } from './CommentCard';
 
 type ToggleCommentSubscribeProps = Readonly<{

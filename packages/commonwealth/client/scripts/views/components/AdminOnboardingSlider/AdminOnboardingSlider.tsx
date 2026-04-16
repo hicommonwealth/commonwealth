@@ -5,6 +5,7 @@ import shape3Url from 'assets/img/shapes/shape3.svg';
 import shape4Url from 'assets/img/shapes/shape4.svg';
 import shape5Url from 'assets/img/shapes/shape5.svg';
 import shape6Url from 'assets/img/shapes/shape6.svg';
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import Permissions from 'shared/utils/Permissions';
@@ -13,7 +14,6 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { ActionCard, CardsSlider, DismissModal } from '../CardsSlider';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 

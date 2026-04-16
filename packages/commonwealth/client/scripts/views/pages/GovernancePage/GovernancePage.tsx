@@ -1,100 +1,42 @@
-import { ChainBase } from '@hicommonwealth/shared';
-import { CosmosProposal } from 'client/scripts/controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
-import app from 'client/scripts/state';
-import {
-  useActiveCosmosProposalsQuery,
-  useCompletedCosmosProposalsQuery,
-} from 'client/scripts/state/api/proposals';
-import React, { useEffect, useState } from 'react';
-import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
+import React from 'react';
 import { LoadingIndicator } from '../../components/LoadingIndicator/LoadingIndicator';
 import { PageNotFound } from '../404';
-import GovernanceCards from './GovernanceCards';
-import GovernanceHeader from './GovernanceHeader/GovernanceHeader';
-import './GovernancePage.scss';
-import ProposalListing from './ProposalListing/ProposalListing';
+import GovernancePageContent from './GovernancePageContent';
+import { useGovernancePageData } from './useGovernancePageData';
 
 const GovernancePage = () => {
-  const governancePageEnabled = useFlag('governancePage');
-
-  const [isLoading, setLoading] = useState(
-    !app.chain || !app.chain.loaded || !app.chain.apiInitialized,
-  );
-  useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
-
-  useEffect(() => {
-    app.chainAdapterReady.on('ready', () => setLoading(false));
-
-    return () => {
-      app.chainAdapterReady.off('ready', () => {
-        setLoading(false);
-        app.chainAdapterReady.removeAllListeners();
-      });
-    };
-  }, [setLoading]);
-
-  const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
-  const onEtherem = app.chain?.base === ChainBase.Ethereum;
-
   const {
-    data: activeCosmosProposals,
-    isLoading: isLoadingActicCosmosProposal,
-  } = useActiveCosmosProposalsQuery({
-    isApiReady: !!app.chain?.apiInitialized,
-  });
-  const {
-    data: completedCosmosProposals,
-    isLoading: isLoadingCompletedCosmosProposal,
-  } = useCompletedCosmosProposalsQuery({
-    isApiReady: !!app.chain?.apiInitialized,
-  });
+    activeCosmosProposals,
+    chain,
+    completedCosmosProposals,
+    status,
+    totalProposalsCount,
+  } = useGovernancePageData();
 
-  if (isLoading) {
-    if (app.chain?.failed) {
-      return (
-        <PageNotFound
-          title="Wrong Ethereum Provider Network!"
-          message="Change Metamask to point to Ethereum Mainnet"
-        />
-      );
-    }
-
+  if (status === 'loading') {
     return <LoadingIndicator message="Connecting to chain" />;
   }
 
-  if (
-    onCosmos &&
-    (isLoadingActicCosmosProposal || isLoadingCompletedCosmosProposal)
-  )
-    return <LoadingIndicator message="Connecting to chain" />;
+  if (status === 'network-error') {
+    return (
+      <PageNotFound
+        title="Wrong Ethereum Provider Network!"
+        message="Change Metamask to point to Ethereum Mainnet"
+      />
+    );
+  }
 
-  const activeProposalsCount = activeCosmosProposals?.length || 0;
-  const inactiveProposalsCount =
-    onCosmos && completedCosmosProposals ? completedCosmosProposals.length : 0;
-  const totalProposalsCount = activeProposalsCount + inactiveProposalsCount;
-
-  if (!governancePageEnabled && (!onEtherem || !onCosmos)) {
+  if (status === 'not-found') {
     return <PageNotFound />;
   }
 
   return (
-    <CWPageLayout>
-      <div className="GovernancePage">
-        <GovernanceHeader />
-        <GovernanceCards totalProposals={totalProposalsCount} />
-        <ProposalListing
-          chain={onCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum}
-          activeCosmosProposals={
-            activeCosmosProposals as CosmosProposal[] | undefined
-          }
-          completedCosmosProposals={
-            completedCosmosProposals as CosmosProposal[] | undefined
-          }
-        />
-      </div>
-    </CWPageLayout>
+    <GovernancePageContent
+      chain={chain}
+      activeCosmosProposals={activeCosmosProposals}
+      completedCosmosProposals={completedCosmosProposals}
+      totalProposalsCount={totalProposalsCount}
+    />
   );
 };
 

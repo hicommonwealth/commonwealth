@@ -1,12 +1,12 @@
-import React, { useCallback } from 'react';
-// eslint-disable-next-line max-len
-import { CWToggle } from 'views/components/component_kit/cw_toggle';
 import {
   SubscriptionPrefType,
   useSubscriptionPreferenceSetting,
-} from 'views/pages/NotificationSettings/useSubscriptionPreferenceSetting';
+} from 'features/notifications/hooks/useSubscriptionPreferenceSetting';
 // eslint-disable-next-line max-len
-import { useSubscriptionPreferenceSettingToggle } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSettingToggle';
+import { useSubscriptionPreferenceSettingToggle } from 'features/notifications/hooks/useSubscriptionPreferenceSettingToggle';
+import React, { useCallback } from 'react';
+// eslint-disable-next-line max-len
+import { CWToggle } from 'views/components/component_kit/cw_toggle';
 
 interface PushNotificationsToggleProps {
   readonly pref: SubscriptionPrefType;

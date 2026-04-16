@@ -1,5 +1,5 @@
+import type { Contest } from 'features/contests/types/contest';
 import moment from 'moment';
-import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 
 export const getSortedContests = (contests: Contest[] | undefined) => {
   return [...(contests || [])].sort(

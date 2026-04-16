@@ -19,8 +19,8 @@ import {
   ReactQuillEditor,
   createDeltaFromText,
 } from 'views/components/react_quill_editor';
-import { TopicForm } from 'views/pages/CommunityManagement/Topics/Topics';
 import z from 'zod';
+import { TopicForm } from '../../topicFlow';
 import { CreateTopicStep } from '../../utils';
 import './CreateTopicSection.scss';
 import { topicCreationValidationSchema } from './validation';

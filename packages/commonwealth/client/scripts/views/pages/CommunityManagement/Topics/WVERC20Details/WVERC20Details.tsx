@@ -15,7 +15,7 @@ import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
 import { notifyError } from 'controllers/app/notifications';
 import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
-import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
+import { HandleCreateTopicProps } from '../topicFlow';
 import './WVERC20Details.scss';
 
 interface WVConsentProps {

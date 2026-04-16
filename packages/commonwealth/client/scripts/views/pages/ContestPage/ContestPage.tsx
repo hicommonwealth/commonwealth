@@ -1,6 +1,6 @@
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import React from 'react';
 import { PageNotFound } from 'views/pages/404';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
 import NewContestPage from './NewContestPage';
 

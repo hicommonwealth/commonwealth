@@ -79,16 +79,22 @@ vi.mock('views/components/react_quill_editor', () => ({
   getTextFromDelta: vi.fn(() => ''),
 }));
 
-vi.mock('views/components/component_kit/new_designs/CWPageLayout', () => ({
-  default: React.forwardRef<
+vi.mock('views/components/component_kit/new_designs/CWPageLayout', () => {
+  const MockCommunityHomeLayout = React.forwardRef<
     HTMLDivElement,
     { children?: React.ReactNode; className?: string }
   >(({ children, className }, ref) => (
     <div ref={ref} className={className} data-testid="community-home-layout">
       {children}
     </div>
-  )),
-}));
+  ));
+
+  MockCommunityHomeLayout.displayName = 'MockCommunityHomeLayout';
+
+  return {
+    default: MockCommunityHomeLayout,
+  };
+});
 
 vi.mock('views/components/component_kit/cw_text', () => ({
   CWText: ({ children }: { children: React.ReactNode }) => (
@@ -251,6 +257,13 @@ describe('CommunityHomePage integration', () => {
     expect(
       screen.getByTestId('community-home-trending-threads'),
     ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('community-home-active-contests'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('community-home-active-prediction-markets'),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('community-home-quests')).toBeInTheDocument();
   });
 
   test('shows sticky thread composer only for logged-in users', () => {
@@ -269,6 +282,20 @@ describe('CommunityHomePage integration', () => {
 
     expect(
       screen.getByTestId('community-home-sticky-input'),
+    ).toBeInTheDocument();
+  });
+
+  test('renders community transactions when a community token is available', () => {
+    useTokenTradeWidgetMock.mockReturnValue({
+      communityToken: { symbol: 'TEST' },
+      isLoadingToken: false,
+      isPinnedToken: false,
+    });
+
+    renderWithProviders(<CommunityHomePage />);
+
+    expect(
+      screen.getByTestId('community-home-transactions'),
     ).toBeInTheDocument();
   });
 });

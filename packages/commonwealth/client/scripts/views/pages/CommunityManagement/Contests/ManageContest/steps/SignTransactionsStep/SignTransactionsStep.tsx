@@ -5,6 +5,7 @@ import {
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import useGetJudgeStatusQuery from 'client/scripts/state/api/contests/getJudgeStatus';
+import useCommunityStake from 'features/communityStake/hooks/useCommunityStake';
 import React, { useMemo, useState } from 'react';
 import {
   BaseMixpanelPayload,
@@ -26,7 +27,6 @@ import {
 import { DeploySingleERC20ContestOnchainProps } from 'state/api/contests/deploySingleERC20ContestOnchain';
 import { DeploySingleJudgedContestOnchainProps } from 'state/api/contests/deploySingleJudgedContestOnchain';
 import useUserStore from 'state/ui/user';
-import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';

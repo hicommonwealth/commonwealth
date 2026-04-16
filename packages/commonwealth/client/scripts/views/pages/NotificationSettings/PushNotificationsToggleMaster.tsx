@@ -1,10 +1,9 @@
+import { useSubscriptionPreferenceSetting } from 'features/notifications/hooks/useSubscriptionPreferenceSetting';
+// eslint-disable-next-line max-len
+import { useSubscriptionPreferenceSettingToggle } from 'features/notifications/hooks/useSubscriptionPreferenceSettingToggle';
 import React, { useCallback } from 'react';
 // eslint-disable-next-line max-len
 import { CWToggle } from 'views/components/component_kit/cw_toggle';
-// eslint-disable-next-line max-len
-import { useSubscriptionPreferenceSettingToggle } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSettingToggle';
-// eslint-disable-next-line max-len
-import { useSubscriptionPreferenceSetting } from './useSubscriptionPreferenceSetting';
 
 export const PushNotificationsToggleMaster = () => {
   const checked = useSubscriptionPreferenceSetting(

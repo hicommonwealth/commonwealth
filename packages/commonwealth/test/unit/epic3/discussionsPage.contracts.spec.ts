@@ -2,8 +2,11 @@ import { describe, expect, test } from 'vitest';
 import {
   DISCUSSIONS_VIEWS,
   filterVisibleThreads,
+  getDiscussionsTotalThreadCount,
   getTopicValidationNavigationDecision,
+  resolveDiscussionsFeedVariant,
   resolveDiscussionsViewFromTab,
+  shouldFetchDiscussionsThreads,
   shouldShowPrivateTopicBlock,
 } from '../../../client/scripts/views/pages/discussions/discussionsPage.contracts';
 
@@ -20,6 +23,46 @@ describe('DiscussionsPage contracts', () => {
       expect(resolveDiscussionsViewFromTab('cardview')).toBe(
         DISCUSSIONS_VIEWS.CARDVIEW,
       );
+    });
+  });
+
+  describe('discussions feed contracts', () => {
+    test('maps each discussions view to the correct feed variant', () => {
+      expect(resolveDiscussionsFeedVariant(DISCUSSIONS_VIEWS.ALL)).toBe('list');
+      expect(resolveDiscussionsFeedVariant(DISCUSSIONS_VIEWS.OVERVIEW)).toBe(
+        'overview',
+      );
+      expect(resolveDiscussionsFeedVariant(DISCUSSIONS_VIEWS.CARDVIEW)).toBe(
+        'grid',
+      );
+    });
+
+    test('fetches thread pages only for list and grid views', () => {
+      expect(shouldFetchDiscussionsThreads(DISCUSSIONS_VIEWS.ALL)).toBe(true);
+      expect(shouldFetchDiscussionsThreads(DISCUSSIONS_VIEWS.CARDVIEW)).toBe(
+        true,
+      );
+      expect(shouldFetchDiscussionsThreads(DISCUSSIONS_VIEWS.OVERVIEW)).toBe(
+        false,
+      );
+    });
+
+    test('keeps archive header counts sourced from the filtered thread list', () => {
+      expect(
+        getDiscussionsTotalThreadCount({
+          filteredThreadsLength: 7,
+          isOnArchivePage: true,
+          totalResults: 99,
+        }),
+      ).toBe(7);
+
+      expect(
+        getDiscussionsTotalThreadCount({
+          filteredThreadsLength: 7,
+          isOnArchivePage: false,
+          totalResults: 99,
+        }),
+      ).toBe(99);
     });
   });
 

@@ -1,4 +1,6 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
+import type { Contest } from 'features/contests/types/contest';
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import moment from 'moment/moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -25,8 +27,6 @@ import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallb
 import { Select } from 'views/components/Select';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
-import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import type { Topic } from '../../../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
@@ -60,6 +60,13 @@ function getTokenSymbolFallback(topicWeight: TopicWeightedVoting) {
 type TabsProps = {
   label: string;
   value: string;
+};
+
+type WeightedTopic = Topic & {
+  secondary_tokens?: Array<{
+    token_address?: string | null;
+    token_symbol?: string | null;
+  }> | null;
 };
 
 type ViewType = {
@@ -171,7 +178,9 @@ export const HeaderWithFilters = ({
     .filter((t) => !t.featured_in_sidebar)
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  const selectedTopic = (topics || []).find((t) => topic && topic === t.name);
+  const selectedTopic = (topics || []).find(
+    (t) => topic && topic === t.name,
+  ) as WeightedTopic | undefined;
 
   const contestNameOptions = (contestsData.all || []).map((contest) => ({
     label: contest?.name,
@@ -431,8 +440,12 @@ export const HeaderWithFilters = ({
                                 iconName="copy"
                                 iconSize="small"
                                 onClick={() => {
+                                  if (!token?.token_address) {
+                                    return;
+                                  }
+
                                   saveToClipboard(
-                                    token?.token_address,
+                                    token.token_address,
                                     true,
                                   ).catch(console.error);
                                 }}
@@ -703,20 +716,15 @@ export const HeaderWithFilters = ({
         )}
 
         {(activeContests || []).map((contest) => {
-          const { end_time } =
-            // @ts-expect-error <StrictNullChecks/>
-            contest?.contests[0] || {};
+          const { end_time } = contest?.contests[0] || {};
 
           return (
             <ContestCard
               key={contest.contest_address}
               isAdmin={false}
-              // @ts-expect-error <StrictNullChecks/>
               address={contest.contest_address}
-              // @ts-expect-error <StrictNullChecks/>
               name={contest.name}
               imageUrl={contest.image_url}
-              // @ts-expect-error <StrictNullChecks/>
               topics={contest.topics}
               decimals={contest.decimals}
               ticker={contest.ticker}

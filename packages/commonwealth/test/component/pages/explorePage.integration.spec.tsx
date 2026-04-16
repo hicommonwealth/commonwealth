@@ -147,6 +147,10 @@ vi.mock('views/pages/ExplorePage/MarketsList', () => ({
   default: () => <div data-testid="explore-markets-list" />,
 }));
 
+vi.mock('views/pages/ExplorePage/PredictionMarketsList', () => ({
+  default: () => <div data-testid="explore-prediction-markets-list" />,
+}));
+
 vi.mock('views/pages/ExplorePage/QuestList', () => ({
   default: () => <div data-testid="explore-quest-list" />,
 }));
@@ -215,6 +219,23 @@ describe('ExplorePage integration', () => {
     });
 
     expect(screen.getByTestId('explore-markets-list')).toBeInTheDocument();
+  });
+
+  test('renders prediction-markets tab when the feature flag is enabled', () => {
+    useFlagMock.mockImplementation(
+      (flag: string) => flag === 'markets' || flag === 'futarchy',
+    );
+
+    renderWithProviders(<ExplorePage />, {
+      initialRoute: '/explore?tab=prediction-markets',
+    });
+
+    expect(
+      screen.getByTestId('explore-prediction-markets-list'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Prediction Markets' }),
+    ).toBeInTheDocument();
   });
 
   test('uses route navigation when switching tabs', async () => {

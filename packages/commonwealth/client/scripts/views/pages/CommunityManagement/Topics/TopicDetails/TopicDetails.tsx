@@ -7,11 +7,11 @@ import {
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 
+import { TopicForm } from '../topicFlow';
 import { CreateTopicStep } from '../utils';
 import CreateTopicSection from './CreateTopicsSection';
 import ManageTopicsSection from './ManageTopicsSection';
 
-import { TopicForm } from 'views/pages/CommunityManagement/Topics/Topics';
 import './TopicDetails.scss';
 
 const TABS = [

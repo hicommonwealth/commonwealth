@@ -18,6 +18,7 @@ import {
   getEthChainIdOrBech32Prefix,
   SessionKeyError,
 } from 'controllers/server/sessions';
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
@@ -61,7 +62,6 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { useTurnstile } from 'views/components/useTurnstile';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,

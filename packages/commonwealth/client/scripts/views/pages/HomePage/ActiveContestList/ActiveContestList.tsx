@@ -1,4 +1,5 @@
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import useCommunityContests from 'features/contests/hooks/useCommunityContests';
 import { useTokenPricing } from 'hooks/useTokenPricing';
 import moment from 'moment';
 import React from 'react';
@@ -10,7 +11,6 @@ import { PotentialContestCard } from 'views/components/PotentialContestCard/Pote
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import { Skeleton } from 'views/components/Skeleton';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
-import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 
 import NoContestsCard from 'client/scripts/views/components/NoContestsCard';
 import './ActiveContestList.scss';
