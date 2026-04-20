@@ -189,8 +189,15 @@ class PredictionMarket extends ContractBase {
       );
       if (currentAllowance < initialLiquidityWei) {
         try {
+          // Some collateral / protocol flows may consume allowance in multiple transferFrom calls.
+          // Approve max allowance to avoid false "exceeds allowance" reverts at propose time.
+          // Note: this grants permission to pull more than initialLiquidityWei, even though
+          // propose() still passes initialLiquidityWei as the intended amount to transfer.
           await collateralToken.methods
-            .approve(spender, initialLiquidityWei)
+            .approve(
+              spender,
+              '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+            )
             .send({ from: normalizedFromAddress });
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
@@ -249,7 +256,6 @@ class PredictionMarket extends ContractBase {
    * Propose a new market, decode events, and return the payload for deployPredictionMarket mutation.
    */
   async deploy(params: DeployParams): Promise<DeployPredictionMarketPayload> {
-    console.log('params => ', params);
     this.isInitialized();
     const normalizedCollateralAddress = normalizeAddress(
       this.web3,

@@ -314,6 +314,61 @@ function extractTransactionHash(input: string): string | null {
   return match ? match[0] : null;
 }
 
+function extractTransactionHashFromUnknown(input: unknown): string | null {
+  if (!input) return null;
+  if (typeof input === 'string') return extractTransactionHash(input);
+  if (typeof input !== 'object') return null;
+
+  const candidate = input as {
+    transactionHash?: unknown;
+    receipt?: unknown;
+    data?: unknown;
+    cause?: unknown;
+    error?: unknown;
+    message?: unknown;
+  };
+
+  if (typeof candidate.transactionHash === 'string') {
+    const parsed = extractTransactionHash(candidate.transactionHash);
+    if (parsed) return parsed;
+  }
+  if (typeof candidate.message === 'string') {
+    const parsed = extractTransactionHash(candidate.message);
+    if (parsed) return parsed;
+  }
+
+  return (
+    extractTransactionHashFromUnknown(candidate.receipt) ??
+    extractTransactionHashFromUnknown(candidate.data) ??
+    extractTransactionHashFromUnknown(candidate.cause) ??
+    extractTransactionHashFromUnknown(candidate.error)
+  );
+}
+
+function extractReceiptStatus(input: unknown): boolean | null {
+  if (!input || typeof input !== 'object') return null;
+  const candidate = input as {
+    status?: unknown;
+    receipt?: unknown;
+    data?: unknown;
+    cause?: unknown;
+    error?: unknown;
+  };
+
+  if (typeof candidate.status === 'boolean') return candidate.status;
+  if (typeof candidate.status === 'string') {
+    if (candidate.status === '0x1' || candidate.status === '1') return true;
+    if (candidate.status === '0x0' || candidate.status === '0') return false;
+  }
+
+  return (
+    extractReceiptStatus(candidate.receipt) ??
+    extractReceiptStatus(candidate.data) ??
+    extractReceiptStatus(candidate.cause) ??
+    extractReceiptStatus(candidate.error)
+  );
+}
+
 async function getReceiptStatusIfAvailable(
   web3: Web3,
   txHash: string | null,
@@ -479,7 +534,11 @@ async function approveToken(
       });
     } catch (err) {
       const rawMessage = err instanceof Error ? err.message : String(err ?? '');
-      const txHash = extractTransactionHash(rawMessage);
+      const txHash =
+        extractTransactionHashFromUnknown(err) ??
+        extractTransactionHash(rawMessage);
+      const receiptStatus = extractReceiptStatus(err);
+      if (receiptStatus === true) return;
       const status = await getReceiptStatusIfAvailable(web3, txHash);
       if (status === true) return;
       throw new Error(mapTransactionError(err));
@@ -512,7 +571,13 @@ async function sendWithEstimatedGas(
     });
   } catch (err) {
     const rawMessage = err instanceof Error ? err.message : String(err ?? '');
-    const txHash = extractTransactionHash(rawMessage);
+    const txHash =
+      extractTransactionHashFromUnknown(err) ??
+      extractTransactionHash(rawMessage);
+    const receiptStatus = extractReceiptStatus(err);
+    if (receiptStatus === true) {
+      return { transactionHash: txHash ?? '' };
+    }
     const status = await getReceiptStatusIfAvailable(web3, txHash);
     if (status === true && txHash) {
       return { transactionHash: txHash };
