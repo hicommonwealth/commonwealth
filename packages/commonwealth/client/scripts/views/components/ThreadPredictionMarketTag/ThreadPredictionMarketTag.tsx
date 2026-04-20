@@ -39,6 +39,8 @@ interface ThreadPredictionMarketTagProps {
   communityId?: string;
 }
 
+const MARKET_DISPLAY_DECIMALS = 18;
+
 const ThreadPredictionMarketTag = ({
   market,
   communityId,
@@ -56,7 +58,7 @@ const ThreadPredictionMarketTag = ({
   const tagType = isPassLeading ? 'passed' : 'failed';
   const lockedDisplay = weiToDisplayNumber(
     sumWeiValues(market.total_collateral, market.initial_liquidity),
-    collateralMeta.decimals,
+    MARKET_DISPLAY_DECIMALS,
   );
 
   return (

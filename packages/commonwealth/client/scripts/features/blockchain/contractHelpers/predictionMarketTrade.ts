@@ -295,6 +295,86 @@ export function applySlippage(amount: bigint, slippageBps: number): bigint {
   return (amount * BigInt(10000 - slippageBps)) / 10000n;
 }
 
+const GAS_PRICE_MULTIPLIER_NUMERATOR = 2n;
+const GAS_PRICE_MULTIPLIER_DENOMINATOR = 1n;
+const MIN_GAS_PRICE_WEI = 5_000_000_000n; // 5 gwei floor for faster inclusion on congested mempools.
+
+async function getAggressiveGasPriceWei(web3: Web3): Promise<string> {
+  const networkGasPrice = BigInt(await web3.eth.getGasPrice());
+  const boostedGasPrice =
+    (networkGasPrice * GAS_PRICE_MULTIPLIER_NUMERATOR) /
+    GAS_PRICE_MULTIPLIER_DENOMINATOR;
+  const finalGasPriceWei =
+    boostedGasPrice > MIN_GAS_PRICE_WEI ? boostedGasPrice : MIN_GAS_PRICE_WEI;
+  return finalGasPriceWei.toString(10);
+}
+
+function extractTransactionHash(input: string): string | null {
+  const match = input.match(/0x[a-fA-F0-9]{64}/);
+  return match ? match[0] : null;
+}
+
+async function getReceiptStatusIfAvailable(
+  web3: Web3,
+  txHash: string | null,
+): Promise<boolean | null> {
+  if (!txHash) return null;
+  try {
+    const receipt = await web3.eth.getTransactionReceipt(txHash);
+    if (!receipt) return null;
+    return Boolean(receipt.status);
+  } catch {
+    return null;
+  }
+}
+
+function mapTransactionError(err: unknown): string {
+  const raw = err instanceof Error ? err.message : String(err ?? '');
+  const lowered = raw.toLowerCase();
+  const txHash = extractTransactionHash(raw);
+  const txHint = txHash ? ` Tx hash: ${txHash}` : '';
+
+  if (
+    /user denied|user rejected|rejected the transaction|denied transaction/i.test(
+      raw,
+    )
+  ) {
+    return 'Transaction was rejected in your wallet.';
+  }
+  if (/insufficient funds|not enough funds|exceeds balance/i.test(raw)) {
+    return 'Insufficient balance to cover the transaction and network fee.';
+  }
+  if (
+    lowered.includes('not mined within') ||
+    lowered.includes('transaction was not mined') ||
+    lowered.includes('transaction still pending')
+  ) {
+    return (
+      'Transaction was submitted but not mined in time. ' +
+      'This usually means gas fee is too low or an older pending nonce is blocking this account. ' +
+      `Check wallet activity, speed up/cancel the oldest pending tx, then retry.${txHint}`
+    );
+  }
+  if (
+    lowered.includes('nonce too low') ||
+    lowered.includes('replacement transaction underpriced') ||
+    lowered.includes('already known')
+  ) {
+    return (
+      'A pending transaction with this account nonce is blocking or conflicting with this one. ' +
+      `Speed up/cancel the pending tx in your wallet and retry.${txHint}`
+    );
+  }
+  if (
+    lowered.includes('max fee per gas less than block base fee') ||
+    lowered.includes('fee cap less than block base fee') ||
+    lowered.includes('underpriced')
+  ) {
+    return 'Network fee is too low for current conditions. Increase gas fee in wallet settings and retry.';
+  }
+  return raw || 'Transaction failed.';
+}
+
 export type SwapQuoteParams = {
   chain_rpc: string;
   eth_chain_id: number;
@@ -389,28 +469,56 @@ async function approveToken(
   );
   if (currentAllowance < amount) {
     const tx = token.methods.approve(spender, amount);
-    const gas = await tx.estimateGas({ from: fromAddress });
-    await tx.send({
-      from: fromAddress,
-      gas: String(BigInt(gas.toString()) + 50000n),
-    });
+    try {
+      const gas = await tx.estimateGas({ from: fromAddress });
+      const gasPrice = await getAggressiveGasPriceWei(web3);
+      await tx.send({
+        from: fromAddress,
+        gas: String(BigInt(gas.toString()) + 100000n),
+        gasPrice,
+      });
+    } catch (err) {
+      const rawMessage = err instanceof Error ? err.message : String(err ?? '');
+      const txHash = extractTransactionHash(rawMessage);
+      const status = await getReceiptStatusIfAvailable(web3, txHash);
+      if (status === true) return;
+      throw new Error(mapTransactionError(err));
+    }
   }
 }
 
 /** Send tx with estimated gas + buffer (matches deploy flow to avoid inflated provider estimates). */
 async function sendWithEstimatedGas(
+  web3: Web3,
   tx: {
     estimateGas: (opts: { from: string }) => Promise<unknown>;
     send: (opts: {
       from: string;
       gas: string;
+      gasPrice: string;
     }) => Promise<{ transactionHash: string }>;
   },
   fromAddress: string,
 ): Promise<{ transactionHash: string }> {
-  const gas = await tx.estimateGas({ from: fromAddress });
-  const gasLimit = BigInt(gas as unknown as string) + 100000n;
-  return tx.send({ from: fromAddress, gas: String(gasLimit) });
+  try {
+    const gas = await tx.estimateGas({ from: fromAddress });
+    const gasPrice = await getAggressiveGasPriceWei(web3);
+    // Slightly over-estimate to reduce risk of borderline out-of-gas / network variance.
+    const gasLimit = BigInt(gas as unknown as string) + 200000n;
+    return await tx.send({
+      from: fromAddress,
+      gas: String(gasLimit),
+      gasPrice,
+    });
+  } catch (err) {
+    const rawMessage = err instanceof Error ? err.message : String(err ?? '');
+    const txHash = extractTransactionHash(rawMessage);
+    const status = await getReceiptStatusIfAvailable(web3, txHash);
+    if (status === true && txHash) {
+      return { transactionHash: txHash };
+    }
+    throw new Error(mapTransactionError(err));
+  }
 }
 
 class BinaryVaultHelper extends ContractBase {
@@ -436,7 +544,7 @@ class BinaryVaultHelper extends ContractBase {
       marketIdBytes,
       amountWei.toString(10),
     );
-    return sendWithEstimatedGas(tx, fromAddress);
+    return sendWithEstimatedGas(this.web3, tx, fromAddress);
   }
 
   async merge(
@@ -465,7 +573,7 @@ class BinaryVaultHelper extends ContractBase {
       marketIdBytes,
       amountWei.toString(10),
     );
-    return sendWithEstimatedGas(tx, fromAddress);
+    return sendWithEstimatedGas(this.web3, tx, fromAddress);
   }
 
   async redeem(
@@ -486,7 +594,7 @@ class BinaryVaultHelper extends ContractBase {
       marketIdBytes,
       amountWei.toString(10),
     );
-    return sendWithEstimatedGas(tx, fromAddress);
+    return sendWithEstimatedGas(this.web3, tx, fromAddress);
   }
 }
 
@@ -544,7 +652,7 @@ class FutarchyRouterHelper extends ContractBase {
       amountInWei.toString(10),
       minAmountOutWei.toString(10),
     );
-    return sendWithEstimatedGas(tx, fromAddress);
+    return sendWithEstimatedGas(this.web3, tx, fromAddress);
   }
 }
 

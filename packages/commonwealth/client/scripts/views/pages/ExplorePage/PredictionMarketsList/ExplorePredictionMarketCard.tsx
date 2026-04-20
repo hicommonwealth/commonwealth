@@ -76,6 +76,8 @@ type ExplorePredictionMarketCardProps = {
   showVolume?: boolean;
 };
 
+const MARKET_DISPLAY_DECIMALS = 18;
+
 export const ExplorePredictionMarketCard = ({
   market,
   showVolume = false,
@@ -93,11 +95,11 @@ export const ExplorePredictionMarketCard = ({
   );
   const totalMinted = weiToDisplayNumber(
     totalMintedWei,
-    collateralMeta.decimals,
+    MARKET_DISPLAY_DECIMALS,
   );
   const volume = weiToDisplayNumber(
     market.market_volume ?? '0',
-    collateralMeta.decimals,
+    MARKET_DISPLAY_DECIMALS,
   );
 
   const handleClick = (e: React.MouseEvent) => {

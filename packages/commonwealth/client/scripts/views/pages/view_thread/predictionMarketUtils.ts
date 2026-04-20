@@ -1,4 +1,11 @@
 /**
+ * Integers from prediction-market totals, indexer trades, and PASS/FAIL ERC20
+ * balances in this app are treated as this fixed scale (WAD / outcome-token scale).
+ * Collateral amounts typed by the user for mint still use the ERC-20's decimals.
+ */
+export const PREDICTION_MARKET_LEDGER_DECIMALS = 18;
+
+/**
  * Format collateral amount from wei/smallest unit to human-readable string.
  * Assumes 18 decimals. Returns e.g. "1.50K", "2.00M", or "0.00" on error.
  */

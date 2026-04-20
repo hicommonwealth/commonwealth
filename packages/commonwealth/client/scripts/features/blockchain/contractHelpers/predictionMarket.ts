@@ -99,6 +99,18 @@ function formatRevertReason(err: unknown): string | null {
   }
 }
 
+function normalizeAddress(
+  web3Like: { utils: { toChecksumAddress: (value: string) => string } },
+  value: string,
+  fieldName: string,
+): `0x${string}` {
+  try {
+    return web3Like.utils.toChecksumAddress(value) as `0x${string}`;
+  } catch {
+    throw new Error(`Invalid ${fieldName} address: ${value}`);
+  }
+}
+
 class PredictionMarket extends ContractBase {
   constructor(governorAddress: string, rpc: string) {
     super(governorAddress, FutarchyGovernorAbi as unknown as AbiItem[], rpc);
@@ -151,25 +163,35 @@ class PredictionMarket extends ContractBase {
     logs?: Array<{ address?: string; data?: string; topics?: string[] }>;
   }> {
     this.isInitialized();
+    const normalizedCollateralAddress = normalizeAddress(
+      this.web3,
+      collateralAddress,
+      'collateral',
+    );
+    const normalizedFromAddress = normalizeAddress(
+      this.web3,
+      fromAddress,
+      'wallet',
+    );
 
     // Approve governor to spend collateral before propose (required when initialLiquidity > 0).
     // Matches common-protocol prediction_market_helpers_frontend: approve then propose.
     if (initialLiquidityWei > 0n) {
       const collateralToken = new this.web3.eth.Contract(
         erc20Abi as unknown as AbiItem[],
-        collateralAddress,
+        normalizedCollateralAddress,
       );
       const spender = this.contractAddress;
       const currentAllowance = BigInt(
         (await collateralToken.methods
-          .allowance(fromAddress, spender)
+          .allowance(normalizedFromAddress, spender)
           .call()) as string,
       );
       if (currentAllowance < initialLiquidityWei) {
         try {
           await collateralToken.methods
             .approve(spender, initialLiquidityWei)
-            .send({ from: fromAddress });
+            .send({ from: normalizedFromAddress });
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           if (/user rejected|denied|reject/i.test(msg)) {
@@ -182,10 +204,10 @@ class PredictionMarket extends ContractBase {
         }
       }
       const currentBalance = BigInt(
-        (await collateralToken.methods.balanceOf(fromAddress).call()) as string,
+        (await collateralToken.methods
+          .balanceOf(normalizedFromAddress)
+          .call()) as string,
       );
-      console.log('currentBalance', currentBalance);
-      console.log('initialLiquidityWei', initialLiquidityWei);
       if (currentBalance < initialLiquidityWei) {
         throw new Error(
           'Insufficient collateral balance for initial liquidity.',
@@ -196,15 +218,15 @@ class PredictionMarket extends ContractBase {
     const tx = this.contract.methods.propose(
       proposalId,
       marketId,
-      collateralAddress,
+      normalizedCollateralAddress,
       durationSeconds,
       resolutionThreshold,
       initialLiquidityWei,
     );
     try {
-      const gas = await tx.estimateGas({ from: fromAddress });
+      const gas = await tx.estimateGas({ from: normalizedFromAddress });
       return await tx.send({
-        from: fromAddress,
+        from: normalizedFromAddress,
         gas: String(BigInt(gas.toString()) + 100000n),
       });
     } catch (err) {
@@ -229,6 +251,16 @@ class PredictionMarket extends ContractBase {
   async deploy(params: DeployParams): Promise<DeployPredictionMarketPayload> {
     console.log('params => ', params);
     this.isInitialized();
+    const normalizedCollateralAddress = normalizeAddress(
+      this.web3,
+      params.collateral_address,
+      'collateral',
+    );
+    const normalizedUserAddress = normalizeAddress(
+      this.web3,
+      params.user_address,
+      'wallet',
+    );
     const proposalId = randomBytes32();
     const marketId = randomBytes32();
     const durationDays = Math.max(1, Math.floor(params.duration_days || 1));
@@ -258,7 +290,7 @@ class PredictionMarket extends ContractBase {
       if (liquidityInput && liquidityInput !== '0') {
         const collateralToken = new this.web3.eth.Contract(
           erc20Abi as unknown as AbiItem[],
-          params.collateral_address,
+          normalizedCollateralAddress,
         );
         const decimals = Number(
           (await collateralToken.methods.decimals().call()) as string | number,
@@ -279,11 +311,11 @@ class PredictionMarket extends ContractBase {
     const rawReceipt = await this.propose(
       proposalId,
       marketId,
-      params.collateral_address,
+      normalizedCollateralAddress,
       durationSeconds,
       resolutionThresholdWei,
       initialLiquidityWei,
-      params.user_address,
+      normalizedUserAddress,
     );
 
     const logs: Array<{ address: string; data: string; topics: string[] }> = (

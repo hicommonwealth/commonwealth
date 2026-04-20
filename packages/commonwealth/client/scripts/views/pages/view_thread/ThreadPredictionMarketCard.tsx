@@ -91,6 +91,8 @@ type ThreadPredictionMarketCardProps = {
   canResolveMarket?: boolean;
 };
 
+const MARKET_DISPLAY_DECIMALS = 18;
+
 const getStatusLabel = (status: string) => {
   switch (status) {
     case PredictionMarketStatus.Draft:
@@ -513,8 +515,14 @@ export const ThreadPredictionMarketCard = ({
     (userPosition?.f_token_balance
       ? BigInt(String(userPosition.f_token_balance))
       : 0n);
-  const pBalanceDisplay = weiToDisplayNumber(pBalanceWei, decimals);
-  const fBalanceDisplay = weiToDisplayNumber(fBalanceWei, decimals);
+  const pBalanceDisplay = weiToDisplayNumber(
+    pBalanceWei,
+    MARKET_DISPLAY_DECIMALS,
+  );
+  const fBalanceDisplay = weiToDisplayNumber(
+    fBalanceWei,
+    MARKET_DISPLAY_DECIMALS,
+  );
   const pWei = userPosition
     ? BigInt(
         String(
@@ -536,8 +544,14 @@ export const ThreadPredictionMarketCard = ({
   const failProbability = 1 - passProbability;
   const totalMintedWei =
     marketCollateralOnChain ?? parseWeiString(market?.total_collateral);
-  const totalMintedDisplay = weiToDisplayNumber(totalMintedWei, decimals);
-  const marketVolumeDisplay = weiToDisplayNumber(marketVolume, decimals);
+  const totalMintedDisplay = weiToDisplayNumber(
+    totalMintedWei,
+    MARKET_DISPLAY_DECIMALS,
+  );
+  const marketVolumeDisplay = weiToDisplayNumber(
+    marketVolume,
+    MARKET_DISPLAY_DECIMALS,
+  );
 
   if (marketProp === undefined && isLoading) {
     return (

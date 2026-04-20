@@ -24,6 +24,7 @@ interface ActivePredictionMarketListProps {
 }
 
 const DISPLAY_LIMIT = 10;
+const MARKET_DISPLAY_DECIMALS = 18;
 
 /** Format time remaining as "12D 4H" style */
 function formatTimeRemaining(endTime: moment.Moment): string {
@@ -74,7 +75,7 @@ const PredictionMarketCardCompact = ({
   );
   const totalMinted = weiToDisplayNumber(
     totalMintedWei,
-    collateralMeta.decimals,
+    MARKET_DISPLAY_DECIMALS,
   );
   const navigate = useCommonNavigate();
 
