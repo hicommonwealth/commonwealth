@@ -111,6 +111,20 @@ function normalizeAddress(
   }
 }
 
+/** ERC-20 allowance cap for uint256-sized values passed to approve(). */
+const MAX_UINT256 = 2n ** 256n - 1n;
+
+/**
+ * Allowance to request before propose(): 2× initial liquidity (capped at MAX_UINT256).
+ * Gives headroom for protocols that pull collateral in more than one transferFrom,
+ * without granting unlimited spend.
+ */
+function allowanceForPropose(initialLiquidityWei: bigint): bigint {
+  if (initialLiquidityWei <= 0n) return 0n;
+  if (initialLiquidityWei > MAX_UINT256 / 2n) return MAX_UINT256;
+  return initialLiquidityWei * 2n;
+}
+
 class PredictionMarket extends ContractBase {
   constructor(governorAddress: string, rpc: string) {
     super(governorAddress, FutarchyGovernorAbi as unknown as AbiItem[], rpc);
@@ -187,17 +201,11 @@ class PredictionMarket extends ContractBase {
           .allowance(normalizedFromAddress, spender)
           .call()) as string,
       );
-      if (currentAllowance < initialLiquidityWei) {
+      const targetAllowance = allowanceForPropose(initialLiquidityWei);
+      if (currentAllowance < targetAllowance) {
         try {
-          // Some collateral / protocol flows may consume allowance in multiple transferFrom calls.
-          // Approve max allowance to avoid false "exceeds allowance" reverts at propose time.
-          // Note: this grants permission to pull more than initialLiquidityWei, even though
-          // propose() still passes initialLiquidityWei as the intended amount to transfer.
           await collateralToken.methods
-            .approve(
-              spender,
-              '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
-            )
+            .approve(spender, targetAllowance.toString())
             .send({ from: normalizedFromAddress });
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
