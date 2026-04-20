@@ -1,7 +1,8 @@
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { useCollateralMeta } from 'client/scripts/views/components/PredictionMarket/useCollateralMeta';
 import {
-  sumWeiValues,
+  PREDICTION_MARKET_LEDGER_DECIMALS,
+  predictionMarketTotalMintedDisplayNumber,
   weiToDisplayNumber,
 } from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
 import moment from 'moment';
@@ -76,8 +77,6 @@ type ExplorePredictionMarketCardProps = {
   showVolume?: boolean;
 };
 
-const MARKET_DISPLAY_DECIMALS = 18;
-
 export const ExplorePredictionMarketCard = ({
   market,
   showVolume = false,
@@ -89,17 +88,17 @@ export const ExplorePredictionMarketCard = ({
   });
 
   const timeDisplay = formatTimeLeft(market.end_time, market.status);
-  const totalMintedWei = sumWeiValues(
+  const totalMinted = predictionMarketTotalMintedDisplayNumber(
+    market.status,
     market.total_collateral,
     market.initial_liquidity,
+    collateralMeta.decimals,
   );
-  const totalMinted = weiToDisplayNumber(
-    totalMintedWei,
-    MARKET_DISPLAY_DECIMALS,
-  );
+  // Backend mixes collateral (collateral decimals) with swap legs (18-decimal outcome tokens).
+  // Single scale is approximate; 18 matches outcome-token-dominant activity.
   const volume = weiToDisplayNumber(
     market.market_volume ?? '0',
-    MARKET_DISPLAY_DECIMALS,
+    PREDICTION_MARKET_LEDGER_DECIMALS,
   );
 
   const handleClick = (e: React.MouseEvent) => {

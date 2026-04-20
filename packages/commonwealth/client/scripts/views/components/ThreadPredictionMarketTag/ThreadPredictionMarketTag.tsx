@@ -8,10 +8,7 @@ import CWPopover, {
   usePopover,
 } from 'client/scripts/views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
-import {
-  sumWeiValues,
-  weiToDisplayNumber,
-} from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
+import { predictionMarketTotalMintedDisplayNumber } from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
 
 import './ThreadPredictionMarketTag.scss';
 
@@ -39,8 +36,6 @@ interface ThreadPredictionMarketTagProps {
   communityId?: string;
 }
 
-const MARKET_DISPLAY_DECIMALS = 18;
-
 const ThreadPredictionMarketTag = ({
   market,
   communityId,
@@ -56,9 +51,11 @@ const ThreadPredictionMarketTag = ({
   const isPassLeading = passPct >= 50;
   const label = isPassLeading ? `PASS ${passPct}%` : `FAIL ${failPct}%`;
   const tagType = isPassLeading ? 'passed' : 'failed';
-  const lockedDisplay = weiToDisplayNumber(
-    sumWeiValues(market.total_collateral, market.initial_liquidity),
-    MARKET_DISPLAY_DECIMALS,
+  const lockedDisplay = predictionMarketTotalMintedDisplayNumber(
+    market.status,
+    market.total_collateral,
+    market.initial_liquidity,
+    collateralMeta.decimals,
   );
 
   return (

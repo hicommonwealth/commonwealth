@@ -41,7 +41,11 @@ import { DeployDraftPredictionMarketModal } from '../../modals/PredictionMarket/
 import { PredictionMarketResolveModal } from '../../modals/PredictionMarket/PredictionMarketResolveModal';
 import { PredictionMarketTradeModal } from '../../modals/PredictionMarketTradeModal';
 import './poll_cards.scss';
-import { weiToDisplayNumber } from './predictionMarketUtils';
+import {
+  PREDICTION_MARKET_LEDGER_DECIMALS,
+  predictionMarketTotalMintedDisplayNumber,
+  weiToDisplayNumber,
+} from './predictionMarketUtils';
 import './ThreadPredictionMarketCard.scss';
 
 function formatCollateralBalance(wei: bigint, decimals: number): string {
@@ -52,20 +56,13 @@ function formatCollateralBalance(wei: bigint, decimals: number): string {
   return `${whole}.${frac.toString().padStart(2, '0').slice(0, 2)}`;
 }
 
-function parseWeiString(value?: string | null): bigint {
-  try {
-    return BigInt(value ?? '0');
-  } catch {
-    return 0n;
-  }
-}
-
 export type PredictionMarketResult = {
   id: number;
   thread_id: number;
   prompt: string;
   status: string;
   total_collateral?: string;
+  initial_liquidity?: string | null;
   current_probability?: number;
   duration?: number;
   resolution_threshold?: number;
@@ -90,8 +87,6 @@ type ThreadPredictionMarketCardProps = {
   isAuthor?: boolean;
   canResolveMarket?: boolean;
 };
-
-const MARKET_DISPLAY_DECIMALS = 18;
 
 const getStatusLabel = (status: string) => {
   switch (status) {
@@ -161,10 +156,6 @@ export const ThreadPredictionMarketCard = ({
   const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
   const [tradeRefreshNonce, setTradeRefreshNonce] = useState(0);
   const [timeDisplay, setTimeDisplay] = useState<string | null>(null);
-  const [onChainPassFailBalances, setOnChainPassFailBalances] = useState<{
-    p: bigint;
-    f: bigint;
-  } | null>(null);
   const user = useUserStore();
   const uniqueAddresses =
     getUniqueUserAddresses({ forChain: ChainBase.Ethereum }) ?? [];
@@ -293,48 +284,6 @@ export const ThreadPredictionMarketCard = ({
     }, 1000);
     return () => clearInterval(interval);
   }, [market?.end_time, market]);
-
-  // Match trade modal: if API has no position row, read PASS/FAIL balances from chain
-  useEffect(() => {
-    if (userPosition) {
-      setOnChainPassFailBalances(null);
-      return;
-    }
-    if (
-      !chainRpc ||
-      !selectedAddress ||
-      !market?.p_token_address ||
-      !market?.f_token_address
-    ) {
-      return;
-    }
-    let cancelled = false;
-    getPredictionMarketBalancesFromChain(
-      chainRpc,
-      selectedAddress,
-      market.p_token_address,
-      market.f_token_address,
-    )
-      .then(({ pTokenBalanceWei, fTokenBalanceWei }) => {
-        if (!cancelled)
-          setOnChainPassFailBalances({
-            p: pTokenBalanceWei,
-            f: fTokenBalanceWei,
-          });
-      })
-      .catch(() => {
-        if (!cancelled) setOnChainPassFailBalances(null);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    chainRpc,
-    selectedAddress,
-    market?.p_token_address,
-    market?.f_token_address,
-    userPosition,
-  ]);
 
   useEffect(() => {
     const addr = market?.collateral_address;
@@ -517,40 +466,24 @@ export const ThreadPredictionMarketCard = ({
       : 0n);
   const pBalanceDisplay = weiToDisplayNumber(
     pBalanceWei,
-    MARKET_DISPLAY_DECIMALS,
+    PREDICTION_MARKET_LEDGER_DECIMALS,
   );
   const fBalanceDisplay = weiToDisplayNumber(
     fBalanceWei,
-    MARKET_DISPLAY_DECIMALS,
+    PREDICTION_MARKET_LEDGER_DECIMALS,
   );
-  const pWei = userPosition
-    ? BigInt(
-        String(
-          (userPosition as { p_token_balance: string }).p_token_balance ?? '0',
-        ),
-      )
-    : (onChainPassFailBalances?.p ?? 0n);
-  const fWei = userPosition
-    ? BigInt(
-        String(
-          (userPosition as { f_token_balance: string }).f_token_balance ?? '0',
-        ),
-      )
-    : (onChainPassFailBalances?.f ?? 0n);
-  const pBalance = formatCollateralBalance(pWei, decimals);
-  const fBalance = formatCollateralBalance(fWei, decimals);
 
   const passProbability = market?.current_probability ?? 0.5;
   const failProbability = 1 - passProbability;
-  const totalMintedWei =
-    marketCollateralOnChain ?? parseWeiString(market?.total_collateral);
-  const totalMintedDisplay = weiToDisplayNumber(
-    totalMintedWei,
-    MARKET_DISPLAY_DECIMALS,
+  const totalMintedDisplay = predictionMarketTotalMintedDisplayNumber(
+    market?.status,
+    marketCollateralOnChain ?? market?.total_collateral,
+    market?.initial_liquidity,
+    decimals,
   );
   const marketVolumeDisplay = weiToDisplayNumber(
     marketVolume,
-    MARKET_DISPLAY_DECIMALS,
+    PREDICTION_MARKET_LEDGER_DECIMALS,
   );
 
   if (marketProp === undefined && isLoading) {

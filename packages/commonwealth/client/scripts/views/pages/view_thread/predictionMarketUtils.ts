@@ -1,9 +1,52 @@
 /**
- * Integers from prediction-market totals, indexer trades, and PASS/FAIL ERC20
- * balances in this app are treated as this fixed scale (WAD / outcome-token scale).
- * Collateral amounts typed by the user for mint still use the ERC-20's decimals.
+ * PASS/FAIL outcome token amounts (balances, swaps) use this fixed 1e18 scale.
+ *
+ * **Total minted / locked collateral from the indexer or vault logs** (`total_collateral`,
+ * `getMarketCollateralBalanceFromLogs`) is stored in **protocol 1e18 fixed-point** (same scale
+ * as mint event `collateral_amount` in tests), not necessarily the collateral ERC-20’s
+ * `decimals()`.
+ *
+ * **`initial_liquidity` on a draft** is stored in **native ERC-20** smallest units (from
+ * `convertInitialLiquidityToWei`). Use `collateralTokenDecimals` only for that field.
+ *
+ * Aggregates that mix collateral legs with swap notionals (e.g. `market_volume` SQL) are not
+ * a single decimal scale; display uses 18 as an approximation where noted.
  */
 export const PREDICTION_MARKET_LEDGER_DECIMALS = 18;
+
+export function parseMarketAmountBigint(
+  value?: string | bigint | null,
+): bigint {
+  try {
+    if (typeof value === 'bigint') return value;
+    return BigInt(value ?? '0');
+  } catch {
+    return 0n;
+  }
+}
+
+/**
+ * Human-readable “total minted” for PM UI: draft uses `initial_liquidity` + token decimals;
+ * live markets use ledger totals + {@link PREDICTION_MARKET_LEDGER_DECIMALS}.
+ */
+export function predictionMarketTotalMintedDisplayNumber(
+  status: string | undefined,
+  ledgerTotalWei: string | bigint | null | undefined,
+  initialLiquidity: string | null | undefined,
+  collateralTokenDecimals: number,
+): number {
+  const draft = (status ?? '').toLowerCase() === 'draft';
+  if (draft) {
+    return weiToDisplayNumber(
+      parseMarketAmountBigint(initialLiquidity),
+      collateralTokenDecimals,
+    );
+  }
+  return weiToDisplayNumber(
+    parseMarketAmountBigint(ledgerTotalWei),
+    PREDICTION_MARKET_LEDGER_DECIMALS,
+  );
+}
 
 /**
  * Format collateral amount from wei/smallest unit to human-readable string.
