@@ -85,7 +85,6 @@
 }
 
 .discussion-layout {
-  height: 80vh;
   width: 100%;
   display: grid;
   grid-template-columns: 3fr 1fr;
@@ -111,23 +110,104 @@
 }
 
 .discussion-header {
-  // border: 1px solid purple;  testing
   width: 100%;
 
   &-row {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: 18px;
   }
 
   &-content {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
+    min-width: 0;
   }
 
   .Avatar {
     border-radius: 6px;
+  }
+}
+
+.discussion-author-avatar-button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 8px;
+  line-height: 0;
+  margin-top: 4px;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    outline: 2px solid colors.$primary-400;
+    outline-offset: 2px;
+  }
+}
+
+.discussion-thread-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: colors.$neutral-900;
+
+  @include media_queries.smallInclusive {
+    font-size: 1.375rem;
+    line-height: 1.3;
+  }
+}
+
+.discussion-thread-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  row-gap: 4px;
+
+  .discussion-thread-meta-sep.Text,
+  .discussion-thread-meta-sep {
+    color: colors.$neutral-400;
+    user-select: none;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .discussion-thread-meta-text.Text {
+    color: colors.$neutral-500;
+  }
+
+  .discussion-thread-meta-version {
+    min-width: 0;
+    max-width: 100%;
+
+    .CWSelectList {
+      min-width: min(100%, 220px);
+
+      .SelectList {
+        min-height: 24px !important;
+        max-height: 24px !important;
+        padding: 0 !important;
+
+        .cwsl__single-value {
+          color: colors.$neutral-500;
+        }
+
+        .cwsl__dropdown-indicator {
+          color: colors.$neutral-500;
+        }
+      }
+
+      .SelectList:not(:focus):not(:focus-within) {
+        border-color: transparent !important;
+        background: transparent !important;
+      }
+    }
   }
 }
 
@@ -140,18 +220,16 @@
 }
 
 .discussion-left-rail {
-  // border: 1px solid red;
   height: 100%;
   width: fit-content;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
+  margin-top: 4px;
 }
 
 .discussion-scroll-area {
-  // background-color: rgb(245, 245, 241); testing
-  // border: 1px solid red;
   height: 100%;
   width: 100%;
   overflow-y: auto;
@@ -163,12 +241,12 @@
 
 .discussion-thread-tabs-scroll {
   flex-shrink: 0;
-  width: 100%;
+  width: fit-content;
   max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  border-bottom: 1px solid colors.$neutral-200;
+  margin-top: 12px;
 
   // Thin scrollbar so overflow is obvious on desktop too
   scrollbar-width: thin;
@@ -188,16 +266,16 @@
   flex-wrap: nowrap;
   flex-shrink: 0;
   min-width: min-content;
-  padding: 8px 12px 0;
+  padding: 0;
   margin-bottom: 0;
-  border-bottom: none;
+  border-bottom: 1px solid colors.$neutral-200;
 }
 
 .discussion-thread-tab-panel {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 12px;
+  padding: 0;
 }
 
 .discussion-scroll-content {

@@ -1,0 +1,112 @@
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/elevation';
+@use '../../../styles/mixins/media_queries';
+
+$popover-transition-duration: 0.22s;
+$popover-transition-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+.ThreadAuthorProfileSheet {
+  width: min(720px, 100%);
+  max-height: min(85vh, 860px);
+  overflow-y: auto;
+}
+
+.ThreadAuthorProfileSheet__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  background-color: rgba(20, 19, 21, 0.38);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity $popover-transition-duration $popover-transition-ease;
+
+  &--visible {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &--visible {
+      opacity: 1;
+    }
+  }
+}
+
+.ThreadAuthorProfileSheetPopperRoot {
+  z-index: 101;
+}
+
+.ThreadAuthorProfileSheet--popover {
+  width: min(400px, calc(100vw - 32px));
+  max-height: min(85vh, 640px);
+  background-color: colors.$white;
+  border-radius: 16px;
+  box-shadow:
+    elevation.$elevation-5,
+    0 24px 48px -12px rgba(20, 19, 21, 0.32),
+    0 0 0 1px rgba(40, 39, 41, 0.08);
+  z-index: 1;
+  isolation: isolate;
+
+  .ProfileHeader {
+    border: none;
+  }
+}
+
+// Pull hit area up into the Popper offset gap so pointer path avatar → card stays "inside"
+.ThreadAuthorProfileSheetPopperInner {
+  position: relative;
+  margin-top: -14px;
+  padding-top: 14px;
+  opacity: 0;
+  transform: translate3d(0, -6px, 0);
+  transition:
+    opacity $popover-transition-duration $popover-transition-ease,
+    transform $popover-transition-duration $popover-transition-ease;
+  will-change: opacity, transform;
+
+  &--visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    transform: none;
+    will-change: auto;
+
+    &--visible {
+      opacity: 1;
+    }
+  }
+}
+
+.thread-author-profile-sheet-loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.thread-author-profile-sheet-empty.Text {
+  padding: 24px 16px;
+}
+
+.ThreadAuthorProfileSheetDrawer {
+  .ProfileHeader {
+    border: none;
+  }
+
+  @include media_queries.extraSmall {
+    .CWDrawer {
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+    }
+
+    .ThreadAuthorProfileSheet {
+      width: 100%;
+      max-height: 80vh;
+    }
+  }
+}

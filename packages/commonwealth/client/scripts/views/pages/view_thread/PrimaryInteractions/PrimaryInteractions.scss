@@ -27,6 +27,11 @@
 
     &--with-count {
       gap: 2px;
+
+      // Extra separation when upvotes and comments stack (both show counts).
+      + .PrimaryInteractions-item--with-count {
+        margin-top: 4px;
+      }
     }
 
     &--icon-only {

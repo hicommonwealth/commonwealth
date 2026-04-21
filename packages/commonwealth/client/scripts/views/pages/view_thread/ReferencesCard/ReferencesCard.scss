@@ -1,4 +1,5 @@
 @use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .ReferencesCard {
   display: flex;
@@ -20,6 +21,19 @@
 
     .Text {
       color: colors.$neutral-700;
+    }
+  }
+
+  // Combined with .cards-column in markup; keep specificity higher than global
+  // .cards-column styles from view_thread/index.scss.
+  .ReferencesCard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: 100%;
+
+    > * {
+      min-width: 0;
     }
   }
 }

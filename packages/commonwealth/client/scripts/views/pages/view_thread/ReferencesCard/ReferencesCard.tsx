@@ -112,9 +112,9 @@ export const ReferencesCard = ({
         relatedDiscussions.length > 0 ||
         otherReferences.length > 0) && (
         <div className="ReferencesCard-list">
-          <CWText type="h4">Related Proposals</CWText>
-          {relatedProposals.length > 0 ? (
+          {relatedProposals.length > 0 && (
             <>
+              <CWText type="h4">Related Proposals</CWText>
               {renderRows(relatedProposals)}
               {canManageReferences && (
                 <LinkedProposalsCard
@@ -125,13 +125,11 @@ export const ReferencesCard = ({
                 />
               )}
             </>
-          ) : (
-            <CWText type="b2">- None</CWText>
           )}
 
-          <CWText type="h4">Related Discussions</CWText>
-          {relatedDiscussions.length > 0 ? (
+          {relatedDiscussions.length > 0 && (
             <>
+              <CWText type="h4">Related Discussions</CWText>
               {renderRows(relatedDiscussions)}
               {canManageReferences && (
                 <LinkedThreadsCard
@@ -142,13 +140,11 @@ export const ReferencesCard = ({
                 />
               )}
             </>
-          ) : (
-            <CWText type="b2">- None</CWText>
           )}
 
-          <CWText type="h4">Other References</CWText>
-          {otherReferences.length > 0 ? (
+          {otherReferences.length > 0 && (
             <>
+              <CWText type="h4">Other References</CWText>
               {renderRows(otherReferences)}
               {canManageReferences && (
                 <LinkedUrlCard
@@ -159,13 +155,11 @@ export const ReferencesCard = ({
                 />
               )}
             </>
-          ) : (
-            <CWText type="b2">- None</CWText>
           )}
         </div>
       )}
 
-      <div className="cards-column">
+      <div className="cards-column ReferencesCard-grid">
         {showProposalCard && relatedProposals.length === 0 && (
           <LinkedProposalsCard
             thread={thread}

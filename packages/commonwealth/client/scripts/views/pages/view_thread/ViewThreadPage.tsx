@@ -37,6 +37,7 @@ import { useGetPredictionMarketsQuery } from 'state/api/predictionMarket';
 import {
   useAddThreadLinksMutation,
   useGetThreadPollsQuery,
+  useGetThreadsByIdQuery,
 } from 'state/api/threads';
 import useUserStore, {
   useAIFeatureEnabled,
@@ -68,6 +69,7 @@ import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
+import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
 import {
   CWTab,
   CWTabsRow,
@@ -82,13 +84,23 @@ import { useSnapshotProposal } from '../NewProposalViewPage/useSnapshotProposal'
 import { CommentTree } from '../discussions/CommentTree';
 import { StreamingReplyInstance } from '../discussions/CommentTree/TreeHierarchy';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import { formatVersionText } from '../discussions/ThreadCard/AuthorAndPublishInfo/utils';
 import { PollCard } from './PollCard';
 import { PredictionMarketCard } from './PredictionMarketCard';
 import { PrimaryInteractions } from './PrimaryInteractions';
 import { ReferencesCard } from './ReferencesCard';
 import { SnapshotCard } from './SnapshotCard';
+import {
+  ThreadAuthorProfileSheet,
+  useThreadAuthorProfileDesktopHover,
+} from './ThreadAuthorProfileSheet';
 import { ThreadTokenCard } from './ThreadTokenCard';
+import { EditBody } from './edit_body';
 import './index.scss';
+import {
+  estimateReadingTimeMinutes,
+  formatCompactSocialCount,
+} from './threadMetaHelpers';
 import {
   resolveViewThreadRenderState,
   shouldShowCreateCommentComposer,
@@ -104,6 +116,7 @@ export const THREAD_VIEW_TAB_NAMES = [
 ] as const;
 
 export type ThreadViewTabName = (typeof THREAD_VIEW_TAB_NAMES)[number];
+const CURRENT_THREAD_VERSION_ID = -1;
 
 type ViewThreadPageProps = {
   identifier: string;
@@ -123,7 +136,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [draftTitle, setDraftTitle] = useState('');
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [showVotesDrawer, setShowVotesDrawer] = useState(false);
-  const { isWindowSmallInclusive } = useBrowserWindow({});
+  const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({});
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
   const initalAiCommentPosted = useRef(false);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
@@ -132,6 +145,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState(false);
   const [isTokenDrawerOpen, setIsTokenDrawerOpen] = useState(false);
+  const [isAuthorProfileSheetOpen, setIsAuthorProfileSheetOpen] =
+    useState(false);
   const [activeThreadViewTab, setActiveThreadViewTab] =
     useState<ThreadViewTabName>('Discussion');
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -140,6 +155,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const user = useUserStore();
   const commentsRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
+  const authorAvatarButtonRef = useRef<HTMLButtonElement>(null);
   const forceRerender = useForceRerender();
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -150,6 +166,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     data: threadView,
     error: fetchThreadError,
     isLoading,
+    refetch: refetchThread,
   } = useGetThreadByIdQuery(
     threadId,
     !!threadId && !!communityId, // only call the api if we have thread id
@@ -157,6 +174,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: pollsData = [] } = useGetThreadPollsQuery({
     threadId: +threadId,
+    apiCallEnabled: !!threadId && !!communityId,
+  });
+  const { data: threadsByIdData = [] } = useGetThreadsByIdQuery({
+    community_id: communityId,
+    thread_ids: threadId ? [threadId] : [],
     apiCallEnabled: !!threadId && !!communityId,
   });
 
@@ -174,6 +196,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const thread = useMemo(() => {
     return threadView;
   }, [threadView]);
+  const fullVersionHistory = useMemo(() => {
+    const fromGetThreadsById = threadsByIdData.find((t) => t.id === thread?.id);
+    return fromGetThreadsById?.versionHistory ?? thread?.versionHistory ?? [];
+  }, [threadsByIdData, thread?.id, thread?.versionHistory]);
+
+  const { avatarHoverProps, popoverHoverProps } =
+    useThreadAuthorProfileDesktopHover({
+      enabled:
+        !isWindowExtraSmall &&
+        !!thread?.profile?.userId &&
+        !!thread?.profile?.avatarUrl,
+      onRequestOpen: () => setIsAuthorProfileSheetOpen(true),
+      onRequestClose: () => setIsAuthorProfileSheetOpen(false),
+    });
 
   //  snapshot proposal hook
   const snapshotLink = thread?.links?.find(
@@ -410,12 +446,107 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   // Imp: this is expected to "not-interfere" with version history selector
   useEffect(() => {
-    if (thread?.versionHistory) {
-      setActiveThreadVersionId(
-        Math.max(...thread.versionHistory.map(({ id }) => id)),
-      );
+    if (fullVersionHistory.length) {
+      setActiveThreadVersionId(CURRENT_THREAD_VERSION_ID);
     }
-  }, [thread?.versionHistory]);
+  }, [fullVersionHistory]);
+
+  const collaboratorLookupInfo = useMemo(() => {
+    return (
+      thread?.collaborators?.reduce<Record<string, string>>((acc, c) => {
+        acc[c.address] = c.User?.profile.name ?? '';
+        return acc;
+      }, {}) ?? {}
+    );
+  }, [thread?.collaborators]);
+
+  const versionHistoryOptions = useMemo(() => {
+    if (!fullVersionHistory.length) {
+      return [];
+    }
+    const fallbackTimestamp = thread?.createdAt ?? moment();
+    const currentVersionTimestamp =
+      thread?.updatedAt && thread.updatedAt.isAfter(fallbackTimestamp)
+        ? thread?.updatedAt
+        : fallbackTimestamp;
+    return [
+      {
+        value: CURRENT_THREAD_VERSION_ID,
+        timestamp: currentVersionTimestamp.valueOf(),
+        label: formatVersionText(
+          currentVersionTimestamp,
+          thread?.author || '',
+          collaboratorLookupInfo,
+          thread?.profile?.name,
+        ),
+      },
+      ...fullVersionHistory.map((v) => ({
+        value: Number(v.id),
+        timestamp: moment(v.timestamp).valueOf(),
+        label: formatVersionText(
+          moment(v.timestamp),
+          v.address,
+          collaboratorLookupInfo,
+          thread?.profile?.name,
+        ),
+      })),
+    ]
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .map(({ value, label }) => ({ value, label }));
+  }, [
+    fullVersionHistory,
+    thread?.updatedAt,
+    thread?.createdAt,
+    thread?.author,
+    collaboratorLookupInfo,
+    thread?.profile?.name,
+  ]);
+
+  const effectiveVersionId = useMemo(() => {
+    if (!fullVersionHistory.length) {
+      return undefined;
+    }
+    if (activeThreadVersionId !== undefined) {
+      return activeThreadVersionId;
+    }
+    return CURRENT_THREAD_VERSION_ID;
+  }, [fullVersionHistory, activeThreadVersionId]);
+
+  const versionHistorySelectedValue = useMemo(() => {
+    return versionHistoryOptions.find((o) => o.value === effectiveVersionId);
+  }, [versionHistoryOptions, effectiveVersionId]);
+
+  const selectedVersionMoment = useMemo(() => {
+    if (effectiveVersionId === CURRENT_THREAD_VERSION_ID) {
+      return thread?.updatedAt && thread.updatedAt.isAfter(thread.createdAt)
+        ? thread.updatedAt
+        : thread?.createdAt;
+    }
+    const version = fullVersionHistory.find(
+      (v) => Number(v.id) === effectiveVersionId,
+    );
+    if (version) {
+      return moment(version.timestamp);
+    }
+    return thread?.createdAt;
+  }, [
+    fullVersionHistory,
+    thread?.createdAt,
+    thread?.updatedAt,
+    effectiveVersionId,
+  ]);
+
+  const formattedThreadDate = useMemo(() => {
+    if (!selectedVersionMoment?.isValid()) {
+      return '';
+    }
+    return selectedVersionMoment.utc().local().format('Do MMM, YYYY');
+  }, [selectedVersionMoment]);
+
+  const estimatedReadMinutes = useMemo(
+    () => estimateReadingTimeMinutes(threadBody || ''),
+    [threadBody],
+  );
 
   const viewThreadRenderState = resolveViewThreadRenderState({
     identifier,
@@ -614,11 +745,34 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     bypassGating,
   });
 
-  const handleVersionHistoryChange = (versionId: number) => {
-    const foundVersion = (thread?.versionHistory || []).find(
-      (version) => version.id === versionId,
+  const handleVersionHistoryChange = (value: number | string) => {
+    const versionId = Number(value);
+    if (Number.isNaN(versionId)) {
+      return;
+    }
+
+    if (versionId === CURRENT_THREAD_VERSION_ID) {
+      setActiveThreadVersionId(CURRENT_THREAD_VERSION_ID);
+      if (thread?.contentUrl) {
+        if (contentUrlBodyToFetch === thread.contentUrl && contentUrlBody) {
+          setThreadBody(contentUrlBody);
+          setContentUrlBodyToFetch('');
+        } else {
+          setContentUrlBodyToFetch(thread.contentUrl);
+        }
+      } else {
+        setThreadBody(thread?.body || '');
+        setContentUrlBodyToFetch('');
+      }
+      return;
+    }
+    const foundVersion = fullVersionHistory.find(
+      (version) => Number(version.id) === versionId,
     );
-    foundVersion && setActiveThreadVersionId(foundVersion?.id);
+    if (!foundVersion) {
+      return;
+    }
+    setActiveThreadVersionId(Number(foundVersion.id));
     if (!foundVersion?.content_url) {
       setThreadBody(foundVersion?.body || '');
       setContentUrlBodyToFetch('');
@@ -821,16 +975,72 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             <div className="discussion-header">
               <div className="discussion-header-row">
                 {thread?.profile?.avatarUrl && (
-                  <CWAvatar avatarUrl={thread.profile.avatarUrl} size={40} />
+                  <button
+                    ref={authorAvatarButtonRef}
+                    type="button"
+                    className="discussion-author-avatar-button"
+                    {...avatarHoverProps}
+                    onClick={() => setIsAuthorProfileSheetOpen((open) => !open)}
+                  >
+                    <CWAvatar avatarUrl={thread.profile.avatarUrl} size={40} />
+                  </button>
                 )}
                 <div className="discussion-header-content">
-                  <CWText type="h2">{thread?.title}</CWText>
-                  <div>
-                    {/* TODO: use correct values */}
-                    <CWText type="b2">
-                      1st Jan, 2026 / 12 min read / 100k views
+                  <h1 className="discussion-thread-title">{thread?.title}</h1>
+                  <div className="discussion-thread-meta">
+                    {versionHistoryOptions.length > 0 ? (
+                      <div className="discussion-thread-meta-version">
+                        <CWSelectList
+                          options={versionHistoryOptions}
+                          placeholder={formattedThreadDate}
+                          onChange={({
+                            value,
+                          }: {
+                            value: number;
+                            label: string;
+                          }) => handleVersionHistoryChange(Number(value))}
+                          formatOptionLabel={(option) =>
+                            option.label.split('\n')[0]
+                          }
+                          isSearchable={false}
+                          {...(versionHistorySelectedValue && {
+                            value: versionHistorySelectedValue,
+                          })}
+                        />
+                      </div>
+                    ) : (
+                      <CWText type="b2" className="discussion-thread-meta-text">
+                        {formattedThreadDate}
+                      </CWText>
+                    )}
+                    <CWText type="b2" className="discussion-thread-meta-sep">
+                      /
+                    </CWText>
+                    <CWText type="b2" className="discussion-thread-meta-text">
+                      {estimatedReadMinutes} min read
+                    </CWText>
+                    <CWText type="b2" className="discussion-thread-meta-sep">
+                      /
+                    </CWText>
+                    <CWText type="b2" className="discussion-thread-meta-text">
+                      {formatCompactSocialCount(thread!.viewCount)}{' '}
+                      {thread!.viewCount === 1 ? 'view' : 'views'}
                     </CWText>
                   </div>
+                  {visibleThreadViewTabs.length > 0 && (
+                    <div className="discussion-thread-tabs-scroll">
+                      <CWTabsRow className="discussion-thread-tabs">
+                        {visibleThreadViewTabs.map((tabName) => (
+                          <CWTab
+                            key={tabName}
+                            label={tabName}
+                            isSelected={effectiveThreadViewTab === tabName}
+                            onClick={() => setActiveThreadViewTab(tabName)}
+                          />
+                        ))}
+                      </CWTabsRow>
+                    </div>
+                  )}
                 </div>
               </div>
               {threadLocked}
@@ -876,53 +1086,67 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 />
               </div>
               <div className="discussion-scroll-area" ref={pageRef}>
-                {visibleThreadViewTabs.length > 0 && (
-                  <div className="discussion-thread-tabs-scroll">
-                    <CWTabsRow className="discussion-thread-tabs">
-                      {visibleThreadViewTabs.map((tabName) => (
-                        <CWTab
-                          key={tabName}
-                          label={tabName}
-                          isSelected={effectiveThreadViewTab === tabName}
-                          onClick={() => setActiveThreadViewTab(tabName)}
-                        />
-                      ))}
-                    </CWTabsRow>
-                  </div>
-                )}
                 <div className="discussion-scroll-content">
                   {effectiveThreadViewTab === 'Discussion' ? (
                     <>
-                      <MarkdownViewerWithFallback
-                        key={threadBody}
-                        markdown={threadBody || ''}
-                        className="discussion-thread-body"
-                        cutoffLines={50}
-                        maxChars={MIN_CHARS_TO_SHOW_MORE}
-                      />
-                      <div
-                        className="discussion-comments-section"
-                        ref={commentsRef}
-                      >
-                        <CommentTree
-                          pageRef={pageRef}
-                          commentsRef={commentsRef}
+                      {isGloballyEditing ? (
+                        <EditBody
+                          title={draftTitle}
+                          savedEdits={savedEdits}
+                          shouldRestoreEdits={shouldRestoreEdits}
                           thread={thread!}
-                          setIsGloballyEditing={setIsGloballyEditing}
-                          canComment={permissions.CREATE_COMMENT.allowed}
-                          canReact={permissions.CREATE_COMMENT_REACTION.allowed}
-                          canReply={permissions.CREATE_COMMENT.allowed}
-                          fromDiscordBot={fromDiscordBot}
-                          onThreadCreated={handleGenerateAIComment}
-                          aiCommentsToggleEnabled={
-                            !!effectiveAiCommentsToggleEnabled
-                          }
-                          streamingInstances={streamingInstances}
-                          setStreamingInstances={setStreamingInstances}
-                          permissions={permissions}
-                          onChatModeChange={handleChatModeChange}
+                          activeThreadBody={threadBody || ''}
+                          cancelEditing={() => {
+                            setIsGloballyEditing(false);
+                            setIsEditingBody(false);
+                            setShouldRestoreEdits(false);
+                          }}
+                          threadUpdatedCallback={(title, body) => {
+                            setDraftTitle(title);
+                            setThreadBody(body);
+                            setIsGloballyEditing(false);
+                            setIsEditingBody(false);
+                            setShouldRestoreEdits(false);
+                            refetchThread().catch(console.error);
+                          }}
+                          isDisabled={isTopicInContest}
                         />
-                      </div>
+                      ) : (
+                        <>
+                          <MarkdownViewerWithFallback
+                            key={threadBody}
+                            markdown={threadBody || ''}
+                            className="discussion-thread-body"
+                            cutoffLines={50}
+                            maxChars={MIN_CHARS_TO_SHOW_MORE}
+                          />
+                          <div
+                            className="discussion-comments-section"
+                            ref={commentsRef}
+                          >
+                            <CommentTree
+                              pageRef={pageRef}
+                              commentsRef={commentsRef}
+                              thread={thread!}
+                              setIsGloballyEditing={setIsGloballyEditing}
+                              canComment={permissions.CREATE_COMMENT.allowed}
+                              canReact={
+                                permissions.CREATE_COMMENT_REACTION.allowed
+                              }
+                              canReply={permissions.CREATE_COMMENT.allowed}
+                              fromDiscordBot={fromDiscordBot}
+                              onThreadCreated={handleGenerateAIComment}
+                              aiCommentsToggleEnabled={
+                                !!effectiveAiCommentsToggleEnabled
+                              }
+                              streamingInstances={streamingInstances}
+                              setStreamingInstances={setStreamingInstances}
+                              permissions={permissions}
+                              onChatModeChange={handleChatModeChange}
+                            />
+                          </div>
+                        </>
+                      )}
                     </>
                   ) : (
                     <div className="discussion-thread-tab-panel">
@@ -1003,6 +1227,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           setIsOpen={setIsTokenDrawerOpen}
         />
       )}
+      {thread?.profile?.userId ? (
+        <ThreadAuthorProfileSheet
+          userId={thread.profile.userId}
+          isOpen={isAuthorProfileSheetOpen}
+          onClose={() => setIsAuthorProfileSheetOpen(false)}
+          anchorRef={authorAvatarButtonRef}
+          popoverHoverProps={popoverHoverProps}
+        />
+      ) : null}
     </StickCommentProvider>
   );
 };

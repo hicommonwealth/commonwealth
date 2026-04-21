@@ -252,6 +252,23 @@ export const PrimaryInteractions = ({
     }
   };
 
+  /**
+   * Clicks on the item shell (padding / flex gap) should run the same handler as
+   * the icon. Count stays on its own control; ignore bubbled icon clicks so we
+   * never double-fire if propagation slips through.
+   */
+  const handleWithCountItemSurfaceClick =
+    (actionKey: ActionKey) => (e: React.MouseEvent) => {
+      const el = e.target as HTMLElement;
+      if (el.closest('.PrimaryInteractions-countButton')) {
+        return;
+      }
+      if (el.closest('.PrimaryInteractions-iconButton')) {
+        return;
+      }
+      handleIconClick(actionKey)(e);
+    };
+
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
 
   return (
@@ -283,10 +300,15 @@ export const PrimaryInteractions = ({
                   }`}
                   onMouseEnter={handleInteraction}
                   onMouseLeave={handleInteraction}
+                  onClick={
+                    count !== null
+                      ? handleWithCountItemSurfaceClick(action.key)
+                      : undefined
+                  }
                 >
                   <button
                     type="button"
-                    className="ThreadAction PrimaryInteractions-target"
+                    className="ThreadAction PrimaryInteractions-target PrimaryInteractions-iconButton"
                     aria-label={`${action.label} icon`}
                     onClick={handleIconClick(action.key)}
                     disabled={
@@ -305,7 +327,7 @@ export const PrimaryInteractions = ({
                   {count !== null && (
                     <button
                       type="button"
-                      className="ThreadAction PrimaryInteractions-target"
+                      className="ThreadAction PrimaryInteractions-target PrimaryInteractions-countButton"
                       aria-label={`${action.label} count`}
                       onClick={handleCountClick(action.key)}
                     >
