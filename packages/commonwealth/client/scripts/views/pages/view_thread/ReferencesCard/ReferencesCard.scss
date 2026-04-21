@@ -1,0 +1,39 @@
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
+
+.ReferencesCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 4px 8px;
+  }
+
+  .reference-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    .Text {
+      color: colors.$neutral-700;
+    }
+  }
+
+  // Combined with .cards-column in markup; keep specificity higher than global
+  // .cards-column styles from view_thread/index.scss.
+  .ReferencesCard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: 100%;
+
+    > * {
+      min-width: 0;
+    }
+  }
+}

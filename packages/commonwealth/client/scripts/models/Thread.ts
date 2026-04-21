@@ -263,7 +263,7 @@ export class Thread implements IUniqueId {
     this.url = t.url!;
     this.communityId = t.community_id;
     this.readOnly = t.read_only ?? false;
-    this.viewCount = t.view_count || 1;
+    this.viewCount = t.view_count ?? 0;
     this.collaborators =
       t.collaborators?.map((c) => ({
         address: c.address,

@@ -1,10 +1,8 @@
 import { filterLinks } from 'helpers/threads';
 import React, { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import type Thread from '../../../models/Thread';
 import { LinkSource } from '../../../models/Thread';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { LinkedUrlModal } from '../../modals/linked_url_modal';
@@ -13,9 +11,16 @@ import './linked_threads_card.scss';
 type LinkedUrlCardProps = {
   thread: Thread;
   allowLinking: boolean;
+  actionOnly?: boolean;
+  actionLabel?: string;
 };
 
-export const LinkedUrlCard = ({ thread, allowLinking }: LinkedUrlCardProps) => {
+export const LinkedUrlCard = ({
+  thread,
+  allowLinking,
+  actionOnly = false,
+  actionLabel = 'Manage Links',
+}: LinkedUrlCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const linkedUrls = useMemo(
@@ -25,36 +30,30 @@ export const LinkedUrlCard = ({ thread, allowLinking }: LinkedUrlCardProps) => {
 
   return (
     <>
-      <CWContentPageCard
-        header="Web Links"
-        showCollapsedIcon={true}
-        content={
-          <div className="LinkedThreadsCard">
-            {linkedUrls.length > 0 ? (
-              <div className="links-container">
-                {linkedUrls.map((t) => {
-                  return (
-                    <Link key={t.identifier} to={t.identifier} target="_blank">
-                      {t.title}
-                    </Link>
-                  );
-                })}
-              </div>
-            ) : (
-              <CWText type="b2" className="no-threads-text">
-                There are currently no linked pages.
-              </CWText>
-            )}
-            {allowLinking && (
-              <CWButton
-                buttonHeight="sm"
-                label="Manage Links"
-                onClick={() => setIsModalOpen(true)}
-              />
-            )}
-          </div>
-        }
-      />
+      {!actionOnly && (
+        <div className="LinkedThreadsCard">
+          <CWText type="h4" className="LinkedThreadsCard-title">
+            Link a Web Page
+          </CWText>
+          <CWText type="b2" className="no-threads-text">
+            Use the action below to manage linked pages.
+          </CWText>
+          {allowLinking && (
+            <CWButton
+              buttonHeight="sm"
+              label={actionLabel}
+              onClick={() => setIsModalOpen(true)}
+            />
+          )}
+        </div>
+      )}
+      {actionOnly && allowLinking && (
+        <CWButton
+          buttonHeight="sm"
+          label={actionLabel}
+          onClick={() => setIsModalOpen(true)}
+        />
+      )}
       <CWModal
         size="small"
         content={
