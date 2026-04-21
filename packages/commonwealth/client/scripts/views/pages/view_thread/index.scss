@@ -3,6 +3,23 @@
 @use '../../../styles/mixins/colors.module';
 @use '../../../styles/mixins/media_queries';
 
+.callout-text {
+  background: colors.$neutral-50;
+  display: flex;
+  gap: 10px;
+  color: #656167;
+  padding: 16px 24px;
+  border-radius: border_radius.$border-radius-corners;
+
+  .Text {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: #656167;
+  }
+}
+
 .thread-content {
   display: flex;
   flex-direction: column;
@@ -13,23 +30,6 @@
     align-items: center;
     display: flex;
     gap: 16px;
-  }
-
-  .callout-text {
-    background: colors.$neutral-50;
-    display: flex;
-    gap: 10px;
-    color: #656167;
-    padding: 16px 24px;
-    border-radius: border_radius.$border-radius-corners;
-
-    .Text {
-      font-style: normal;
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 20px;
-      color: #656167;
-    }
   }
 
   .JoinCommunityBanner {
@@ -81,5 +81,190 @@
     .Checkbox {
       margin-left: 0 !important;
     }
+  }
+}
+
+.discussion-layout {
+  height: 80vh;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 16px;
+  overflow: hidden;
+
+  @include media_queries.smallInclusive {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+}
+
+.discussion-main {
+  grid-column: 1;
+  grid-row: 1;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.discussion-header {
+  // border: 1px solid purple;  testing
+  width: 100%;
+
+  &-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  &-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .Avatar {
+    border-radius: 6px;
+  }
+}
+
+.discussion-content-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  min-height: 0;
+  flex: 1;
+}
+
+.discussion-left-rail {
+  // border: 1px solid red;
+  height: 100%;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.discussion-scroll-area {
+  // background-color: rgb(245, 245, 241); testing
+  // border: 1px solid red;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.discussion-thread-tabs-scroll {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid colors.$neutral-200;
+
+  // Thin scrollbar so overflow is obvious on desktop too
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: colors.$neutral-300;
+    border-radius: 3px;
+  }
+}
+
+.discussion-thread-tabs.CWTabsRow {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  min-width: min-content;
+  padding: 8px 12px 0;
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.discussion-thread-tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+
+.discussion-scroll-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.discussion-thread-body {
+  overflow: visible;
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+
+.discussion-comments-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+
+  .CommentsTree {
+    flex: 1;
+    min-height: 0;
+  }
+}
+
+.discussion-sidebar {
+  grid-column: 2;
+  grid-row: 1;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+
+  &-create-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  &-polls {
+    width: 100%;
+  }
+
+  @include media_queries.smallInclusive {
+    display: none;
+  }
+}
+
+// Sticky comment composer: full width of the thread layout (main + right rail cards).
+.discussion-sticky-composer {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  min-width: 0;
+  width: 100%;
+
+  .DesktopStickyInput {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 0;
+    margin-top: 0;
+    justify-content: stretch;
   }
 }

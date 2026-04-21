@@ -1,0 +1,61 @@
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../components/component_kit/new_designs/cw_thread_action.scss';
+
+.PrimaryInteractions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+
+  &-item {
+    width: 40px;
+    min-height: 42px;
+    border-radius: border_radius.$border-radius-corners;
+    color: colors.$neutral-700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    cursor: pointer;
+    padding: 4px;
+
+    &:hover {
+      background: colors.$neutral-100;
+    }
+
+    &--with-count {
+      gap: 2px;
+    }
+
+    &--icon-only {
+      gap: 0;
+    }
+  }
+
+  &-target {
+    min-width: 24px;
+    min-height: 18px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: colors.$neutral-500;
+
+    &:hover {
+      background: transparent;
+      color: colors.$neutral-600;
+    }
+
+    .Text {
+      margin-left: 0;
+      color: colors.$neutral-500;
+    }
+  }
+
+  &-count.Text {
+    line-height: 1;
+  }
+}

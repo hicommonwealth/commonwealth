@@ -1,12 +1,8 @@
-import { slugify } from '@hicommonwealth/shared';
 import { filterLinks } from 'helpers/threads';
-import { getProposalUrlPath } from 'identifiers';
 import React, { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import app from 'state';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
 import Thread, { LinkSource } from '../../../models/Thread';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -17,11 +13,15 @@ import './linked_threads_card.scss';
 type LinkedThreadsCardProps = {
   thread: Thread;
   allowLinking: boolean;
+  actionOnly?: boolean;
+  actionLabel?: string;
 };
 
 export const LinkedThreadsCard = ({
   thread,
   allowLinking,
+  actionOnly = false,
+  actionLabel = 'Link discussion',
 }: LinkedThreadsCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -42,47 +42,36 @@ export const LinkedThreadsCard = ({
 
   return (
     <>
-      <CWContentPageCard
-        header="Linked Discussions"
-        showCollapsedIcon={true}
-        content={
-          linkedThreadIds.length > 0 && isLoading ? (
+      {!actionOnly && (
+        <div className="LinkedThreadsCard">
+          <CWText type="h4" className="LinkedThreadsCard-title">
+            Link a Discussion
+          </CWText>
+          {linkedThreadIds.length > 0 && isLoading ? (
             <div className="spinner-container">
               <CWCircleMultiplySpinner />
             </div>
           ) : (
-            <div className="LinkedThreadsCard">
-              {linkedThreadIds.length > 0 ? (
-                <div className="links-container">
-                  {linkedThreads!.map((t) => {
-                    const discussionLink = getProposalUrlPath(
-                      t.slug,
-                      `${t.identifier}-${slugify(t.title)}`,
-                      false,
-                    );
-                    return (
-                      <Link key={t.id} to={`${discussionLink}?tab=0`}>
-                        {t.title}
-                      </Link>
-                    );
-                  })}
-                </div>
-              ) : (
-                <CWText type="b2" className="no-threads-text">
-                  There are currently no linked discussions.
-                </CWText>
-              )}
-              {allowLinking && (
-                <CWButton
-                  buttonHeight="sm"
-                  label="Link discussion"
-                  onClick={() => setIsModalOpen(true)}
-                />
-              )}
-            </div>
-          )
-        }
-      />
+            <CWText type="b2" className="no-threads-text">
+              Use the action below to manage linked discussions.
+            </CWText>
+          )}
+          {allowLinking && (
+            <CWButton
+              buttonHeight="sm"
+              label={actionLabel}
+              onClick={() => setIsModalOpen(true)}
+            />
+          )}
+        </div>
+      )}
+      {actionOnly && allowLinking && (
+        <CWButton
+          buttonHeight="sm"
+          label={actionLabel}
+          onClick={() => setIsModalOpen(true)}
+        />
+      )}
       <CWModal
         size="small"
         content={

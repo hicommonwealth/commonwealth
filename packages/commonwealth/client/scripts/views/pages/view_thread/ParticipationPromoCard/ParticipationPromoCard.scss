@@ -1,0 +1,21 @@
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
+
+.ParticipationPromoCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px dashed colors.$neutral-400;
+  border-radius: border_radius.$border-radius-corners;
+  background: colors.$white;
+
+  &-title.Text {
+    font-weight: 600;
+  }
+
+  &-description.Text {
+    color: colors.$neutral-600;
+    line-height: 1.4;
+  }
+}

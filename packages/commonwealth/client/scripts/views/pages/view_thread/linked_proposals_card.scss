@@ -1,16 +1,24 @@
 @use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
 @use '../../../styles/mixins/colors.module';
 
 .spinner-container {
-  margin: auto;
+  margin: 4px 0;
 }
 
 .LinkedProposalsCard {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   padding: 16px;
   width: 100%;
+  border: 1px dashed colors.$neutral-400;
+  border-radius: border_radius.$border-radius-corners;
+  background: colors.$white;
+
+  &-title.Text {
+    font-weight: 600;
+  }
 
   .links-container {
     display: flex;

@@ -12,6 +12,7 @@ import {
 import useUserStore from 'state/ui/user';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { AnchorType } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ArchiveThreadModal } from 'views/modals/ArchiveThreadModal';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
@@ -43,6 +44,10 @@ export type AdminActionsProps = {
   onDownloadMarkdown?: () => void;
   hasPendingEdits?: boolean;
   editingDisabled?: boolean;
+  renderTrigger?: (
+    onClick: (e: React.MouseEvent<AnchorType>) => void,
+    isOpen?: boolean,
+  ) => React.ReactNode;
 };
 
 export const AdminActions = ({
@@ -61,6 +66,7 @@ export const AdminActions = ({
   editingDisabled,
   onDownloadMarkdown,
   canUpdateThread,
+  renderTrigger,
 }: AdminActionsProps) => {
   const navigate = useCommonNavigate();
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
@@ -449,9 +455,12 @@ export const AdminActions = ({
                 ]
               : []),
           ]}
-          renderTrigger={(onClick) => (
-            <CWThreadAction action="overflow" onClick={onClick} />
-          )}
+          renderTrigger={
+            renderTrigger ||
+            ((onClick) => (
+              <CWThreadAction action="overflow" onClick={onClick} />
+            ))
+          }
         />
       </span>
 

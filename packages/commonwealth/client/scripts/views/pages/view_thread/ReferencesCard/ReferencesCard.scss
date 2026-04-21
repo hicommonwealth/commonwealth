@@ -1,0 +1,25 @@
+@use '../../../../styles/mixins/colors.module';
+
+.ReferencesCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 4px 8px;
+  }
+
+  .reference-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    .Text {
+      color: colors.$neutral-700;
+    }
+  }
+}
