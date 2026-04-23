@@ -93,6 +93,7 @@ import { SnapshotPollCardContainer } from '../Snapshots/ViewSnapshotProposal/Sna
 import { CommentTree } from '../discussions/CommentTree';
 import { StreamingReplyInstance } from '../discussions/CommentTree/TreeHierarchy';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import { CollateralMetaDecimalsDevPanel } from './CollateralMetaDecimalsDevPanel';
 import { LinkedUrlCard } from './LinkedUrlCard';
 import { ThreadPollCard } from './ThreadPollCard';
 import { ThreadPollEditorCard } from './ThreadPollEditorCard';
@@ -750,6 +751,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 )}
               </div>
             ),
+          },
+        ]
+      : []),
+    ...(communityId
+      ? [
+          {
+            label: 'Dev: PM collateral decimals',
+            item: <CollateralMetaDecimalsDevPanel communityId={communityId} />,
           },
         ]
       : []),

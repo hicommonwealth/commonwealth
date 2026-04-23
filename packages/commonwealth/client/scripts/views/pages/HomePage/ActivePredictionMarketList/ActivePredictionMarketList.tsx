@@ -5,10 +5,7 @@ import { CWButton } from 'client/scripts/views/components/component_kit/new_desi
 import FractionalValue from 'client/scripts/views/components/FractionalValue';
 import { useCollateralMeta } from 'client/scripts/views/components/PredictionMarket/useCollateralMeta';
 import { Skeleton } from 'client/scripts/views/components/Skeleton';
-import {
-  sumWeiValues,
-  weiToDisplayNumber,
-} from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
+import { predictionMarketTotalMintedDisplayNumber } from 'client/scripts/views/pages/view_thread/predictionMarketUtils';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -68,12 +65,10 @@ const PredictionMarketCardCompact = ({
     collateralAddress: market.collateral_address,
   });
 
-  const totalMintedWei = sumWeiValues(
+  const totalMinted = predictionMarketTotalMintedDisplayNumber(
+    market.status,
     market.total_collateral,
     market.initial_liquidity,
-  );
-  const totalMinted = weiToDisplayNumber(
-    totalMintedWei,
     collateralMeta.decimals,
   );
   const navigate = useCommonNavigate();
