@@ -45,6 +45,10 @@ import { CWTextInput } from '../../components/component_kit/new_designs/CWTextIn
 import { CWTooltip } from '../../components/component_kit/new_designs/CWTooltip';
 import FractionalValue from '../../components/FractionalValue';
 import {
+  PREDICTION_MARKET_LEDGER_DECIMALS,
+  weiToDisplayNumber,
+} from '../../pages/view_thread/predictionMarketUtils';
+import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from '../ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
@@ -64,15 +68,28 @@ function formatTokenDisplay(wei: bigint, decimals = 18): string {
   return fractionalTrimmed ? `${whole}.${fractionalTrimmed}` : whole.toString();
 }
 
-function weiToDisplayNumber(wei: bigint, decimals = 18): number {
-  if (wei <= 0n) return 0;
-  const safeDecimals = Math.max(0, decimals);
-  const raw = wei.toString();
-  if (safeDecimals === 0) return Number(raw);
-  const padded = raw.padStart(safeDecimals + 1, '0');
-  const whole = padded.slice(0, -safeDecimals);
-  const frac = padded.slice(-safeDecimals).replace(/0+$/, '');
-  return Number(frac ? `${whole}.${frac}` : whole);
+function extractTxHash(input: string): string | null {
+  const match = input.match(/0x[a-fA-F0-9]{64}/);
+  return match ? match[0] : null;
+}
+
+function formatTxHashShort(hash: string): string {
+  if (!hash.startsWith('0x') || hash.length < 14) return hash;
+  return `${hash.slice(0, 8)}...${hash.slice(-6)}`;
+}
+
+function parseErrorForDisplay(message: string): {
+  userMessage: string;
+  txHash: string | null;
+} {
+  const txHash = extractTxHash(message);
+  if (!txHash) return { userMessage: message, txHash: null };
+  const userMessage = message
+    .replace(`Tx hash: ${txHash}`, '')
+    .replace(txHash, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return { userMessage, txHash };
 }
 
 type Market = {
@@ -190,6 +207,7 @@ export const PredictionMarketTradeModal = ({
   const swapQuoteDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
+  const parsedError = errorMessage ? parseErrorForDisplay(errorMessage) : null;
 
   const { data: community } = useGetCommunityByIdQuery({
     id: threadCommunityId,
@@ -367,8 +385,10 @@ export const PredictionMarketTradeModal = ({
       setSwapQuoteLoading(false);
       return;
     }
-    const swapDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
-    const amountInWei = parseTokenAmount(swapAmount, swapDecimals);
+    const amountInWei = parseTokenAmount(
+      swapAmount,
+      PREDICTION_MARKET_LEDGER_DECIMALS,
+    );
     const chainIdForQuote = effectiveMarket.eth_chain_id ?? ethChainId;
     if (
       amountInWei <= 0n ||
@@ -441,7 +461,6 @@ export const PredictionMarketTradeModal = ({
     effectiveMarket.f_token_address,
     effectiveMarket.eth_chain_id,
     ethChainId,
-    collateralInfo?.decimals,
   ]);
 
   const isResolved = market.status === 'resolved';
@@ -451,10 +470,16 @@ export const PredictionMarketTradeModal = ({
   const mintDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
   const totalMintedDisplay = weiToDisplayNumber(
     marketCollateralOnChain ?? BigInt(market.total_collateral ?? '0'),
-    mintDecimals,
+    PREDICTION_MARKET_LEDGER_DECIMALS,
   );
-  const pBalanceDisplay = weiToDisplayNumber(pTokenBalance, mintDecimals);
-  const fBalanceDisplay = weiToDisplayNumber(fTokenBalance, mintDecimals);
+  const pBalanceDisplay = weiToDisplayNumber(
+    pTokenBalance,
+    PREDICTION_MARKET_LEDGER_DECIMALS,
+  );
+  const fBalanceDisplay = weiToDisplayNumber(
+    fTokenBalance,
+    PREDICTION_MARKET_LEDGER_DECIMALS,
+  );
 
   const handleMint = async () => {
     const amountWei = parseTokenAmount(mintAmount, mintDecimals);
@@ -522,8 +547,10 @@ export const PredictionMarketTradeModal = ({
       setErrorMessage('Connect a wallet to swap.');
       return;
     }
-    const swapDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
-    const amountInWei = parseTokenAmount(swapAmount, swapDecimals);
+    const amountInWei = parseTokenAmount(
+      swapAmount,
+      PREDICTION_MARKET_LEDGER_DECIMALS,
+    );
     if (amountInWei <= 0n) {
       setErrorMessage('Enter a valid amount.');
       return;
@@ -531,8 +558,12 @@ export const PredictionMarketTradeModal = ({
     const sellBalance = swapBuyPass ? fTokenBalance : pTokenBalance;
     if (amountInWei > sellBalance) {
       const tokenName = swapBuyPass ? 'FAIL' : 'PASS';
+      const bal = formatTokenDisplay(
+        sellBalance,
+        PREDICTION_MARKET_LEDGER_DECIMALS,
+      );
       setErrorMessage(
-        `Insufficient ${tokenName} tokens. You have ${formatTokenDisplay(sellBalance, swapDecimals)} ${tokenName}.`,
+        `Insufficient ${tokenName} tokens. You have ${bal} ${tokenName}.`,
       );
       return;
     }
@@ -611,14 +642,19 @@ export const PredictionMarketTradeModal = ({
   };
 
   const handleMerge = async () => {
-    const mergeDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
-    const amountWei = parseTokenAmount(mergeAmount, mergeDecimals);
+    const amountWei = parseTokenAmount(
+      mergeAmount,
+      PREDICTION_MARKET_LEDGER_DECIMALS,
+    );
     if (amountWei <= 0n) {
       setErrorMessage('Enter a valid amount.');
       return;
     }
     if (amountWei > minBalanceForMerge) {
-      const maxDisplay = formatTokenDisplay(minBalanceForMerge, mergeDecimals);
+      const maxDisplay = formatTokenDisplay(
+        minBalanceForMerge,
+        PREDICTION_MARKET_LEDGER_DECIMALS,
+      );
       setErrorMessage(
         `Insufficient balance. You can merge at most ${maxDisplay} (limited by your PASS/FAIL balance).`,
       );
@@ -684,12 +720,14 @@ export const PredictionMarketTradeModal = ({
       setErrorMessage('Market has no winner yet.');
       return;
     }
-    const redeemDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
-    const amountWei = parseTokenAmount(redeemAmount, redeemDecimals);
+    const amountWei = parseTokenAmount(
+      redeemAmount,
+      PREDICTION_MARKET_LEDGER_DECIMALS,
+    );
     const maxRedeem = winner === 1 ? pTokenBalance : fTokenBalance;
     if (amountWei <= 0n || amountWei > maxRedeem) {
       setErrorMessage(
-        `Enter a valid amount (max ${formatTokenDisplay(maxRedeem, redeemDecimals)}).`,
+        `Enter a valid amount (max ${formatTokenDisplay(maxRedeem, PREDICTION_MARKET_LEDGER_DECIMALS)}).`,
       );
       return;
     }
@@ -789,8 +827,10 @@ export const PredictionMarketTradeModal = ({
       );
     }
     if (activeTab === 'swap') {
-      const swapDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
-      const amountInWei = parseTokenAmount(swapAmount, swapDecimals);
+      const amountInWei = parseTokenAmount(
+        swapAmount,
+        PREDICTION_MARKET_LEDGER_DECIMALS,
+      );
       const minOutAfterSlippageWei =
         swapQuoteOutWei === null
           ? 0n
@@ -830,7 +870,11 @@ export const PredictionMarketTradeModal = ({
                   You Sell
                 </CWText>
                 <CWText type="caption" className="panel-balance">
-                  Balance: {formatTokenDisplay(sellBalance, swapDecimals)}
+                  Balance:{' '}
+                  {formatTokenDisplay(
+                    sellBalance,
+                    PREDICTION_MARKET_LEDGER_DECIMALS,
+                  )}
                 </CWText>
               </div>
               <div className="panel-body">
@@ -852,7 +896,10 @@ export const PredictionMarketTradeModal = ({
                     className="max-link"
                     onClick={() =>
                       setSwapAmount(
-                        formatTokenDisplay(sellBalance, swapDecimals),
+                        formatTokenDisplay(
+                          sellBalance,
+                          PREDICTION_MARKET_LEDGER_DECIMALS,
+                        ),
                       )
                     }
                   >
@@ -875,7 +922,11 @@ export const PredictionMarketTradeModal = ({
                   You Buy
                 </CWText>
                 <CWText type="caption" className="panel-balance">
-                  Balance: {formatTokenDisplay(buyBalance, swapDecimals)}
+                  Balance:{' '}
+                  {formatTokenDisplay(
+                    buyBalance,
+                    PREDICTION_MARKET_LEDGER_DECIMALS,
+                  )}
                 </CWText>
               </div>
               <div className="panel-body">
@@ -892,13 +943,19 @@ export const PredictionMarketTradeModal = ({
                       : swapQuoteError
                         ? '—'
                         : swapQuoteOutWei !== null && amountInWei > 0n
-                          ? formatTokenDisplay(swapQuoteOutWei, swapDecimals)
+                          ? formatTokenDisplay(
+                              swapQuoteOutWei,
+                              PREDICTION_MARKET_LEDGER_DECIMALS,
+                            )
                           : '—'}
                   </CWText>
                   {minOutAfterSlippageWei > 0n && swapQuoteOutWei !== null && (
                     <CWText type="caption" className="min-out-hint">
                       Min. received (≤{DEFAULT_SLIPPAGE_BPS / 100}% slippage):{' '}
-                      {formatTokenDisplay(minOutAfterSlippageWei, swapDecimals)}
+                      {formatTokenDisplay(
+                        minOutAfterSlippageWei,
+                        PREDICTION_MARKET_LEDGER_DECIMALS,
+                      )}
                     </CWText>
                   )}
                   {swapQuoteError && (
@@ -920,8 +977,10 @@ export const PredictionMarketTradeModal = ({
       );
     }
     if (activeTab === 'merge') {
-      const mergeDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
-      const amountWei = parseTokenAmount(mergeAmount, mergeDecimals);
+      const amountWei = parseTokenAmount(
+        mergeAmount,
+        PREDICTION_MARKET_LEDGER_DECIMALS,
+      );
       const validMerge = amountWei > 0n && amountWei <= minBalanceForMerge;
       const limitedByPass = pTokenBalance <= fTokenBalance;
       const mergeDisplay = validMerge ? mergeAmount || '0' : '0';
@@ -933,7 +992,11 @@ export const PredictionMarketTradeModal = ({
               Amount to merge
             </CWText>
             <CWText type="caption" className="available">
-              Available: {formatTokenDisplay(minBalanceForMerge, mergeDecimals)}{' '}
+              Available:{' '}
+              {formatTokenDisplay(
+                minBalanceForMerge,
+                PREDICTION_MARKET_LEDGER_DECIMALS,
+              )}{' '}
               (Limited by&nbsp;
               {limitedByPass ? 'PASS' : 'FAIL'})
             </CWText>
@@ -956,7 +1019,10 @@ export const PredictionMarketTradeModal = ({
               buttonWidth="narrow"
               onClick={() =>
                 setMergeAmount(
-                  formatTokenDisplay(minBalanceForMerge, mergeDecimals),
+                  formatTokenDisplay(
+                    minBalanceForMerge,
+                    PREDICTION_MARKET_LEDGER_DECIMALS,
+                  ),
                 )
               }
             />
@@ -1003,9 +1069,11 @@ export const PredictionMarketTradeModal = ({
     }
     // redeem
     const canRedeem = winner === 1 || winner === 2;
-    const redeemDecimals = collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
     const redeemCollateralSymbol = collateralInfo?.symbol ?? 'ETH';
-    const amountWei = parseTokenAmount(redeemAmount, redeemDecimals);
+    const amountWei = parseTokenAmount(
+      redeemAmount,
+      PREDICTION_MARKET_LEDGER_DECIMALS,
+    );
     const maxRedeem = winner === 1 ? pTokenBalance : fTokenBalance;
     const winningToken = winner === 1 ? 'PASS' : 'FAIL';
     const validRedeem = canRedeem && amountWei > 0n && amountWei <= maxRedeem;
@@ -1025,7 +1093,11 @@ export const PredictionMarketTradeModal = ({
                 Winning token amount ({winningToken})
               </CWText>
               <CWText type="caption" className="available">
-                Available: {formatTokenDisplay(maxRedeem, redeemDecimals)}{' '}
+                Available:{' '}
+                {formatTokenDisplay(
+                  maxRedeem,
+                  PREDICTION_MARKET_LEDGER_DECIMALS,
+                )}{' '}
                 {winningToken}
               </CWText>
             </div>
@@ -1046,7 +1118,12 @@ export const PredictionMarketTradeModal = ({
                 buttonHeight="sm"
                 buttonWidth="narrow"
                 onClick={() =>
-                  setRedeemAmount(formatTokenDisplay(maxRedeem, redeemDecimals))
+                  setRedeemAmount(
+                    formatTokenDisplay(
+                      maxRedeem,
+                      PREDICTION_MARKET_LEDGER_DECIMALS,
+                    ),
+                  )
                 }
               />
             </div>
@@ -1130,9 +1207,10 @@ export const PredictionMarketTradeModal = ({
             collateralInfo.balanceWei)
       : activeTab === 'swap'
         ? (() => {
-            const swapDecimals =
-              collateralInfo?.decimals ?? COLLATERAL_DECIMALS;
-            const amountWei = parseTokenAmount(swapAmount, swapDecimals);
+            const amountWei = parseTokenAmount(
+              swapAmount,
+              PREDICTION_MARKET_LEDGER_DECIMALS,
+            );
             const sellBalance = swapBuyPass ? fTokenBalance : pTokenBalance;
             const hasBalanceData =
               userPosition != null || onChainBalances != null;
@@ -1146,25 +1224,17 @@ export const PredictionMarketTradeModal = ({
         : activeTab === 'merge'
           ? !activeAddress ||
             !mergeAmount ||
-            parseTokenAmount(
-              mergeAmount,
-              collateralInfo?.decimals ?? COLLATERAL_DECIMALS,
-            ) <= 0n ||
-            parseTokenAmount(
-              mergeAmount,
-              collateralInfo?.decimals ?? COLLATERAL_DECIMALS,
-            ) > minBalanceForMerge
+            parseTokenAmount(mergeAmount, PREDICTION_MARKET_LEDGER_DECIMALS) <=
+              0n ||
+            parseTokenAmount(mergeAmount, PREDICTION_MARKET_LEDGER_DECIMALS) >
+              minBalanceForMerge
           : !activeAddress ||
             (winner !== 1 && winner !== 2) ||
             !redeemAmount ||
-            parseTokenAmount(
-              redeemAmount,
-              collateralInfo?.decimals ?? COLLATERAL_DECIMALS,
-            ) <= 0n ||
-            parseTokenAmount(
-              redeemAmount,
-              collateralInfo?.decimals ?? COLLATERAL_DECIMALS,
-            ) > (winner === 1 ? pTokenBalance : fTokenBalance);
+            parseTokenAmount(redeemAmount, PREDICTION_MARKET_LEDGER_DECIMALS) <=
+              0n ||
+            parseTokenAmount(redeemAmount, PREDICTION_MARKET_LEDGER_DECIMALS) >
+              (winner === 1 ? pTokenBalance : fTokenBalance);
 
   return (
     <div className="PredictionMarketTradeModal">
@@ -1566,7 +1636,33 @@ export const PredictionMarketTradeModal = ({
               iconSize="small"
               className="alert-icon"
             />
-            <CWText type="b2">{errorMessage}</CWText>
+            <div>
+              <CWText type="b2">
+                {parsedError?.userMessage ?? errorMessage}
+              </CWText>
+              {parsedError?.txHash && (
+                <CWText type="caption">
+                  Tx hash: {formatTxHashShort(parsedError.txHash)}{' '}
+                  <button
+                    type="button"
+                    className="balance-copy-btn"
+                    onClick={() =>
+                      saveToClipboard(parsedError.txHash ?? '', true).catch(
+                        () => notifyError('Failed to copy'),
+                      )
+                    }
+                    title="Copy transaction hash"
+                    aria-label="Copy transaction hash"
+                  >
+                    <CWIcon
+                      iconName="copy"
+                      iconSize="xs"
+                      className="copy-icon"
+                    />
+                  </button>
+                </CWText>
+              )}
+            </div>
           </div>
         )}
         {isLoading && (
