@@ -1,5 +1,6 @@
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
+import { getScopePrefix } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import useBrowserWindow from 'shared/hooks/useBrowserWindow';
@@ -79,10 +80,22 @@ export const CreateTopicSection = ({
       : community?.allow_tokenized_threads || false,
   );
 
-  const { data: groups } = useFetchGroupsQuery({
+  const { data: groups, refetch: refetchGroups } = useFetchGroupsQuery({
     communityId: communityId,
     enabled: !!communityId,
   });
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        refetchGroups();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [refetchGroups]);
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
@@ -272,7 +285,19 @@ export const CreateTopicSection = ({
           {isPrivate && (
             <CWSelectList
               isMulti
-              label="Allowed groups"
+              label={
+                <div>
+                  Allowed groups{' '}
+                  <a
+                    href={`${getScopePrefix()}/members/groups/create`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Create group
+                  </a>
+                </div>
+              }
+              instructionalMessage="Create a group in a new tab, then return to see it here."
               options={groups?.map((g) => ({ label: g.name, value: g.id }))}
               value={groups
                 ?.filter((g) => selectedGroups.includes(g.id))
