@@ -724,6 +724,7 @@ export const HeaderWithFilters = ({
               finishDate={end_time ? moment(end_time).toISOString() : ''}
               isCancelled={contest.cancelled}
               isRecurring={!contest.funding_token_address}
+              contestBalance={parseInt(contest.contest_balance || '0', 10)}
               isHorizontal
               showShareButton={false}
               payoutStructure={contest.payout_structure}
