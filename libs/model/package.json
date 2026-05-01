@@ -116,7 +116,7 @@
     "passport-magic": "^1.0.0",
     "pg": "^8.11.3",
     "quill-delta-to-markdown": "^0.6.0",
-    "sequelize": "^6.32.1",
+    "sequelize": "^6.37.8",
     "umzug": "^3.7.0",
     "unique-username-generator": "^1.3.0",
     "sanitize-html": "^2.14.0",
