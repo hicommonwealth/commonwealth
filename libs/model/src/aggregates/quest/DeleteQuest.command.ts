@@ -1,14 +1,13 @@
 import { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { models } from '../../database';
+import { models, sequelize } from '../../database';
 import { isSuperAdmin } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
-import { removeJob } from '../../services';
-import { getQuestXpLeaderboardViewName } from '../../utils/quests';
+import { removeJob } from '../../services/graphileWorker';
 
-export function DeleteQuest(): Command<typeof schemas.DeleteQuest> {
+export function CancelQuest(): Command<typeof schemas.CancelQuest> {
   return {
-    ...schemas.DeleteQuest,
+    ...schemas.CancelQuest,
     auth: [isSuperAdmin],
     secure: true,
     body: async ({ payload }) => {
@@ -16,25 +15,11 @@ export function DeleteQuest(): Command<typeof schemas.DeleteQuest> {
 
       const quest = await models.Quest.scope('withPrivateData').findOne({
         where: { id: quest_id },
-        attributes: ['start_date'],
+        attributes: ['start_date', 'scheduled_job_id'],
       });
       mustExist(`Quest "${quest_id}"`, quest);
 
-      const actions = await models.XpLog.count({
-        include: [
-          {
-            model: models.QuestActionMeta,
-            as: 'quest_action_meta',
-            where: { quest_id },
-          },
-        ],
-      });
-      if (actions > 0)
-        throw new Error(
-          `Cannot delete quest "${quest_id}" because it has actions`,
-        );
-
-      let rows: number | undefined;
+      let rows: [number] | undefined;
       await models.sequelize.transaction(async (transaction) => {
         if (quest.scheduled_job_id) {
           await removeJob({
@@ -42,19 +27,14 @@ export function DeleteQuest(): Command<typeof schemas.DeleteQuest> {
             transaction,
           });
         }
-        rows = await models.Quest.destroy({
-          where: { id: quest_id },
-          transaction,
-        });
-        await models.sequelize.query(
-          `
-          DROP MATERIALIZED VIEW IF EXISTS "${getQuestXpLeaderboardViewName(quest_id)}";
-        `,
-          { transaction },
+
+        rows = await models.Quest.update(
+          { end_date: sequelize.literal('NOW()') },
+          { where: { id: quest_id } },
         );
       });
 
-      return rows ? rows > 0 : false;
+      return rows ? rows[0] > 0 : false;
     },
   };
 }
