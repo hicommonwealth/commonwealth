@@ -1,0 +1,91 @@
+name: Observability ➜ Seer autofix
+
+on:
+  repository_dispatch:
+    types: [observability_error]
+  workflow_dispatch:
+    inputs:
+      source:
+        description: Source of alert (datadog, sentry, etc)
+        default: manual
+        required: true
+      title:
+        description: Alert title/summary
+        required: true
+      severity:
+        description: Severity level
+        default: warning
+        required: true
+      message:
+        description: Full alert text or description
+        required: true
+      link:
+        description: Link back to observability system (Datadog/Sentry/etc)
+        required: false
+
+jobs:
+  forward-to-seer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate required secrets
+        run: |
+          if [[ -z "${{ secrets.SEER_WEBHOOK_URL }}" ]]; then
+            echo "Missing SEER_WEBHOOK_URL secret."
+            exit 1
+          fi
+          if [[ -z "${{ secrets.SEER_WEBHOOK_TOKEN }}" ]]; then
+            echo "Missing SEER_WEBHOOK_TOKEN secret."
+            exit 1
+          fi
+
+      - name: Prepare payload
+        id: payload
+        env:
+          SOURCE: ${{ github.event.client_payload.source || github.event.inputs.source || 'unknown' }}
+          TITLE: ${{ github.event.client_payload.title || github.event.inputs.title || 'Unknown alert' }}
+          SEVERITY: ${{ github.event.client_payload.severity || github.event.inputs.severity || 'unknown' }}
+          MESSAGE: ${{ github.event.client_payload.message || github.event.inputs.message || '' }}
+          LINK: ${{ github.event.client_payload.link || github.event.inputs.link || secrets.OBSERVABILITY_SOURCE_URL || '' }}
+          SERVICE: ${{ github.event.client_payload.service || '' }}
+          HOST: ${{ github.event.client_payload.host || '' }}
+          TIMESTAMP: ${{ github.event.client_payload.timestamp || '' }}
+          COMMIT_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          cat > seer-payload.json <<'JSON'
+          {
+            "source": "${SOURCE}",
+            "title": "${TITLE}",
+            "severity": "${SEVERITY}",
+            "message": "${MESSAGE}",
+            "link": "${LINK}",
+            "service": "${SERVICE}",
+            "host": "${HOST}",
+            "timestamp": "${TIMESTAMP}",
+            "repository": "${REPO}",
+            "commit": "${COMMIT_SHA}"
+          }
+          JSON
+          echo "payload_path=seer-payload.json" >> "$GITHUB_OUTPUT"
+
+      - name: Send to Seer/Codex endpoint
+        env:
+          SEER_WEBHOOK_URL: ${{ secrets.SEER_WEBHOOK_URL }}
+          SEER_WEBHOOK_TOKEN: ${{ secrets.SEER_WEBHOOK_TOKEN }}
+          PAYLOAD_PATH: ${{ steps.payload.outputs.payload_path }}
+        run: |
+          echo "Dispatching payload to Seer endpoint..."
+          curl -sSfL -X POST \
+            -H "Authorization: Bearer ${SEER_WEBHOOK_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data @"${PAYLOAD_PATH}" \
+            "${SEER_WEBHOOK_URL}"
+
+      - name: Summary
+        run: |
+          echo "Alert forwarded to Seer/Codex endpoint."
+          echo "Source: ${{ github.event.client_payload.source || github.event.inputs.source || 'unknown' }}"
+          echo "Title:  ${{ github.event.client_payload.title || github.event.inputs.title || 'Unknown alert' }}"
+          if [[ -n "${{ github.event.client_payload.link || github.event.inputs.link || secrets.OBSERVABILITY_SOURCE_URL }}" ]]; then
+            echo "Link:   ${{ github.event.client_payload.link || github.event.inputs.link || secrets.OBSERVABILITY_SOURCE_URL }}"
+          fi
