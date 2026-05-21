@@ -1,4 +1,4 @@
-import { CommunityVerificationItem } from '@hicommonwealth/shared';
+import { CommunityVerificationItem, TierIcons } from '@hicommonwealth/shared';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
@@ -7,15 +7,6 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { ButtonType } from 'views/components/component_kit/new_designs/CWButton/CWButton';
 import { Status } from './types';
 
-type ComponentIcon =
-  | 'stopSymbol'
-  | 'socialVerified'
-  | 'sandClock'
-  | 'globe'
-  | 'pins'
-  | 'whiteCheck'
-  | 'starGolden';
-
 interface LevelBoxProps {
   level: number;
   title: string;
@@ -23,7 +14,7 @@ interface LevelBoxProps {
   color: string;
   status: Status;
   isLocked: boolean;
-  icon?: ComponentIcon;
+  icon?: TierIcons;
   items?: CommunityVerificationItem[];
   showArrow?: boolean;
   onClick?: () => void;

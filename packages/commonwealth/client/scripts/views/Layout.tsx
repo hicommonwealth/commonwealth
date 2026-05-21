@@ -15,7 +15,6 @@ import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useErrorStore from 'state/ui/error';
 import useUserStore from 'state/ui/user';
 import { MobileScrollBuffer } from 'views/components/MobileNavigation/MobileScrollBuffer';
-import { ReactNativeBridgeRouter } from 'views/components/ReactNativeBridge';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { z } from 'zod';
@@ -23,6 +22,7 @@ import useAppStatus from '../hooks/useAppStatus';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import { useGetCommunityByIdQuery } from '../state/api/communities';
 import { useUpdateUserMutation } from '../state/api/user';
+import CWLayoutBanner from './CWLayoutBanner/CWLayoutBanner';
 import './Layout.scss';
 import SubLayout from './Sublayout';
 import MetaTags from './components/MetaTags';
@@ -241,12 +241,12 @@ const LayoutComponent = ({
   return (
     <ErrorBoundary
       FallbackComponent={({ error }) => (
-        <ErrorPage message={error?.message} data-testid="app-error" />
+        <ErrorPage message={error?.message} testid="app-error" />
       )}
     >
       {renderDefaultMetatags && <MetaTags />}
-      <ReactNativeBridgeRouter />
       <div className="Layout">
+        <CWLayoutBanner />
         {type === 'blank' ? (
           childToRender()
         ) : (

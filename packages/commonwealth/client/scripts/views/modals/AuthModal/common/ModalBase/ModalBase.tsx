@@ -4,8 +4,7 @@ import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
-import { isMobileApp } from 'hooks/useReactNativeWebView';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import AuthButton from 'views/components/AuthButton';
@@ -15,8 +14,6 @@ import {
   AuthWallets,
   EVMWallets,
 } from 'views/components/AuthButton/types';
-import { PrivyEmailDialog } from 'views/components/Privy/dialogs/PrivyEmailDialog';
-import { PrivySMSDialog } from 'views/components/Privy/dialogs/PrivySMSDialog';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import {
@@ -28,7 +25,6 @@ import CWTabsRow from '../../../../components/component_kit/new_designs/CWTabs/C
 import { TemporaryCrecimientoModalBase } from '../../TemporaryCrecimientoModalBase';
 import { AuthModalType, ModalBaseProps, ModalBaseTabs } from '../../types';
 import useAuthentication from '../../useAuthentication';
-import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { EmailForm } from './EmailForm';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
 import './ModalBase.scss';
@@ -56,7 +52,7 @@ const MODAL_COPY = {
   },
 };
 
-const mobileApp = isMobileApp();
+const SMS_ALLOWED_COUNTRIES = ['US', 'CA', 'AS', 'GU', 'MP', 'PR', 'VI'];
 
 const SSO_OPTIONS_DEFAULT: AuthSSOs[] = [
   'google',
@@ -68,15 +64,6 @@ const SSO_OPTIONS_DEFAULT: AuthSSOs[] = [
   'farcaster',
   'SMS',
 ] as const;
-
-const SSO_OPTIONS_MOBILE: AuthSSOs[] = [
-  'google',
-  'apple',
-  'email',
-  'SMS',
-] as const;
-
-const SSO_OPTIONS = mobileApp ? SSO_OPTIONS_MOBILE : SSO_OPTIONS_DEFAULT;
 
 /**
  * AuthModal base component with customizable options, callbacks, layouts and auth options display strategy.
@@ -106,11 +93,34 @@ const ModalBase = ({
   triggerOpenEVMWalletsSubModal,
   isUserFromWebView = false,
 }: ModalBaseProps) => {
+  const mobileApp = isUserFromWebView;
   const copy = MODAL_COPY[layoutType];
 
-  const partnershipWalletEnabled = useFlag('partnershipWallet');
-  const gateWalletEnabled = useFlag('gateWallet');
+  const binanceWebEnabled = useFlag('binanceWeb');
   const crecimientoHackathonEnabled = useFlag('crecimientoHackathon');
+  const isBinanceProvider = () =>
+    typeof window !== 'undefined' &&
+    (window.ethereum as { isBinance?: boolean } | undefined)?.isBinance ===
+      true;
+
+  const [isSMSAllowed, setIsSMSAllowed] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/ipCountry')
+      .then((res) => res.json())
+      .then((data) => {
+        const country = data.country?.toUpperCase();
+        setIsSMSAllowed(SMS_ALLOWED_COUNTRIES.includes(country));
+      })
+      .catch(() => {
+        setIsSMSAllowed(false);
+      });
+  }, []);
+
+  const ssoOptions = useMemo(
+    () => SSO_OPTIONS_DEFAULT.filter((opt) => opt !== 'SMS' || isSMSAllowed),
+    [isSMSAllowed],
+  );
 
   const { farcasterContext, signInToFarcasterFrame } = useFarcasterStore();
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
@@ -118,13 +128,6 @@ const ModalBase = ({
       showAuthOptionTypesFor.length === 1
       ? 1
       : 0,
-  );
-  const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] = useState(
-    () => {
-      return triggerOpenEVMWalletsSubModal
-        ? triggerOpenEVMWalletsSubModal
-        : false;
-    },
   );
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
     useState(false);
@@ -138,7 +141,6 @@ const ModalBase = ({
   const handleClose = async () => {
     setIsAuthenticatingWithEmail(false);
     setIsAuthenticatingWithSMS(false);
-    setIsEVMWalletsModalVisible(false);
     isWalletConnectEnabled &&
       (await onResetWalletConnect().catch(console.error));
     await onClose();
@@ -187,35 +189,50 @@ const ModalBase = ({
   const suiWallets = filterWalletNames(ChainBase.Sui);
   const getEVMWalletsForMainModal = () => {
     const configEvmWallets: string[] = [];
-    if (isGateWalletAvailable && gateWalletEnabled) {
+
+    // Always put MetaMask first if available
+    if (evmWallets.includes('metamask')) {
+      configEvmWallets.push('metamask');
+    }
+
+    // Add gate wallet if available and enabled
+    if (isGateWalletAvailable) {
       configEvmWallets.push('gate');
     }
 
-    if (partnershipWalletEnabled) {
-      if (isOkxWalletAvailable) {
-        configEvmWallets.push('okx');
-      }
-      if (isBinanceWalletAvailable) {
-        configEvmWallets.push('binance');
-      }
+    if (isOkxWalletAvailable) {
+      configEvmWallets.push('okx');
     }
-    if (hasWalletConnect) {
-      configEvmWallets.push('walletconnect');
+    if (isBinanceWalletAvailable) {
+      configEvmWallets.push('binance');
     }
-    return configEvmWallets;
-  };
-  const getEVMWalletsForEVMSubModal = () => {
-    const configEvmWallets: string[] = [
-      // to ensure it always comes first
-      ...(evmWallets.includes('walletconnect') ? ['walletconnect'] : []),
-      ...evmWallets.filter((x) => {
-        if (!partnershipWalletEnabled) {
-          if (x === 'okx' || x === 'binance' || x === 'gate') return false;
-        }
 
-        return x !== 'walletconnect';
-      }),
-    ];
+    // Add Binance wallet if feature flag is enabled (and not already added)
+    // This applies to Chrome extension version (window.binancew3w.ethereum)
+    // App browser version (window.ethereum.isBinance) doesn't need feature flag
+    if (
+      isBinanceWalletAvailable &&
+      binanceWebEnabled &&
+      !configEvmWallets.includes('binance')
+    ) {
+      configEvmWallets.push('binance');
+    }
+
+    // Add other EVM wallets (excluding ones already handled above)
+    evmWallets.forEach((wallet) => {
+      if (!configEvmWallets.includes(wallet)) {
+        // Skip Binance wallet (Chrome extension) if binanceWeb flag is disabled
+        // App browser version (window.ethereum.isBinance) is always available
+        if (
+          wallet === 'binance' &&
+          !binanceWebEnabled &&
+          !isBinanceProvider()
+        ) {
+          return;
+        }
+        configEvmWallets.push(wallet);
+      }
+    });
 
     return configEvmWallets;
   };
@@ -291,7 +308,7 @@ const ModalBase = ({
     },
     {
       name: 'Email or Social',
-      options: SSO_OPTIONS,
+      options: ssoOptions,
     },
   ];
 
@@ -299,10 +316,8 @@ const ModalBase = ({
     setActiveTabIndex((prevActiveTab) => {
       if (!shouldShowSSOOptions && prevActiveTab === 1) return 0;
 
-      if (isMobileApp()) return 1;
-
       if (showAuthOptionFor) {
-        return SSO_OPTIONS.includes(showAuthOptionFor as AuthSSOs) ? 1 : 0;
+        return ssoOptions.includes(showAuthOptionFor as AuthSSOs) ? 1 : 0;
       }
 
       if (
@@ -315,7 +330,12 @@ const ModalBase = ({
 
       return 0;
     });
-  }, [showAuthOptionTypesFor, showAuthOptionFor, shouldShowSSOOptions]);
+  }, [
+    showAuthOptionTypesFor,
+    showAuthOptionFor,
+    shouldShowSSOOptions,
+    ssoOptions,
+  ]);
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
@@ -329,12 +349,6 @@ const ModalBase = ({
 
     // if any wallet option is selected
     if (activeTabIndex === 0) {
-      // if wallet connect option is selected, open the EVM wallet list modal
-      if (option === 'walletconnect' && !isEVMWalletsModalVisible) {
-        setIsEVMWalletsModalVisible(true);
-        return;
-      }
-
       // @ts-expect-error <StrictNullChecks>
       await onWalletSelect(wallets.find((wallet) => wallet.name === option));
     }
@@ -379,8 +393,6 @@ const ModalBase = ({
 
   return (
     <>
-      <PrivySMSDialog />
-      <PrivyEmailDialog />
       <section className="ModalBase">
         {!isUserFromWebView && (
           <CWIcon iconName="close" onClick={onClose} className="close-btn" />
@@ -514,27 +526,6 @@ const ModalBase = ({
           )}
         </CWModalFooter>
       </section>
-      <EVMWalletsSubModal
-        availableWallets={
-          getEVMWalletsForEVMSubModal().filter((wallet) =>
-            showAuthOptionFor ? wallet === showAuthOptionFor : true,
-          ) as EVMWallets[]
-        }
-        isOpen={isEVMWalletsModalVisible}
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onClose={async () => {
-          setIsEVMWalletsModalVisible(false);
-          isWalletConnectEnabled && (await onResetWalletConnect());
-        }}
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onWalletSelect={async (option) => await onAuthMethodSelect(option)}
-        disabled={isMagicLoading}
-        canResetWalletConnect={isWalletConnectEnabled}
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onResetWalletConnect={onResetWalletConnect}
-        isUserFromWebView={isUserFromWebView}
-        handleNextOrSkip={handleSuccess}
-      />
       {/* Signature verification modal is only displayed on mobile */}
       <MobileWalletConfirmationSubModal
         isOpen={isMobileWalletVerificationStep}

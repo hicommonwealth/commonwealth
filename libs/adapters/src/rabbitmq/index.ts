@@ -1,2 +1,2 @@
-export * from './RabbitMQAdapter';
 export * from './createRmqConfig';
+export * from './RabbitMQAdapter';

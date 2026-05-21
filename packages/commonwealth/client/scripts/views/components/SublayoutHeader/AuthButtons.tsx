@@ -30,6 +30,7 @@ const AuthButtons = ({
         buttonWidth={fullWidthButtons ? 'full' : 'narrow'}
         disabled={isDisabled}
         onClick={() => onButtonClick(AuthModalType.CreateAccount)}
+        data-testid="create-account-button"
       />
       <CWButton
         buttonType="primary"
@@ -40,6 +41,7 @@ const AuthButtons = ({
         buttonWidth={fullWidthButtons ? 'full' : 'narrow'}
         disabled={isDisabled}
         onClick={handleSignIn}
+        data-testid="sign-in-button"
       />
     </>
   );

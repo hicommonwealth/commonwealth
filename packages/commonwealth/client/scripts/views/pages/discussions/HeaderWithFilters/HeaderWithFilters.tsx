@@ -1,23 +1,29 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { parseCustomStages, threadStageToLabel } from 'helpers';
-import { isUndefined } from 'helpers/typeGuards';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import moment from 'moment/moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation, useSearchParams } from 'react-router-dom';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
+import { saveToClipboard } from 'shared/utils/clipboard';
+import Permissions from 'shared/utils/Permissions';
+import { isUndefined } from 'shared/utils/typeGuards';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
-import ContestCard from 'views/components/ContestCard';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
-import { Select } from 'views/components/Select';
-import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
+import ContestCard from 'views/components/ContestCard';
+import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
+import { Select } from 'views/components/Select';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
@@ -29,6 +35,27 @@ import {
   ThreadViewFilterTypes,
 } from '../../../../models/types';
 import './HeaderWithFilters.scss';
+
+function getTokenSymbolFallback(topicWeight: TopicWeightedVoting) {
+  switch (topicWeight) {
+    case TopicWeightedVoting.SuiNative:
+      return 'Sui Native';
+    case TopicWeightedVoting.SuiToken:
+      return 'Sui Token';
+    case TopicWeightedVoting.SuiNFT:
+      return 'Sui NFT';
+    case TopicWeightedVoting.SPL:
+      return 'SPL';
+    case TopicWeightedVoting.ERC20:
+      return 'ERC20';
+    case TopicWeightedVoting.Stake:
+      return 'Stake';
+    case TopicWeightedVoting.ERC1155ID:
+      return 'ERC1155ID';
+    default:
+      return 'ETH';
+  }
+}
 
 type TabsProps = {
   label: string;
@@ -79,6 +106,8 @@ export const HeaderWithFilters = ({
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<
     Topic | undefined
   >();
+
+  const tokenAddressPopover = usePopover();
 
   const filterRowRef = useRef<HTMLDivElement>();
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
@@ -222,11 +251,43 @@ export const HeaderWithFilters = ({
     }
   };
 
+  const layoutSelector = (
+    <Select
+      containerClassname="layout-selector"
+      selected={selectedView || ThreadViewFilterTypes.All}
+      onSelect={(item) => {
+        setSelectedView?.((item as ViewType).value);
+      }}
+      options={[
+        {
+          id: 1,
+          value: ThreadViewFilterTypes.All,
+          label: 'Row',
+          iconLeft: 'viewAll',
+        },
+
+        {
+          id: 2,
+          value: ThreadViewFilterTypes.Overview,
+          label: 'Overview',
+          iconLeft: 'viewOverView',
+        },
+
+        {
+          id: 3,
+          value: ThreadViewFilterTypes.CardView,
+          label: 'ImageView',
+          iconLeft: 'kanban',
+        },
+      ]}
+    />
+  );
+
   return (
     <div className="HeaderWithFilters">
       <div className="header-row">
         {!isOnArchivePage && views && views.length ? (
-          <div className="filter-section">
+          <div className="filter-section filter-section-header">
             {!user.activeAccount && (
               <div className="join-community-header-button">
                 <CWButton
@@ -239,34 +300,7 @@ export const HeaderWithFilters = ({
                 />
               </div>
             )}
-            <Select
-              selected={selectedView || ThreadViewFilterTypes.All}
-              onSelect={(item) => {
-                setSelectedView?.((item as ViewType).value);
-              }}
-              options={[
-                {
-                  id: 1,
-                  value: ThreadViewFilterTypes.All,
-                  label: 'Row',
-                  iconLeft: 'viewAll',
-                },
-
-                {
-                  id: 2,
-                  value: ThreadViewFilterTypes.Overview,
-                  label: 'Overview',
-                  iconLeft: 'viewOverView',
-                },
-
-                {
-                  id: 3,
-                  value: ThreadViewFilterTypes.CardView,
-                  label: 'ImageView',
-                  iconLeft: 'kanban',
-                },
-              ]}
-            />
+            {!isWindowExtraSmall && layoutSelector}
           </div>
         ) : (
           <CWText type="h3" fontWeight="semiBold" className="header-text">
@@ -304,11 +338,124 @@ export const HeaderWithFilters = ({
         </div>
       </div>
 
+      {/* Display weighted topic information if topic is weighted */}
+      {selectedTopic?.weighted_voting && (
+        <div className="weighted-topic-info">
+          <CWText type="caption" className="weighted-topic-header">
+            Weighted by
+          </CWText>
+          <div className="token-info-stack">
+            {/* Primary token */}
+            <div className="token-entry">
+              {selectedTopic.token_symbol ? (
+                <span className="token-symbol">
+                  {selectedTopic.token_symbol}
+                </span>
+              ) : (
+                <span className="token-symbol">
+                  {getTokenSymbolFallback(selectedTopic.weighted_voting)}
+                </span>
+              )}
+              {/* Secondary tokens */}
+              {selectedTopic.secondary_tokens &&
+                selectedTopic.secondary_tokens.length > 0 &&
+                selectedTopic.secondary_tokens.map((token, idx) => (
+                  <div key={idx} className="token-entry">
+                    <span className="token-symbol">
+                      + {token.token_symbol || token?.token_address}
+                    </span>
+                  </div>
+                ))}
+              {selectedTopic?.token_address && (
+                <div className="token-address-button-container">
+                  <CWIconButton
+                    iconName="infoEmpty"
+                    iconSize="small"
+                    onClick={tokenAddressPopover.handleInteraction}
+                    className="token-info-button"
+                  />
+                  <CWPopover
+                    title={
+                      selectedTopic.weighted_voting ===
+                        TopicWeightedVoting.SuiToken ||
+                      selectedTopic.weighted_voting ===
+                        TopicWeightedVoting.SuiNFT
+                        ? 'Object Types'
+                        : 'Token Addresses'
+                    }
+                    body={
+                      <div className="token-addresses-popover-container">
+                        {/* Primary token address */}
+                        <div className="token-address-popover-content">
+                          <div className="token-address-section">
+                            {selectedTopic.token_symbol && (
+                              <div className="token-label">
+                                {selectedTopic.token_symbol}
+                              </div>
+                            )}
+                            <div className="token-address-text">
+                              {selectedTopic.token_address}
+                            </div>
+                          </div>
+                          <CWIconButton
+                            iconName="copy"
+                            iconSize="small"
+                            onClick={() => {
+                              saveToClipboard(
+                                selectedTopic.token_address!,
+                                true,
+                              ).catch(console.error);
+                            }}
+                            className="copy-button"
+                          />
+                        </div>
+                        {/* Secondary token addresses */}
+                        {selectedTopic.secondary_tokens &&
+                          selectedTopic.secondary_tokens.length > 0 &&
+                          selectedTopic.secondary_tokens.map((token, idx) => (
+                            <div
+                              key={idx}
+                              className="token-address-popover-content"
+                            >
+                              <div className="token-address-section">
+                                {token.token_symbol && (
+                                  <div className="token-label">
+                                    {token.token_symbol}
+                                  </div>
+                                )}
+                                <div className="token-address-text">
+                                  {token?.token_address}
+                                </div>
+                              </div>
+                              <CWIconButton
+                                iconName="copy"
+                                iconSize="small"
+                                onClick={() => {
+                                  saveToClipboard(
+                                    token?.token_address,
+                                    true,
+                                  ).catch(console.error);
+                                }}
+                                className="copy-button"
+                              />
+                            </div>
+                          ))}
+                      </div>
+                    }
+                    {...tokenAddressPopover}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <>
         {selectedTopic?.description &&
           views &&
           views[1].value !== selectedView && (
-            <MarkdownViewerUsingQuillOrNewEditor
+            <MarkdownViewerWithFallback
               markdown={selectedTopic.description}
               className="subheader-text"
             />
@@ -327,6 +474,7 @@ export const HeaderWithFilters = ({
           <div className="filter-row" ref={filterRowRef}>
             <div className="filter-section">
               {!isWindowExtraSmall && <p className="filter-label">Sort</p>}
+              {isWindowExtraSmall && layoutSelector}
               <Select
                 selected={featuredFilter || ThreadFeaturedFilterTypes.Newest}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any

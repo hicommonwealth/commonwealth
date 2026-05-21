@@ -95,6 +95,7 @@ export default (
           ).update(
             {
               comment_count: Sequelize.literal('comment_count + 1'),
+              net_comment_count: Sequelize.literal('net_comment_count + 1'),
               activity_rank_date: comment.created_at,
             },
             {
@@ -112,6 +113,7 @@ export default (
           ).update(
             {
               comment_count: Sequelize.literal('comment_count - 1'),
+              net_comment_count: Sequelize.literal('net_comment_count - 1'),
             },
             {
               where: { id: thread_id },

@@ -1,43 +1,26 @@
 import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import emojiRegex from 'emoji-regex';
 import { z } from 'zod';
 import { AuthContext, VerifiedContext } from '../context';
-import { Address, EmailNotificationInterval, User } from '../entities';
+import {
+  Address,
+  EmailNotificationInterval,
+  User,
+  UserProfile,
+} from '../entities';
 
 export const SignIn = {
   input: z.object({
     address: z.string(),
     community_id: z.string(),
-    wallet_id: z.nativeEnum(WalletId),
+    wallet_id: z.enum(WalletId),
     session: z.string(),
     block_info: z.string().nullish(),
     referrer_address: z.string().nullish(),
-    privy: z
-      .object({
-        identityToken: z.string(),
-        ssoOAuthToken: z
-          .string()
-          .optional()
-          .describe(
-            'The OAuth token of the SSO service the user signed in with e.g. Google, Github, etc.',
-          ),
-        ssoProvider: z
-          .union([
-            z.literal('google_oauth'),
-            z.literal('github_oauth'),
-            z.literal('discord_oauth'),
-            z.literal('apple_oauth'),
-            z.literal('twitter_oauth'),
-            z.literal('phone'),
-            z.literal('farcaster'),
-            z.literal('email'),
-          ])
-          .optional(),
-      })
-      .optional(),
   }),
   output: Address.extend({
-    community_base: z.nativeEnum(ChainBase),
+    community_base: z.enum(ChainBase),
     community_ss58_prefix: z.number().nullish(),
     was_signed_in: z.boolean().describe('True when user was already signed in'),
     user_created: z
@@ -65,13 +48,38 @@ export const UpdateUser = {
     id: z.number(),
     promotional_emails_enabled: z.boolean().nullish(),
     tag_ids: z.number().array().nullish(),
+    profile: UserProfile.extend({
+      name: z
+        .string()
+        .nullish()
+        .refine(
+          (val) => {
+            if (!val) return true;
+            else return !emojiRegex().test(val);
+          },
+          {
+            message: 'name must not contain emojis',
+          },
+        )
+        .refine(
+          (val) => {
+            if (!val) return true;
+            else return !/common/i.test(val);
+          },
+          {
+            message: 'Username must not contain the word "Common"',
+          },
+        ),
+    }),
   }),
   output: User,
   context: VerifiedContext,
 };
 
 export const GetNewContent = {
-  input: z.object({}),
+  input: z
+    .object({})
+    .describe('Check which joined communities have new content'),
   output: z.object({
     joinedCommunityIdsWithNewContent: z.array(z.string()),
   }),

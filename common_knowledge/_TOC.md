@@ -78,6 +78,7 @@
 
 _These entries should be assessed for relevance, and be either transformed into tickets or purged from the KB, as they are not stable descriptive documents._
 
+- [Commonwealth Frontend Refactor Plan](./Commonwealth-Frontend-Refactor-Plan.md)
 - [Forum Endpoints Audit](./Forum-Endpoints-Audit.md)
 - [Notifications Refactor](./Notifications-Refactor.md)
 - [Thread Loading Flow](./Thread-Loading-Flow.md)

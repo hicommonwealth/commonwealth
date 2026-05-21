@@ -1,0 +1,53 @@
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+
+.MarketsList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .markets-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 48px;
+  }
+
+  .empty-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    text-align: center;
+    gap: 8px;
+
+    .empty-description {
+      color: colors.$neutral-500;
+    }
+  }
+
+  .markets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .load-more-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 24px 0;
+  }
+}

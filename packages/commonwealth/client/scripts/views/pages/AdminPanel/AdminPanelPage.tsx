@@ -1,10 +1,11 @@
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import Permissions from 'client/scripts/utils/Permissions';
+import CWPageLayout from 'client/scripts/views/components/component_kit/new_designs/CWPageLayout';
+import RerankThreads from 'client/scripts/views/pages/AdminPanel/RerankThreads';
+import UpdateCommunityIdTask from 'client/scripts/views/pages/AdminPanel/UpdateCommunityIdTask';
+import UpdateCustomDomainTask from 'client/scripts/views/pages/AdminPanel/UpdateCustomDomainTask';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect } from 'react';
-import Permissions from 'utils/Permissions';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import RerankThreads from 'views/pages/AdminPanel/RerankThreads';
-import UpdateCommunityIdTask from 'views/pages/AdminPanel/UpdateCommunityIdTask';
-import UpdateCustomDomainTask from 'views/pages/AdminPanel/UpdateCustomDomainTask';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -27,6 +28,7 @@ import UserTier from './UserTier';
 
 const AdminPanelPage = () => {
   const navigate = useCommonNavigate();
+  const marketsEnabled = useFlag('markets');
 
   useEffect(() => {
     if (!Permissions.isSiteAdmin()) {
@@ -44,6 +46,13 @@ const AdminPanelPage = () => {
           iconRight="arrowRightPhosphor"
           onClick={() => navigate('/createQuest')}
         />
+        {marketsEnabled && (
+          <CWButton
+            label="Manage Markets"
+            iconRight="arrowRightPhosphor"
+            onClick={() => navigate('/manageMarkets')}
+          />
+        )}
         <CWDivider />
         <CWText type="h2">Site Analytics</CWText>
         <Analytics />

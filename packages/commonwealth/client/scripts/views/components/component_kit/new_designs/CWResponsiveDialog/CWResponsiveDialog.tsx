@@ -1,6 +1,6 @@
 import clsx from 'clsx';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { ReactNode, useState } from 'react';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import './CWResponsiveDialog.scss';

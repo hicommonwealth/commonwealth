@@ -1,5 +1,5 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
+import { VALIDATION_MESSAGES } from 'shared/utils/formValidations/messages';
 import { ContestFeeType } from 'views/pages/CommunityManagement/Contests/ManageContest/types';
 import z from 'zod';
 
@@ -16,7 +16,7 @@ export const detailsFormValidationSchema = (isFarcasterContest: boolean) => {
         value: z.number().optional(),
         label: z.string(),
         helpText: z.string().optional(),
-        weightedVoting: z.nativeEnum(TopicWeightedVoting).optional().nullish(),
+        weightedVoting: z.enum(TopicWeightedVoting).optional().nullish(),
         tokenAddress: z.string().optional().nullable(),
       })
       .optional()

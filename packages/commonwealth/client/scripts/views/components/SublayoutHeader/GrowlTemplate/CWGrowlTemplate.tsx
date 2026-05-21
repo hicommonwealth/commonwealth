@@ -20,6 +20,11 @@ interface CWGrowlTemplateProps {
   extraText?: string;
   growlType: string;
   blackCloseButton?: boolean;
+  /**
+   * Automatically disables the growl after the specified number of days
+   * since the first time it was displayed.
+   */
+  expiryDays?: number;
 }
 
 //CWGrowlTemplate should be placed in Sublayout.tsx when used for general announcements
@@ -35,27 +40,40 @@ export const CWGrowlTemplate = ({
   extraText,
   growlType,
   blackCloseButton,
+  expiryDays,
 }: CWGrowlTemplateProps) => {
   const { setIsGrowlHidden, isGrowlHidden } = useGrowlStore();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [shouldHideGrowlPermanently, setShouldHideGrowlPermanently] =
     useState(false);
 
-  const [isDisabled, setIsDisabled] = useState(
-    localStorage.getItem(
-      `LOCALSTORAGE_GROWL_TEMPLATE_${growlType.toUpperCase()}_KEY`,
-    ) === 'true' || isGrowlHidden,
-  );
+  const storageKey = `LOCALSTORAGE_GROWL_TEMPLATE_${growlType.toUpperCase()}_KEY`;
+  const firstSeenKey = `LOCALSTORAGE_GROWL_TEMPLATE_${growlType.toUpperCase()}_FIRST_SEEN`;
+
+  const [isDisabled, setIsDisabled] = useState(() => {
+    const baseDisabled =
+      localStorage.getItem(storageKey) === 'true' || isGrowlHidden;
+
+    if (expiryDays) {
+      const now = Date.now();
+      const firstSeen = localStorage.getItem(firstSeenKey);
+      if (!firstSeen) {
+        localStorage.setItem(firstSeenKey, now.toString());
+      } else if (now - Number(firstSeen) > expiryDays * 24 * 60 * 60 * 1000) {
+        localStorage.setItem(storageKey, 'true');
+        return true;
+      }
+    }
+
+    return baseDisabled;
+  });
 
   const handleExit = () => {
     setIsDisabled(true);
     setIsGrowlHidden(true);
 
     if (shouldHideGrowlPermanently) {
-      localStorage.setItem(
-        `LOCALSTORAGE_GROWL_TEMPLATE_${growlType.toUpperCase()}_KEY`,
-        'true',
-      );
+      localStorage.setItem(storageKey, 'true');
     }
   };
 

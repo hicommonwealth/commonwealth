@@ -1,18 +1,25 @@
 import { ContentType } from '@hicommonwealth/shared';
-import app from 'client/scripts/state';
-import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
-import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
-import useUserStore from 'client/scripts/state/ui/user';
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
+import ManageCommunityStakeModal from 'client/scripts/views/modals/ManageCommunityStakeModal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { findDenominationString } from 'helpers/findDenomination';
-import { useFlag } from 'hooks/useFlag';
 import type { DeltaStatic } from 'quill';
 import React, { useRef, useState } from 'react';
+import {
+  isRateLimitError,
+  RATE_LIMIT_MESSAGE,
+  RateLimitErrorType,
+} from 'shared/utils/rateLimit';
+import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
 import useCreateThreadMutation, {
   buildCreateThreadInput,
 } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   createDeltaFromText,
@@ -20,16 +27,16 @@ import {
 } from 'views/components/react_quill_editor';
 import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import ActiveContestList from '../HomePage/ActiveContestList/ActiveContestList';
+import ActivePredictionMarketList from '../HomePage/ActivePredictionMarketList/ActivePredictionMarketList';
 import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
 import XpQuestList from '../HomePage/XpQuestList/XpQuestList';
 import './CommunityHomePage.scss';
 import CommunityTransactions from './CommunityTransactions/CommunityTransactions';
 import TokenDetails from './TokenDetails/TokenDetails';
 import TokenPerformance from './TokenPerformance/TokenPerformance';
+// eslint-disable-next-line max-len
+import { useTokenTradeWidget } from 'client/scripts/views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 // eslint-disable-next-line max-len
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
@@ -38,7 +45,6 @@ const CommunityHome = () => {
   const user = useUserStore();
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const xpEnabled = useFlag('xp');
   const chain = app.chain.meta.id;
 
   const communityId = app.activeChainId() || '';
@@ -55,6 +61,8 @@ const CommunityHome = () => {
   const { mutateAsync: createThread, isPending: isCreatingThread } =
     useCreateThreadMutation({ communityId });
 
+  const { communityToken } = useTokenTradeWidget();
+
   const {
     setModeOfManageCommunityStakeModal,
     modeOfManageCommunityStakeModal,
@@ -70,7 +78,9 @@ const CommunityHome = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
 
-  const handleCreateThread = async (): Promise<number> => {
+  const handleCreateThread = async (
+    turnstileToken?: string,
+  ): Promise<number> => {
     if (!user.activeAccount || !community || !topics || topics.length === 0) {
       notifyError('User, community data, or topics missing.');
       return -1;
@@ -98,6 +108,7 @@ const CommunityHome = () => {
         body: bodyText,
         ethChainIdOrBech32Prefix:
           app.chain.meta.ChainNode?.eth_chain_id ?? undefined,
+        turnstileToken,
       });
 
       const newThread = await createThread(input);
@@ -113,7 +124,18 @@ const CommunityHome = () => {
       console.error('Error creating thread:', error);
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
-      notifyError(`Failed to create thread: ${errorMessage}`);
+
+      // Type guard to check if error has the structure expected by isRateLimitError
+      const isRateLimitErrorType = (
+        err: unknown,
+      ): err is RateLimitErrorType => {
+        return typeof err === 'object' && err !== null;
+      };
+      if (isRateLimitErrorType(error) && isRateLimitError(error)) {
+        notifyError(RATE_LIMIT_MESSAGE);
+      } else {
+        notifyError(`Failed to create thread: ${errorMessage}`);
+      }
       return -1;
     }
   };
@@ -140,8 +162,12 @@ const CommunityHome = () => {
             communityIdFilter={chain}
           />
           <ActiveContestList isCommunityHomePage />
-          <CommunityTransactions />
-          {xpEnabled && <XpQuestList communityIdFilter={chain} />}
+          <ActivePredictionMarketList
+            isCommunityHomePage
+            communityIdFilter={chain}
+          />
+          {communityToken && <CommunityTransactions />}
+          <XpQuestList communityIdFilter={chain} />
           <CWModal
             size="small"
             content={

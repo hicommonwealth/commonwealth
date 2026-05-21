@@ -45,7 +45,7 @@ export function verifyAlchemySignature(req: any) {
 
   if (!hmac) throw new Error('Unauthorized');
 
-  hmac.update(req.body.toString(), 'utf-8');
+  hmac.update(req.body.toString(), 'utf8');
   const digest = hmac.digest('hex');
   if (signature !== digest) throw new Error('Invalid signature');
 }

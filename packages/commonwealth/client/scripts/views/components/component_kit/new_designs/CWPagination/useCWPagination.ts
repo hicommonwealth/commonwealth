@@ -70,15 +70,15 @@ const useCWPagination = ({
     siblingsStart > boundaryCount + 2
       ? [ButtonType.StartEllipsis]
       : boundaryCount + 1 < totalCount - boundaryCount
-      ? [boundaryCount + 1]
-      : [];
+        ? [boundaryCount + 1]
+        : [];
 
   const siblingsEndPages =
     siblingsEnd < totalCount - boundaryCount - 1
       ? [ButtonType.EndEllipsis]
       : totalCount - boundaryCount > boundaryCount
-      ? [totalCount - boundaryCount]
-      : [];
+        ? [totalCount - boundaryCount]
+        : [];
 
   const itemList = [
     ButtonType.Previous,

@@ -18,8 +18,8 @@ import {
   doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { ZodError } from 'zod';
 import './QuestActionSubForm.scss';
 import {
@@ -100,7 +100,7 @@ const useQuestActionMultiFormsState = ({
       schema.parse(values);
     } catch (e) {
       const zodError = e as ZodError;
-      zodError.errors.map((error) => {
+      zodError.issues.map((error) => {
         errors = {
           ...errors,
           [error.path[0] as keyof QuestActionSubFormErrors]: error.message,

@@ -10,6 +10,8 @@ export const DeleteAddressErrors = {
   CannotDeleteMagic: 'Cannot delete Magic Link address',
   CannotDeleteOnlyAdmin:
     'Community must have at least 1 admin. Please assign another community member as admin, to leave this community.',
+  CannotDeleteLastAddress:
+    'Cannot delete last address. Please join another community before leaving this one.',
 };
 
 export function DeleteAddress(): Command<typeof schemas.DeleteAddress> {
@@ -20,10 +22,17 @@ export function DeleteAddress(): Command<typeof schemas.DeleteAddress> {
     body: async ({ actor, payload }) => {
       const { community_id, address } = payload;
 
+      const addresses = await models.Address.count({
+        where: { user_id: actor.user.id },
+      });
+      if (addresses <= 1)
+        throw new InvalidInput(DeleteAddressErrors.CannotDeleteLastAddress);
+
       const addr = await models.Address.findOne({
         where: { community_id, address, user_id: actor.user.id },
       });
       mustExist('Address', addr);
+
       if (addr.wallet_id === WalletId.Magic)
         throw new InvalidInput(DeleteAddressErrors.CannotDeleteMagic);
 
@@ -33,7 +42,6 @@ export function DeleteAddress(): Command<typeof schemas.DeleteAddress> {
       if (admins.length === 1 && admins[0].address === addr.address)
         throw new InvalidInput(DeleteAddressErrors.CannotDeleteOnlyAdmin);
 
-      // TODO: why soft delete?
       await models.Address.update(
         { user_id: null, verified: null },
         { where: { id: addr.id } },

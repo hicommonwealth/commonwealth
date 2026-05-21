@@ -54,7 +54,7 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
     expressAdapter.query(Community.GetNamespaceMetadata()),
   );
   registerRoute(router, 'get', '/domain', async (req, res) => {
-    const hostname = req.headers['x-forwarded-host'] || req.hostname;
+    const hostname = req.headers['cf-original-host'] || req.hostname;
     // return the community id matching the hostname's custom domain
     try {
       const result = await query(Community.GetByDomain(), {
@@ -69,8 +69,55 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
     // otherwise, return false
     return res.json({ customDomain: null });
   });
+  registerRoute(router, 'get', '/ipCountry', (req, res) => {
+    const country = (req.headers['CF-IPCountry'] as string)?.toUpperCase();
+    return res.json({ country });
+  });
+  // GET renders an intermediate page that auto-submits a POST form
+  // This protects against CSRF by requiring POST for the state-changing action
   registerRoute(router, 'get', '/finishUpdateEmail', async (req, res) => {
     const { token, email } = req.query;
+    if (!token || !email) {
+      throw new AppError('Missing token or email parameter');
+    }
+    // Render an auto-submitting form to POST the actual verification
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Verifying Email...</title>
+          <style>
+            body { font-family: system-ui, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f5f5f5; }
+            .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            noscript { color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <p>Verifying your email...</p>
+            <noscript>
+              <form method="POST" action="/api/finishUpdateEmail">
+                <input type="hidden" name="token" value="${token}" />
+                <input type="hidden" name="email" value="${email}" />
+                <button type="submit">Click here to verify your email</button>
+              </form>
+            </noscript>
+            <form id="verifyForm" method="POST" action="/api/finishUpdateEmail">
+              <input type="hidden" name="token" value="${token}" />
+              <input type="hidden" name="email" value="${email}" />
+            </form>
+            <script>document.getElementById('verifyForm').submit();</script>
+          </div>
+        </body>
+      </html>
+    `;
+    res.setHeader('Content-Type', 'text/html');
+    return res.send(html);
+  });
+
+  // POST performs the actual state-changing email verification
+  registerRoute(router, 'post', '/finishUpdateEmail', async (req, res) => {
+    const { token, email } = req.body;
     try {
       const result = await query(User.FinishUpdateEmail(), {
         actor: { user: { id: 0, email: '' } },
@@ -155,7 +202,7 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
   );
 
   // logout
-  registerRoute(router, 'get', '/logout', logout.bind(this));
+  registerRoute(router, 'post', '/logout', logout.bind(this));
 
   registerRoute(
     router,

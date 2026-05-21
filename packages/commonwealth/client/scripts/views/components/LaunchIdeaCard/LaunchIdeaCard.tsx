@@ -1,5 +1,5 @@
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import React from 'react';
+import { VALIDATION_MESSAGES } from 'shared/utils/formValidations/messages';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWTextInput } from '../component_kit/new_designs/CWTextInput';

@@ -144,6 +144,7 @@ ${
         Select tempC.* FROM "Comments" tempC
         JOIN T tempTT ON tempTT.id = tempC.thread_id
         WHERE deleted_at IS NULL
+          AND tempC.marked_as_spam_at IS NULL
         ORDER BY created_at DESC
         LIMIT :withXRecentComments
       ) COM

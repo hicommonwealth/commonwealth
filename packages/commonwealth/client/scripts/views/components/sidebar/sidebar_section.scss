@@ -3,8 +3,6 @@
 @use '../../../styles/mixins/colors.module';
 
 .SidebarSectionGroup {
-  border-bottom-color: colors.$neutral-50;
-  border-bottom-width: 1px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -12,10 +10,10 @@
 
   .section-group-title-container {
     align-items: center;
-    color: colors.$neutral-800;
+    color: colors.$neutral-500;
     display: flex;
     justify-content: left;
-    padding: 8px;
+    padding: 2px 8px;
 
     &:hover {
       background-color: colors.$primary-50;

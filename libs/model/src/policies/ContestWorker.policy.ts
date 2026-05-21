@@ -125,9 +125,10 @@ export function ContestWorker(): Policy<typeof inputs> {
         );
         if (!activeContestManagersWithoutVote?.length) {
           // throw to trigger retry in case the content is pending creation
-          throw new Error(
+          log.warn(
             'ThreadUpvoted: no matching active contests without actions',
           );
+          return;
         }
 
         const chainNodeUrl = getChainNodeUrl(
@@ -172,11 +173,22 @@ export function ContestWorker(): Policy<typeof inputs> {
           },
         );
 
-        await createOnchainContestVote({
-          contestManagers: allowedContestManagers,
-          content_url,
-          author_address: payload.address!,
-        });
+        try {
+          await createOnchainContestVote({
+            contestManagers: allowedContestManagers,
+            content_url,
+            author_address: payload.address!,
+          });
+        } catch (err) {
+          if (
+            err instanceof Error &&
+            err.message.indexOf(
+              'Content already listed as a winner in a previous contest',
+            ) > 0
+          )
+            log.error(err.message, err);
+          else throw err;
+        }
       },
       ContestRolloverTimerTicked: async () => {
         try {

@@ -79,9 +79,6 @@ const databaseUrl = config.DB.URI;
 const featureFlags = {
   newEditor: buildFlag(process.env.FLAG_NEW_EDITOR),
   contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
-  knockPushNotifications: buildFlag(
-    process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
-  ),
   // Other feature flags
 };
 

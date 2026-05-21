@@ -40,11 +40,13 @@ const UserDropdown = ({ onAuthModalOpen }: UserDropdownProps) => {
         <button
           className={clsx('UserDropdownTriggerButton', { isOpen })}
           onClick={onClick}
+          data-testid="user-menu"
         >
           <User
             avatarSize={24}
             userAddress={user?.address}
             userCommunityId={user?.community?.id}
+            shouldShowTrustLevelTooltip
           />
           <CWIcon
             iconName={isOpen ? 'caretUp' : 'caretDown'}

@@ -3,20 +3,20 @@ import React, { useState } from 'react';
 import commonUrl from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
 import shape2Url from 'assets/img/shapes/shape2.svg';
-import useAppStatus from 'hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
   BaseMixpanelPayload,
   MixpanelContestEvents,
 } from 'shared/analytics/types';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import { useFlag } from 'shared/hooks/useFlag';
+import Permissions from 'shared/utils/Permissions';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';

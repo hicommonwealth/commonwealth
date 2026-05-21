@@ -2,7 +2,10 @@ import type { ContentType } from '@hicommonwealth/shared';
 import app from 'state';
 
 // Add callback registry for AI streaming
-type AIStreamingCallback = (commentId: number) => void;
+type AIStreamingCallback = (
+  commentId: number,
+  useDefaultModelOnly: boolean,
+) => void;
 let aiStreamingCallbacks: AIStreamingCallback[] = [];
 
 export const registerAIStreamingCallback = (callback: AIStreamingCallback) => {
@@ -19,6 +22,7 @@ export const registerAIStreamingCallback = (callback: AIStreamingCallback) => {
 export const jumpHighlightComment = (
   commentId: number,
   shouldTriggerAI: boolean = false,
+  useDefaultModelOnly: boolean = false,
 ) => {
   const element = document.querySelector(`.comment-${commentId}`);
   if (!element) {
@@ -36,7 +40,7 @@ export const jumpHighlightComment = (
   if (shouldTriggerAI && aiStreamingCallbacks.length > 0) {
     aiStreamingCallbacks.forEach((callback) => {
       try {
-        callback(commentId);
+        callback(commentId, useDefaultModelOnly);
       } catch (error) {
         console.error('Error in AI streaming callback:', error);
       }
@@ -57,6 +61,7 @@ export const listenForComment = (
   commentId: number,
   shouldTriggerAI: boolean = false,
   maxAttempts = 10,
+  useDefaultModelOnly: boolean = false,
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     let attempts = 0;
@@ -64,7 +69,7 @@ export const listenForComment = (
       attempts++;
       const element = document.querySelector(`.comment-${commentId}`);
       if (element) {
-        jumpHighlightComment(commentId, shouldTriggerAI);
+        jumpHighlightComment(commentId, shouldTriggerAI, useDefaultModelOnly);
         resolve();
       } else if (attempts < maxAttempts) {
         setTimeout(checkElement, 100); // Try again after 100ms

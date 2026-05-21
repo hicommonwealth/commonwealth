@@ -1,10 +1,11 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
+import { TokenType } from 'client/scripts/views/components/TokenCard/TokenCard';
 import clsx from 'clsx';
-import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useFlag } from 'shared/hooks/useFlag';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -18,7 +19,6 @@ import TradeTokenModal, {
   TradingConfig,
   TradingMode,
 } from 'views/modals/TradeTokenModel';
-import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import FiltersDrawer, {
@@ -29,10 +29,6 @@ import FiltersDrawer, {
   tokenSortOptionsLabelToKeysMap,
 } from './FiltersDrawer';
 import './TokensList.scss';
-
-const TokenWithCommunity = TokenView.extend({
-  community_id: z.string(),
-});
 
 type TokensListProps = {
   hideHeader?: boolean;
@@ -52,7 +48,7 @@ const TokensList = ({
   hideSearchTag,
 }: TokensListProps) => {
   const navigate = useCommonNavigate();
-  const launchpadEnabled = useFlag('launchpad');
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
     isOpen: boolean;
@@ -82,6 +78,11 @@ const TokensList = ({
     cursor: 1,
     limit: 8,
     with_stats: true,
+    token_type: !tokenizedThreadsEnabled
+      ? 'launchpad'
+      : filters.withTokenType
+        ? (filters.withTokenType.toLowerCase() as 'launchpad' | 'postcoin')
+        : undefined,
     order_by: (() => {
       if (filters?.withTokenSortBy) {
         return tokenSortOptionsLabelToKeysMap[
@@ -108,6 +109,13 @@ const TokensList = ({
     }
   };
 
+  const removeTokenTypeFilter = () => {
+    setFilters({
+      ...filters,
+      withTokenType: undefined,
+    });
+  };
+
   const removeCommunitySortByFilter = () => {
     setFilters({
       ...filters,
@@ -125,7 +133,7 @@ const TokensList = ({
 
   const handleCTAClick = (
     mode: TradingMode,
-    token: z.infer<typeof TokenWithCommunity>,
+    token: z.infer<typeof TokenView>,
   ) => {
     setTokenLaunchModalConfig({
       isOpen: true,
@@ -136,8 +144,6 @@ const TokensList = ({
       } as TradingConfig,
     });
   };
-
-  if (!launchpadEnabled) return <></>;
 
   return (
     <div className="TokensList">
@@ -155,6 +161,13 @@ const TokensList = ({
               label={`Search: ${searchText?.trim()}`}
               type="filter"
               onCloseClick={onClearSearch}
+            />
+          )}
+          {filters.withTokenType && (
+            <CWTag
+              label={filters.withTokenType}
+              type="filter"
+              onCloseClick={removeTokenTypeFilter}
             />
           )}
           {filters.withTokenSortBy && (
@@ -193,11 +206,7 @@ const TokensList = ({
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
-        <div
-          className={clsx('empty-placeholder', {
-            'my-16': launchpadEnabled,
-          })}
-        >
+        <div className={clsx('empty-placeholder', 'my-16')}>
           <CWText type="h2">
             No tokens found
             <br />
@@ -210,12 +219,9 @@ const TokensList = ({
             return (
               <TokenCard
                 key={token.name}
-                token={token as LaunchpadToken}
+                token={token as TokenType}
                 onCTAClick={(mode) => {
-                  handleCTAClick(
-                    mode,
-                    token as z.infer<typeof TokenWithCommunity>,
-                  );
+                  handleCTAClick(mode, token as z.infer<typeof TokenView>);
                 }}
                 onCardBodyClick={() =>
                   navigateToCommunity({
@@ -258,6 +264,12 @@ const TokensList = ({
           onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
         />
       )}
+      <FiltersDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        filters={filters}
+        onFiltersChange={(newFilters) => setFilters(newFilters)}
+      />
     </div>
   );
 };

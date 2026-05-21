@@ -5,14 +5,14 @@ import {
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import useGetJudgeStatusQuery from 'client/scripts/state/api/contests/getJudgeStatus';
-import useAppStatus from 'hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { useFlag } from 'hooks/useFlag';
 import React, { useMemo, useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelContestEvents,
 } from 'shared/analytics/types';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import { useFlag } from 'shared/hooks/useFlag';
 import app from 'state';
 import { useFetchPublicEnvVarQuery } from 'state/api/configuration';
 import {

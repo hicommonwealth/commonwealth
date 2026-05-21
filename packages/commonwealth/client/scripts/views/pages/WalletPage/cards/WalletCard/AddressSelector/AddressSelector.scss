@@ -1,0 +1,10 @@
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
+
+.AddressSelector {
+  .SelectList {
+    padding: 4px 8px !important;
+    max-height: 40px;
+    width: 100%;
+  }
+}

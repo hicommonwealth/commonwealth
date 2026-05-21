@@ -84,8 +84,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import clsx from 'clsx';
-import { getRelativeTimestamp } from 'helpers/dates';
 import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
+import { getRelativeTimestamp } from 'shared/utils/dates';
 import { Avatar } from '../../../Avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';
@@ -94,7 +94,7 @@ import CWIconButton from '../CWIconButton';
 import CWPopover, { usePopover } from '../CWPopover';
 
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { prettyVoteWeight } from 'shared/adapters/currency';
+import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
 import './CWTable.scss';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -115,6 +115,7 @@ export type CWTableColumnInfo = {
   numeric: boolean;
   tokenDecimals?: number | null | undefined;
   weightedVoting?: TopicWeightedVoting | null | undefined;
+  tokenSymbol?: string;
   sortable: boolean;
   chronological?: boolean;
   customElementKey?: string;
@@ -197,10 +198,17 @@ export const CWTable = ({
                 return (
                   <div className="numeric">
                     {col.weightedVoting
-                      ? prettyVoteWeight(
-                          numericColVal,
-                          col.tokenDecimals,
+                      ? prettyCompoundVoteWeight(
+                          [
+                            {
+                              wei: numericColVal,
+                              tokenNumDecimals: col.tokenDecimals,
+                              multiplier: 1,
+                              tokenSymbol: col.tokenSymbol,
+                            },
+                          ],
                           col.weightedVoting,
+                          undefined,
                         )
                       : numericColVal}
                   </div>
@@ -278,18 +286,24 @@ export const CWTable = ({
   };
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && !isLoadingMoreRows) {
-        onScrollEnd?.();
-      }
-    });
+    if (!tableRef.current) return;
+    const observeRef = tableRef.current;
 
-    if (tableRef.current) {
-      observer.observe(tableRef.current);
-    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const firstEntry = entries[0];
+        if (firstEntry.isIntersecting && !isLoadingMoreRows) {
+          onScrollEnd?.();
+        }
+      },
+      { root: null, rootMargin: '0px', threshold: 0.1 },
+    );
+
+    observer.observe(observeRef);
 
     return () => {
-      observer?.disconnect();
+      observer.unobserve(observeRef);
+      observer.disconnect();
     };
   }, [isLoadingMoreRows, tableRef, onScrollEnd]);
 

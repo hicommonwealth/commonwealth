@@ -69,7 +69,7 @@ export const ResultsSections = ({
               onResultsClick && hasVotes ? (e) => onResultsClick(e) : undefined
             }
           >
-            {`${totalVoteCount} ${tokenSymbol ?? 'votes'}`}
+            {`${totalVoteCount} votes`}
           </CWText>
         </div>
       )}

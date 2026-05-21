@@ -18,8 +18,10 @@ import UserDropdown from './UserDropdown';
 import { ChainBase } from '@hicommonwealth/shared';
 import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
-import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
-import { useFlag } from 'hooks/useFlag';
+import {
+  fetchCachedNodes,
+  useFetchNodesQuery,
+} from 'client/scripts/state/api/nodes';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
@@ -28,7 +30,6 @@ import { CWCustomIcon } from '../../component_kit/cw_icons/cw_custom_icon';
 import { CWText } from '../../component_kit/cw_text';
 import XPProgressIndicator from '../XPProgressIndicator';
 
-import DownloadMobileApp from 'views/components/DownloadMobileApp';
 import FormattedDisplayNumber from '../../FormattedDisplayNumber/FormattedDisplayNumber';
 import './DesktopHeader.scss';
 
@@ -41,8 +42,6 @@ const baseNodeId = 1358;
 
 const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const navigate = useCommonNavigate();
-  const rewardsEnabled = useFlag('rewardsPage');
-  const xpEnabled = useFlag('xp');
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
     useSidebarStore();
   const user = useUserStore();
@@ -56,6 +55,8 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
     }, 200);
   };
 
+  // Ensure chain node data is loaded before attempting to read from cache
+  useFetchNodesQuery();
   const nodes = fetchCachedNodes();
   const baseNode = nodes?.find((node) => node.id === baseNodeId);
 
@@ -73,7 +74,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const balance = ethBalance === '0.' ? '0' : ethBalance;
 
   return (
-    <div className="DesktopHeader">
+    <div className="DesktopHeader" data-testid="header">
       <div className="header-left">
         <CWIconButton
           iconName="commonLogo"
@@ -102,7 +103,6 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
       </div>
       <div className="searchbar">
         <CWSearchBar />
-        <DownloadMobileApp />
       </div>
 
       <div></div>
@@ -117,7 +117,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
               isLoggedIn: user.isLoggedIn,
             })}
           >
-            {xpEnabled && <XPProgressIndicator />}
+            <XPProgressIndicator />
             <CreateContentPopover />
             {!isWindowSmallInclusive(window.innerWidth) && (
               <CWTooltip
@@ -157,39 +157,37 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
             <>
               <KnockNotifications />
 
-              {rewardsEnabled && (
-                <div className="rewards-button">
-                  <CWTooltip
-                    content="Wallet and rewards"
-                    placement="bottom"
-                    renderTrigger={(handleInteraction) => (
-                      <div
-                        className="rewards-button-container"
-                        onClick={() => navigate('/wallet', {}, null)}
-                        onMouseEnter={handleInteraction}
-                        onMouseLeave={handleInteraction}
-                      >
-                        <CWIconButton
-                          iconName="cardholder"
-                          weight="fill"
-                          iconButtonTheme="black"
-                        />
-                        <FormattedDisplayNumber
-                          value={balance}
-                          options={{ decimals: 3, useShortSuffixes: false }}
-                          className="mr-1"
-                          type="caption"
-                          fontWeight="medium"
-                        />
-                        <CWText type="caption" className="ml-1">
-                          ETH
-                        </CWText>
-                        <CWCustomIcon iconName="base" iconSize="xs" />
-                      </div>
-                    )}
-                  />
-                </div>
-              )}
+              <div className="rewards-button">
+                <CWTooltip
+                  content="Wallet and rewards"
+                  placement="bottom"
+                  renderTrigger={(handleInteraction) => (
+                    <div
+                      className="rewards-button-container"
+                      onClick={() => navigate('/wallet', {}, null)}
+                      onMouseEnter={handleInteraction}
+                      onMouseLeave={handleInteraction}
+                    >
+                      <CWIconButton
+                        iconName="cardholder"
+                        weight="fill"
+                        iconButtonTheme="black"
+                      />
+                      <FormattedDisplayNumber
+                        value={balance}
+                        options={{ decimals: 3, useShortSuffixes: false }}
+                        className="mr-1"
+                        type="caption"
+                        fontWeight="medium"
+                      />
+                      <CWText type="caption" className="ml-1">
+                        ETH
+                      </CWText>
+                      <CWCustomIcon iconName="base" iconSize="xs" />
+                    </div>
+                  )}
+                />
+              </div>
             </>
           )}
         </div>

@@ -8,13 +8,13 @@ import useGetPinnedTokenByCommunityId from './getPinnedTokenByCommunityId';
 import usePinTokenToCommunityMutation from './pinTokenToCommunity';
 import useRefreshCustomDomainQuery from './refreshCustomDomain';
 import useSearchCommunitiesQuery from './searchCommunities';
+import useSetCommunityMcpServersMutation from './setCommunityMcpServers';
 import useToggleCommunityStarMutation from './toggleCommunityStar';
 import useUnpinTokenFromCommunityMutation from './unpinTokenFromCommunity';
 import useUpdateCommunityMutation from './updateCommunity';
 import useUpdateCommunityDirectoryTags from './updateCommunityDirectoryTags';
 import useUpdateCustomDomainMutation from './updateCustomDomain';
 import { useUpdateRoleMutation } from './updateRole';
-import useSetCommunityMcpServersMutation from './setCommunityMcpServers';
 
 export {
   useEditCommunityBannerMutation,
@@ -27,11 +27,11 @@ export {
   usePinTokenToCommunityMutation,
   useRefreshCustomDomainQuery,
   useSearchCommunitiesQuery,
+  useSetCommunityMcpServersMutation,
   useToggleCommunityStarMutation,
   useUnpinTokenFromCommunityMutation,
   useUpdateCommunityDirectoryTags,
   useUpdateCommunityMutation,
   useUpdateCustomDomainMutation,
   useUpdateRoleMutation,
-  useSetCommunityMcpServersMutation,
 };

@@ -7,6 +7,7 @@ type CWPhoneInputProps = {
   name: string;
   label?: string;
   country?: string;
+  onlyCountries?: string[];
   disabled?: boolean;
   hookToForm?: boolean;
 };
@@ -14,6 +15,7 @@ type CWPhoneInputProps = {
 const CWPhoneInput = ({
   name,
   country = 'us',
+  onlyCountries,
   disabled,
   hookToForm,
 }: CWPhoneInputProps) => {
@@ -26,6 +28,7 @@ const CWPhoneInput = ({
       <PhoneInput
         {...formFieldContext}
         country={country}
+        onlyCountries={onlyCountries}
         disabled={disabled}
         onChange={(value) => formContext.setValue(name, value)}
         inputClass="input-container"

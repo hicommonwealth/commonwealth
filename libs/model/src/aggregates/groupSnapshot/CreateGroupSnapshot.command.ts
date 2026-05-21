@@ -13,7 +13,7 @@ const log = logger(import.meta);
 type SuiNFTSource = {
   source_type: BalanceSourceType.SuiNFT;
   sui_network: string;
-  collection_id: string;
+  collection_id: string; // full object type
   token_standard?: string;
 };
 
@@ -25,7 +25,7 @@ function extractSuiNFTSource(requirements: Requirement[]): SuiNFTSource | null {
         return {
           source_type: source.source_type,
           sui_network: source.sui_network,
-          collection_id: source.collection_id,
+          collection_id: source.collection_id, // full object type
           token_standard: source.token_standard,
         };
       }
@@ -95,7 +95,7 @@ export function CreateGroupSnapshot(): Command<
         balanceSourceType: BalanceSourceType.SuiNFT,
         sourceOptions: {
           suiNetwork: suiNFTSource.sui_network,
-          collectionId: suiNFTSource.collection_id,
+          fullObjectType: suiNFTSource.collection_id,
         },
       });
 

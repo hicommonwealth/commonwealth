@@ -1,0 +1,15 @@
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
+
+.ProposalsEmptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+
+  .empty-description {
+    color: colors.$neutral-600;
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+}

@@ -17,7 +17,6 @@ export const ReactionContextInput = z.object({
   reaction_id: z.number(),
 });
 export const PollContextInput = z.object({ poll_id: z.number() });
-
 /**
  * Light authorization context
  * - Authorizes verified address, loading address instance

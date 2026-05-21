@@ -37,6 +37,8 @@ export function createTestRpc(
       return 'https://testnet.skalenodes.com/v1/giant-half-dual-testnet';
     case ValidChains.Anvil:
       return 'http://localhost:5502';
+    case ValidChains.Soneium:
+      return buildChainNodeUrl('https://rpc.soneium.com/', scope);
     default:
       throw new Error(`Eth chain id ${ethChainId} not supported`);
   }

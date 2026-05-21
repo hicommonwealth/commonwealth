@@ -1,6 +1,6 @@
 import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
-import { APIOrderDirection } from 'helpers/constants';
 import React from 'react';
+import { APIOrderDirection } from 'shared/utils/constants';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';

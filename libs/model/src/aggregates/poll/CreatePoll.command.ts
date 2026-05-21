@@ -17,7 +17,7 @@ export function CreatePoll(): Command<typeof schemas.CreatePoll> {
         actor,
         context,
       );
-      const { prompt, options, duration } = payload;
+      const { prompt, options, duration, allow_revotes } = payload;
 
       const ends_at = duration ? dayjs().add(duration, 'days').toDate() : null;
 
@@ -38,6 +38,7 @@ export function CreatePoll(): Command<typeof schemas.CreatePoll> {
             prompt,
             options,
             ends_at,
+            allow_revotes,
           },
           { transaction },
         );

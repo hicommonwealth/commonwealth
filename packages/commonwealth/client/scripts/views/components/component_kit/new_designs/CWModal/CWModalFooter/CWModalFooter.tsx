@@ -14,7 +14,7 @@ const CWModalFooter: FC<CWModalFooterProps> = ({ children, className }) => {
     <div
       className={getClasses<{ className?: string }>(
         { className },
-        'CWModalFooter'
+        'CWModalFooter',
       )}
     >
       {children}

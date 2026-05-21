@@ -1,4 +1,4 @@
-import { isBoolean, isNotNil } from 'helpers/typeGuards';
+import { isBoolean, isNotNil } from 'shared/utils/typeGuards';
 
 import breakpoints from '../../../styles/mixins/breakpoints.module.scss';
 

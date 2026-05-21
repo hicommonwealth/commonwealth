@@ -18,6 +18,7 @@ interface CWModalProps {
   rootClassName?: string;
   visibleOverflow?: boolean;
   zIndex?: number;
+  'data-testid'?: string;
 }
 
 // Backdrop is needed for modal clickaway events
@@ -44,6 +45,7 @@ const CWModal: FC<CWModalProps> = ({
   className,
   visibleOverflow,
   zIndex,
+  'data-testid': dataTestId,
 }) => (
   <ModalUnstyled
     open={open}
@@ -59,6 +61,7 @@ const CWModal: FC<CWModalProps> = ({
         { isFullScreen, size, visibleOverflow },
         ComponentType.Modal,
       )} ${className}`}
+      data-testid={dataTestId}
     >
       {content}
     </div>

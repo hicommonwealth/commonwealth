@@ -1,0 +1,61 @@
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/border_radius';
+
+.ThreadPredictionMarketTag {
+  display: inline-block;
+
+  .Tag.passed,
+  .Tag.failed {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    line-height: 24px;
+  }
+}
+
+.prediction-market-popover {
+  .popover-title {
+    color: colors.$neutral-900;
+    font-weight: 700;
+  }
+}
+
+.ThreadPredictionMarketTag-popover-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ThreadPredictionMarketTag-probability-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+
+  .ThreadPredictionMarketTag-progress {
+    flex: 1;
+    min-width: 0;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: border_radius.$border-radius-corners;
+    background-color: colors.$rorange-500;
+
+    &::-webkit-progress-bar {
+      background-color: colors.$rorange-500;
+      border-radius: border_radius.$border-radius-corners;
+    }
+
+    &::-webkit-progress-value {
+      background-color: colors.$green-500;
+      border-radius: border_radius.$border-radius-corners;
+    }
+
+    &::-moz-progress-bar {
+      background-color: colors.$green-500;
+      border-radius: border_radius.$border-radius-corners;
+    }
+  }
+}

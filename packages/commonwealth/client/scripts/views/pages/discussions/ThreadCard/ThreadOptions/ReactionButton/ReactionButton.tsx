@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
 import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads/deleteReaction';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
@@ -5,7 +6,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
-import { prettyVoteWeight } from 'shared/adapters/currency';
+import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
 import app from 'state';
 import {
   useCreateThreadReactionMutation,
@@ -142,13 +143,18 @@ export const ReactionButton = ({
     }
   };
 
-  const formattedVoteCount = prettyVoteWeight(
-    thread.topic!.weighted_voting
-      ? reactionWeightsSum
-      : thread.reactionCount.toString(),
-    thread.topic!.token_decimals,
-    thread.topic!.weighted_voting,
-    1,
+  const formattedVoteCount = prettyCompoundVoteWeight(
+    [
+      {
+        wei: thread.topic!.weighted_voting
+          ? reactionWeightsSum
+          : thread.reactionCount.toString(),
+        tokenNumDecimals: thread.topic!.token_decimals,
+        multiplier: 1,
+        tokenSymbol: thread.topic?.token_symbol || undefined,
+      },
+    ],
+    thread.topic!.weighted_voting as TopicWeightedVoting,
     size === 'big' ? 1 : 6,
   );
 

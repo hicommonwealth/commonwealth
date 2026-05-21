@@ -6,7 +6,6 @@ import {
   CommunityTierMap,
   hasCommunityTierClientInfo,
 } from '@hicommonwealth/shared';
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -27,8 +26,6 @@ const SidebarHeader = ({
   onMobile: boolean;
 }) => {
   const navigate = useCommonNavigate();
-
-  const trustLevelEnabled = useFlag('trustLevel');
 
   const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
@@ -80,8 +77,7 @@ const SidebarHeader = ({
                 >
                   {smartTrim(community?.name, 17) || <Skeleton width="70%" />}
                 </CWText>
-                {trustLevelEnabled &&
-                  community?.tier &&
+                {community?.tier &&
                   community.tier !== CommunityTierMap.Unverified &&
                   (() => {
                     const tier = community.tier as CommunityTierMap;

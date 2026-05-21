@@ -14,6 +14,7 @@ import React from 'react';
 import { formatAddressShort } from 'shared/utils';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import './GovernanceTresury.scss';
+import TreasuryEmptyState from './TreasuryEmptyState';
 
 const GovernanceTresury = () => {
   const { communityToken, isLoadingToken, isPinnedToken } =
@@ -41,6 +42,14 @@ const GovernanceTresury = () => {
       ? (communityToken as ExternalToken).contract_address
       : (communityToken as LaunchpadToken).token_address
     : null;
+
+  if (!communityToken) {
+    return (
+      <div className="GovernanceTreassury">
+        <TreasuryEmptyState />
+      </div>
+    );
+  }
 
   return (
     <div className="GovernanceTreassury">
@@ -81,31 +90,19 @@ const GovernanceTresury = () => {
       </div>
       <div className="card-body">
         <div className="price-details">
-          {communityToken ? (
-            <CWText fontWeight="semiBold" type="h1">
-              ${ethToUsdRate}
-            </CWText>
-          ) : (
-            <CWText fontWeight="semiBold" type="h1">
-              N/A
-            </CWText>
-          )}
+          <CWText fontWeight="semiBold" type="h2">
+            ${ethToUsdRate}
+          </CWText>
           <div>
-            {communityToken ? (
-              <>
-                {tokenPricing && (
-                  <PricePercentageChange
-                    pricePercentage24HourChange={
-                      tokenPricing.pricePercentage24HourChange
-                    }
-                    alignment="left"
-                    className="pad-8"
-                    show24Hour={false}
-                  />
-                )}
-              </>
-            ) : (
-              <CWText>N/A</CWText>
+            {tokenPricing && (
+              <PricePercentageChange
+                pricePercentage24HourChange={
+                  tokenPricing.pricePercentage24HourChange
+                }
+                alignment="left"
+                className="pad-8"
+                show24Hour={false}
+              />
             )}
           </div>
         </div>

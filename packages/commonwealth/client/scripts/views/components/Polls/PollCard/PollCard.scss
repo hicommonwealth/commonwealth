@@ -29,6 +29,7 @@
 
     .poll-title-text.Text {
       width: 100%;
+      word-break: break-word;
     }
 
     .poll-end-timestamp.Text {
@@ -40,6 +41,18 @@
       flex-direction: column;
       gap: 4px;
       width: 100%;
+    }
+
+    .poll-title-and-badge {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+
+      .poll-revotable-badge {
+        flex-shrink: 0;
+      }
     }
   }
 

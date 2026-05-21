@@ -3,6 +3,7 @@ import React from 'react';
 import { handleRedirectClicks } from 'helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
+import { useFlag } from 'shared/hooks/useFlag';
 import app from 'state';
 import { SidebarSectionGroup } from '../sidebar_section';
 import type { SectionGroupAttrs, SidebarSectionAttrs } from '../types';
@@ -10,6 +11,7 @@ import { useSidebarTreeToggle } from '../useSidebarTreeToggle';
 
 const AdminSection = () => {
   const communityId = app.activeChainId() || '';
+  const marketsEnabled = useFlag('markets');
 
   const navigate = useCommonNavigate();
   const location = useLocation();

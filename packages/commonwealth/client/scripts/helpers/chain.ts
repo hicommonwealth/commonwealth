@@ -1,7 +1,7 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { updateActiveAddresses } from 'controllers/app/login';
-import { DEFAULT_CHAIN } from 'helpers/constants';
+import { DEFAULT_CHAIN } from 'shared/utils/constants';
 import app, { ApiStatus } from 'state';
 import { z } from 'zod';
 import { getCommunityByIdQuery } from '../state/api/communities/getCommuityById';

@@ -13,7 +13,8 @@ const MCP = () => {
         <CWText type="h4">MCP Integrations</CWText>
         <CWText type="b1">
           <p>
-            Enable or disable Model Context Protocol servers to control the AI tools available in your community.{' '}
+            Enable or disable Model Context Protocol servers to control the AI
+            tools available in your community.{' '}
             <a
               target="_blank"
               rel="noopener noreferrer"

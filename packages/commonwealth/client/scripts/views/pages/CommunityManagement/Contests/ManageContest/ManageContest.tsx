@@ -1,10 +1,10 @@
 import { Denominations, WeiDecimals } from '@hicommonwealth/evm-protocols';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import Permissions from 'shared/utils/Permissions';
 import app from 'state';
 import { useTokenMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { PageNotFound } from 'views/pages/404';
 import { ContestType } from '../types';

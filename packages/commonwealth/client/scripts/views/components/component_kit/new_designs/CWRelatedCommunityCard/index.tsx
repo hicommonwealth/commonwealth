@@ -1,1 +1,1 @@
-export { CWRelatedCommunityCard } from './CWRelatedCommunityCard'
+export { CWRelatedCommunityCard } from './CWRelatedCommunityCard';

@@ -1,9 +1,9 @@
 import { TokenBondingCurveAbi } from '@commonxyz/common-protocol-abis';
 import {
-  type Command,
   InvalidState,
   notificationsProvider,
   WorkflowKeys,
+  type Command,
 } from '@hicommonwealth/core';
 import {
   getFactoryContract,
@@ -12,13 +12,14 @@ import {
   mustBeProtocolChainId,
   transferPostLiquidityToUniswap,
 } from '@hicommonwealth/evm-protocols';
-import { config, emitEvent } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { parseEventLogs } from 'viem';
 import z from 'zod';
+import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware';
+import { emitEvent } from '../../utils';
 
 export function CreateThreadTokenTrade(): Command<
   typeof schemas.CreateThreadTokenTrade

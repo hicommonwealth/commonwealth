@@ -1,7 +1,6 @@
 import { Magic } from 'magic-sdk';
 import NodeInfo from 'models/NodeInfo';
 import { fetchCachedPublicEnvVar } from 'state/api/configuration';
-import { fetchCachedNodes } from 'state/api/nodes';
 import { userStore } from 'state/ui/user';
 
 // Cache Magic instances to avoid recreating them
@@ -45,19 +44,17 @@ export const getMagicInstanceForChain = (
 /**
  * Gets Magic instance for a known chain using cached nodes
  */
-export const getMagicForChain = (chainId: number): Magic | null => {
-  const nodes = fetchCachedNodes();
-  if (!nodes) {
-    return null;
-  }
-
-  const chainNode = nodes.find((n) => n.ethChainId === chainId) as NodeInfo;
-  if (!chainNode) {
+export const getMagicForChain = (
+  chainId: number,
+  node: NodeInfo | undefined,
+): Magic | null => {
+  if (!node) {
+    console.warn('No node provided');
     return null;
   }
 
   // Use the first URL if multiple are provided
-  const urls = chainNode.url.split(',').map((url) => url.trim());
+  const urls = node.url.split(',').map((url) => url.trim());
   const primaryUrl = urls[0];
 
   return getMagicInstanceForChain(chainId, primaryUrl);

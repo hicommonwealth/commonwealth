@@ -5,7 +5,7 @@ import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import React, { useState } from 'react';
-import { prettyVoteWeight } from 'shared/adapters/currency';
+import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
@@ -24,6 +24,7 @@ type CommentReactionButtonProps = {
   onReaction?: () => void;
   weightType?: TopicWeightedVoting | null;
   tokenNumDecimals?: number;
+  tokenSymbol?: string;
 };
 
 export const CommentReactionButton = ({
@@ -33,6 +34,7 @@ export const CommentReactionButton = ({
   onReaction,
   weightType,
   tokenNumDecimals,
+  tokenSymbol,
 }: CommentReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const user = useUserStore();
@@ -114,13 +116,18 @@ export const CommentReactionButton = ({
     }
   };
 
-  const formattedVoteCount = prettyVoteWeight(
-    weightType
-      ? reactionWeightsSum.toString()
-      : comment.reaction_count.toString(),
-    tokenNumDecimals,
+  const formattedVoteCount = prettyCompoundVoteWeight(
+    [
+      {
+        wei: weightType
+          ? reactionWeightsSum.toString()
+          : comment.reaction_count.toString(),
+        tokenNumDecimals: tokenNumDecimals,
+        multiplier: 1,
+        tokenSymbol: tokenSymbol,
+      },
+    ],
     weightType,
-    1,
     6,
   );
 

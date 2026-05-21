@@ -1,7 +1,7 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
-import { splitCamelOrPascalCase } from 'helpers/string';
 import React from 'react';
+import { splitCamelOrPascalCase } from 'shared/utils/string';
 import CWRepetitionCycleRadioButton from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';

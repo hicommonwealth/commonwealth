@@ -1,5 +1,5 @@
-import { APIOrderDirection } from 'helpers/constants';
 import React from 'react';
+import { APIOrderDirection } from 'shared/utils/constants';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';

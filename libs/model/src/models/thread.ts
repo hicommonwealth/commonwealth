@@ -7,7 +7,8 @@ import {
 } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { emitEvent, getThreadContestManagers } from '../utils/utils';
+import { emitEvent } from '../utils/outbox';
+import { getThreadContestManagers } from '../utils/utils';
 import { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
@@ -62,7 +63,6 @@ export default (
       links: { type: Sequelize.JSONB, allowNull: true },
       discord_meta: { type: Sequelize.JSONB, allowNull: true },
       has_poll: { type: Sequelize.BOOLEAN, allowNull: true },
-
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
       canvas_msg_id: { type: Sequelize.STRING, allowNull: true },
@@ -92,6 +92,11 @@ export default (
         defaultValue: 0,
       },
       comment_count: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      net_comment_count: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,

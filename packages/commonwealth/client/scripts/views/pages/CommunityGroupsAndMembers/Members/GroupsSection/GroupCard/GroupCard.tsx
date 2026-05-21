@@ -1,9 +1,8 @@
 import { UserFriendlyActionMap } from '@hicommonwealth/shared';
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import { Avatar } from 'views/components/Avatar';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -31,7 +30,6 @@ const GroupCard = ({
   onEditClick = () => {},
   profiles,
 }: GroupCardProps) => {
-  const privateTopicsEnabled = useFlag('privateTopics');
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [currentAllowlistPage, setCurrentAllowlistPage] = useState(1);
 
@@ -172,7 +170,7 @@ const GroupCard = ({
                   <CWText type="b2" className="topic-name">
                     <span className="topic-name-flex">
                       {t.name}
-                      {privateTopicsEnabled && t.is_private && (
+                      {t.is_private && (
                         <CWIcon
                           iconName="lockedNew"
                           iconSize="small"

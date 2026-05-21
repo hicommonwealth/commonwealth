@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const ThreadToken = z.object({
   token_address: z.string(),
-  thread_id: z.string(),
+  thread_id: z.number(),
   name: z.string(),
   symbol: z.string(),
   created_at: z.date(),

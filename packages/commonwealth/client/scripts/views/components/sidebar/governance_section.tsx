@@ -5,9 +5,9 @@ import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 import { handleRedirectClicks } from 'helpers';
 import './index.scss';
 
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
+import { useFlag } from 'shared/hooks/useFlag';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { sidebarStore } from 'state/ui/sidebar';
@@ -58,7 +58,7 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
 
   const navigate = useCommonNavigate();
   const location = useLocation();
-  const xpEnabled = useFlag('xp');
+  const marketsEnabled = useFlag('markets');
 
   const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
@@ -113,6 +113,10 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
           children: {},
         },
       }),
+      Directory: {
+        toggledState: false,
+        children: {},
+      },
     },
   };
 
@@ -155,6 +159,14 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
   );
   const matchesGovernanceRoute = matchRoutes(
     [{ path: '/governance' }, { path: ':scope/governance' }],
+    location,
+  );
+  const matchesDirectoryRoute = matchRoutes(
+    [{ path: '/directory' }, { path: ':scope/directory' }],
+    location,
+  );
+  const matchesMarketsAppRoute = matchRoutes(
+    [{ path: '/markets-app' }, { path: ':scope/markets-app' }],
     location,
   );
 
@@ -294,7 +306,7 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     displayData: null,
     hasDefaultToggle: false,
     isActive: !!matchesQuestsRoute,
-    isVisible: xpEnabled,
+    isVisible: true,
     isUpdated: true,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
@@ -305,14 +317,52 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     },
   };
 
+  const marketsData: SectionGroupAttrs = {
+    title: 'Markets',
+    containsChildren: false,
+    displayData: null,
+    hasDefaultToggle: false,
+    isActive: !!matchesMarketsAppRoute,
+    isVisible: marketsEnabled,
+    isUpdated: true,
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      resetSidebarState();
+      handleRedirectClicks(navigate, e, `/markets-app`, communityId, () => {
+        setGovernanceToggleTree('children.Markets.toggledState', toggle);
+      });
+    },
+  };
+
+  // Directory
+  const directoryData: SectionGroupAttrs = {
+    title: 'Directory',
+    containsChildren: false,
+    displayData: null,
+    hasDefaultToggle: false,
+    isActive: !!matchesDirectoryRoute,
+    isVisible: community?.directory_page_enabled || false,
+    isUpdated: true,
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      resetSidebarState();
+      handleRedirectClicks(navigate, e, `/directory`, communityId, () => {
+        setGovernanceToggleTree('children.Directory.toggledState', toggle);
+      });
+    },
+  };
+
   let governanceGroupData: SectionGroupAttrs[] = [
     membersData,
     snapshotData,
     proposalsData,
     questsData,
+    marketsData,
+    directoryData,
   ];
 
-  if (!hasProposals) governanceGroupData = [membersData, questsData];
+  if (!hasProposals)
+    governanceGroupData = [membersData, questsData, marketsData, directoryData];
   if (isContestAvailable) {
     governanceGroupData.push(contestData);
   }

@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import type Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction } from 'react';
 import app from 'state';
@@ -42,7 +43,8 @@ export const ViewThreadUpvotesDrawer = ({
           : null
       }
       tokenDecimals={thread?.topic?.token_decimals}
-      topicWeight={thread?.topic?.weighted_voting}
+      topicWeight={thread?.topic?.weighted_voting as TopicWeightedVoting}
+      tokenSymbol={thread?.topic?.token_symbol || undefined}
       publishDate={thread.createdAt}
     />
   );

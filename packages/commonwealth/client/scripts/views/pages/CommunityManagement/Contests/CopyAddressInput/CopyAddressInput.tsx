@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { saveToClipboard } from 'utils/clipboard';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 

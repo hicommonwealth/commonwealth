@@ -12,5 +12,6 @@ export * from './SetCommunityTier.command';
 export * from './SetUserTier.command';
 export * from './TriggerNotificationsWorkflow.command';
 export * from './UpdateCommunityId.command';
+export * from './UpdateMarket.command';
 export * from './UpdateResourceTimestamps.command';
 export * from './UpdateSiteAdmin.command';

@@ -1,8 +1,8 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
 import { useEffect, useMemo, useState } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
 import { fetchNodes } from 'state/api/nodes';

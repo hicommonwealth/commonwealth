@@ -1,8 +1,8 @@
 import { trpc } from 'utils/trpcClient';
 
 const useFetchMcpServersQuery = (communityId: string) => {
-  return trpc.mcpServers.getAllMcpServers.useQuery(
-    { community_id: communityId },
+  return trpc.mcp.getCommunityMcpServers.useQuery(
+    { community_id: communityId, private_only: true },
     { enabled: !!communityId },
   );
 };

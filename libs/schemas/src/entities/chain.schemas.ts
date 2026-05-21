@@ -12,7 +12,7 @@ export const ChainNode = z.object({
   eth_chain_id: PG_INT.nullish(),
   alt_wallet_url: z.string().max(255).nullish(),
   private_url: z.string().max(255).nullish(),
-  balance_type: z.nativeEnum(BalanceType),
+  balance_type: z.enum(BalanceType),
   name: z.string().max(255),
   description: z.string().max(255).nullish(),
   ss58: PG_INT.nullish(),
@@ -22,8 +22,8 @@ export const ChainNode = z.object({
     .string()
     .regex(/[a-z0-9]+/)
     .nullish(),
-  cosmos_gov_version: z.nativeEnum(CosmosGovernanceVersion).nullish(),
-  health: z.nativeEnum(NodeHealth).default(NodeHealth.Healthy).nullish(),
+  cosmos_gov_version: z.enum(CosmosGovernanceVersion).nullish(),
+  health: z.enum(NodeHealth).default(NodeHealth.Healthy).nullish(),
   block_explorer: z.string().nullish(),
   max_ce_block_range: z.number().gte(-1).nullish(),
   alchemy_metadata: z

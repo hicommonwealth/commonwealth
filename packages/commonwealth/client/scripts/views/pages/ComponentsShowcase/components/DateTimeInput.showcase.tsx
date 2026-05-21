@@ -1,5 +1,5 @@
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import React from 'react';
+import { VALIDATION_MESSAGES } from 'shared/utils/formValidations/messages';
 import { CWDateTimeInput } from 'views/components/component_kit/CWDateTimeInput';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 export const validation = z.object({
   date: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string({ error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
 });
 

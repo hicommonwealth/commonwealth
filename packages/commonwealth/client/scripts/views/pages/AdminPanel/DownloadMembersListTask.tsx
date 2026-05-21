@@ -18,7 +18,7 @@ const DownloadMembersListTask = () => {
     if (!membersStatsLoading && membersStats) {
       try {
         setIsDownloading(true);
-        downloadCSV(membersStats.members, `${communityId}_members_list.csv`);
+        downloadCSV(membersStats, `${communityId}_members_list.csv`);
         setIsDownloading(false);
         setComponentKey((k) => k + 1);
         notifySuccess('Members list downloaded');

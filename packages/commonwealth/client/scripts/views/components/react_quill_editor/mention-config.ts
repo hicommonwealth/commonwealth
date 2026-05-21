@@ -1,3 +1,4 @@
+import { MCP_MENTION_SYMBOL, MIN_SEARCH_LENGTH } from '@hicommonwealth/shared';
 import { SearchScope } from 'models/SearchQuery';
 import { z } from 'zod';
 import { SearchEntityResult } from '../../../../../../../libs/model/src/aggregates/search';
@@ -6,7 +7,7 @@ export const MENTION_CONFIG = {
   MAX_SEARCH_RESULTS: 10,
   MAX_MENTIONS_PER_POST: 5,
   CONTEXT_DATA_DAYS: 30,
-  MIN_SEARCH_LENGTH: 3,
+  MIN_SEARCH_LENGTH,
   SEARCH_DEBOUNCE_MS: 500,
 } as const;
 
@@ -16,6 +17,7 @@ export enum MentionEntityType {
   THREAD = 'thread',
   COMMUNITY = 'community',
   PROPOSAL = 'proposal',
+  MCP_SERVER = 'mcp_server',
 }
 
 export const MENTION_DENOTATION_CHARS = {
@@ -23,6 +25,7 @@ export const MENTION_DENOTATION_CHARS = {
   '#': MentionEntityType.TOPIC,
   '!': MentionEntityType.THREAD,
   '~': MentionEntityType.COMMUNITY,
+  [MCP_MENTION_SYMBOL]: MentionEntityType.MCP_SERVER,
 } as const;
 
 export const ENTITY_TYPE_INDICATORS = {
@@ -31,6 +34,7 @@ export const ENTITY_TYPE_INDICATORS = {
   [MentionEntityType.TOPIC]: '🏷️',
   [MentionEntityType.THREAD]: '💬',
   [MentionEntityType.PROPOSAL]: '📋',
+  [MentionEntityType.MCP_SERVER]: '🔧',
   deleted: '❌',
 } as const;
 
@@ -40,6 +44,7 @@ export const GLOBAL_SEARCH_PRIORITY = [
   MentionEntityType.TOPIC,
   MentionEntityType.THREAD,
   MentionEntityType.PROPOSAL,
+  MentionEntityType.MCP_SERVER,
 ] as const;
 
 export const ENTITY_TO_SEARCH_SCOPE = {
@@ -61,6 +66,8 @@ export const MENTION_LINK_FORMATS = {
     `[~${name}](/${id})`,
   [MentionEntityType.PROPOSAL]: (name: string, id: string) =>
     `[${name}](/proposal/${id})`,
+  [MentionEntityType.MCP_SERVER]: (name: string, handleAndId: string) =>
+    `[${MCP_MENTION_SYMBOL}${name}](/mcp-server/${handleAndId})`,
 } as const;
 
 export const DENOTATION_SEARCH_CONFIG = {
@@ -84,10 +91,28 @@ export const DENOTATION_SEARCH_CONFIG = {
     communityScoped: false,
     description: 'Search all communities',
   },
+  [MCP_MENTION_SYMBOL]: {
+    scopes: ['MCPServers'],
+    communityScoped: true,
+    description: 'Search MCP servers in current community',
+  },
 } as const;
 
 // Type alias for search results from SearchEntities query
-export type MentionSearchResult = z.infer<typeof SearchEntityResult>;
+export type MentionSearchResult = z.infer<typeof SearchEntityResult> & {
+  handle?: string; // Additional property for MCP servers
+};
+
+// Type for MCP server search results
+export type MCPServerSearchResult = {
+  id: string;
+  name: string;
+  description?: string;
+  handle: string;
+  type: 'mcp_server';
+  created_at: string;
+  auth_username?: string;
+};
 
 export const getEntityTypeFromSearchResult = (
   result: MentionSearchResult,
@@ -110,6 +135,8 @@ export const formatEntityDisplayName = (
       return result.name || 'Unknown Community';
     case MentionEntityType.PROPOSAL:
       return result.name || 'Unknown Proposal';
+    case MentionEntityType.MCP_SERVER:
+      return result.name || 'Unknown MCP Server';
     default:
       return 'Unknown Entity';
   }

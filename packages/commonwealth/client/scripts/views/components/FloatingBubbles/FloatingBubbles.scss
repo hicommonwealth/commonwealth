@@ -1,0 +1,130 @@
+@use '../../../styles/mixins/colors.module';
+
+.FloatingBubbles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+
+  // Base bubble pattern
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(
+        circle at 20% 20%,
+        rgba(255, 255, 255, 0.15) 2px,
+        transparent 2px
+      ),
+      radial-gradient(
+        circle at 80% 30%,
+        rgba(255, 255, 255, 0.12) 1.5px,
+        transparent 1.5px
+      ),
+      radial-gradient(
+        circle at 40% 70%,
+        rgba(255, 255, 255, 0.18) 1px,
+        transparent 1px
+      ),
+      radial-gradient(
+        circle at 90% 80%,
+        rgba(255, 255, 255, 0.1) 2.5px,
+        transparent 2.5px
+      ),
+      radial-gradient(
+        circle at 10% 90%,
+        rgba(255, 255, 255, 0.14) 1.2px,
+        transparent 1.2px
+      ),
+      radial-gradient(
+        circle at 60% 10%,
+        rgba(255, 255, 255, 0.16) 1.8px,
+        transparent 1.8px
+      ),
+      radial-gradient(
+        circle at 30% 50%,
+        rgba(255, 255, 255, 0.11) 1.3px,
+        transparent 1.3px
+      ),
+      radial-gradient(
+        circle at 70% 60%,
+        rgba(255, 255, 255, 0.13) 1.6px,
+        transparent 1.6px
+      );
+    background-size:
+      100px 100px,
+      80px 80px,
+      120px 120px,
+      90px 90px,
+      110px 110px,
+      85px 85px,
+      95px 95px,
+      105px 105px;
+    animation: floatBubbles 8s ease-in-out infinite;
+    opacity: 0.7;
+  }
+
+  // Intensity variations
+  &.low {
+    &::before {
+      opacity: 0.4;
+    }
+  }
+
+  &.medium {
+    &::before {
+      opacity: 0.7;
+    }
+  }
+
+  &.high {
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  // Speed variations
+  &.slow {
+    &::before {
+      animation-duration: 12s;
+    }
+  }
+
+  &.normal {
+    &::before {
+      animation-duration: 8s;
+    }
+  }
+
+  &.fast {
+    &::before {
+      animation-duration: 5s;
+    }
+  }
+}
+
+@keyframes floatBubbles {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+    opacity: 0.7;
+  }
+  25% {
+    transform: translateY(-10px) scale(1.05);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-5px) scale(0.95);
+    opacity: 0.6;
+  }
+  75% {
+    transform: translateY(-15px) scale(1.02);
+    opacity: 0.9;
+  }
+}

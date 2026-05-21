@@ -1,7 +1,7 @@
 import { cache, CacheNamespaces, dispose, logger } from '@hicommonwealth/core';
 import { pgMultiRowUpdate } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
-import { GraphileTask, TaskPayloads } from '@hicommonwealth/model/services';
+import { TaskPayloads } from '@hicommonwealth/model/services';
 import { CountAggregatorKeys } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { batchedIncrementCachedRank } from '../../../api/ranking';
@@ -9,9 +9,7 @@ import { config } from '../../../config';
 
 const log = logger(import.meta);
 
-export const countAggregatorTask: GraphileTask<
-  typeof TaskPayloads.CountAggregator
-> = {
+export const countAggregatorTask = {
   input: TaskPayloads.CountAggregator,
   fn: countAggregator,
 };

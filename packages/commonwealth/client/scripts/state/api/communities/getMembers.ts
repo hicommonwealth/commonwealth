@@ -1,4 +1,4 @@
-import { APIOrderDirection } from 'helpers/constants';
+import { APIOrderDirection } from 'shared/utils/constants';
 import { trpc } from 'utils/trpcClient';
 import { MemberResultsOrderBy } from 'views/pages/CommunityGroupsAndMembers/Members/index.types';
 

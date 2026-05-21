@@ -2,10 +2,12 @@ import { GetLaunchpadTrades } from '@hicommonwealth/schemas';
 import { formatUnits } from 'ethers/lib/utils';
 import { formatAddressShort } from 'helpers';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import { useGetLaunchpadTradesQuery } from 'state/api/launchPad';
 import { useTokensMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { buildEtherscanLink } from 'views/modals/ManageCommunityStakeModal/utils';
+import { z } from 'zod';
 import useAuthentication from '../../../../modals/AuthModal/useAuthentication';
 import { CWIcon } from '../../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../component_kit/cw_text';
@@ -19,7 +21,7 @@ import TransactionsHistory from './TransactionHistory';
 import './TransactionsTab.scss';
 import useTransactionHistory from './useTransactionHistory';
 
-type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._type;
+type GetLaunchpadTradesOutput = z.infer<typeof GetLaunchpadTrades.output>;
 
 type TransactionHistoryItem = {
   address: string;
@@ -93,7 +95,7 @@ const transformLaunchpadTradeData = (
       transaction_hash: trade.transaction_hash,
       community_id: trade.token_address,
     };
-  });
+  }) as unknown as TransactionHistoryItem[];
 };
 
 const TransactionsTab = ({
@@ -114,10 +116,13 @@ const TransactionsTab = ({
     }));
   }, [searchText]);
 
+  const location = useLocation();
+  const pathParts = location.pathname.split('/');
   const user = useUserStore();
+  const user_id = user.id ?? parseInt(pathParts[pathParts.length - 1]);
 
   const { data: launchpadData } = useGetLaunchpadTradesQuery({
-    trader_addresses: user.addresses.map((u) => u.address),
+    user_id,
   });
 
   const hasMagic = user.hasMagicWallet;

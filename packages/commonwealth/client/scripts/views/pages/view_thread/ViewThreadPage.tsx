@@ -1,5 +1,8 @@
+import { GetThreadToken } from '@hicommonwealth/schemas';
 import {
   ContentType,
+  DEFAULT_COMPLETION_MODEL,
+  DEFAULT_COMPLETION_MODEL_LABEL,
   GatedActionEnum,
   getThreadUrl,
   MIN_CHARS_TO_SHOW_MORE,
@@ -8,17 +11,16 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'client/scripts/helpers/snapshot_utils';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import { AnyProposal } from 'client/scripts/models/types';
 import useGetThreadByIdQuery from 'client/scripts/state/api/threads/getThreadById';
+import useGetThreadToken from 'client/scripts/state/api/tokens/getThreadToken';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -31,6 +33,9 @@ import React, {
 } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import app from 'state';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useFetchProfilesByAddressesQuery from 'state/api/profiles/fetchProfilesByAddress';
@@ -44,8 +49,9 @@ import useUserStore, {
 } from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
-import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
+import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
+import { ThreadTokenWidget } from 'views/components/NewThreadForm/ToketWidget';
+import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
@@ -53,6 +59,7 @@ import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity'
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { z } from 'zod';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
@@ -86,15 +93,21 @@ import { SnapshotPollCardContainer } from '../Snapshots/ViewSnapshotProposal/Sna
 import { CommentTree } from '../discussions/CommentTree';
 import { StreamingReplyInstance } from '../discussions/CommentTree/TreeHierarchy';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import { CollateralMetaDecimalsDevPanel } from './CollateralMetaDecimalsDevPanel';
 import { LinkedUrlCard } from './LinkedUrlCard';
 import { ThreadPollCard } from './ThreadPollCard';
 import { ThreadPollEditorCard } from './ThreadPollEditorCard';
+import { ThreadPredictionMarketEditorCard } from './ThreadPredictionMarketEditorCard';
 import { EditBody } from './edit_body';
 import './index.scss';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { SnapshotCreationCard } from './snapshot_creation_card';
+import {
+  resolveViewThreadRenderState,
+  shouldShowCreateCommentComposer,
+} from './viewThreadPage.contracts';
 
 type ViewThreadPageProps = {
   identifier: string;
@@ -112,6 +125,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [searchParams] = useSearchParams();
   const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+  const futarchyEnabled = useFlag('futarchy');
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [savedEdits, setSavedEdits] = useState('');
@@ -125,7 +140,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [imageActionModalOpen, setImageActionModalOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   useInitChainIfNeeded(app);
@@ -150,6 +165,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { data: pollsData = [] } = useGetThreadPollsQuery({
     threadId: +threadId,
     apiCallEnabled: !!threadId && !!communityId,
+  });
+
+  const { data: threadToken } = useGetThreadToken({
+    thread_id: threadId,
+    enabled: !!threadId && !!communityId,
   });
 
   const thread = useMemo(() => {
@@ -272,11 +292,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const handleGenerateAIComment = useCallback(
     async (mainThreadId: number): Promise<void> => {
-      if (
-        !effectiveAiCommentsToggleEnabled ||
-        !user.activeAccount ||
-        selectedModels.length === 0
-      ) {
+      if (!effectiveAiCommentsToggleEnabled || !user.activeAccount) {
         return;
       }
 
@@ -287,7 +303,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         return;
       }
 
-      const newInstances: StreamingReplyInstance[] = selectedModels.map(
+      const modelsToUse =
+        selectedModels.length > 0
+          ? selectedModels
+          : [
+              {
+                value: DEFAULT_COMPLETION_MODEL,
+                label: DEFAULT_COMPLETION_MODEL_LABEL,
+              },
+            ];
+
+      const newInstances: StreamingReplyInstance[] = modelsToUse.map(
         (model) => ({
           targetCommentId: mainThreadId,
           modelId: model.value,
@@ -429,15 +455,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return profilesMap;
   }, [fetchedProfiles]);
 
-  if (typeof identifier !== 'string' || fetchThreadError) {
+  const viewThreadRenderState = resolveViewThreadRenderState({
+    identifier,
+    fetchThreadError,
+    hasChainMeta: !!app.chain?.meta,
+    isLoading,
+    isLoadingContentBody,
+    contentUrlBodyToFetch,
+    thread,
+    activeChainId: app.activeChainId(),
+  });
+
+  if (viewThreadRenderState === 'fetch_error') {
     return <PageNotFound message={fetchThreadError?.message} />;
   }
 
-  if (
-    !app.chain?.meta ||
-    isLoading ||
-    (isLoadingContentBody && contentUrlBodyToFetch)
-  ) {
+  if (viewThreadRenderState === 'loading') {
     return (
       <CWPageLayout>
         <CWContentPage
@@ -448,11 +481,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     );
   }
 
-  if (
-    (!isLoading && !thread) ||
-    fetchThreadError ||
-    thread?.communityId !== app.activeChainId()
-  ) {
+  if (viewThreadRenderState === 'thread_not_found') {
     return <PageNotFound message="Thread not found" />;
   }
 
@@ -607,6 +636,23 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const sidebarComponent = [
+    ...(tokenizedThreadsEnabled && threadToken?.token_address
+      ? [
+          {
+            label: 'Token',
+            item: (
+              <div className="cards-column">
+                <ThreadTokenWidget
+                  tokenizedThreadsEnabled={tokenizedThreadsEnabled}
+                  threadId={thread?.id}
+                  addressType={app.chain?.base || 'ethereum'}
+                  tokenCommunity={app.chain?.meta}
+                />
+              </div>
+            ),
+          },
+        ]
+      : []),
     ...(showLinkedProposalOptions || showLinkedThreadOptions
       ? [
           {
@@ -662,7 +708,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         ]
       : []),
     ...(pollsData?.length > 0 ||
-    (isAuthor && (!app.chain?.meta?.admin_only_polling || isAdmin))
+    (isAuthor && (!app.chain?.meta?.admin_only_polling || isAdmin)) ||
+    (isAuthor && futarchyEnabled)
       ? [
           {
             label: 'Polls',
@@ -695,8 +742,23 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       threadAlreadyHasPolling={!pollsData?.length}
                     />
                   )}
+                {(isAuthor || isAdmin) && futarchyEnabled && thread && (
+                  <ThreadPredictionMarketEditorCard
+                    thread={thread}
+                    isAuthor={isAuthor}
+                    isAdmin={isAdmin}
+                  />
+                )}
               </div>
             ),
+          },
+        ]
+      : []),
+    ...(communityId
+      ? [
+          {
+            label: 'Dev: PM collateral decimals',
+            item: <CollateralMetaDecimalsDevPanel communityId={communityId} />,
           },
         ]
       : []),
@@ -763,6 +825,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
+
+  const showCreateCommentComposer = shouldShowCreateCommentComposer({
+    thread,
+    fromDiscordBot,
+    isGloballyEditing,
+    isUserLoggedIn: user.isLoggedIn,
+  });
 
   return (
     <StickCommentProvider>
@@ -845,7 +914,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               showLinkedThreadOptions ||
               pollsData?.length > 0 ||
               isAuthor ||
-              !!hasWebLinks)
+              !!hasWebLinks ||
+              !!threadToken)
           }
           onCommentClick={scrollToFirstComment}
           isSpamThread={!!thread?.markedAsSpamAt}
@@ -913,6 +983,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           hasPendingEdits={!!editsToSave}
           activeThreadVersionId={activeThreadVersionId}
           onChangeVersionHistoryNumber={handleVersionHistoryChange}
+          threadToken={threadToken as z.infer<typeof GetThreadToken.output>}
           body={(threadOptionsComp) => (
             <div className="thread-content">
               {thread && isEditingBody && threadBody ? (
@@ -941,7 +1012,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 </>
               ) : (
                 <>
-                  <MarkdownViewerUsingQuillOrNewEditor
+                  <MarkdownViewerWithFallback
                     key={threadBody}
                     markdown={threadBody || ''}
                     cutoffLines={50}
@@ -1135,18 +1206,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           isChatMode={isChatMode}
         />
         <WithDefaultStickyComment>
-          {thread &&
-            !thread.readOnly &&
-            !fromDiscordBot &&
-            !isGloballyEditing &&
-            user.isLoggedIn && (
-              <CreateComment
-                rootThread={thread}
-                canComment={permissions.CREATE_COMMENT.allowed}
-                aiCommentsToggleEnabled={!!effectiveAiCommentsToggleEnabled}
-                tooltipText={permissions.CREATE_COMMENT.tooltip}
-              />
-            )}
+          {showCreateCommentComposer && (
+            <CreateComment
+              rootThread={thread!}
+              canComment={permissions.CREATE_COMMENT.allowed}
+              aiCommentsToggleEnabled={!!effectiveAiCommentsToggleEnabled}
+              tooltipText={permissions.CREATE_COMMENT.tooltip}
+            />
+          )}
         </WithDefaultStickyComment>
 
         <StickyCommentElementSelector />

@@ -11,7 +11,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
     ...schemas.GetThreads,
     auth: [authOptional],
     secure: true,
-    body: async ({ actor, context, payload }) => {
+    body: async ({ actor, payload }) => {
       const {
         community_id,
         stage,
@@ -151,10 +151,22 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 U.tier as user_tier,
                 A.last_active as address_last_active,
                 U.profile->>'avatar_url' as avatar_url,
-                U.profile->>'name' as profile_name
+                U.profile->>'name' as profile_name,
+                json_build_object(
+                  'price', latest_trade.price,
+                  'is_buy', latest_trade.is_buy
+                ) as last_purchase_activity
               FROM top_threads TH JOIN "Topics" T ON TH.topic_id = T.id
               LEFT JOIN "Addresses" A ON TH.address_id = A.id
               LEFT JOIN "Users" U ON A.user_id = U.id
+              LEFT JOIN "ThreadTokens" ThreadT ON ThreadT.thread_id = TH.id
+              LEFT JOIN LATERAL ( -- get latest threadTokenTrade per thread
+                SELECT TTT.price, TTT.is_buy
+                FROM "ThreadTokenTrades" TTT
+                WHERE TTT.token_address = ThreadT.token_address
+                ORDER BY TTT.timestamp DESC
+                LIMIT 1
+              ) latest_trade ON TRUE
             ), collaborator_data AS ( -- get the thread collaborators and their profiles
             SELECT
               TT.id as thread_id,

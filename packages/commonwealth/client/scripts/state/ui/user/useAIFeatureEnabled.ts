@@ -1,4 +1,3 @@
-import { useFlag } from 'hooks/useFlag';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useUserAiSettingsStore } from 'state/ui/user';
@@ -9,7 +8,6 @@ import { useUserAiSettingsStore } from 'state/ui/user';
  * Community-level setting overrides user preferences.
  */
 export const useAIFeatureEnabled = () => {
-  const aiCommentsFeatureEnabled = useFlag('aiComments');
   const { aiInteractionsToggleEnabled } = useUserAiSettingsStore();
 
   const communityId = app.activeChainId() || '';
@@ -21,19 +19,12 @@ export const useAIFeatureEnabled = () => {
   // Community-level setting overrides everything
   const communityAIEnabled = community?.ai_features_enabled;
 
-  // AI is enabled if:
-  // 1. Feature flag is on AND
-  // 2. Community allows AI AND
-  // 3. User has AI interactions enabled
-  const isAIEnabled =
-    aiCommentsFeatureEnabled &&
-    communityAIEnabled &&
-    aiInteractionsToggleEnabled;
+  // AI is enabled if community allows AI and user has AI interactions enabled.
+  const isAIEnabled = communityAIEnabled && aiInteractionsToggleEnabled;
 
   return {
     isAIEnabled,
     communityAIEnabled,
-    aiCommentsFeatureEnabled,
     aiInteractionsToggleEnabled,
   };
 };

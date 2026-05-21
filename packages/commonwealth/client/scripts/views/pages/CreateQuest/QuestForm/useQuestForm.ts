@@ -9,7 +9,6 @@ import {
   getDefaultContestImage,
 } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
 import {
   calculateTotalXPForQuestActions,
   doesActionAllowChainId,
@@ -30,11 +29,12 @@ import {
   doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { isEqual } from 'lodash';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
+import { calculateRemainingPercentageChangeFractional } from 'shared/utils/number';
 import {
   useCreateQuestMutation,
   useDeleteQuestMutation,

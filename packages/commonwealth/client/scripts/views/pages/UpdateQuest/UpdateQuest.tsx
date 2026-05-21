@@ -2,17 +2,16 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { useFlag } from 'hooks/useFlag';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
+import Permissions from 'shared/utils/Permissions';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { useGetQuestByIdQuery } from 'state/api/quest';
 import { useGetGoalMetasQuery } from 'state/api/superAdmin';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -30,14 +29,12 @@ import './UpdateQuest.scss';
 const UpdateQuest = ({ id }: { id: number }) => {
   const questId = parseInt(`${id}`) || 0;
 
-  const xpEnabled = useFlag('xp');
-
   const user = useUserStore();
   const navigate = useCommonNavigate();
 
   const { data: quest, isLoading: isLoadingQuest } = useGetQuestByIdQuery({
     quest_id: questId,
-    enabled: !!(xpEnabled && questId),
+    enabled: !!questId,
   });
 
   const { data: community, isLoading: isLoadingCommunity } =
@@ -99,8 +96,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
     shouldRun: !!quest,
   });
 
-  if (!xpEnabled || !user.isLoggedIn || !Permissions.isSiteAdmin())
-    return <PageNotFound />;
+  if (!user.isLoggedIn || !Permissions.isSiteAdmin()) return <PageNotFound />;
 
   if (
     isLoadingQuest ||

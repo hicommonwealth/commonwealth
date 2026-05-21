@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { saveToClipboard } from 'shared/utils/clipboard';
 import app from 'state';
-import { saveToClipboard } from 'utils/clipboard';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';

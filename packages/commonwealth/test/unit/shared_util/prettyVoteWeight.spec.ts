@@ -10,7 +10,17 @@ describe('prettyVoteWeight', () => {
 
     expect(prettyVoteWeight('5'), 'handle unweighted > 1').to.eq('5');
 
-    expect(prettyVoteWeight('5000'), 'handle unweighted > 1000').to.eq('5000');
+    expect(prettyVoteWeight('5000'), 'handle unweighted > 1000').to.eq('5k');
+
+    expect(
+      prettyVoteWeight('1908887952'),
+      'handle very large unweighted numbers',
+    ).to.eq('1.91b');
+
+    expect(
+      prettyVoteWeight('1000000'),
+      'handle million threshold unweighted',
+    ).to.eq('1m');
   });
   test('erc20 and native ETH', () => {
     expect(
@@ -144,5 +154,108 @@ describe('prettyVoteWeight', () => {
       prettyVoteWeight('20', 18, TopicWeightedVoting.Stake, 0.5),
       'multiply < 1',
     ).to.eq('10');
+
+    expect(
+      prettyVoteWeight('5000', 18, TopicWeightedVoting.Stake),
+      'handle large stake numbers',
+    ).to.eq('5k');
+
+    expect(
+      prettyVoteWeight('1908887952', 18, TopicWeightedVoting.Stake),
+      'handle very large stake numbers',
+    ).to.eq('1.91b');
+
+    expect(
+      prettyVoteWeight('1000000', 18, TopicWeightedVoting.Stake),
+      'handle million threshold',
+    ).to.eq('1m');
+  });
+
+  test('unweighted large numbers', () => {
+    expect(
+      prettyVoteWeight('1908887952'),
+      'handle very large unweighted numbers',
+    ).to.eq('1.91b');
+
+    expect(
+      prettyVoteWeight('1000000'),
+      'handle million threshold unweighted',
+    ).to.eq('1m');
+
+    expect(prettyVoteWeight('5000'), 'handle thousands unweighted').to.eq('5k');
+  });
+
+  test('Sui NAVX NFT with 9 decimals', () => {
+    expect(
+      prettyVoteWeight(
+        '1000000000',
+        undefined,
+        TopicWeightedVoting.SuiNFT,
+        1,
+        undefined,
+        'NAVX',
+      ),
+      'handle NAVX with 9 decimal places',
+    ).to.eq('1');
+
+    expect(
+      prettyVoteWeight(
+        '5000000000',
+        undefined,
+        TopicWeightedVoting.SuiNFT,
+        1,
+        undefined,
+        'NAVX',
+      ),
+      'handle NAVX with 9 decimal places and 5 base value',
+    ).to.eq('5');
+
+    expect(
+      prettyVoteWeight(
+        '1500000000000',
+        undefined,
+        TopicWeightedVoting.SuiNFT,
+        1,
+        undefined,
+        'NAVX',
+      ),
+      'handle large NAVX value with formatting',
+    ).to.eq('1.5k');
+
+    expect(
+      prettyVoteWeight(
+        '1000000000',
+        undefined,
+        TopicWeightedVoting.SuiNFT,
+        1,
+        undefined,
+        'veNAVX',
+      ),
+      'handle veNAVX with 9 decimal places',
+    ).to.eq('1');
+
+    expect(
+      prettyVoteWeight(
+        '1000000000',
+        undefined,
+        TopicWeightedVoting.SuiNFT,
+        1,
+        undefined,
+        'OTHER',
+      ),
+      'handle other token without decimal adjustment',
+    ).to.eq('1b');
+
+    expect(
+      prettyVoteWeight(
+        '1000000000',
+        undefined,
+        TopicWeightedVoting.SuiNFT,
+        1,
+        undefined,
+        undefined,
+      ),
+      'handle SuiNFT without token symbol',
+    ).to.eq('1b');
   });
 });

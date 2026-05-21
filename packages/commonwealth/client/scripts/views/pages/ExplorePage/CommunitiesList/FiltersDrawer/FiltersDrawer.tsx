@@ -1,5 +1,4 @@
 import { ChainBase, ChainNetwork, CommunityType } from '@hicommonwealth/shared';
-import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import { useFetchTagsQuery } from 'state/api/tags';
 import CWAccordion from 'views/components/CWAccordion';
@@ -32,7 +31,6 @@ export const FiltersDrawer = ({
   onFiltersChange,
 }: FiltersDrawerProps) => {
   const { data: tags } = useFetchTagsQuery({ enabled: true });
-  const launchpadEnabled = useFlag('launchpad');
 
   const onStakeFilterChange = () => {
     onFiltersChange({
@@ -173,80 +171,78 @@ export const FiltersDrawer = ({
               />
             </div>
 
-            {launchpadEnabled && (
-              <>
-                <CWAccordion
-                  header="Sort By"
-                  content={
-                    <div className="options-list">
-                      {Object.entries(communitySortOptionsLabelToKeysMap).map(
-                        ([sortOption]) => (
-                          <CWRadioButton
-                            key={sortOption}
-                            groupName="community-sort-option"
-                            value={sortOption}
-                            label={sortOption}
-                            checked={filters.withCommunitySortBy === sortOption}
-                            onChange={() =>
-                              onCommunitySortOptionChange(
-                                sortOption as CommunitySortOptions,
-                              )
-                            }
-                          />
-                        ),
-                      )}
-                    </div>
-                  }
-                />
-
-                <CWAccordion
-                  header="Sort Order"
-                  content={
-                    <div className="options-list">
-                      {Object.entries(sortOrderLabelsToDirectionsMap).map(
-                        ([order]) => (
-                          <CWRadioButton
-                            key={order}
-                            groupName="community-sort-direction"
-                            value={order}
-                            label={order}
-                            checked={filters.withCommunitySortOrder === order}
-                            onChange={() =>
-                              onCommunityOrderChange(
-                                order as CommunitySortDirections,
-                              )
-                            }
-                            disabled={
-                              filters.withCommunitySortBy ===
-                                CommunitySortOptions.MostRecent ||
-                              !hasAppliedFilters
-                            }
-                          />
-                        ),
-                      )}
-                    </div>
-                  }
-                />
-
-                <CWAccordion
-                  header="Community Type"
-                  content={
-                    <div className="options-list">
-                      {communityTypes.map((type) => (
+            <>
+              <CWAccordion
+                header="Sort By"
+                content={
+                  <div className="options-list">
+                    {Object.entries(communitySortOptionsLabelToKeysMap).map(
+                      ([sortOption]) => (
                         <CWRadioButton
-                          key={type}
-                          groupName="community-type"
-                          value={type}
-                          label={type}
-                          checked={filters.withCommunityType === type}
-                          onChange={() => onCommunityTypeChange(type)}
+                          key={sortOption}
+                          groupName="community-sort-option"
+                          value={sortOption}
+                          label={sortOption}
+                          checked={filters.withCommunitySortBy === sortOption}
+                          onChange={() =>
+                            onCommunitySortOptionChange(
+                              sortOption as CommunitySortOptions,
+                            )
+                          }
                         />
-                      ))}
-                    </div>
-                  }
-                />
-              </>
-            )}
+                      ),
+                    )}
+                  </div>
+                }
+              />
+
+              <CWAccordion
+                header="Sort Order"
+                content={
+                  <div className="options-list">
+                    {Object.entries(sortOrderLabelsToDirectionsMap).map(
+                      ([order]) => (
+                        <CWRadioButton
+                          key={order}
+                          groupName="community-sort-direction"
+                          value={order}
+                          label={order}
+                          checked={filters.withCommunitySortOrder === order}
+                          onChange={() =>
+                            onCommunityOrderChange(
+                              order as CommunitySortDirections,
+                            )
+                          }
+                          disabled={
+                            filters.withCommunitySortBy ===
+                              CommunitySortOptions.MostRecent ||
+                            !hasAppliedFilters
+                          }
+                        />
+                      ),
+                    )}
+                  </div>
+                }
+              />
+
+              <CWAccordion
+                header="Community Type"
+                content={
+                  <div className="options-list">
+                    {communityTypes.map((type) => (
+                      <CWRadioButton
+                        key={type}
+                        groupName="community-type"
+                        value={type}
+                        label={type}
+                        checked={filters.withCommunityType === type}
+                        onChange={() => onCommunityTypeChange(type)}
+                      />
+                    ))}
+                  </div>
+                }
+              />
+            </>
 
             <CWAccordion
               header="Community Preferences"
@@ -283,25 +279,23 @@ export const FiltersDrawer = ({
                       }
                     />
                   ))}
-                  {launchpadEnabled &&
-                    Object.keys(communityChains).map((chain) => (
-                      <CWRadioButton
-                        key={chain}
-                        groupName="community-ecosystem"
-                        value={chain}
-                        label={chain}
-                        checked={
-                          filters.withEcosystemChainId ===
-                          communityChains[chain]
-                        }
-                        onChange={(e) =>
-                          e.target.checked &&
-                          onCommunityEcosystemChainIdChange(
-                            communityChains[chain],
-                          )
-                        }
-                      />
-                    ))}
+                  {Object.keys(communityChains).map((chain) => (
+                    <CWRadioButton
+                      key={chain}
+                      groupName="community-ecosystem"
+                      value={chain}
+                      label={chain}
+                      checked={
+                        filters.withEcosystemChainId === communityChains[chain]
+                      }
+                      onChange={(e) =>
+                        e.target.checked &&
+                        onCommunityEcosystemChainIdChange(
+                          communityChains[chain],
+                        )
+                      }
+                    />
+                  ))}
                 </div>
               }
             />

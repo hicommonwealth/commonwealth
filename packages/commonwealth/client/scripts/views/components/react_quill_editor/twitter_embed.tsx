@@ -1,8 +1,8 @@
 import { loadScript } from 'helpers';
-import { twitterLinkRegex } from 'helpers/constants';
 import _ from 'lodash';
 import { DeltaStatic } from 'quill';
 import { Quill } from 'react-quill';
+import { twitterLinkRegex } from 'shared/utils/constants';
 
 const BlockEmbed = Quill.import('blots/block/embed');
 

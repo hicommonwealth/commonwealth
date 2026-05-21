@@ -2,13 +2,13 @@ import { UserTierMap } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment';
 import React from 'react';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import {
   useCreateApiKeyMutation,
   useDeleteApiKeyMutation,
   useGetApiKeyQuery,
 } from 'state/api/user';
 import useUserStore from 'state/ui/user';
-import { saveToClipboard } from 'utils/clipboard';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';

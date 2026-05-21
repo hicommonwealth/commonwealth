@@ -3,9 +3,9 @@ import messagesImg from 'assets/img/share/messages.png';
 import telegramImg from 'assets/img/share/telegram.png';
 import warpcastImg from 'assets/img/share/warpcast.png';
 import twitterImg from 'assets/img/share/x.png';
-import useAppStatus from 'hooks/useAppStatus';
 import React, { useCallback, useMemo } from 'react';
-import { saveToClipboard } from 'utils/clipboard';
+import useAppStatus from 'shared/hooks/useAppStatus';
+import { saveToClipboard } from 'shared/utils/clipboard';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { ShareOption } from './ShareOption';
 

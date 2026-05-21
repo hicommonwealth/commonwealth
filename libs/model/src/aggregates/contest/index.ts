@@ -4,6 +4,7 @@ export * from './Contests.projection';
 export * from './CreateContestManagerMetadata.command';
 export * from './DeleteContestManagerMetadata.command';
 export * from './FarcasterCastWebhook.command';
+export * from './FarcasterContest.projection';
 export * from './FarcasterNotificationsWebhook.command';
 export * from './FarcasterUpvoteAction.command';
 export * from './GetActiveContestManagers.query';

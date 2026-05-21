@@ -2,10 +2,10 @@ import { CWTag } from 'client/scripts/views/components/component_kit/new_designs
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Permissions from 'shared/utils/Permissions';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
 import { useGetNewContent } from 'state/api/user';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CommunityPreviewCard } from './CommunityPreviewCard';

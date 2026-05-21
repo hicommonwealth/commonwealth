@@ -13,6 +13,11 @@ import { notifyError } from 'controllers/app/notifications';
 import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
 import './WVSuiNFTDetails.scss';
 
+interface NFTConfig {
+  fullObjectType: string;
+  voteWeightMultiplier: number;
+}
+
 interface WVSuiNFTDetailsProps {
   onStepChange: (step: CreateTopicStep) => void;
   onCreateTopic: (props: HandleCreateTopicProps) => Promise<void>;
@@ -22,15 +27,24 @@ const WVSuiNFTDetails = ({
   onStepChange,
   onCreateTopic,
 }: WVSuiNFTDetailsProps) => {
-  const [collectionId, setCollectionId] = useState('');
-  const [tokenSymbol, setTokenSymbol] = useState('');
-  const [multiplier, setMultiplier] = useState(1);
+  const [nft, setNft] = useState<NFTConfig>({
+    fullObjectType: '',
+    voteWeightMultiplier: 1,
+  });
   const [loading, setLoading] = useState(false);
 
   const chainNodeId = app?.chain?.meta?.ChainNode?.id;
 
+  const handleNFTChange = (field: keyof NFTConfig, value: string | number) => {
+    setNft({
+      ...nft,
+      [field]: field === 'fullObjectType' ? value : Number(value),
+    });
+  };
+
   const handleSubmit = async () => {
-    if (!collectionId || !tokenSymbol || !chainNodeId) {
+    // Validate NFT has required fields
+    if (!nft.fullObjectType || nft.voteWeightMultiplier <= 0 || !chainNodeId) {
       notifyError('Please fill in all required fields');
       return;
     }
@@ -39,12 +53,13 @@ const WVSuiNFTDetails = ({
     try {
       await onCreateTopic({
         suiToken: {
-          tokenAddress: collectionId,
-          tokenSymbol,
+          tokenAddress: nft.fullObjectType,
           tokenDecimals: 0, // NFTs typically don't have decimals
-          voteWeightMultiplier: multiplier,
+          voteWeightMultiplier: nft.voteWeightMultiplier,
           chainNodeId,
           weightedVoting: TopicWeightedVoting.SuiNFT,
+          // No secondary tokens for NFTs
+          secondaryTokens: undefined,
         },
       });
     } catch (err) {
@@ -67,49 +82,51 @@ const WVSuiNFTDetails = ({
       <CWDivider />
 
       <CWText type="h4">Connect Sui NFT</CWText>
-
-      <CWText type="h5">Sui NFT Collection ID</CWText>
       <CWText type="b1" className="description">
-        Enter the Sui NFT Collection ID
+        Configure a single NFT collection for weighted voting.
       </CWText>
-      <CWTextInput
-        value={collectionId}
-        onInput={(e) => setCollectionId(e.target.value)}
-        placeholder="0x1234…"
-        fullWidth
-      />
 
-      <CWText type="h5">Token Symbol</CWText>
-      <CWText type="b1" className="description">
-        Enter the token symbol (e.g., MYNFT)
-      </CWText>
-      <CWTextInput
-        value={tokenSymbol}
-        onInput={(e) => setTokenSymbol(e.target.value)}
-        placeholder="Enter token symbol"
-        fullWidth
-      />
-
-      <CWText type="h5">Vote weight multiplier</CWText>
-
-      <div className="input-row">
+      <div className="nft-config-section">
+        <CWText type="b2" className="field-label">
+          Sui NFT Object Type
+        </CWText>
         <CWText type="b1" className="description">
-          1 NFT is equal to
+          {
+            'Enter full object type (e.g., 0x1234::vault::VoteEscrowedToken<0x7890::my_token::MY_TOKEN>)'
+          }
         </CWText>
         <CWTextInput
-          type="number"
-          min={1}
-          isCompact
-          value={multiplier}
-          onInput={(e) => setMultiplier(Number(e.target.value))}
+          value={nft.fullObjectType}
+          onInput={(e) => handleNFTChange('fullObjectType', e.target.value)}
+          placeholder="0x1234…"
+          fullWidth
         />
+
+        <CWText type="b2" className="field-label">
+          Vote weight multiplier
+        </CWText>
+        <div className="input-row">
+          <CWText type="b1" className="description">
+            1 NFT is equal to
+          </CWText>
+          <CWTextInput
+            type="number"
+            min={1}
+            isCompact
+            value={nft.voteWeightMultiplier}
+            onInput={(e) =>
+              handleNFTChange('voteWeightMultiplier', e.target.value)
+            }
+          />
+          <CWText type="b1" className="description">
+            votes.
+          </CWText>
+        </div>
         <CWText type="b1" className="description">
-          votes.
+          Vote weight per NFT held by the user will be{' '}
+          {nft.voteWeightMultiplier || 0}.
         </CWText>
       </div>
-      <CWText type="b1" className="description">
-        Vote weight per NFT held by the user will be {multiplier || 0}.
-      </CWText>
 
       <CWText className="info" fontWeight="medium">
         Not sure?
@@ -135,9 +152,8 @@ const WVSuiNFTDetails = ({
         />
         <CWButton
           disabled={
-            !collectionId ||
-            !tokenSymbol ||
-            !multiplier ||
+            !nft.fullObjectType ||
+            nft.voteWeightMultiplier <= 0 ||
             loading ||
             !chainNodeId
           }

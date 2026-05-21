@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
-import { generateImagePromptWithContext } from 'state/api/ai/prompts';
+import { generateImagePromptFromReferenceTexts } from 'state/api/ai/prompts';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
 import { CWButton } from '../new_designs/CWButton';
@@ -40,6 +40,7 @@ export const UploadControl = ({
     formFieldErrorMessage,
     imageToRender,
     openFilePicker,
+    ignoreNextClickRef,
     registeredFormContext,
     dropzoneRef,
     imageInputRef,
@@ -95,7 +96,18 @@ export const UploadControl = ({
         { hasImageURL: !!imageToRender },
         uploadControlClassName,
       )}
-      onClick={() => openFilePicker()}
+      onClick={(e) => {
+        // Ignore the synthetic click triggered after the native file picker closes
+        if (ignoreNextClickRef.current) {
+          ignoreNextClickRef.current = false;
+          return;
+        }
+
+        // Prevent reopening when the click originates from the hidden input itself
+        if (e.target !== imageInputRef.current) {
+          openFilePicker();
+        }
+      }}
       onKeyUp={(e) =>
         e.target === e.currentTarget &&
         (e.key === 'Enter' || e.key === ' ') &&
@@ -249,7 +261,7 @@ export const UploadControl = ({
                       e.stopPropagation();
                       imagePrompt.trim() &&
                         generateImage({
-                          prompt: generateImagePromptWithContext(
+                          prompt: generateImagePromptFromReferenceTexts(
                             imagePrompt,
                             referenceTexts,
                             !!referenceImageUrls &&
@@ -298,7 +310,7 @@ export const UploadControl = ({
               e.preventDefault();
               e.stopPropagation();
               generateImage({
-                prompt: generateImagePromptWithContext(
+                prompt: generateImagePromptFromReferenceTexts(
                   imagePrompt,
                   referenceTexts,
                   !!referenceImageUrls && referenceImageUrls.length > 0,
@@ -357,7 +369,7 @@ export const UploadControl = ({
               onClick={() => {
                 imagePrompt.trim() &&
                   generateImage({
-                    prompt: generateImagePromptWithContext(
+                    prompt: generateImagePromptFromReferenceTexts(
                       imagePrompt,
                       referenceTexts,
                       !!referenceImageUrls && referenceImageUrls.length > 0,

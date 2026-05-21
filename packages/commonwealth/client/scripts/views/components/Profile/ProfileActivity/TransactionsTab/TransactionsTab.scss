@@ -22,6 +22,10 @@
     align-items: center;
     gap: 24px;
 
+    .btn-border {
+      margin: 0 !important;
+    }
+
     @include media_queries.smallInclusive {
       flex-direction: column;
       align-items: flex-end;

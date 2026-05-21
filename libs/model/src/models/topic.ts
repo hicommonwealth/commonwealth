@@ -60,6 +60,7 @@ export default (
       },
       recalculated_votes_start: { type: Sequelize.DATE, allowNull: true },
       recalculated_votes_finish: { type: Sequelize.DATE, allowNull: true },
+      secondary_tokens: { type: Sequelize.JSONB, allowNull: true },
     },
     {
       timestamps: true,

@@ -28,6 +28,9 @@ export type Aggregates = Extract<
   | 'MCPServer'
   | 'MCPServerCommunity'
   | 'ThreadToken'
+  | 'PredictionMarket'
+  | 'PredictionMarketPosition'
+  | 'PredictionMarketTrade'
 >;
 
 export * from './commands';

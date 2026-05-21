@@ -260,7 +260,7 @@ function _thresholdCheck(
           case BalanceSourceType.SuiNFT:
             return (
               b.options.sourceOptions.suiNetwork === chainId &&
-              b.options.sourceOptions.collectionId === contractAddress
+              b.options.sourceOptions.fullObjectType === contractAddress
             );
           default:
             return null;

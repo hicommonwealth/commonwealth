@@ -1,4 +1,9 @@
-import { ActionGroups, GatedActionEnum, slugify } from '@hicommonwealth/shared';
+import {
+  ActionGroups,
+  GatedActionEnum,
+  isValidImageUrl,
+  slugify,
+} from '@hicommonwealth/shared';
 import { pluralize } from 'client/scripts/helpers';
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
@@ -17,6 +22,7 @@ import threadPlaceholder from '../../../../assets/img/threadplaceholder.png';
 import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
 import { SharePopover } from '../../components/SharePopover';
 import { ThreadContestTagContainer } from '../../components/ThreadContestTag';
+import { ThreadPredictionMarketTagContainer } from '../../components/ThreadPredictionMarketTag';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { CWThreadAction } from '../../components/component_kit/new_designs/cw_thread_action';
@@ -72,13 +78,19 @@ const ThreadCell = ({
           undoUpvoteDisabled={false}
           tooltipText={permissions.tooltip}
         />
-        <img src={image[0] || threadPlaceholder} alt="Thread content" />
+        <img
+          src={
+            image[0] && isValidImageUrl(image[0]) ? image[0] : threadPlaceholder
+          }
+          alt="Thread content"
+        />
         <div className="thread-details">
           <div className="content-title">
             <CWText type="h5" fontWeight="semiBold" noWrap>
               <ThreadContestTagContainer
                 associatedContests={thread.associatedContests}
               />
+              <ThreadPredictionMarketTagContainer thread={thread} />
               {thread.title}
             </CWText>
             <NewThreadTag threadCreatedAt={moment(thread.createdAt)} />

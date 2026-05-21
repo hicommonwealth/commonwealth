@@ -1,5 +1,5 @@
-import { APIOrderDirection } from 'helpers/constants';
 import { useMemo, useState } from 'react';
+import { APIOrderDirection } from 'shared/utils/constants';
 import { CWTableColumnInfo, CWTableSorting } from './CWTable';
 
 type UseCWTableStateProps = {

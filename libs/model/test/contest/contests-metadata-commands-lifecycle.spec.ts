@@ -71,9 +71,10 @@ describe('Contests metadata commands lifecycle', () => {
             verified: new Date(),
           },
         ],
-        topics: [{}, {}, {}],
+        topics: [{ name: 'test1' }, { name: 'test2' }, { name: 'test3' }],
         contest_managers: [
           {
+            environment: 'local',
             contest_address: '0x1',
             name,
             interval,
@@ -86,6 +87,7 @@ describe('Contests metadata commands lifecycle', () => {
             cancelled: false,
           },
           {
+            environment: 'local',
             contest_address: '0x2',
             name,
             interval,

@@ -59,7 +59,7 @@ export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
       });
       if (!token || !Array.isArray(token) || token.length !== 1) return null;
 
-      return token[0];
+      return { ...token[0], community_id };
     },
   };
 }

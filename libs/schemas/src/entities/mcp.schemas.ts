@@ -21,6 +21,7 @@ export const MCPServer = z.object({
   auth_required: z.boolean().default(false),
   auth_completed: z.boolean().default(false),
   auth_user_id: PG_INT.nullish(),
+  auth_username: z.string().optional(), // dynamic property, not persisted
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });

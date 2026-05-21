@@ -1,5 +1,5 @@
-import { isNonEmptyString } from 'helpers/typeGuards';
 import React, { useState } from 'react';
+import { isNonEmptyString } from 'shared/utils/typeGuards';
 import app from 'state';
 import { CWMessageBanner } from './components/component_kit/cw_banner';
 import { TermsBanner } from './components/terms_banner';

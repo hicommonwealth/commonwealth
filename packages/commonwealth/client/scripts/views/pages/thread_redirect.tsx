@@ -1,7 +1,7 @@
 import useGetThreadByIdQuery from 'client/scripts/state/api/threads/getThreadById';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
 import { LoadingIndicator } from '../components/LoadingIndicator/LoadingIndicator';
 
 const ThreadRedirect = ({ identifier }: { identifier: string }) => {

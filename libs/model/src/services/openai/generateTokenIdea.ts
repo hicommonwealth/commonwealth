@@ -189,6 +189,29 @@ const convoHistory: (ChatCompletionMessage | ChatCompletionUserMessageParam)[] =
 
 const log = logger(import.meta);
 
+// Debouncing mechanism for 429 errors
+let last429ErrorTime = 0;
+const DEBOUNCE_DURATION_MS = 60_000 * 60; // 1 hour
+
+const debouncedLogError = (message: string, error: Error) => {
+  const now = Date.now();
+
+  // Check if this is a 429 error
+  const is429Error = error.message.includes('429') || message.includes('429');
+
+  if (is429Error) {
+    // If we haven't logged a 429 error recently, log it and update the timestamp
+    if (now - last429ErrorTime > DEBOUNCE_DURATION_MS) {
+      last429ErrorTime = now;
+      log.error(message, error);
+    }
+    // If it's within debounce period, skip logging
+  } else {
+    // For non-429 errors, log normally
+    log.error(message, error);
+  }
+};
+
 const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
   convoHistory.push({ role: 'user', content: prompt }); // user msg
 
@@ -285,7 +308,7 @@ const generateTokenIdea = async function* ({
     yield 'event: imageURL\n';
     yield `data: ${imageUrl}\n\n`;
   } catch (e) {
-    log.error('Error in generateTokenIdea', e as Error);
+    debouncedLogError('Error in generateTokenIdea', e as Error);
     let error = TokenErrors.RequestFailed;
 
     if (

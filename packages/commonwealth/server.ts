@@ -120,11 +120,40 @@ const start = async () => {
         const { startGraphileWorker } = await import(
           './server/workers/graphileWorker/graphileWorker'
         );
+        const { registerWorker } = await import(
+          './server/bindings/workerLifecycle'
+        );
 
-        await bootstrapBindings();
-        await bootstrapRelayer();
-        bootstrapContestRolloverLoop();
-        await startGraphileWorker();
+        // Start workers asynchronously to avoid blocking the main event loop
+        // Each worker registers its own cleanup with the workerLifecycle
+        log.info('[modulith] Starting workers in background...');
+
+        // bootstrapBindings must complete first to register RabbitMQ adapter
+        // before other workers (like relayer) try to use broker()
+        bootstrapBindings()
+          .then(() => {
+            // Start remaining workers in parallel after bindings are ready
+            return Promise.all([
+              bootstrapRelayer(),
+              startGraphileWorker({
+                onRunnerCreated: (runner) => {
+                  registerWorker('graphile-worker', async () => {
+                    log.info('Stopping Graphile Worker...');
+                    await runner.stop();
+                    log.info('Graphile Worker stopped');
+                  });
+                },
+              }),
+            ]);
+          })
+          .then(() => {
+            // Contest rollover loop is sync, start after bindings are ready
+            bootstrapContestRolloverLoop();
+            log.info('[modulith] All workers started');
+          })
+          .catch((err) => {
+            log.error('[modulith] Failed to start workers', err);
+          });
       }
     })
     .catch((e) => {

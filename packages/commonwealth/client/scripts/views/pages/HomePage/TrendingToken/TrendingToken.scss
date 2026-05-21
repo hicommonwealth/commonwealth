@@ -1,6 +1,7 @@
 @use '../../../../styles/shared';
 @use '../../../../styles/mixins/border_radius';
 @use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/elevation';
 
 .Trendingtoken {
   border-radius: border_radius.$border-radius-corners;
@@ -13,6 +14,12 @@
   height: 115px;
   border: 1px solid colors.$neutral-300;
   cursor: pointer;
+  box-shadow: elevation.$elevation-1;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: elevation.$elevation-3;
+  }
 
   .header {
     display: flex;

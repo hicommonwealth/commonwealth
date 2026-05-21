@@ -1,8 +1,8 @@
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifySuccess } from 'controllers/app/notifications';
-import { linkValidationSchema } from 'helpers/formValidations/common';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useCallback, useState } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
+import { linkValidationSchema } from 'shared/utils/formValidations/common';
 import app from 'state';
 import {
   useGetCommunityByIdQuery,
@@ -51,7 +51,7 @@ const CustomTOS = () => {
         linkValidationSchema.required.parse(value);
       } catch (e: any) {
         const zodError = e as ZodError;
-        error = zodError.errors[0].message;
+        error = zodError.message;
       }
     }
 

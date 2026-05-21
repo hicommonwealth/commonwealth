@@ -1,6 +1,9 @@
 import clsx from 'clsx';
-import { formatDisplayNumber, FormatNumberOptions } from 'helpers/formatting';
 import React from 'react';
+import {
+  formatDisplayNumber,
+  FormatNumberOptions,
+} from 'shared/utils/formatting';
 import { CWText, TextStyleProps } from '../component_kit/cw_text';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import FractionalValue from '../FractionalValue';

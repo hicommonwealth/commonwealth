@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
+import { withMCPAuthUsername } from '../../services/mcpServerHelpers';
 
 export const SetCommunityMCPServersErrors = {
   InvalidMCPServer: 'One or more MCP server IDs do not exist',
@@ -88,10 +89,16 @@ export function SetCommunityMCPServers(): Command<
             where: { community_id },
             attributes: [],
           },
+          {
+            model: models.User,
+            as: 'AuthUser',
+            attributes: ['id', 'profile'],
+            required: false,
+          },
         ],
       });
 
-      return updatedMCPServers.map((server) => server.toJSON());
+      return updatedMCPServers.map((server) => withMCPAuthUsername(server));
     },
   };
 }

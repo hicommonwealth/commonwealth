@@ -2,6 +2,76 @@ import { WalletId } from '@hicommonwealth/shared';
 import { pluralize } from 'helpers';
 import React, { ReactNode } from 'react';
 
+const binanceWalletCopy = (
+  <div>
+    <strong>IMPORTANT:</strong> Sign up MUST BE DONE VIA THE BINANCE MOBILE APP{' '}
+    — Download:{' '}
+    <a
+      href="https://play.google.com/store/apps/details?id=com.binance.dev&hl=en&pli=1"
+      target="_blank"
+      rel="noreferrer"
+    >
+      Android
+    </a>{' '}
+    |{' '}
+    <a
+      href="https://apps.apple.com/kn/app/binance-buy-bitcoin-crypto/id1436799971"
+      target="_blank"
+      rel="noreferrer"
+    >
+      iOS
+    </a>{' '}
+    — View{' '}
+    <a
+      // eslint-disable-next-line max-len
+      href="https://docs.common.xyz/commonwealth/commonaura/commonaura/season-2/season-2-week-1/system-quest-4-or-binance-wallet"
+      target="_blank"
+      rel="noreferrer"
+    >
+      demo docs
+    </a>
+    <br />
+    Steps to complete:
+    <ol>
+      <li>1. Open Binance Wallet app</li>
+      <li>2. Create your account or sign in</li>
+      <li>3. Click on wallet tab</li>
+      <li>4. Visit Common</li>
+      <li>5. Complete the signup/signin process to earn Aura</li>
+    </ol>
+    <br />
+    Visit Binance to explore more onchain:{' '}
+    <a href="https://www.binance.com/en/web3">
+      https://www.binance.com/en/web3
+    </a>
+  </div>
+);
+
+const gateWalletCopy = (
+  <div>
+    View{' '}
+    <a
+      href="https://docs.common.xyz/commonwealth/commonaura/commonaura/season-2/season-2-week-1/system-quest-6-or-gate-wallet"
+      target="_blank"
+      rel="noreferrer"
+    >
+      demo docs
+    </a>
+    <br />
+    Steps to complete:
+    <ol>
+      <li>1. Open Gate Wallet</li>
+      <li>2. Create your account or sign in</li>
+      <li>3. Click on wallet tab</li>
+      <li>4. Visit Common</li>
+      <li>5. Complete the signup/signin process to earn Aura</li>
+    </ol>
+    <br />
+    Visit Gate to explore more onchain:{' '}
+    <a href="https://www.gate.io">https://www.gate.io</a>
+  </div>
+);
+
 export const actionCopies = {
   title: {
     ['SignUpFlowCompleted']: 'Sign in to Common',
@@ -50,25 +120,11 @@ export const actionCopies = {
   explainer: {
     // eslint-disable-next-line react/no-multi-comp
     ['SignUpFlowCompleted']: (walletId?: WalletId) =>
-      walletId === WalletId.Binance ? (
-        <div>
-          <strong>IMPORTANT:</strong> Sign up MUST BE DONE VIA THE BINANCE
-          WALLET APP. <br />
-          Steps to complete:
-          <ol>
-            <li>1. Open Binance Wallet app</li>
-            <li>2. Create your account or sign in</li>
-            <li>3. Connect your wallet to Common</li>
-            <li>4. Complete the signup process</li>
-          </ol>
-          Visit Binance to explore more onchain:{' '}
-          <a href="https://www.binance.com/en/web3">
-            https://www.binance.com/en/web3
-          </a>
-        </div>
-      ) : (
-        ``
-      ),
+      walletId === WalletId.Binance
+        ? binanceWalletCopy
+        : walletId === WalletId.Gate
+          ? gateWalletCopy
+          : ``,
     ['CommunityCreated']: (chainName?: string) =>
       chainName ? `● Must be created on the ${chainName} chain.` : '',
     ['CommunityJoined']: () => '',
@@ -78,25 +134,11 @@ export const actionCopies = {
     ['CommentUpvoted']: () => '',
     // eslint-disable-next-line react/no-multi-comp
     ['WalletLinked']: (walletId?: WalletId) =>
-      walletId === WalletId.Binance ? (
-        <div>
-          <strong>IMPORTANT:</strong> Sign up MUST BE DONE VIA THE BINANCE
-          WALLET APP. <br />
-          Steps to complete:
-          <ol>
-            <li>1. Open Binance Wallet app</li>
-            <li>2. Create your account or sign in</li>
-            <li>3. Connect your wallet to Common</li>
-            <li>4. Complete the signup process</li>
-          </ol>
-          Visit Binance to explore more onchain:{' '}
-          <a href="https://www.binance.com/en/web3">
-            https://www.binance.com/en/web3
-          </a>
-        </div>
-      ) : (
-        ``
-      ),
+      walletId === WalletId.Binance
+        ? binanceWalletCopy
+        : walletId === WalletId.Gate
+          ? gateWalletCopy
+          : ``,
     // eslint-disable-next-line react/no-multi-comp
     ['SSOLinked']: (ssoType?: string) =>
       ssoType ? (

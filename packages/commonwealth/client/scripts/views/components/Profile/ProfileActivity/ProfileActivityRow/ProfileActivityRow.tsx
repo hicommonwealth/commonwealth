@@ -13,7 +13,7 @@ import Thread from 'models/Thread';
 import moment from 'moment';
 import withRouter from 'navigation/helpers';
 import { Link } from 'react-router-dom';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
+import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { SharePopover } from '../../../SharePopover';
 import { CWThreadAction } from '../../../component_kit/new_designs/cw_thread_action';
@@ -101,7 +101,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
           </CWText>
         </div>
         <div className="content">
-          <MarkdownViewerUsingQuillOrNewEditor
+          <MarkdownViewerWithFallback
             markdown={comment?.text}
             cutoffLines={2}
             maxChars={100}

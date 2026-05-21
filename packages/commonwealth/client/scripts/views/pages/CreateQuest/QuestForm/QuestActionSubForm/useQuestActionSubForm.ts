@@ -2,10 +2,10 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { numberNonDecimalGTZeroValidationSchema } from 'helpers/formValidations/common';
-import { splitCamelOrPascalCase } from 'helpers/string';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useEffect } from 'react';
+import useRunOnceOnCondition from 'shared/hooks/useRunOnceOnCondition';
+import { numberNonDecimalGTZeroValidationSchema } from 'shared/utils/formValidations/common';
+import { splitCamelOrPascalCase } from 'shared/utils/string';
 import { useCWRepetitionCycleRadioButton } from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { ValidationFnProps } from 'views/components/component_kit/CWRepetitionCycleRadioButton/types';
 import { doesConfigAllowContentIdField } from '../helpers';
@@ -13,9 +13,9 @@ import { QuestAction, QuestActionSubFormProps } from './types';
 
 // these restrictions are only on client side, update per future requirements
 const MAX_REPETITION_COUNTS = {
-  PER_DAY: 4,
-  PER_WEEK: 28,
-  PER_MONTH: 120,
+  PER_DAY: 100,
+  PER_WEEK: 700,
+  PER_MONTH: 3000,
 };
 
 const useQuestActionSubForm = ({

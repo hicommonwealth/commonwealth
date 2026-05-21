@@ -1,10 +1,10 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { APIOrderDirection } from 'helpers/constants';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import React, { Dispatch, SetStateAction } from 'react';
-import { prettyVoteWeight } from 'shared/adapters/currency';
+import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
+import { APIOrderDirection } from 'shared/utils/constants';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
@@ -28,6 +28,7 @@ type ViewUpvotesDrawerProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   tokenDecimals?: number | null | undefined;
   topicWeight?: TopicWeightedVoting | null | undefined;
+  tokenSymbol?: string;
 };
 
 type Upvoter = {
@@ -69,6 +70,7 @@ export const ViewUpvotesDrawer = ({
   setIsOpen,
   tokenDecimals,
   topicWeight,
+  tokenSymbol,
 }: ViewUpvotesDrawerProps) => {
   const tableState = useCWTableState({
     columns: columns.map((c) =>
@@ -193,11 +195,16 @@ export const ViewUpvotesDrawer = ({
                     Total
                   </CWText>
                   <CWText type="b2">
-                    {prettyVoteWeight(
-                      getVoteWeightTotal(reactorData).toString(),
-                      tokenDecimals,
+                    {prettyCompoundVoteWeight(
+                      [
+                        {
+                          wei: getVoteWeightTotal(reactorData).toString(),
+                          tokenNumDecimals: tokenDecimals,
+                          multiplier: 1,
+                          tokenSymbol: tokenSymbol,
+                        },
+                      ],
                       topicWeight,
-                      1,
                       6,
                     )}
                   </CWText>

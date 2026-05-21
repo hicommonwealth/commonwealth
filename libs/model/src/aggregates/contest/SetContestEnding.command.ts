@@ -9,7 +9,8 @@ import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { createOnchainContestVote } from '../../policies/utils/contest-utils';
-import { emitEvent, getChainNodeUrl } from '../../utils/utils';
+import { emitEvent } from '../../utils/outbox';
+import { getChainNodeUrl } from '../../utils/utils';
 
 const log = logger(import.meta);
 

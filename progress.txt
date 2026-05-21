@@ -1,0 +1,88 @@
+# Progress Log
+
+This file tracks AI-assisted development progress.
+Each entry documents: date, feature, decisions, files changed, tests, and concerns.
+
+---
+[2026-02-04] #13341 fix: add graceful shutdown for modulith workers
+- Files: server.ts, bootstrap.ts, relayForever.ts, graphileWorker.ts, workerLifecycle.ts, workerLifecycle.spec.ts, archiveOutbox.ts
+- Changes: Added workerLifecycle module for coordinating worker shutdown. Workers register cleanup functions called on SIGTERM/SIGINT. Workers start in background to avoid blocking server. Fixed blocking execSync in archiveOutbox by converting to async exec.
+- Decisions: Used Promise.all for parallel worker startup; 30s timeout for graceful shutdown; workers check isShutdownInProgress() flag.
+
+[2026-02-06] #13352 fix: use bind mounts for macos volumes
+- Files: scripts/macos/cwup.sh, scripts/macos/cwdown.sh
+- Changes: Switched macOS cwup.sh volumes to bind mounts under ~/.container-volumes with directory creation and permissive chmod for local dev; run RabbitMQ as uid 999 to avoid chown failures; cwdown now removes those host directories.
+
+[2026-02-06] #13354 fix: add Outbox table existence check before starting message relayer loop
+- Files: relayForever.ts, bootstrap.ts, waitForOutboxTable.spec.ts
+- Changes: Added waitForOutboxTable() with exponential backoff (1s-30s) that polls for Outbox table accessibility before relay loop starts. Called from bootstrapRelayer() so isServiceHealthy gates on DB readiness.
+- Decisions: Placed readiness check in bootstrapRelayer (awaited) rather than inside fire-and-forget relayForever, so health check naturally gates on it.
+
+[2026-02-09] #13361 feat: add prediction market schemas, models, and migration
+- Files: .env.example, libs/model/src/config.ts, libs/model/src/models/associations.ts, libs/model/src/models/factories.ts, libs/model/src/models/index.ts, libs/model/src/models/prediction_market.ts, libs/model/src/models/thread.ts, libs/model/migrations/20260209120000-create-prediction-markets.js, libs/model/test/prediction-market/models.spec.ts, libs/model/test/prediction-market/schemas.spec.ts, libs/schemas/src/commands/index.ts, libs/schemas/src/commands/prediction-market.schemas.ts, libs/schemas/src/context.ts, libs/schemas/src/entities/index.ts, libs/schemas/src/entities/prediction-market.schemas.ts, libs/schemas/src/entities/thread.schemas.ts, libs/schemas/src/events/events.schemas.ts, libs/schemas/src/queries/index.ts, libs/schemas/src/queries/prediction-market.schemas.ts, packages/commonwealth/client/scripts/helpers/feature-flags.ts, packages/commonwealth/client/vite.config.ts
+- Changes: Added futarchy feature flag wiring, prediction market schemas, events, and contexts; introduced Sequelize models, associations, thread flag, and migration for prediction market tables; added schema and model tests.
+- Decisions: Used DECIMAL(78,0) for on-chain amounts and enforced composite/unique constraints via model indexes and migration.
+
+[2026-02-09] #13361 test: extend prediction market schema coverage
+- Files: libs/model/test/prediction-market/schemas.spec.ts
+- Changes: Added command schema validation coverage for prediction market create, deploy, resolve, cancel, and projection commands.
+
+[2026-02-09] #13361 chore: align prediction market context and tests
+- Files: libs/schemas/src/context.ts, libs/model/test/prediction-market/prediction-market-lifecycle.spec.ts
+- Changes: Removed prediction market context in favor of thread context and dropped lifecycle test until command layer exists.
+
+[2026-02-09] #13361 chore: drop thread prediction-market flag
+- Files: libs/model/src/models/thread.ts, libs/schemas/src/entities/thread.schemas.ts, libs/model/migrations/20260209120000-create-prediction-markets.js, libs/model/test/prediction-market/models.spec.ts, common_knowledge/Prediction-Markets.md
+- Changes: Removed has_prediction_market column/schema/migration usage and updated docs/tests to rely on prediction market thread FK.
+
+[2026-02-09] #13361 chore: drop prediction market community fk
+- Files: libs/schemas/src/entities/prediction-market.schemas.ts, libs/schemas/src/queries/prediction-market.schemas.ts, libs/model/src/models/prediction_market.ts, libs/model/src/models/associations.ts, libs/model/migrations/20260209120000-create-prediction-markets.js, libs/model/test/prediction-market/models.spec.ts, libs/model/test/prediction-market/schemas.spec.ts, common_knowledge/Prediction-Markets.md
+- Changes: Removed community_id from prediction markets, associations, migration, and queries; updated tests/docs to rely on thread FK only.
+
+[2026-02-11] #13370 feat: implement prediction market deploy flow, policy, and read model
+- Files: libs/model/src/aggregates/prediction_market/{CreatePredictionMarket,DeployPredictionMarket,ProjectPredictionMarketProposal,ProjectPredictionMarketMarket}.command.ts, PredictionMarket.projection.ts, index.ts, libs/model/src/policies/PredictionMarket.policy.ts, libs/model/src/policies/index.ts, libs/model/src/index.ts, libs/model/test/prediction-market/prediction-market-lifecycle.spec.ts, libs/model/test/prediction-market/schemas.spec.ts, libs/schemas/src/commands/prediction-market.schemas.ts, libs/schemas/src/events/events.schemas.ts, libs/schemas/src/index.ts
+- Changes: Implemented CreatePredictionMarket and DeployPredictionMarket commands with thread author auth and transactional writes. Added PredictionMarketPolicy to reconcile on-chain ProposalCreated/MarketCreated events. Added PredictionMarket.projection as read model. Added lifecycle test covering create->deploy->policy reconciliation.
+- Decisions: Used EventPair type assertion for DeployPredictionMarket event emission (large union narrowing). Read model currently mirrors write model (projection is a no-op logger). Added thread_id to all command schemas requiring ThreadContext auth.
+
+[2026-02-11] #13370 fix: wire prediction market router and remove projection
+- Files: libs/model/src/aggregates/prediction_market/{GetPredictionMarkets.query.ts,index.ts}, libs/adapters/src/trpc/types.ts, packages/commonwealth/server/api/{predictionMarket.ts,internal-router.ts}, packages/commonwealth/server/bindings/rascalConsumerMap.ts
+- Changes: Removed unused PredictionMarket.projection (policy handles projecting). Added GetPredictionMarkets query. Created predictionMarket router exposed behind FLAG_FUTARCHY in internal-router. Registered PredictionMarketPolicy in rascalConsumerMap. Added PredictionMarket tag.
+- Decisions: Used raw SQL query with window function for paginated GetPredictionMarkets, matching quest query pattern.
+
+[2026-02-13] #13382 feat: auto-cleanup deprecated RabbitMQ queues on broker init
+- Files: libs/adapters/src/config.ts, libs/adapters/src/rabbitmq/RabbitMQAdapter.ts, packages/commonwealth/server/bindings/bootstrap.ts, packages/commonwealth/server/bindings/rascalConsumerMap.ts, libs/adapters/test/rabbitmq/cleanupDeprecatedQueues.spec.ts
+- Changes: Added cleanupDeprecatedQueues method to RabbitMQAdapter that uses the RabbitMQ Management HTTP API to discover orphaned queues, deletes empty ones, and warns about non-empty ones. Added CLEANUP_DEPRECATED_QUEUES and RABBITMQ_MANAGEMENT_URL config flags. Added deriveManagementUrl helper to auto-derive management URL from AMQP URI for local dev. Integrated into bootstrapBindings after broker init. Sorted rascalConsumerMap alphabetically by consumer name.
+- Decisions: Used Management HTTP API (native fetch) for queue listing since amqplib has no list-queues API. Only targets queues matching *Queue naming convention to avoid touching system queues. Auto-derives management URL for localhost (port 15672, guest:guest defaults).
+[2026-02-12] #13379 refactor: enforce policy vs projection architecture rule and fix misclassified files
+- Files: 9 new .projection.ts files, 5 deleted .policy.ts files, 3 deleted Project*.command.ts files, updated index.ts barrels, rascalConsumerMap.ts, CLAUDE.md, AGENT.md, 3 test files, 2 schema files
+- Changes: Reclassified 5 misclassified policies as projections (CreateUnverifiedUser, Governance, Nominations, ReactionWorker, UpgradeTier). Split hybrid ChainEventCreated.policy into separate policy+projection. Extracted FarcasterReplyCastDeleted from FarcasterWorker.policy into FarcasterContest.projection. Eliminated Project... command indirection for PredictionMarket and LaunchpadTrade. Updated all barrel exports and consumer registrations. Documented policy vs projection rules in CLAUDE.md and AGENT.md.
+- Decisions: Kept ProjectPredictionMarketTrade/Resolution schemas as they're future projection schemas. LaunchpadPolicy now derives community_id independently for RefreshCommunityMemberships calls.
+
+[2026-02-12] #13379 refactor: relocate projection handlers from policies/ to aggregates/
+- Files: handleCommunityStakeTrades.ts→projectCommunityStakeTrades.ts, handleReferralFeeDistributed.ts→projectReferralFeeDistributed.ts (moved from policies/handlers/ to aggregates/community/projections/), policies/utils/utils.ts, utils/utils.ts, LaunchpadTrade.projection.ts, ChainEventCreated.projection.ts, chainEventCreatedPolicy.spec.ts
+- Changes: Moved projection handler files to live alongside their projection consumers under projections/ subfolder with project* naming convention. Moved chainNodeMustExist utility from policies/utils/utils.ts to the shared utils/utils.ts module. Updated all import paths and function names.
+- Decisions: Only moved handlers exclusively consumed by projections. Notification handlers (notify*.ts) and policy-specific handlers (handleNamespaceDeployed, handleTokenStaking) remain in policies/handlers/.
+
+[2026-02-13] #13385 docs: update prediction markets plan for projection architecture and ABI events
+- Files: common_knowledge/Prediction-Markets.md
+- Changes: Replaced all PredictionMarketPolicy references with PredictionMarketProjection. Removed ProjectPredictionMarketTrade/Resolution command indirection pattern. Updated PM-4 to import ABIs from @commonxyz/common-protocol-abis instead of creating local files. Marked PM-1 and PM-2 (Slices 1+2) as completed. Added complete EVM event-to-mapper-to-projection mapping table with all 8 ABI event signatures. Updated all diagrams to show projection-based flow (no policy or system command boxes).
+- Decisions: Kept ProjectPredictionMarketTrade/Resolution schemas in prediction-market.schemas.ts as they define the shape of event payloads used by the projection.
+
+[2026-02-13] #13387 feat: implement prediction market TokensMinted event pipeline
+- Files: eventSignatures.ts, eventRegistry.ts, chain-event-utils.ts, PredictionMarket.projection.ts, prediction-market-mint.spec.ts
+- Changes: Added TokensMinted EVM event signature, BinaryVault contract source, mapper decoding raw logs to PredictionMarketTokensMinted events, and projection handler that inserts trades, upserts positions, and increments market total_collateral. All DB mutations in a single transaction with idempotency via composite PK.
+- Decisions: Used Sequelize literal for DECIMAL(78,0) increments to avoid bigint precision loss. BinaryVault source exported (not registered in EventRegistry) since contract addresses come from EvmEventSources DB table at deploy time. Skipped position/market updates on duplicate trade for idempotency.
+
+[2026-02-13] #13389 feat: implement prediction market SwapExecuted event pipeline
+- Files: eventSignatures.ts, eventRegistry.ts, chain-event-utils.ts, PredictionMarket.projection.ts, events.schemas.ts, prediction-market-swap.spec.ts
+- Changes: Added SwapExecuted event signature and FutarchyRouter contract source. Updated PredictionMarketSwapExecuted schema to use buy_pass/amount_in/amount_out fields. Implemented mapper decoding FutarchyRouterAbi logs and projection handler that inserts trades (SwapBuyPass/SwapBuyFail), updates positions (token exchange), and updates market current_probability.
+- Decisions: Probability derived as simple ratio: buyPass→amountOut/(amountIn+amountOut), buyFail→amountIn/(amountIn+amountOut). Swap sets collateral_amount=0 on trade record since no collateral is exchanged. Position defaults use 0n for the non-received token and total_collateral_in on new positions from swaps.
+
+[2026-02-13] #13389 fix: gate prediction market projection behind feature flag
+- Files: rascalConsumerMap.ts
+- Changes: Conditionally register PredictionMarketProjection in rascalConsumerMap only when config.MARKETS.FUTARCHY_ENABLED is true, matching the pattern used by the prediction market API router in internal-router.ts.
+
+[2026-02-14] #13392 feat: implement prediction market event pipelines for slices 5-8
+- Files: eventSignatures.ts, eventRegistry.ts, chain-event-utils.ts, PredictionMarket.projection.ts, events.schemas.ts, ResolvePredictionMarket.command.ts, CancelPredictionMarket.command.ts, GetPredictionMarketTrades.query.ts, GetPredictionMarketPositions.query.ts, predictionMarket.ts (tRPC router), prediction_market/index.ts, prediction-market-merge.spec.ts, prediction-market-resolution.spec.ts, prediction-market-redeem.spec.ts, prediction-market-cancel.spec.ts
+- Changes: Added TokensMerged, TokensRedeemed, ProposalResolved, MarketResolved EVM event signatures, mappers, and projection handlers. Created ResolvePredictionMarket and CancelPredictionMarket commands with auth (author/admin). Added GetPredictionMarketTrades and GetPredictionMarketPositions queries. Updated tRPC router with all new endpoints behind FLAG_FUTARCHY. Added PredictionMarketResolved event schema for command-emitted events. Updated ProposalResolved/MarketResolved event schemas to be EVM-mapper-compatible.
+- Decisions: Resolution event schemas changed from using prediction_market_id (DB key) to market_id/proposal_id (on-chain identifiers) for EVM mapper compatibility. Projection looks up market by on-chain ID. Added separate PredictionMarketResolved event for the command path (distinct from EVM-originated ProposalResolved/MarketResolved). FutarchyGovernorAbi imported from @commonxyz/common-protocol-abis. Redeem mapper maps outcome=1 to p_token, outcome=2 to f_token.

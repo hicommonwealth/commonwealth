@@ -1,18 +1,17 @@
 import {
   emailValidationSchema,
   quillValidationSchema,
-} from 'helpers/formValidations/common';
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
+  usernameSchema,
+} from 'shared/utils/formValidations/common';
+import { VALIDATION_MESSAGES } from 'shared/utils/formValidations/messages';
 import { z } from 'zod';
 
 export const editProfileValidation = z.object({
-  username: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+  username: usernameSchema,
   email: emailValidationSchema,
   backgroundImg: z.union([
     z.literal(''),
-    z.string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT }),
+    z.string({ error: VALIDATION_MESSAGES.NO_INPUT }),
   ]),
   bio: quillValidationSchema,
 });

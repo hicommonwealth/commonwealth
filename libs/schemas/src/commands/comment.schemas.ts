@@ -17,18 +17,24 @@ export const CreateComment = {
   input: CanvasComment.extend({
     discord_meta: DiscordMetaSchema.optional(),
     turnstile_token: z.string().nullish(),
-  }),
+  }).describe(
+    'Create a comment on a thread. ' +
+      'The thread must not be read-only or archived. ' +
+      'Use parent_id to reply to an existing comment (max 8 levels deep).',
+  ),
   output: Comment.extend({ community_id: z.string() }),
   context: ThreadContext,
 };
 
 export const UpdateComment = {
-  input: z.object({
-    comment_id: PG_INT,
-    body: z.string().min(1),
-    canvas_signed_data: z.string().optional(),
-    canvas_msg_id: z.string().optional(),
-  }),
+  input: z
+    .object({
+      comment_id: PG_INT,
+      body: z.string().min(1),
+      canvas_signed_data: z.string().optional(),
+      canvas_msg_id: z.string().optional(),
+    })
+    .describe("Update a comment's body"),
   output: Comment.extend({ community_id: z.string() }),
   context: CommentContext,
 };
@@ -42,15 +48,17 @@ export const CommentCanvasReaction = z.object({
 });
 
 export const CreateCommentReaction = {
-  input: CommentCanvasReaction,
+  input: CommentCanvasReaction.describe('Like a comment'),
   output: Reaction.extend({ community_id: z.string() }),
   context: CommentContext,
 };
 
 export const DeleteComment = {
-  input: z.object({
-    comment_id: PG_INT,
-  }),
+  input: z
+    .object({
+      comment_id: PG_INT,
+    })
+    .describe('Delete a comment'),
   output: z.object({
     thread_id: PG_INT,
     comment_id: PG_INT,
@@ -65,10 +73,12 @@ export const DeleteComment = {
 };
 
 export const ToggleCommentSpam = {
-  input: z.object({
-    comment_id: PG_INT,
-    spam: z.boolean(),
-  }),
+  input: z
+    .object({
+      comment_id: PG_INT,
+      spam: z.boolean(),
+    })
+    .describe('Mark or unmark a comment as spam'),
   output: Comment.extend({
     community_id: z.string(),
     spam_toggled: z.boolean(),

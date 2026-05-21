@@ -5,7 +5,6 @@ import {
   hasCommunityTierClientInfo,
 } from '@hicommonwealth/shared';
 import useDeferredConditionTriggerCallback from 'client/scripts/hooks/useDeferredConditionTriggerCallback';
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
@@ -60,8 +59,6 @@ const CommunityPreviewCard = ({
   const isJoined = Permissions.isCommunityMember(community?.id);
   const { linkSpecificAddressToSpecificCommunity } = useJoinCommunity();
 
-  const trustLevelEnabled = useFlag('trustLevel');
-
   const { register, trigger } = useDeferredConditionTriggerCallback({
     shouldRunTrigger: user.isLoggedIn,
   });
@@ -106,8 +103,7 @@ const CommunityPreviewCard = ({
                     {smartTrim(community?.name, 8)}
                   </CWText>
                 )}
-                {trustLevelEnabled &&
-                  community?.tier &&
+                {community?.tier &&
                   community.tier !== CommunityTierMap.Unverified &&
                   (() => {
                     const tier = community.tier as CommunityTierMap;

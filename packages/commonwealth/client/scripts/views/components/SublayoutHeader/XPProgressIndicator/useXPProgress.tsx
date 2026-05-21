@@ -1,6 +1,5 @@
 import { QuestActionMeta } from '@hicommonwealth/schemas';
 import { isQuestComplete, XPLog } from 'helpers/quest';
-import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import { useGetXPs } from 'state/api/user';
@@ -15,7 +14,6 @@ type UseXPProgress = {
 };
 
 const useXPProgress = ({ includeSystemQuests }: UseXPProgress) => {
-  const xpEnabled = useFlag('xp');
   const user = useUserStore();
   const currentWeekStart = moment().startOf('week');
   const currentWeekEnd = moment().endOf('week');
@@ -25,7 +23,7 @@ const useXPProgress = ({ includeSystemQuests }: UseXPProgress) => {
       user_id: user.id,
       from: currentWeekStart.toDate(),
       to: currentWeekEnd.toDate(),
-      enabled: user.isLoggedIn && xpEnabled,
+      enabled: user.isLoggedIn,
     });
 
   const { data: questsList, isInitialLoading: isLoadingQuestsList } =
@@ -35,7 +33,7 @@ const useXPProgress = ({ includeSystemQuests }: UseXPProgress) => {
       end_after: currentWeekStart.toDate(),
       start_before: currentWeekEnd.toDate(),
       include_system_quests: includeSystemQuests,
-      enabled: user.isLoggedIn && xpEnabled,
+      enabled: user.isLoggedIn,
     });
 
   const allWeeklyQuests = (questsList?.pages || [])

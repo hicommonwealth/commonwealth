@@ -1,11 +1,11 @@
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
+import { VALIDATION_MESSAGES } from 'shared/utils/formValidations/messages';
 import { z } from 'zod';
 
 export const connectTokenFormValidationSchema = z.object({
   chainNodeId: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+    .string({ error: VALIDATION_MESSAGES.INVALID_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   tokenAddress: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+    .string({ error: VALIDATION_MESSAGES.INVALID_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
 });

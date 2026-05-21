@@ -1,8 +1,8 @@
 import { ChainNetwork } from '@hicommonwealth/shared';
 import { CoinObject } from 'controllers/chain/cosmos/types';
 import React from 'react';
+import { downloadDataAsFile } from 'shared/utils/downloadDataAsFile';
 import app from 'state';
-import { downloadDataAsFile } from 'utils/downloadDataAsFile';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';

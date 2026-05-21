@@ -68,9 +68,6 @@ const {
   TWITTER_ACCESS_TOKEN,
   TWITTER_ACCESS_TOKEN_SECRET,
   SKALE_PRIVATE_KEY,
-  PRIVY_FLAG,
-  PRIVY_APP_ID,
-  PRIVY_APP_SECRET,
   FLAG_USE_RUNWARE,
   RUNWARE_API_KEY,
   CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
@@ -90,14 +87,27 @@ const {
   MCP_DEMO_CLIENT_SERVER_URL,
   EVM_CHAINS_WHITELIST,
   MCP_KEY_BYPASS,
+  MCP_AUTH_TOKEN,
   LOG_XP_LAUNCHPAD,
+  XP_REFERRER_FEE_RATIO,
   KNOCK_PUBLIC_API_KEY,
   KNOCK_IN_APP_FEED_ID,
   UNLEASH_FRONTEND_API_TOKEN,
   CONTEST_DURATION_IN_SEC,
+  MOONPAY_PUBLISHABLE_KEY,
+  MOONPAY_SECRET_KEY,
   KLAVIS_API_KEY,
   REORG_SAFETY_DISABLED,
   SEND_EMAILS,
+  IGNORE_CONTENT_CREATION_LIMIT,
+  AI_BOT_USER_ADDRESS,
+  MAGNA_API_KEY,
+  MAGNA_API_URL,
+  MAGNA_BATCH_SIZE,
+  SLACK_WEBHOOK_URL_ALL_ENG,
+  SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
+  FLAG_MARKETS,
+  FLAG_FUTARCHY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -114,6 +124,8 @@ const DEFAULTS = {
   TIER_SOCIAL_VERIFIED_MIN_ETH: '0.006',
   KNOCK_PUBLIC_API_KEY: 'pk_test_Hd4ZpzlVcz9bqepJQoo9BvZHokgEqvj4T79fPdKqpYM',
   KNOCK_IN_APP_FEED_ID: 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb',
+  XP_REFERRER_FEE_RATIO: '0',
+  MAGNA_BATCH_SIZE: '10',
 };
 
 export const config = configure(
@@ -238,6 +250,9 @@ export const config = configure(
       USE_OPENROUTER: process.env.USE_OPENROUTER || 'false',
       OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
     },
+    AI: {
+      BOT_USER_ADDRESS: AI_BOT_USER_ADDRESS || undefined,
+    },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
     },
@@ -251,11 +266,6 @@ export const config = configure(
     },
     SKALE: {
       PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
-    },
-    PRIVY: {
-      FLAG_ENABLED: PRIVY_FLAG === 'true',
-      APP_ID: PRIVY_APP_ID,
-      APP_SECRET: PRIVY_APP_SECRET,
     },
     IMAGE_GENERATION: {
       FLAG_USE_RUNWARE: FLAG_USE_RUNWARE === 'true' || false,
@@ -314,8 +324,14 @@ export const config = configure(
     MCP: {
       MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
       MCP_KEY_BYPASS: MCP_KEY_BYPASS,
+      MCP_AUTH_TOKEN: MCP_AUTH_TOKEN,
     },
-    LOG_XP_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
+    XP: {
+      REFERRER_FEE_RATIO: parseFloat(
+        XP_REFERRER_FEE_RATIO || DEFAULTS.XP_REFERRER_FEE_RATIO,
+      ),
+      LOG_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
+    },
     NOTIFICATIONS: {
       KNOCK_PUBLIC_API_KEY:
         KNOCK_PUBLIC_API_KEY || DEFAULTS.KNOCK_PUBLIC_API_KEY,
@@ -326,8 +342,28 @@ export const config = configure(
     UNLEASH: {
       FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
     },
+    MOONPAY: {
+      PUBLISHABLE_KEY: MOONPAY_PUBLISHABLE_KEY || '',
+      SECRET_KEY: MOONPAY_SECRET_KEY || '',
+    },
     KLAVIS: {
       API_KEY: KLAVIS_API_KEY,
+    },
+    IGNORE_CONTENT_CREATION_LIMIT: IGNORE_CONTENT_CREATION_LIMIT === 'true',
+    MAGNA: {
+      API_URL: MAGNA_API_URL || 'https://api.test.magna.com',
+      API_KEY: MAGNA_API_KEY || '', // This is the gateway to magna API integration, starting with syncing allocations
+      BATCH_SIZE: parseInt(MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE, 10),
+    },
+    SLACK: {
+      CHANNELS: {
+        ALL_ENG: SLACK_WEBHOOK_URL_ALL_ENG,
+        MAGNA_NOTIFS: SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
+      },
+    },
+    MARKETS: {
+      ENABLED: FLAG_MARKETS === 'true',
+      FUTARCHY_ENABLED: FLAG_FUTARCHY === 'true',
     },
   },
   z.object({
@@ -537,7 +573,7 @@ export const config = configure(
       THREAD_PRIORITY: z.coerce.number(),
       PROFILE_PRIORITY: z.coerce.number(),
     }),
-    DEFAULT_COMMONWEALTH_LOGO: z.string().url(),
+    DEFAULT_COMMONWEALTH_LOGO: z.url(),
     TEST_EVM: z.object({
       ETH_RPC: z.string(),
       PROVIDER_URL: z.string(),
@@ -565,6 +601,9 @@ export const config = configure(
       ORGANIZATION: z.string().optional(),
       USE_OPENROUTER: z.string().optional(),
       OPENROUTER_API_KEY: z.string().optional(),
+    }),
+    AI: z.object({
+      BOT_USER_ADDRESS: z.string().optional(),
     }),
     BOT: z.object({
       CONTEST_BOT_NAMESPACE: z
@@ -598,15 +637,6 @@ export const config = configure(
           }),
         ),
     }),
-    PRIVY: z
-      .object({
-        FLAG_ENABLED: z.boolean(),
-        APP_ID: z.string().optional(),
-        APP_SECRET: z.string().optional(),
-      })
-      .refine(
-        (data) => !(data.FLAG_ENABLED && (!data.APP_ID || !data.APP_SECRET)),
-      ),
     IMAGE_GENERATION: z
       .object({
         FLAG_USE_RUNWARE: z.boolean().optional(),
@@ -690,8 +720,12 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && data),
           'MCP_KEY_BYPASS cannot be set in production',
         ),
+      MCP_AUTH_TOKEN: z.string().optional(),
     }),
-    LOG_XP_LAUNCHPAD: z.boolean().default(false),
+    XP: z.object({
+      REFERRER_FEE_RATIO: z.number(),
+      LOG_LAUNCHPAD: z.boolean().default(false),
+    }),
     NOTIFICATIONS: z.object({
       KNOCK_PUBLIC_API_KEY: z.string().refine(
         requiredInEnvironmentServices({
@@ -722,8 +756,28 @@ export const config = configure(
           }),
         ),
     }),
+    MOONPAY: z.object({
+      PUBLISHABLE_KEY: z.string().optional(),
+      SECRET_KEY: z.string().optional(),
+    }),
     KLAVIS: z.object({
       API_KEY: z.string().optional(),
+    }),
+    IGNORE_CONTENT_CREATION_LIMIT: z.boolean().optional(),
+    MAGNA: z.object({
+      API_URL: z.url(),
+      API_KEY: z.string(),
+      BATCH_SIZE: z.number(),
+    }),
+    SLACK: z.object({
+      CHANNELS: z.object({
+        ALL_ENG: z.string().optional(),
+        MAGNA_NOTIFS: z.string().optional(),
+      }),
+    }),
+    MARKETS: z.object({
+      ENABLED: z.boolean(),
+      FUTARCHY_ENABLED: z.boolean(),
     }),
   }),
 );

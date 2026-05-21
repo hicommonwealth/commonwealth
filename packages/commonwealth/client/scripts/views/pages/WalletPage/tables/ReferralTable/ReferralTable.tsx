@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { fromWei } from 'web3-utils';
 
 import { formatAddressShort } from 'helpers';
-import { APIOrderDirection } from 'helpers/constants';
+import { APIOrderDirection } from 'shared/utils/constants';
 import { Avatar } from 'views/components/Avatar';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';

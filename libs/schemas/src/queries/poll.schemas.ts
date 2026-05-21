@@ -18,15 +18,19 @@ export const PollView = Poll.omit({
 });
 
 export const GetPolls = {
-  input: z.object({
-    thread_id: PG_INT,
-  }),
+  input: z
+    .object({
+      thread_id: PG_INT,
+    })
+    .describe('Get polls for a thread'),
   output: z.array(PollView),
 };
 
 export const GetPollVotes = {
-  input: z.object({
-    poll_id: PG_INT,
-  }),
+  input: z
+    .object({
+      poll_id: PG_INT,
+    })
+    .describe('Get votes for a specific poll'),
   output: z.array(VoteView),
 };

@@ -1,0 +1,103 @@
+name: Visual Baseline Update
+
+env:
+  APP_ENV: CI
+  IS_CI: true
+  CI: true
+  NODE_ENV: 'test'
+  ROLLBAR_ENV: 'GitHubCI'
+  TEST_WITHOUT_LOGS: 'true'
+  PRIVATE_KEY: '0x83c65f24efbc8f4bc54ad425e897fc3ea01f760d5e71671a30eacb075ebe2313'
+  USES_DOCKER_PGSQL: true
+  PORT: 8080
+  REDIS_URL: redis://localhost:6379
+  FEDERATION_POSTGRES_DB_URL: postgresql://commonwealth:edgeware@localhost/common_test
+  ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
+  ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_ref:
+        description: "Branch to update (defaults to selected branch)"
+        required: false
+        type: string
+      push_changes:
+        description: "Commit and push generated baselines"
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  update-visual-baselines:
+    name: Update Visual Baselines
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    services:
+      postgres:
+        image: hicommonwealth/cw_postgres:latest
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: common_test
+          POSTGRES_PASSWORD: edgeware
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.target_ref != '' && github.event.inputs.target_ref || github.ref_name }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - uses: ./.github/actions/e2e
+
+      - name: Build server
+        run: pnpm -F commonwealth build
+
+      - name: Refresh visual baselines (linux)
+        run: |
+          pnpm -F commonwealth bootstrap-test-db &&
+          (cd packages/commonwealth && SERVICE=web node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-visual:update)
+
+      - name: Upload visual baseline artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-baseline-update-artifacts
+          path: |
+            packages/commonwealth/test/visual/test-results
+            packages/commonwealth/test/visual/__snapshots__
+            packages/commonwealth/test/visual/visual-report
+          retention-days: 7
+
+      - name: Commit refreshed baselines
+        if: github.event.inputs.push_changes != 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f packages/commonwealth/test/visual/__snapshots__
+          if git diff --cached --quiet; then
+            echo "No visual baseline updates to commit."
+            exit 0
+          fi
+          git commit -m "test(visual): refresh linux visual baselines"
+          git push

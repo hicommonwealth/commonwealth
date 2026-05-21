@@ -1,5 +1,5 @@
-import { linkValidationSchema } from 'helpers/formValidations/common';
 import { useState } from 'react';
+import { linkValidationSchema } from 'shared/utils/formValidations/common';
 import { ZodError } from 'zod';
 import { SocialLinkField } from './types';
 
@@ -41,7 +41,7 @@ const useSocialLinks = () => {
         const zodError = e as ZodError;
         updatedSocialLinks[index] = {
           ...updatedSocialLinks[index],
-          error: zodError.errors[0].message,
+          error: zodError.message,
         };
       }
     });
@@ -71,7 +71,7 @@ const useSocialLinks = () => {
       const zodError = e as ZodError;
       updatedSocialLinks[index] = {
         ...updatedSocialLinks[index],
-        error: zodError.errors[0].message,
+        error: zodError.message,
       };
     }
     setSocialLinks([...updatedSocialLinks]);

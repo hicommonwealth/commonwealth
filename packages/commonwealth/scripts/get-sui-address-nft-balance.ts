@@ -8,13 +8,13 @@ import {
 import { BalanceSourceType } from '@hicommonwealth/shared';
 
 /**
- * Standalone script to get SUI NFT balance for a given address and collection using the token balance cache
- * Usage: pnpm get-sui-address-nft-balance <sui-address> <collection-id>
+ * Standalone script to get SUI NFT balance for a given address and full object type using the token balance cache
+ * Usage: pnpm get-sui-address-nft-balance <sui-address> <full-object-type>
  */
 
 async function getSuiAddressNftBalance(
   address: string,
-  collectionId: string,
+  fullObjectType: string,
   forceRefresh: boolean = false,
 ): Promise<string> {
   try {
@@ -34,13 +34,13 @@ async function getSuiAddressNftBalance(
       );
     }
 
-    // Validate collection ID format (should start with 0x and be a valid hex string)
-    if (
-      !collectionId.startsWith('0x') ||
-      !/^0x[a-fA-F0-9]+$/.test(collectionId)
-    ) {
+    // Validate fullObjectType format (should be a valid Move type like 0xpackage::module::struct)
+    const moveTypePattern =
+      /^0x[a-fA-F0-9]+::[a-zA-Z_][a-zA-Z0-9_]*::[a-zA-Z_][a-zA-Z0-9_<>,:\s]*$/;
+    if (!moveTypePattern.test(fullObjectType)) {
       throw new Error(
-        `Invalid collection ID format: ${collectionId}. Collection ID should start with 0x followed by hex characters.`,
+        `Invalid full object type format: ${fullObjectType}. ` +
+          `Should be in format 0xpackage::module::struct (e.g., 0x123::collection::NFT)`,
       );
     }
 
@@ -50,14 +50,14 @@ async function getSuiAddressNftBalance(
       addresses: [address],
       sourceOptions: {
         suiNetwork: suiChainNode.name,
-        collectionId: collectionId,
+        fullObjectType: fullObjectType,
       },
       cacheRefresh: forceRefresh,
     };
 
     const balances = await getBalances(balanceOptions);
 
-    // Return the NFT count for this address, defaulting to '0' if not found
+    // Return the balance for this address (could be voting power or NFT count), defaulting to '0' if not found
     return balances[address] || '0';
   } catch (error) {
     throw new Error(
@@ -66,17 +66,30 @@ async function getSuiAddressNftBalance(
   }
 }
 
-function formatNftBalance(balance: string, collectionId: string): string {
-  const count = parseInt(balance, 10);
-  const collectionName =
-    collectionId.slice(0, 20) + (collectionId.length > 20 ? '...' : '');
+function formatNftBalance(balance: string, fullObjectType: string): string {
+  const count = BigInt(balance);
+  const typeName = fullObjectType.split('::').pop() || 'Unknown';
+  const packageAddress = fullObjectType.split('::')[0];
+  const displayName = `${packageAddress.slice(0, 10)}...::${typeName}`;
 
-  if (count === 0) {
-    return `0 NFTs from collection ${collectionName}`;
-  } else if (count === 1) {
-    return `1 NFT from collection ${collectionName}`;
+  // Check if this is a VoteEscrowedToken type
+  const isVoteEscrowedToken = fullObjectType.includes('VoteEscrowedToken');
+  if (isVoteEscrowedToken) {
+    // For VoteEscrowedTokens, the balance represents voting power
+    if (count === 0n) {
+      return `0 voting power from ${displayName}`;
+    } else {
+      return `${count.toString()} voting power from ${displayName}`;
+    }
   } else {
-    return `${count} NFTs from collection ${collectionName}`;
+    // For regular NFTs, the balance represents count
+    if (count === 0n) {
+      return `0 NFTs from ${displayName}`;
+    } else if (count === 1n) {
+      return `1 NFT from ${displayName}`;
+    } else {
+      return `${count.toString()} NFTs from ${displayName}`;
+    }
   }
 }
 
@@ -85,23 +98,31 @@ async function main() {
 
   if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
     console.log(`
-Usage: pnpm get-sui-address-nft-balance.ts <sui-address> <collection-id> [--force-refresh]
+Usage: pnpm get-sui-address-nft-balance.ts <sui-address> <full-object-type> [--force-refresh]
 
 Arguments:
   sui-address      The Sui address to check NFT balance for (0x followed by 64 hex characters)
-  collection-id    The collection ID to check balance for (0x followed by hex characters)
+  full-object-type The full Move object type to check balance for (e.g., 0xpackage::module::struct)
   --force-refresh  Skip cache and force fetch fresh balance data
 
 Examples:
-  pnpm get-sui-nft-balance 0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef 0xabcdef123456
-  pnpm get-sui-nft-balance 0x1234... 0xabcdef... --force-refresh
+  # Regular NFT collection
+  pnpm get-sui-nft-balance 0x1234... 0xabcdef123456::collection::MyNFT
+
+  # VoteEscrowedToken (returns voting power instead of count)
+  pnpm get-sui-nft-balance 0x1234... 0xf21c5d05c...::vault::VoteEscrowedToken<...>
+
+  # Force refresh cache
+  pnpm get-sui-nft-balance 0x1234... 0xabcdef::module::NFT --force-refresh
 
 Environment Variables:
-  RAW_OUTPUT=true    Output only the raw NFT count (useful for programmatic use)
+  RAW_OUTPUT=true    Output only the raw balance value (useful for programmatic use)
 
 Note:
-  - The collection ID can be a full Move struct type (e.g., 0x123::collection::NFT) or just the package ID
-  - The script will attempt multiple matching strategies to find NFTs in the specified collection
+  - The full-object-type must be a complete Move type specification (0xpackage::module::struct)
+  - For VoteEscrowedToken types, the balance represents voting power rather than NFT count
+  - For regular NFT types, the balance represents the number of NFTs owned
+  - The script automatically detects the type and formats output accordingly
     `);
     return;
   }
@@ -110,32 +131,35 @@ Note:
   const nonFlagArgs = args.filter((arg) => !arg.startsWith('--'));
 
   if (nonFlagArgs.length < 2) {
-    console.error('Error: Both sui-address and collection-id are required.');
+    console.error('Error: Both sui-address and full-object-type are required.');
     console.error('Use --help for usage information.');
     return dispose();
   }
 
-  const [address, collectionId] = nonFlagArgs;
+  const [address, fullObjectType] = nonFlagArgs;
 
   try {
     console.log(
       `Fetching SUI NFT balance for address: ${address}${forceRefresh ? ' (force refresh)' : ' (using cache)'}`,
     );
-    console.log(`Collection ID: ${collectionId}`);
+    console.log(`Full Object Type: ${fullObjectType}`);
 
     const balance = await getSuiAddressNftBalance(
       address,
-      collectionId,
+      fullObjectType,
       forceRefresh,
     );
 
     if (process.env.RAW_OUTPUT === 'true') {
-      // Output just the raw NFT count for programmatic use
+      // Output just the raw balance value for programmatic use
       console.log(balance);
     } else {
-      console.log(`\nRaw balance: ${balance} NFTs`);
+      const isVoteEscrowedToken = fullObjectType.includes('VoteEscrowedToken');
       console.log(
-        `Formatted balance: ${formatNftBalance(balance, collectionId)}`,
+        `\nRaw balance: ${balance}${isVoteEscrowedToken ? ' (voting power)' : ' (NFT count)'}`,
+      );
+      console.log(
+        `Formatted balance: ${formatNftBalance(balance, fullObjectType)}`,
       );
     }
   } catch (error) {

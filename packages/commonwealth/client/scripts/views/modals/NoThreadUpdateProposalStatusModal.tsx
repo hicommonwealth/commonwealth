@@ -3,7 +3,7 @@ import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import React, { useState } from 'react';
 import app from 'state';
-import { ProposalState } from '../components/NewThreadFormModern/NewThreadForm';
+import { ProposalState } from '../components/NewThreadForm/types';
 import { ProposalStatusModalContent } from './ProposalStatusModalContent';
 
 type NoThreadUpdateProposalStatusModalProps = {

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 
-import useBrowserWindow from 'hooks/useBrowserWindow';
+import useBrowserWindow from 'shared/hooks/useBrowserWindow';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ComponentType } from 'views/components/component_kit/types';

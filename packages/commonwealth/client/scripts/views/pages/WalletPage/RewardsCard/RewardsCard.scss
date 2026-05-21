@@ -19,10 +19,8 @@
       color: colors.$primary-500;
       white-space: nowrap;
 
-      &.disabled {
-        cursor: default;
-        color: colors.$neutral-400;
-        opacity: 0.7;
+      &.hidden {
+        display: none;
       }
     }
   }

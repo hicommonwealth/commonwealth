@@ -65,7 +65,7 @@ export const CWContentPageSkeleton = ({
                   <Skeleton width="50%" />
                   <Skeleton width="75%" />
                 </div>
-              )
+              ),
             )}
           </div>
         )}

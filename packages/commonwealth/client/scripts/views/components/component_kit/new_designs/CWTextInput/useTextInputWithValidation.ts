@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-import { ValidationStatus } from "../../cw_validation_text";
+import { ValidationStatus } from '../../cw_validation_text';
 
 export const useTextInputWithValidation = () => {
   const [inputTimeout, setInputTimeout] = React.useState<

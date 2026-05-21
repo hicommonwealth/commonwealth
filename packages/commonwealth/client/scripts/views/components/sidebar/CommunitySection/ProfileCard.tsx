@@ -2,9 +2,8 @@ import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import useUserStore from 'client/scripts/state/ui/user';
 import clsx from 'clsx';
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
-import { CWTooltip } from '../../../components/component_kit/new_designs/CWTooltip';
+import { Link, useNavigate } from 'react-router-dom';
+// removed tooltip hover for profile name
 import TrustLevelRole from '../../TrustLevelRole';
 
 import './ProfileCard.scss';
@@ -16,6 +15,7 @@ enum ImageBehavior {
 
 const ProfileCard = () => {
   const userData = useUserStore();
+  const navigate = useNavigate();
 
   const { data } = useFetchProfileByIdQuery({
     apiCallEnabled: userData.isLoggedIn,
@@ -51,31 +51,20 @@ const ProfileCard = () => {
             alt="Profile"
           />
         </Link>
-        <CWTooltip
-          content={
-            data?.profile.name && data?.profile.name.length > 17
-              ? data?.profile.name
-              : null
-          }
-          placement="top"
-          renderTrigger={(handleInteraction, isTooltipOpen) => (
-            <Link
-              onMouseEnter={(e) => {
-                handleMouseEnter({ e, isTooltipOpen, handleInteraction });
-              }}
-              onMouseLeave={(e) => {
-                handleMouseLeave({ e, isTooltipOpen, handleInteraction });
-              }}
-              to={`/profile/id/${userData.id}`}
-              className="user-info"
-            >
-              <h3 className="profile-name">
-                {data?.profile.name}
-                <TrustLevelRole type="user" level={data?.tier} />
-              </h3>
-            </Link>
-          )}
-        />
+        <div className="user-info">
+          <Link to={`/profile/id/${userData.id}`}>
+            <h3 className="profile-name">{data?.profile.name}</h3>
+          </Link>
+          <span
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              navigate('/profile/edit');
+            }}
+          >
+            <TrustLevelRole type="user" tier={data?.tier} withTooltip />
+          </span>
+        </div>
       </div>
     </div>
   );

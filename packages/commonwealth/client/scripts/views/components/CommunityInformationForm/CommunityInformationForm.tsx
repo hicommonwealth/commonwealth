@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 
 import { useFlag } from 'client/scripts/hooks/useFlag';
+import { communityNameSchema } from 'shared/utils/formValidations/common';
 import { useFetchPublicEnvVarQuery } from 'state/api/configuration';
 import {
   CWImageInput,
@@ -10,6 +11,7 @@ import {
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import type { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
@@ -78,6 +80,14 @@ const CommunityInformationForm = ({
       )
     : baseCommunityInformationFormValidationSchema;
 
+  const validateCommunityName = (
+    value: string,
+  ): [ValidationStatus, string] | [] => {
+    const res = communityNameSchema.safeParse(value);
+    if (res.success) return [];
+    return ['failure', JSON.parse(res.error.message)[0].message];
+  };
+
   const getChainOptions = () => {
     const mappedChainValue = (chainType) => ({
       helpText: chainType.hasStakeEnabled ? 'Community Stake' : '',
@@ -95,13 +105,13 @@ const CommunityInformationForm = ({
 
     if (withChainsConfig?.community?.type === CommunityType.Solana) {
       return sortedChains
-        .filter((chainType) => chainType.chainBase === CommunityType.Solana)
+        .filter((chainType) => chainType.chainBase === 'solana')
         .map(mappedChainValue);
     }
 
     if (withChainsConfig?.community?.type === CommunityType.Sui) {
       return sortedChains
-        .filter((chainType) => chainType.chainBase === CommunityType.Sui)
+        .filter((chainType) => chainType.chainBase === 'sui')
         .map(mappedChainValue);
     }
 
@@ -110,8 +120,8 @@ const CommunityInformationForm = ({
         (chainType) =>
           chainType.chainBase ===
           (withChainsConfig?.community?.type === CommunityType.Cosmos
-            ? CommunityType.Cosmos
-            : CommunityType.Ethereum),
+            ? 'cosmos'
+            : 'ethereum'),
       )
       .map(mappedChainValue);
   };
@@ -138,6 +148,7 @@ const CommunityInformationForm = ({
               return options?.find((o) => o.value === SONEIUM_ID);
             case CommunityType.Polygon:
             case CommunityType.Solana:
+            case CommunityType.Sui:
               return options?.[0];
           }
         })(),
@@ -183,6 +194,7 @@ const CommunityInformationForm = ({
         customError={
           isCommunityNameTaken ? 'Community name is already taken' : ''
         }
+        inputValidationFn={validateCommunityName}
       />
 
       {withChainsConfig && (
@@ -194,7 +206,8 @@ const CommunityInformationForm = ({
           placeholder="Select chain"
           isDisabled={
             withChainsConfig.community.type === CommunityType.Polygon ||
-            withChainsConfig.community.type === CommunityType.Solana
+            withChainsConfig.community.type === CommunityType.Solana ||
+            withChainsConfig.community.type === CommunityType.Sui
           }
           options={getChainOptions()}
         />

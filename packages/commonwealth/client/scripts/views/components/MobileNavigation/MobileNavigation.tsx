@@ -1,14 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import useUserStore from 'state/ui/user';
-import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
-
-import CreateContentDrawer from './CreateContentDrawer';
 import NavigationButton, { NavigationButtonProps } from './NavigationButton';
 
-import { useFlag } from 'hooks/useFlag';
 import { QuickPostButton } from 'views/components/MobileNavigation/QuickPostButton';
 import './MobileNavigation.scss';
 
@@ -16,10 +12,6 @@ const MobileNavigation = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
   const user = useUserStore();
-  const newMobileNav = useFlag('newMobileNav');
-  const rewardsEnabled = useFlag('rewardsPage');
-
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const navigationRef = useRef<HTMLDivElement>(null);
 
   const matchesDashboard = matchRoutes([{ path: '/dashboard/*' }], location);
@@ -35,15 +27,6 @@ const MobileNavigation = () => {
       onClick: () => navigate('/dashboard', {}, null),
       selected: !!matchesDashboard,
     },
-    ...(user.isLoggedIn && !newMobileNav
-      ? [
-          {
-            type: 'create' as const,
-            onClick: () => setIsDrawerOpen(true),
-            selected: false,
-          },
-        ]
-      : []),
     {
       type: 'explore',
       onClick: () => navigate('/explore', {}, null),
@@ -58,7 +41,7 @@ const MobileNavigation = () => {
           },
         ]
       : []),
-    ...(user.isLoggedIn && rewardsEnabled
+    ...(user.isLoggedIn
       ? [
           {
             type: 'wallet' as const,
@@ -93,8 +76,12 @@ const MobileNavigation = () => {
 
   return (
     <>
-      {newMobileNav && !shouldHideQuickPost && <QuickPostButton />}
-      <div className="MobileNavigation" ref={navigationRef}>
+      {!shouldHideQuickPost && <QuickPostButton />}
+      <div
+        className="MobileNavigation"
+        ref={navigationRef}
+        data-testid="mobile-nav"
+      >
         <div id="MobileNavigationHead">
           {/*react portal container for anyone that wants to put content*/}
           {/*into the bottom nav.*/}
@@ -111,14 +98,6 @@ const MobileNavigation = () => {
           ))}
         </div>
       </div>
-      <CWDrawer
-        size="auto"
-        direction="bottom"
-        open={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-      >
-        <CreateContentDrawer onClose={() => setIsDrawerOpen(false)} />
-      </CWDrawer>
     </>
   );
 };

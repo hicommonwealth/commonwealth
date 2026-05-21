@@ -1,9 +1,9 @@
-import { chromium, TestInfo } from '@playwright/test';
+import { TestInfo } from '@playwright/test';
 import { Page } from 'playwright-test';
 
 export async function screenshotOnFailure(
   { page }: { page: Page },
-  testInfo: TestInfo
+  testInfo: TestInfo,
 ) {
   if (testInfo.status !== testInfo.expectedStatus) {
     // Get a unique place for the screenshot.

@@ -38,7 +38,7 @@ const RewardsCard = ({
           customAction
         ) : onSeeAllClick ? (
           <CWText
-            className={clsx('see-all-text', { disabled: isAlreadySelected })}
+            className={clsx('see-all-text', { hidden: isAlreadySelected })}
             onClick={isAlreadySelected ? undefined : onSeeAllClick}
             type="b2"
           >

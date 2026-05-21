@@ -1,6 +1,6 @@
-import { APIOrderDirection } from 'helpers/constants';
 import NodeInfo from 'models/NodeInfo';
 import React from 'react';
+import { APIOrderDirection } from 'shared/utils/constants';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { ViewType } from 'views/pages/DirectoryPage/useDirectoryPageData';

@@ -11,8 +11,8 @@ export * as Feed from './aggregates/feed';
 export * as GroupSnapshot from './aggregates/groupSnapshot';
 export * as LoadTest from './aggregates/load-testing';
 export * as MCP from './aggregates/mcp';
-export * as MCPServer from './aggregates/mcp-server';
 export * as Poll from './aggregates/poll';
+export * as PredictionMarket from './aggregates/prediction_market';
 export * as Quest from './aggregates/quest';
 export * as Reaction from './aggregates/reaction';
 export * as Search from './aggregates/search';
@@ -47,11 +47,14 @@ export {
 } from './utils/farcasterUtils';
 export { generateImage } from './utils/generateImage';
 export { magicLogin } from './utils/magic';
+export { emitEvent } from './utils/outbox';
 export {
+  extractMCPMentions,
   findMentionDiff,
   parseUserMentions,
   uniqueMentions,
 } from './utils/parseUserMentions';
+export type { MCPMention } from './utils/parseUserMentions';
 export { pgMultiRowUpdate } from './utils/pgMultiRowUpdate';
 export {
   createEventRegistryChainNodes,
@@ -60,8 +63,9 @@ export {
 export {
   R2_ADAPTER_KEY,
   buildChainNodeUrl,
-  emitEvent,
   equalEvmAddresses,
   getSaltedApiKeyHash,
   uploadIfLarge,
 } from './utils/utils';
+
+export { getQuestXpLeaderboardViewName } from './utils/quests';

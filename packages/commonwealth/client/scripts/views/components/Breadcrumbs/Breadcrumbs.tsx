@@ -98,6 +98,14 @@ export const Breadcrumbs = () => {
     currentProposalTitle,
   );
 
+  const breadcrumbs = communityId
+    ? pathnames.map((breadcrumb) =>
+        breadcrumb.isParent
+          ? { ...breadcrumb, isParent: false, path: `/${communityId}` }
+          : breadcrumb,
+      )
+    : pathnames;
+
   //Gets the tooltip copy based on the current page.
   const getToolTipCopy = () => {
     const lastPathSegment = location.pathname.split('/').pop();
@@ -120,18 +128,19 @@ export const Breadcrumbs = () => {
       : undefined;
   };
 
+  const tooltipStr = communityId
+    ? undefined
+    : getToolTipCopy() || 'This is an app, not a selectable page.';
+
   return (
     <CWPageLayout className="BreadcrumbsPageLayout">
       <nav className="BreadcrumbsComponent">
         {standalone ? (
-          <CWBreadcrumbs breadcrumbs={[pathnames[0]]} />
+          <CWBreadcrumbs breadcrumbs={[breadcrumbs[0]]} />
+        ) : tooltipStr ? (
+          <CWBreadcrumbs breadcrumbs={breadcrumbs} tooltipStr={tooltipStr} />
         ) : (
-          <CWBreadcrumbs
-            breadcrumbs={pathnames}
-            tooltipStr={
-              getToolTipCopy() || 'This is an app, not a selectable page.'
-            }
-          />
+          <CWBreadcrumbs breadcrumbs={breadcrumbs} />
         )}
       </nav>
       {/* an empty div that takes the block content area on the active page, similar

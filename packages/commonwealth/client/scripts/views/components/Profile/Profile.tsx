@@ -1,4 +1,5 @@
 import { DEFAULT_NAME, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { useGetUserCommunitiesQuery } from 'client/scripts/state/api/user/useGetUserCommunitiesQuery';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
@@ -35,6 +36,11 @@ const Profile = ({ userId }: ProfileProps) => {
     apiCallEnabled: !!userId,
   });
 
+  const { data: userCommunities } = useGetUserCommunitiesQuery({
+    userId,
+    enabled: !!userId,
+  });
+
   useEffect(() => {
     if (isLoading) return;
     if (error) {
@@ -57,6 +63,7 @@ const Profile = ({ userId }: ProfileProps) => {
         data.threads.map((t) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { Comments, ...rest } = t; // comments aren't needed for display here
+          // @ts-expect-error User is required in one of the results
           return new Thread({ ...rest, user_tier: data.tier });
         }),
       );
@@ -168,7 +175,12 @@ const Profile = ({ userId }: ProfileProps) => {
           >
             {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity threads={threads} comments={comments} />
+            <ProfileActivity
+              threads={threads}
+              comments={comments}
+              userId={userId}
+              communities={userCommunities || []}
+            />
           </div>
         </CWPageLayout>
       </div>
@@ -180,7 +192,12 @@ const Profile = ({ userId }: ProfileProps) => {
           <div className="ProfilePageContainer">
             {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity threads={threads} comments={comments} />
+            <ProfileActivity
+              threads={threads}
+              comments={comments}
+              userId={userId}
+              communities={userCommunities || []}
+            />
           </div>
         </div>
       </CWPageLayout>

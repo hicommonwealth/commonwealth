@@ -6,9 +6,9 @@ import {
   CosmosProposal,
   CosmosVote,
 } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React, { useMemo, useState } from 'react';
 import { MixpanelGovernanceEvents } from 'shared/analytics/types';
+import { useBrowserAnalyticsTrack } from 'shared/hooks/useBrowserAnalyticsTrack';
 import app from 'state';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';

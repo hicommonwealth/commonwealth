@@ -7,15 +7,19 @@ import { useTokenBalanceQuery, useTokensMetadataQuery } from 'state/api/tokens';
 
 type UseUserWalletHoldingsProps = {
   userSelectedAddress: string;
+  selectedNetworkChainId?: number;
 };
 
-const CHAIN_FOR_HOLDINGS = 1358; // base mainnet
+const BASE_MAINNET = 8453; // base mainnet
 
 const useUserWalletHoldings = ({
   userSelectedAddress,
+  selectedNetworkChainId = BASE_MAINNET,
 }: UseUserWalletHoldingsProps) => {
   const cachedNodes = fetchCachedNodes();
-  const chainNode = cachedNodes?.find((c) => c.id === CHAIN_FOR_HOLDINGS);
+  const chainNode = cachedNodes?.find(
+    (c) => c.ethChainId === selectedNetworkChainId,
+  );
 
   // get balances of all the tokens user is holding
   const {
@@ -23,7 +27,7 @@ const useUserWalletHoldings = ({
     isLoading: isLoadingTokenBalances,
     refetch: refetchTokenBalances,
   } = useTokenBalanceQuery({
-    chainId: CHAIN_FOR_HOLDINGS,
+    chainId: chainNode?.id || 0,
     tokenId: userSelectedAddress,
   });
   const tokenAddresses = tokenBalances?.tokenBalances.map(

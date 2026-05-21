@@ -21,7 +21,7 @@ export function GetMutualConnections(): Query<
       const mutual_communities = await models.sequelize.query<
         z.infer<typeof schemas.MutualCommunityView>
       >(
-        `SELECT c.id, c.name, c.base, c.icon_url
+        `SELECT c.id, c.name, c.base, c.icon_url, c.tier
          FROM "Communities" c
          WHERE c.id IN (
            SELECT community_id 

@@ -3,6 +3,7 @@ export * from './constants';
 export * from './errors';
 export * from './groups';
 export * from './images';
+export * from './mcpToolWhitelist';
 export * from './regex';
 export * from './tiers';
 export * from './types';

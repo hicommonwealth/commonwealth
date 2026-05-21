@@ -19,6 +19,7 @@ const getSellPrice = async ({
     getFactoryContract(ethChainId).CommunityStake,
     getFactoryContract(ethChainId).NamespaceFactory,
     chainRpc,
+    `${ethChainId}`,
   );
 
   return await communityStakes.getSellPrice(namespace, stakeId, amount);

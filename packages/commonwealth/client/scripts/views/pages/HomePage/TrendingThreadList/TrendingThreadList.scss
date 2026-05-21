@@ -62,9 +62,11 @@
     padding-bottom: 10px;
   }
 
-  .virtuoso-grid-list > div {
-    flex: 0 0 auto;
-    width: 325px !important;
-    height: 280px !important;
+  .virtuoso-grid-list {
+    .virtuoso-grid-item {
+      flex: 0 0 auto;
+      width: 325px !important;
+      height: 280px !important;
+    }
   }
 }

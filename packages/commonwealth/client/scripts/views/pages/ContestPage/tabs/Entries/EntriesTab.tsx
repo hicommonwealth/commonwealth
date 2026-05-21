@@ -8,7 +8,7 @@ import CommonEntriesList from '../../CommonEntriesList';
 import FarcasterEntriesList from '../../FarcasterEntriesList';
 import { SortType } from '../../types';
 
-import { Thread } from 'client/scripts/models/Thread';
+import { Thread, ThreadView } from 'client/scripts/models/Thread';
 import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import './EntriesTab.scss';
 
@@ -19,6 +19,7 @@ export interface EntriesTabProps {
   isFarcasterContest: boolean;
   contestDecimals: number;
   voteWeightMultiplier: number;
+  contestTokenSymbol?: string;
 }
 
 const EntriesTab = ({
@@ -28,6 +29,7 @@ const EntriesTab = ({
   isFarcasterContest,
   contestDecimals,
   voteWeightMultiplier,
+  contestTokenSymbol,
 }: EntriesTabProps) => {
   const [selectedSort, setSelectedSort] = React.useState<SortType>(
     SortType.Upvotes,
@@ -61,7 +63,9 @@ const EntriesTab = ({
 
   // TODO: Replace Thread with ThreadView -> should we use Memo here?
   const sortedThreads = sortByFeaturedFilter(
-    threads?.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [],
+    threads?.pages.flatMap((p) =>
+      p.results.map((t) => new Thread(t as ThreadView)),
+    ) || [],
     threadSort,
   );
 
@@ -79,6 +83,7 @@ const EntriesTab = ({
           onSortChange={handleSortChange}
           contestDecimals={contestDecimals}
           voteWeightMultiplier={voteWeightMultiplier}
+          contestTokenSymbol={contestTokenSymbol}
         />
       ) : (
         <CommonEntriesList

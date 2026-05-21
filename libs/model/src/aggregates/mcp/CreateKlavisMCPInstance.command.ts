@@ -59,7 +59,7 @@ export function CreateKlavisMCPInstance(): Command<
           case 'Google Sheets':
             await models.MCPServer.create({
               name: serverType,
-              description: `${serverType} connected by user #${actor.user.id}`,
+              description: serverType,
               handle: 'google_sheets',
               source: 'klavis',
               source_identifier: instance.instanceId,
@@ -88,7 +88,9 @@ export function CreateKlavisMCPInstance(): Command<
           throw new Error(`Failed to create MCP instance: ${message}`);
         }
 
-        throw new Error('Failed to create MCP instance');
+        throw new Error(
+          `Failed to create MCP instance: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
       }
     },
   };

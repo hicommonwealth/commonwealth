@@ -1,3 +1,3 @@
-import { CWSearchBar } from "./CWSearchBar";
+import { CWSearchBar } from './CWSearchBar';
 
 export { CWSearchBar };

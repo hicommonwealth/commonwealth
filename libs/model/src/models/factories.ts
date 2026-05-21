@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 import type { Associable } from './types';
 
 import Address from './address';
+import AICompletionToken from './ai_completion_token';
 import ApiKey from './api_key';
 import ChainEventXpSource from './chain_event_xp_sources';
 import ChainNode from './chain_node';
@@ -22,18 +23,26 @@ import DiscordBotConfig from './discord_bot_config';
 import Dlq from './dlq';
 import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
+import GovernanceProposal from './governance_proposals';
 import Group from './group';
 import GroupGatedAction from './groupGatedAction';
 import GroupSnapshot from './groupSnapshot';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LaunchpadTrade from './launchpad_trade';
+import { CommunityMarket, Market } from './market';
 import MCPServer from './mcp_server';
 import MCPServerCommunity from './mcp_server_community';
 import Membership from './membership';
 import Outbox from './outbox';
 import PinnedToken from './pinned_token';
 import Poll from './poll';
+import {
+  PredictionMarket,
+  PredictionMarketPosition,
+  PredictionMarketTrade,
+} from './prediction_market';
 import ProfileTags from './profile_tags';
+import ProposalVote from './proposal_votes';
 import { Quest, QuestActionMeta } from './quest';
 import QuestTweets from './quest_tweets';
 import Reaction from './reaction';
@@ -54,7 +63,9 @@ import LaunchpadToken from './token';
 import {
   AuraAllocations,
   ClaimAddresses,
+  ClaimEvents,
   HistoricalAllocations,
+  NftSnapshot,
 } from './token-allocation';
 import Topic from './topic';
 import TopicSubscription from './topic_subscription';
@@ -67,10 +78,12 @@ import XpLog from './xp_log';
 
 export const Factories = {
   Address,
+  AICompletionToken,
   ApiKey,
   AuraAllocations,
   ChainNode,
   ClaimAddresses,
+  ClaimEvents,
   Collaboration,
   Comment,
   CommentVersionHistory,
@@ -79,6 +92,7 @@ export const Factories = {
   CommunityAlert,
   CommunityGoalMeta,
   CommunityGoalReached,
+  CommunityMarket,
   CommunityStake,
   CommunityTags,
   CommunityDirectoryTags,
@@ -90,12 +104,14 @@ export const Factories = {
   Dlq,
   EmailUpdateToken,
   EvmEventSource,
+  GovernanceProposal,
   Group,
   GroupGatedAction,
   GroupSnapshot,
   HistoricalAllocations,
   LastProcessedEvmBlock,
   LaunchpadTrade,
+  Market,
   MCPServer,
   MCPServerCommunity,
   Membership,
@@ -103,6 +119,10 @@ export const Factories = {
   PinnedToken,
   Poll,
   ProfileTags,
+  ProposalVote,
+  PredictionMarket,
+  PredictionMarketPosition,
+  PredictionMarketTrade,
   Quest,
   QuestActionMeta,
   QuestTweets,
@@ -129,6 +149,7 @@ export const Factories = {
   XpLog,
   ThreadToken,
   ThreadTokenTrade,
+  NftSnapshot,
 };
 
 export type DB = {
