@@ -402,7 +402,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   // Handle Logic for creating a new account, including validating signature
   const onCreateNewAccount = async (session?: Session, account?: Account) => {
     try {
-      if (session && account)
+      if (session && account) {
         await signIn(session, {
           address: account.address,
           community_id: account.community.id,
@@ -410,8 +410,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           block_info: account.validationBlockInfo,
           referrer_address: refcode,
         });
-      if (session && !isSuiSession(session)) {
-        await verifySession(session);
+        if (session && !isSuiSession(session)) {
+          await verifySession(session);
+        }
       }
       // @ts-expect-error <StrictNullChecks>
       await onLogInWithAccount(account, false, true);
