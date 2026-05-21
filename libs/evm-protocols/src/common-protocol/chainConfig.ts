@@ -112,6 +112,9 @@ export const factoryContracts: FactoryContractsType = {
     ReferralFeeManager: '0x9d3BE262bed6F3A0AAb4E97c0232071EF730632f',
     TokenLaunchpad: '0xACD353A1Bf569662E2e0e5Dd127FeCbee505986c',
     TokenBondingCurve: '0xC815d94E05dCAa6D84a740291A03A1e73BF48C1f',
+    BinaryVault: '0x9F43B07FF2B63F895930017D727c3dfA58fB838c',
+    FutarchyRouter: '0xFE985509910e5C1f667C2E8AD86349c50f35f234',
+    FutarchyGovernor: '0xD454743008A7c127136bDc0DFA1A24524F3Daf66',
     chainId: 8453,
   },
   [ValidChains.Linea]: {

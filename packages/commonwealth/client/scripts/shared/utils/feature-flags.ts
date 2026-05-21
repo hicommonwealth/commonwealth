@@ -36,6 +36,7 @@ const featureFlags = {
   binanceWeb: buildFlag(process.env.FLAG_BINANCE_WEB),
   markets: buildFlag(process.env.FLAG_MARKETS),
   futarchy: buildFlag(process.env.FLAG_FUTARCHY),
+  moonpayFunds: buildFlag(process.env.FLAG_MOONPAY_FUNDS),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
