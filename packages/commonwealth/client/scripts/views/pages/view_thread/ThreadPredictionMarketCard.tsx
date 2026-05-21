@@ -387,7 +387,6 @@ export const ThreadPredictionMarketCard = ({
   const handleTradeModalSuccess = () => {
     void (async () => {
       await refreshTradeData();
-      setIsTradeModalOpen(false);
     })();
   };
 
