@@ -76,6 +76,9 @@ type UseAuthenticationProps = {
 type Wallet = IWebWallet<any>;
 
 const useAuthentication = (props: UseAuthenticationProps) => {
+  const isSuiSession = (session?: Session) =>
+    !!session?.did?.startsWith('did:pkh:sui:');
+
   const [username, setUsername] = useState<string>(DEFAULT_NAME);
   const [email, setEmail] = useState<string>();
   const [SMS, setSMS] = useState<string>();
@@ -407,8 +410,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           block_info: account.validationBlockInfo,
           referrer_address: refcode,
         });
-      // @ts-expect-error StrictNullChecks
-      await verifySession(session);
+      if (session && !isSuiSession(session)) {
+        await verifySession(session);
+      }
       // @ts-expect-error <StrictNullChecks>
       await onLogInWithAccount(account, false, true);
       // Important: when we first create an account and verify it, the user id
@@ -657,7 +661,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         ? JSON.stringify(validationBlockInfo)
         : null,
     });
-    await verifySession(session);
+    if (!isSuiSession(session)) {
+      await verifySession(session);
+    }
     console.log('Started new session for', wallet.chain, chainIdentifier);
 
     // ensure false for newlyCreated / linking vars on revalidate

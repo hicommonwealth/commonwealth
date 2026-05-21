@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import {
   notifyError,
@@ -43,8 +43,10 @@ import {
 } from './predictionMarketEditorValidation';
 import { SyncPromptData } from './SyncPromptData';
 
-// Base Sepolia placeholder addresses; replace with chain config when available
-const COLLATERAL_OPTIONS = [
+const BASE_MAINNET_CHAIN_ID = 8453;
+const BASE_SEPOLIA_CHAIN_ID = 84532;
+
+const BASE_SEPOLIA_COLLATERAL_OPTIONS = [
   {
     value: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
     label: 'USDC',
@@ -53,7 +55,17 @@ const COLLATERAL_OPTIONS = [
     value: '0x4200000000000000000000000000000000000006',
     label: 'WETH',
   },
-  { value: 'custom', label: 'Custom ERC20' },
+];
+
+const BASE_MAINNET_COLLATERAL_OPTIONS = [
+  {
+    value: '0x833589fCD6EDb6E08f4c7C32D4f71b54bDa02913',
+    label: 'USDC',
+  },
+  {
+    value: '0x4200000000000000000000000000000000000006',
+    label: 'WETH',
+  },
 ];
 
 type Phase = 'form' | 'creating' | 'deploying' | 'success' | 'error';
@@ -68,15 +80,6 @@ type PredictionMarketEditorModalProps = {
   isAIresponseCompleted?: boolean;
   /** Called when user clicks the AI generate button; only shown when AI is enabled */
   onGeneratePrompt?: () => void;
-};
-
-const INITIAL_FORM_VALUES = {
-  prompt: '',
-  collateralOption: COLLATERAL_OPTIONS[0],
-  customCollateralAddress: '',
-  durationDays: 14,
-  resolutionThreshold: THRESHOLD_DEFAULT,
-  initialLiquidity: '1',
 };
 
 export const PredictionMarketEditorModal = ({
@@ -104,6 +107,28 @@ export const PredictionMarketEditorModal = ({
   const ethChainId =
     (community as { ChainNode?: { eth_chain_id?: number } } | undefined)
       ?.ChainNode?.eth_chain_id ?? 0;
+  const collateralOptions = useMemo(
+    () => [
+      ...(ethChainId === BASE_MAINNET_CHAIN_ID
+        ? BASE_MAINNET_COLLATERAL_OPTIONS
+        : ethChainId === BASE_SEPOLIA_CHAIN_ID
+          ? BASE_SEPOLIA_COLLATERAL_OPTIONS
+          : BASE_SEPOLIA_COLLATERAL_OPTIONS),
+      { value: 'custom', label: 'Custom ERC20' },
+    ],
+    [ethChainId],
+  );
+  const initialFormValues = useMemo(
+    () => ({
+      prompt: '',
+      collateralOption: collateralOptions[0],
+      customCollateralAddress: '',
+      durationDays: 14,
+      resolutionThreshold: THRESHOLD_DEFAULT,
+      initialLiquidity: '1',
+    }),
+    [collateralOptions],
+  );
 
   const createMutation = useCreatePredictionMarketMutation();
   const deployMutation = useDeployPredictionMarketMutation();
@@ -272,7 +297,7 @@ export const PredictionMarketEditorModal = ({
       <CWForm
         className="PredictionMarketEditorModal-form"
         validationSchema={predictionMarketEditorFormSchema}
-        initialValues={INITIAL_FORM_VALUES}
+        initialValues={initialFormValues}
         onSubmit={handleCreateAndDeploy}
         onErrors={(values) => console.log(values)}
       >
@@ -320,7 +345,7 @@ export const PredictionMarketEditorModal = ({
                   hookToForm
                   label="Collateral token"
                   isSearchable={false}
-                  options={COLLATERAL_OPTIONS}
+                  options={collateralOptions}
                   placeholder="Select collateral"
                 />
                 {watch('collateralOption')?.value === 'custom' && (

@@ -13,16 +13,28 @@ const DEFAULT_COLLATERAL_META: CollateralMeta = {
   decimals: 18,
 };
 
-const KNOWN_COLLATERAL_META: Record<string, CollateralMeta> = {
+const BASE_MAINNET_CHAIN_ID = 8453;
+const BASE_SEPOLIA_CHAIN_ID = 84532;
+const EMPTY_COLLATERAL_META: Record<string, CollateralMeta> = {};
+
+const BASE_SEPOLIA_COLLATERAL_META: Record<string, CollateralMeta> = {
   // Base Sepolia USDC
   '0x036cbd53842c5426634e7929541ec2318f3dcf7e': { symbol: 'USDC', decimals: 6 },
-  // Base (and Base Sepolia) WETH
+  // Base Sepolia WETH
   '0x4200000000000000000000000000000000000006': {
     symbol: 'WETH',
     decimals: 18,
   },
-  // Ethereum Mainnet USDC
-  '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': { symbol: 'USDC', decimals: 6 },
+};
+
+const BASE_MAINNET_COLLATERAL_META: Record<string, CollateralMeta> = {
+  // Base Mainnet USDC
+  '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913': { symbol: 'USDC', decimals: 6 },
+  // Base Mainnet WETH
+  '0x4200000000000000000000000000000000000006': {
+    symbol: 'WETH',
+    decimals: 18,
+  },
 };
 
 type UseCollateralMetaProps = {
@@ -48,6 +60,15 @@ export const useCollateralMeta = ({
   const chainRpc =
     (community as { ChainNode?: { url?: string } } | undefined)?.ChainNode
       ?.url ?? '';
+  const ethChainId =
+    (community as { ChainNode?: { eth_chain_id?: number } } | undefined)
+      ?.ChainNode?.eth_chain_id ?? 0;
+  const knownCollateralMetaByChain =
+    ethChainId === BASE_MAINNET_CHAIN_ID
+      ? BASE_MAINNET_COLLATERAL_META
+      : ethChainId === BASE_SEPOLIA_CHAIN_ID
+        ? BASE_SEPOLIA_COLLATERAL_META
+        : EMPTY_COLLATERAL_META;
 
   useEffect(() => {
     const addr = collateralAddress?.trim() ?? '';
@@ -57,7 +78,7 @@ export const useCollateralMeta = ({
       return;
     }
     const lower = addr.toLowerCase();
-    const known = KNOWN_COLLATERAL_META[lower];
+    const known = knownCollateralMetaByChain[lower];
     if (known) {
       setCollateralMeta(known);
       // Known addresses are deterministic enough for display and avoid RPC dependency.
@@ -75,7 +96,7 @@ export const useCollateralMeta = ({
     return () => {
       cancelled = true;
     };
-  }, [chainRpc, collateralAddress, readerAddress]);
+  }, [chainRpc, collateralAddress, knownCollateralMetaByChain, readerAddress]);
 
   return collateralMeta;
 };

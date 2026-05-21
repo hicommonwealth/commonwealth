@@ -28,6 +28,7 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { fromWei } from 'web3-utils';
+import MagicWalletManager from '../../WalletPage/cards/WalletCard/MagicWalletManager/MagicWalletManager';
 import useCreateTokenCommunity from '../useCreateTokenCommunity';
 import './QuickTokenLaunchForm.scss';
 import SuccessStep from './steps/SuccessStep';
@@ -109,6 +110,7 @@ export const QuickTokenLaunchForm = ({
     createdCommunityIdsToTokenInfoMap,
     setCreatedCommunityIdsToTokenInfoMap,
   ] = useState({});
+  const [showMagicWalletManager, setShowMagicWalletManager] = useState(false);
   const [processedImagesPerIdea, setProcessedImagesPerIdea] = useState<
     {
       ideaIndex: number;
@@ -350,7 +352,7 @@ export const QuickTokenLaunchForm = ({
         setCreatedCommunityId(communityId);
         onCommunityCreated(communityId);
       } catch (e) {
-        console.error(`Error creating token: `, e, e.name);
+        console.error(`Error creating token: `, e, e?.name);
 
         if (isRateLimitError(e)) {
           notifyError(RATE_LIMIT_MESSAGE);
@@ -366,6 +368,11 @@ export const QuickTokenLaunchForm = ({
           e?.data?.message?.toLowerCase().includes('insufficient funds')
         ) {
           notifyError('Insufficient funds to launch token!');
+        } else if (e?.message?.toLowerCase().includes('insufficient funds')) {
+          notifyError('Insufficient funds to launch token!');
+          if (e?.message?.toLowerCase().includes('magic')) {
+            setShowMagicWalletManager(true);
+          }
         } else {
           notifyError('Failed to create token!');
         }
@@ -506,6 +513,19 @@ export const QuickTokenLaunchForm = ({
                   '0.000444 ETH and a compatible EVM wallet.',
                 ].join('')}
               />
+              {showMagicWalletManager && (
+                <div className="magic-wallet-manage-container">
+                  <CWText type="caption">
+                    Insufficient funds: Add and manage funds for your magic
+                    wallet
+                  </CWText>
+                  <MagicWalletManager
+                    userSelectedAddress={selectedAddress?.address || ''}
+                    selectedNetworkChainId={baseNode?.ethChainId || 0}
+                  />
+                </div>
+              )}
+
               <div className="cta-elements">
                 {/* allows to switch b/w generated ideas */}
                 <PageCounter

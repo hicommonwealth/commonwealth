@@ -345,6 +345,28 @@
     .alert-icon + * {
       color: colors.$rorange-700;
     }
+
+    .balance-copy-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-left: 4px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: colors.$rorange-700;
+
+      &:hover {
+        color: colors.$rorange-500;
+      }
+
+      &:focus-visible {
+        outline: 2px solid colors.$rorange-500;
+        outline-offset: 1px;
+        border-radius: 3px;
+      }
+    }
   }
 
   .loading-row {

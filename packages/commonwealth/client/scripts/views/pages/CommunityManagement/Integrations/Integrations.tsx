@@ -8,6 +8,7 @@ import CustomURL from './CustomURL';
 import Directory from './Directory';
 import Discord from './Discord';
 import './Integrations.scss';
+import Markets from './Markets';
 import MCP from './MCP';
 import OnchainVerification from './OnchainVerification';
 import Snapshots from './Snapshots';
@@ -22,6 +23,7 @@ const Integrations = () => {
 
   const isJudgementEnabled = useFlag('judgeContest');
   const mcpIntegrationsEnabled = useFlag('mcpIntegrationsEnabled');
+  const marketsEnabled = useFlag('markets');
 
   return (
     <CommunityManagementLayout
@@ -44,6 +46,7 @@ const Integrations = () => {
         {isEthereum && <Snapshots />}
         <Tokenization />
         {mcpIntegrationsEnabled && <MCP />}
+        {marketsEnabled && <Markets />}
         <Discord />
         <Webhooks />
         <CustomTOS />
