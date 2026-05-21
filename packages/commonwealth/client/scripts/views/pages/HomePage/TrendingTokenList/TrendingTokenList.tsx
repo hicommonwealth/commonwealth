@@ -1,6 +1,5 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
-import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import clsx from 'clsx';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo, useState } from 'react';
@@ -9,8 +8,12 @@ import useDeferredConditionTriggerCallback from 'shared/hooks/useDeferredConditi
 import { APIOrderDirection } from 'shared/utils/constants';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import RealTimeResultsToggle from 'views/components/component_kit/RealTimeResultsToggle/RealTimeResultsToggle';
+import { RealTimeToggleLocalStorageKeys } from 'views/components/component_kit/RealTimeResultsToggle/types';
+import useRealTimeResultsToggle from 'views/components/component_kit/RealTimeResultsToggle/useRealTimeResultsToggle';
 import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, { TradingMode } from 'views/modals/TradeTokenModel';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
@@ -26,6 +29,12 @@ type TrendingTokensListProps = {
   variant?: 'trending' | 'recent' | 'marketcap' | 'graduated';
   heading?: string;
   limit?: number;
+};
+
+const variantToRealtimeKeyMap = {
+  trending: RealTimeToggleLocalStorageKeys.HomeTrendingTokens,
+  recent: RealTimeToggleLocalStorageKeys.HomeGraduatedTokens,
+  graduated: RealTimeToggleLocalStorageKeys.HomeRecentlyLaunchedTokens,
 };
 
 const TrendingTokensList = ({
@@ -50,6 +59,11 @@ const TrendingTokensList = ({
     shouldRunTrigger: user.isLoggedIn,
   });
 
+  const foundRealtimeStorageKey = variantToRealtimeKeyMap[variant];
+  const { isRealTime, setIsRealTime } = useRealTimeResultsToggle({
+    localStorageKey: foundRealtimeStorageKey,
+  });
+
   // Increase limit for carousel variants to ensure smooth scrolling
   const fetchLimit = useMemo(() => {
     if (variant === 'trending' || variant === 'recent') {
@@ -71,6 +85,8 @@ const TrendingTokensList = ({
     })(),
     order_direction: APIOrderDirection.Desc,
     is_graduated: variant === 'graduated',
+    enabled: launchpadEnabled,
+    refetchInterval: isRealTime ? 3 : undefined, // refetch after every 3 sec if realime
   });
   const tokens = (tokensList?.pages || [])
     .flatMap((page) => page.results)
@@ -112,7 +128,16 @@ const TrendingTokensList = ({
   return (
     <div className="TokensList">
       <div className="heading-container">
-        <CWText type="h2">{heading}</CWText>
+        <div className="header">
+          <CWText type="h2">{heading}</CWText>
+          {foundRealtimeStorageKey && (
+            <RealTimeResultsToggle
+              label="⚡️ Auto refresh"
+              localStorageKey={foundRealtimeStorageKey}
+              onChange={(change) => setIsRealTime(change.isRealTime)}
+            />
+          )}
+        </div>
         <Link to="/explore?tab=tokens">
           <div className="link-right">
             <CWText className="link">Tokens</CWText>

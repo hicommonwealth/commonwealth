@@ -9,11 +9,13 @@ export const useFetchGlobalActivityQuery = ({
   community_id,
   search,
   apiEnabled = true,
+  refetchInterval,
 }: {
   limit: number;
   community_id?: string;
   search?: string;
   apiEnabled?: boolean;
+  refetchInterval?: number;
 }) => {
   return trpc.feed.getGlobalActivity.useInfiniteQuery(
     {
@@ -26,6 +28,7 @@ export const useFetchGlobalActivityQuery = ({
       gcTime: USER_ACTIVITY_CACHE_TIME,
       initialCursor: 1,
       enabled: apiEnabled,
+      refetchInterval,
       getNextPageParam: (lastPage) => {
         if (lastPage.results.length === 0) return undefined;
         return lastPage.page + 1;
@@ -37,9 +40,11 @@ export const useFetchGlobalActivityQuery = ({
 export const useFetchUserActivityQuery = ({
   limit,
   apiEnabled,
+  refetchInterval,
 }: {
   limit: number;
   apiEnabled?: boolean;
+  refetchInterval?: number;
 }) => {
   return trpc.feed.getUserActivity.useInfiniteQuery(
     {
@@ -51,6 +56,7 @@ export const useFetchUserActivityQuery = ({
       gcTime: USER_ACTIVITY_CACHE_TIME,
       initialCursor: 1,
       enabled: apiEnabled,
+      refetchInterval,
       getNextPageParam: (lastPage) => {
         const nextPageNum = lastPage.page + 1;
         if (nextPageNum <= lastPage.totalPages) return nextPageNum;
